@@ -123,6 +123,7 @@ Implementation guardrails:
 - Intake-generated IDs are stable across file-order changes and include the inbox-relative path to avoid duplicate-content collisions.
 - Intake must not scan its own `state/` or `evidence/` outputs even when those folders are inside the inbox.
 - Claim checking must treat evidence IDs as necessary but not sufficient: report numbers still need to match linked evidence values.
+- Binary `.hwp` extraction is optional. Use `rhwp dump` when an `rhwp` CLI is available; otherwise mark extraction as `needs_review` instead of pretending HWP text was parsed.
 
 When running locally, prefer:
 

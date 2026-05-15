@@ -2,7 +2,7 @@
 
 Purpose: 한국형 국책 R&D 환경에서 연구 행정 문서화, 증빙 정합성, 보고서 생성, 논문/데이터 인사이트 보조를 evidence-first 방식으로 지원하는 Codex/Skill 프로젝트입니다.
 
-Current release: `0.1 BETA` (`0.1.0b1`).
+Current release: `0.1 BETA 2` (`0.1.0b2`).
 
 Core principle:
 
@@ -31,6 +31,7 @@ This repository does not encode any single ministry/institution form as authorit
 - End-to-end intake pipeline that writes `state/raw-registry.json`, `evidence/*.json`, `state/evidence-index.*`, and `state/open-issues.md`.
 - Stable source/evidence IDs derived from source hash plus inbox-relative path, so adding another file does not renumber existing evidence.
 - Intake excludes its own `state/` and `evidence/` output folders when they are placed inside the inbox.
+- Document text extraction for TXT/MD/CSV/JSON/LOG, DOCX, XLSX, HWPX, PDF, and optional HWP via `rhwp` CLI when installed.
 - Draft monthly report writer plus claim-review sidecar.
 - Draft audit-defense Q&A writer from evidence metadata.
 - Conservative plan mapper for KPI/milestone draft extraction from text.
@@ -50,3 +51,5 @@ python -m k_resdev_skill profile .\inbox\metrics.csv
 ```
 
 The package name is `k_resdev_skill`; the Codex skill name is `k-resdev`.
+
+For binary `.hwp` intake, install an `rhwp` CLI separately. K-ResDev treats it as an optional adapter and marks HWP extraction as `needs_review` when the CLI is unavailable.

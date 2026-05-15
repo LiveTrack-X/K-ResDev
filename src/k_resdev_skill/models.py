@@ -194,6 +194,23 @@ class DataProfile(StrictModel):
     possible_metrics: list[str] = Field(default_factory=list)
 
 
+class ExtractedSegment(StrictModel):
+    text: str
+    page: int | None = None
+    sheet: str | None = None
+    cell_range: str | None = None
+    line_range: str | None = None
+    quote: str | None = None
+
+
+class ExtractedDocument(StrictModel):
+    source_file: str
+    file_type: str
+    text: str
+    segments: list[ExtractedSegment] = Field(default_factory=list)
+    warnings: list[str] = Field(default_factory=list)
+
+
 class CheckFinding(StrictModel):
     code: str
     severity: str
@@ -231,6 +248,18 @@ class IntakeResult(StrictModel):
 class ReportDraftPaths(StrictModel):
     report_path: str
     review_path: str | None = None
+
+
+class ProjectProfile(StrictModel):
+    profile_id: str
+    agency: str | None = None
+    program: str | None = None
+    report_cycle: str | None = None
+    required_outputs: list[str] = Field(default_factory=list)
+    budget_categories: list[str] = Field(default_factory=list)
+    field_map: dict[str, str] = Field(default_factory=dict)
+    status: str = "needs_review"
+    notes: str | None = None
 
 
 class PaperRecord(StrictModel):

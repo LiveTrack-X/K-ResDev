@@ -1,0 +1,11 @@
+{
+  "profile_id": "national-rnd-basic",
+  "agency": null,
+  "program": null,
+  "report_cycle": "needs_review",
+  "required_outputs": [],
+  "budget_categories": [],
+  "field_map": {},
+  "status": "needs_review",
+  "notes": "Template profile only. Verify agency-specific official forms and rules before use."
+}

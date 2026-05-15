@@ -12,6 +12,8 @@
 
 Status: implemented as a conservative first pass in `src/k_resdev_skill/`. Outputs remain draft projections and require human review before official use.
 
+P0 intake hardening now includes DOCX/XLSX/HWPX/PDF text extraction, optional HWP extraction through an installed `rhwp` CLI, document-level evidence candidates, and provenance fields populated from line/page/sheet/cell hints.
+
 ## P1 - Research assistant MVP
 
 1. Paper card generator.

@@ -90,6 +90,25 @@ def test_run_intake_does_not_reingest_derived_outputs_inside_inbox(tmp_path):
     assert result.evidence_count == 1
 
 
+def test_run_intake_extracts_document_level_evidence_with_provenance(tmp_path):
+    inbox = tmp_path / "inbox"
+    inbox.mkdir()
+    (inbox / "plan.txt").write_text(
+        "과제명: AI 진단\nKPI: Validation Dice 목표: 0.85\n마일스톤: Prototype freeze 2026-06-30\n",
+        encoding="utf-8",
+    )
+
+    run_intake(inbox, tmp_path / "state", tmp_path / "evidence", run_date=date(2026, 5, 15))
+    index = json.loads((tmp_path / "state" / "evidence-index.json").read_text(encoding="utf-8"))
+    evidence_types = {item["evidence_type"] for item in index["items"]}
+    extracted = [item for item in index["items"] if item["evidence_type"] in {"kpi", "milestone"}]
+
+    assert "plan_goal" in evidence_types
+    assert "kpi" in evidence_types
+    assert "milestone" in evidence_types
+    assert all(item["provenance"]["line_range"] for item in extracted)
+
+
 def test_run_intake_distinguishes_duplicate_content_files(tmp_path):
     inbox = tmp_path / "inbox"
     inbox.mkdir()

@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ProjectProfile",
+  "type": "object",
+  "required": ["profile_id", "status"],
+  "properties": {
+    "profile_id": {"type": "string"},
+    "agency": {"type": ["string", "null"]},
+    "program": {"type": ["string", "null"]},
+    "report_cycle": {"type": ["string", "null"]},
+    "required_outputs": {"type": "array", "items": {"type": "string"}},
+    "budget_categories": {"type": "array", "items": {"type": "string"}},
+    "field_map": {"type": "object", "additionalProperties": {"type": "string"}},
+    "status": {"type": "string", "enum": ["needs_review", "draft", "verified", "deprecated"]},
+    "notes": {"type": ["string", "null"]}
+  }
+}

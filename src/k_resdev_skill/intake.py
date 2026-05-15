@@ -8,8 +8,9 @@ from typing import Iterable
 
 from .classifier import classify_file
 from .data_profiler import profile_data_file
+from .document_extractors import extract_document_text
+from .evidence_extraction import extract_evidence_items_from_document
 from .evidence_index import write_evidence_index
-from .io_utils import read_text_file
 from .models import (
     Confidence,
     EvidenceItem,
@@ -65,23 +66,36 @@ def run_intake(
     evidence_items: list[EvidenceItem] = []
 
     for path in _iter_files(inbox, excluded_roots=[state, evidence_root]):
-        sample_text = _sample_text(path)
+        document = extract_document_text(path, limit=65536)
+        sample_text = document.text
         classification = classify_file(path, sample_text)
         source_hash = _sha256(path)
         stable_suffix = _stable_suffix(source_hash, path, inbox)
         source_id = f"SRC-{today.year}-{stable_suffix}"
         evidence_id = f"EVI-{today.year}-{stable_suffix}"
 
-        evidence_item = _candidate_evidence(
+        source_evidence_item = _candidate_evidence(
             evidence_id=evidence_id,
             path=path,
             source_hash=source_hash,
             category=FileCategory(classification.category),
             confidence_score=classification.confidence,
             project=project,
+            document_warnings=document.warnings,
+            segment_count=len(document.segments),
+            text_char_count=len(document.text),
         )
-        evidence_items.append(evidence_item)
-        _write_evidence_json(evidence_root, evidence_item)
+        extracted_items = extract_evidence_items_from_document(
+            document=document,
+            source_hash=source_hash,
+            base_suffix=stable_suffix,
+            project=project,
+            run_date=today,
+        )
+        source_items = [source_evidence_item, *extracted_items]
+        evidence_items.extend(source_items)
+        for evidence_item in source_items:
+            _write_evidence_json(evidence_root, evidence_item)
 
         stat = path.stat()
         modified = datetime.fromtimestamp(stat.st_mtime, tz=timezone.utc).isoformat()
@@ -93,7 +107,7 @@ def run_intake(
                 size_bytes=stat.st_size,
                 modified_time_utc=modified,
                 classification=classification,
-                evidence_ids=[evidence_id],
+                evidence_ids=[item.evidence_id for item in source_items],
             )
         )
 
@@ -143,10 +157,21 @@ def _candidate_evidence(
     category: FileCategory,
     confidence_score: float,
     project: str | None,
+    document_warnings: list[str] | None = None,
+    segment_count: int = 0,
+    text_char_count: int = 0,
 ) -> EvidenceItem:
     evidence_type = CATEGORY_TO_EVIDENCE_TYPE[category]
-    value: dict[str, object] = {"category": category.value, "classification_confidence": confidence_score}
+    value: dict[str, object] = {
+        "category": category.value,
+        "classification_confidence": confidence_score,
+        "extracted_segment_count": segment_count,
+        "extracted_text_chars": text_char_count,
+    }
     risk_flags = ["auto_extracted", "needs_human_review"]
+    if document_warnings:
+        value["extraction_warnings"] = document_warnings
+        risk_flags.append("text_extraction_warning")
 
     if category == FileCategory.DATA:
         try:
@@ -231,15 +256,6 @@ def _render_open_issues(sources: list[SourceRecord], evidence_items: list[Eviden
         lines.append("| - | No blocking intake issues detected. | Continue human review before using outputs. |")
     lines.append("")
     return "\n".join(lines)
-
-
-def _sample_text(path: Path, limit: int = 65536) -> str:
-    if path.suffix.lower() not in TEXT_EXTENSIONS:
-        return ""
-    try:
-        return read_text_file(path, limit)
-    except OSError:
-        return ""
 
 
 def _sha256(path: Path) -> str:

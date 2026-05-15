@@ -108,6 +108,18 @@ Implement:
 - enum value rendering in Markdown outputs
 - numeric mismatch checks for evidence-linked claims
 
+### Task 11: Korean document intake foundation
+
+Implement:
+- TXT/MD/CSV/JSON/LOG text extraction
+- DOCX XML text extraction
+- XLSX row text extraction with sheet/row provenance
+- HWPX zip/XML text extraction
+- PDF text extraction via `pypdf`
+- optional binary HWP extraction through `rhwp dump` when available
+- document-level evidence candidates with quote/provenance fields
+- project profile template/schema for verified agency profiles later
+
 ## Safety constraints
 
 - Never alter raw files.

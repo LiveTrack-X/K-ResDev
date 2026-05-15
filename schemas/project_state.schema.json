@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ProjectState",
+  "type": "object",
+  "required": ["project_id", "title", "period", "status"],
+  "properties": {
+    "project_id": {"type": "string"},
+    "title": {"type": "string"},
+    "agency": {"type": "string"},
+    "program": {"type": "string"},
+    "period": {"type": "string"},
+    "participants": {"type": "array", "items": {"type": "string"}},
+    "goals": {"type": "array", "items": {"type": "object"}},
+    "kpis": {"type": "array", "items": {"type": "object"}},
+    "milestones": {"type": "array", "items": {"type": "object"}},
+    "budget_categories": {"type": "array", "items": {"type": "object"}},
+    "status": {"type": "string", "enum": ["planning", "active", "reporting", "closed"]}
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "EvidenceItem",
+  "type": "object",
+  "required": ["evidence_id", "source_file", "evidence_type", "claim", "status", "provenance"],
+  "properties": {
+    "evidence_id": {"type": "string"},
+    "source_file": {"type": "string"},
+    "source_hash": {"type": "string"},
+    "evidence_type": {
+      "type": "string",
+      "enum": ["plan_goal", "kpi", "milestone", "experiment_result", "budget_evidence", "meeting_decision", "risk", "outcome", "change_request", "paper_claim", "data_profile", "research_insight"]
+    },
+    "project": {"type": "string"},
+    "linked_goal": {"type": "string"},
+    "linked_kpi": {"type": "string"},
+    "claim": {"type": "string"},
+    "value": {"type": "object"},
+    "confidence": {"type": "string", "enum": ["low", "medium", "high", "unknown"]},
+    "status": {"type": "string", "enum": ["draft", "needs_review", "accepted", "rejected", "superseded"]},
+    "risk_flags": {"type": "array", "items": {"type": "string"}},
+    "provenance": {
+      "type": "object",
+      "properties": {
+        "page": {"type": ["integer", "null"]},
+        "sheet": {"type": ["string", "null"]},
+        "cell_range": {"type": ["string", "null"]},
+        "line_range": {"type": ["string", "null"]},
+        "quote": {"type": ["string", "null"]}
+      }
+    }
+  }
+}

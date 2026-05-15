@@ -1,0 +1,7 @@
+interface:
+  display_name: "K-ResDev"
+  short_description: "Evidence-first Korean R&D admin and research copilot."
+  default_prompt: "Use $k-resdev to intake R&D evidence, check unsupported claims, or draft research/admin projections."
+
+policy:
+  allow_implicit_invocation: true

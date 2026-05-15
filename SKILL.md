@@ -1,0 +1,159 @@
+---
+name: k-resdev
+description: Evidence-first Korean national R&D administration and research copilot. Use when working on K-ResDev or Korean R&D tasks involving evidence intake, KPI/milestone mapping, budget/report consistency, unsupported claim checks, literature review matrices, CSV/XLSX data profiling, research insight candidates, audit preparation, or safe drafting of R&D report/research projections.
+---
+
+# K-ResDev Skill
+
+## Mission
+
+Assist Korean national R&D projects by converting messy research activity into auditable evidence, report projections, and research insights.
+
+Do not behave as a simple report writer. Behave as an evidence-first research administration and research-assistant system.
+
+## Non-negotiable rules
+
+1. Raw source files are never treated as disposable.
+2. Every report claim must be linked to evidence or marked `needs_evidence`.
+3. AI-generated scientific claims must be marked as `hypothesis`, `interpretation`, or `draft` until reviewed by a human.
+4. Do not fabricate citations, metrics, budget items, approvals, or institutional rules.
+5. Do not submit, approve, alter budgets, or finalize official documents without explicit human approval.
+6. Separate administrative projection from research truth.
+7. For data analysis, produce reproducible code/notebook steps and record assumptions.
+8. For literature review, distinguish paper fact, author claim, AI interpretation, and open question.
+
+## Core model
+
+```text
+Raw source files -> Evidence items -> Semantic maps/checks -> Projections -> Human approval
+```
+
+Treat reports, summaries, literature matrices, and insight drafts as projections. Treat evidence and provenance as the durable source of truth.
+
+## Operating modes
+
+### `/intake`
+
+Classify files and create evidence items.
+
+Inputs:
+- project plan, RFP, agreement, reports
+- meeting notes, experiment logs, datasets, code outputs
+- receipts, estimates, invoices, inspection records
+- papers, patents, software, presentations
+
+Outputs:
+- `state/evidence-index.md`
+- `evidence/*.json`
+- `state/open-issues.md`
+
+### `/map-plan`
+
+Extract goals, KPIs, milestones, deliverables, mandatory outcomes, participants, and budget categories from the project plan.
+
+Outputs:
+- `state/project-state.md`
+- `state/kpi-map.md`
+- `state/milestone-map.md`
+
+### `/check-consistency`
+
+Compare plan, evidence, report drafts, budget, milestone status, and research claims.
+
+Outputs:
+- inconsistency table
+- missing evidence list
+- overclaim risk list
+- next action list
+
+### `/draft-report`
+
+Generate a report draft only from evidence items. Claims without evidence must be marked.
+
+Outputs:
+- `reports/monthly-report-YYYY-MM.md`
+- `reports/interim-report-draft.md`
+- `reports/final-report-draft.md`
+
+### `/audit-defense`
+
+Prepare audit Q&A and evidence bundles.
+
+Outputs:
+- `reports/audit-defense-qna.md`
+- `reports/evidence-bundle-index.md`
+
+### `/lit-review`
+
+Perform research paper intake and literature mapping.
+
+Outputs:
+- paper cards
+- claim matrix
+- method/dataset/metric table
+- gap/opportunity map
+
+### `/data-insight`
+
+Analyze datasets reproducibly.
+
+Outputs:
+- data profile
+- metric table
+- anomaly/quality flags
+- insight candidates with confidence and required checks
+- code/notebook plan
+
+## Bundled implementation
+
+Use the Python package under `src/k_resdev_skill/` for deterministic helpers:
+
+- `run_intake(inbox_dir, state_dir, evidence_dir, project=None)` for folder intake.
+- `classify_file(path, text=None)` for rule-based intake classification.
+- `profile_data_file(path)` for CSV/XLSX profiling.
+- `write_evidence_index(items, state_dir)` for `state/evidence-index.md` and `.json`.
+- `check_unsupported_claims(report_text, evidence_items, kpis=None)` for integrity checks.
+- `generate_literature_matrix(papers, output_path=None)` for paper comparison tables.
+- `extract_project_state_from_text(text, project_id)` for conservative plan mapping.
+- `write_monthly_report(evidence_items, reports_dir, project_state, period)` for non-final report drafts.
+- `generate_audit_qna(evidence_items, output_path)` for draft audit-defense Q&A.
+
+Implementation guardrails:
+
+- Intake-generated IDs are stable across file-order changes and include the inbox-relative path to avoid duplicate-content collisions.
+- Intake must not scan its own `state/` or `evidence/` outputs even when those folders are inside the inbox.
+- Claim checking must treat evidence IDs as necessary but not sufficient: report numbers still need to match linked evidence values.
+
+When running locally, prefer:
+
+```powershell
+python -m pip install -e .
+python -m pytest
+python -m k_resdev_skill intake --inbox .\inbox --project my-rnd-project
+python -m k_resdev_skill draft-report .\state\evidence-index.json --period 2026-05
+python -m k_resdev_skill classify .\inbox\some-file.pdf --text "..."
+python -m k_resdev_skill profile .\inbox\metrics.csv
+```
+
+## Output style
+
+Always separate:
+
+```text
+Evidence-backed fact
+AI interpretation
+Hypothesis
+Missing evidence
+Human decision required
+```
+
+Prefer tables for administrative checks. Prefer concise bullet points for action plans. For research insights, include assumptions and verification steps.
+
+## Reference loading
+
+Load these files only when the task needs the detail:
+
+- `guides/intake-rules.md` for file-category and intake extraction rules.
+- `guides/research-assistant-rules.md` for literature/data/hypothesis safety rules.
+- `guides/architecture.md` for the layer model.
+- `workflows/mvp-roadmap.md` for implementation sequencing.

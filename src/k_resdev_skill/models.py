@@ -1,0 +1,251 @@
+from __future__ import annotations
+
+from datetime import date
+from enum import Enum
+from typing import Any
+
+from pydantic import BaseModel, ConfigDict, Field, field_validator
+
+
+class StrictModel(BaseModel):
+    model_config = ConfigDict(extra="forbid", use_enum_values=True, validate_default=True)
+
+
+class Confidence(str, Enum):
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
+    UNKNOWN = "unknown"
+
+
+class EvidenceStatus(str, Enum):
+    DRAFT = "draft"
+    NEEDS_REVIEW = "needs_review"
+    ACCEPTED = "accepted"
+    REJECTED = "rejected"
+    SUPERSEDED = "superseded"
+
+
+class EvidenceType(str, Enum):
+    PLAN_GOAL = "plan_goal"
+    KPI = "kpi"
+    MILESTONE = "milestone"
+    EXPERIMENT_RESULT = "experiment_result"
+    BUDGET_EVIDENCE = "budget_evidence"
+    MEETING_DECISION = "meeting_decision"
+    RISK = "risk"
+    OUTCOME = "outcome"
+    CHANGE_REQUEST = "change_request"
+    PAPER_CLAIM = "paper_claim"
+    DATA_PROFILE = "data_profile"
+    RESEARCH_INSIGHT = "research_insight"
+
+
+class ProjectStatus(str, Enum):
+    PLANNING = "planning"
+    ACTIVE = "active"
+    REPORTING = "reporting"
+    CLOSED = "closed"
+
+
+class KPIStatus(str, Enum):
+    PLANNED = "planned"
+    NEEDS_REVIEW = "needs_review"
+    ON_TRACK = "on_track"
+    BELOW_TARGET = "below_target"
+    MET = "met"
+    MISSED = "missed"
+    SUPERSEDED = "superseded"
+
+
+class MilestoneStatus(str, Enum):
+    PLANNED = "planned"
+    IN_PROGRESS = "in_progress"
+    DONE = "done"
+    DELAYED = "delayed"
+    NEEDS_REVIEW = "needs_review"
+    SUPERSEDED = "superseded"
+
+
+class InsightStatus(str, Enum):
+    HYPOTHESIS = "hypothesis"
+    NEEDS_REVIEW = "needs_review"
+    ACCEPTED = "accepted"
+    REJECTED = "rejected"
+    SUPERSEDED = "superseded"
+
+
+class FileCategory(str, Enum):
+    PLAN = "plan"
+    PROGRESS = "progress"
+    EXPERIMENT = "experiment"
+    BUDGET = "budget"
+    OUTCOME = "outcome"
+    CHANGE = "change"
+    LITERATURE = "literature"
+    DATA = "data"
+    UNKNOWN = "unknown"
+
+
+class Provenance(StrictModel):
+    page: int | None = None
+    sheet: str | None = None
+    cell_range: str | None = None
+    line_range: str | None = None
+    quote: str | None = None
+
+
+class EvidenceItem(StrictModel):
+    evidence_id: str
+    source_file: str
+    source_hash: str | None = None
+    evidence_type: EvidenceType
+    project: str | None = None
+    linked_goal: str | None = None
+    linked_kpi: str | None = None
+    claim: str
+    value: dict[str, Any] = Field(default_factory=dict)
+    confidence: Confidence = Confidence.UNKNOWN
+    status: EvidenceStatus = EvidenceStatus.NEEDS_REVIEW
+    risk_flags: list[str] = Field(default_factory=list)
+    provenance: Provenance = Field(default_factory=Provenance)
+
+    @field_validator("evidence_id", "source_file", "claim")
+    @classmethod
+    def _must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
+class KPI(StrictModel):
+    kpi_id: str
+    name: str
+    target: float | str
+    metric: str | None = None
+    unit: str | None = None
+    current_value: float | str | None = None
+    evidence_ids: list[str] = Field(default_factory=list)
+    status: KPIStatus = KPIStatus.NEEDS_REVIEW
+    notes: str | None = None
+
+
+class Milestone(StrictModel):
+    milestone_id: str
+    name: str
+    due_date: date | None = None
+    deliverable: str | None = None
+    evidence_ids: list[str] = Field(default_factory=list)
+    status: MilestoneStatus = MilestoneStatus.PLANNED
+    notes: str | None = None
+
+
+class ProjectState(StrictModel):
+    project_id: str
+    title: str
+    period: str
+    status: ProjectStatus
+    agency: str | None = None
+    program: str | None = None
+    participants: list[str] = Field(default_factory=list)
+    goals: list[dict[str, Any]] = Field(default_factory=list)
+    kpis: list[KPI] = Field(default_factory=list)
+    milestones: list[Milestone] = Field(default_factory=list)
+    budget_categories: list[dict[str, Any]] = Field(default_factory=list)
+
+
+class ResearchInsight(StrictModel):
+    insight_id: str
+    claim: str
+    basis: list[str]
+    confidence: Confidence
+    assumptions: list[str] = Field(default_factory=list)
+    risk_flags: list[str] = Field(default_factory=list)
+    next_checks: list[str] = Field(default_factory=list)
+    status: InsightStatus = InsightStatus.HYPOTHESIS
+
+
+class FileClassification(StrictModel):
+    category: FileCategory
+    confidence: float = Field(ge=0.0, le=1.0)
+    reasons: list[str] = Field(default_factory=list)
+
+
+class NumericSummary(StrictModel):
+    count: int
+    min: float | None = None
+    max: float | None = None
+    mean: float | None = None
+
+
+class Missingness(StrictModel):
+    missing_count: int
+    missing_ratio: float
+
+
+class DataProfile(StrictModel):
+    source_file: str
+    file_type: str
+    row_count: int
+    column_count: int
+    columns: list[str]
+    missingness: dict[str, Missingness]
+    numeric_summary: dict[str, NumericSummary]
+    possible_metrics: list[str] = Field(default_factory=list)
+
+
+class CheckFinding(StrictModel):
+    code: str
+    severity: str
+    message: str
+    claim: str
+    evidence_ids: list[str] = Field(default_factory=list)
+    suggested_action: str | None = None
+
+
+class EvidenceIndexPaths(StrictModel):
+    markdown_path: str
+    json_path: str
+
+
+class SourceRecord(StrictModel):
+    source_id: str
+    path: str
+    source_hash: str
+    size_bytes: int
+    modified_time_utc: str | None = None
+    classification: FileClassification
+    evidence_ids: list[str] = Field(default_factory=list)
+
+
+class IntakeResult(StrictModel):
+    source_count: int
+    evidence_count: int
+    raw_registry_path: str
+    evidence_dir: str
+    evidence_index_markdown_path: str
+    evidence_index_json_path: str
+    open_issues_path: str
+
+
+class ReportDraftPaths(StrictModel):
+    report_path: str
+    review_path: str | None = None
+
+
+class PaperRecord(StrictModel):
+    paper_id: str
+    title: str
+    authors: list[str] = Field(default_factory=list)
+    year: int | None = None
+    venue: str | None = None
+    doi: str | None = None
+    url: str | None = None
+    method: str | None = None
+    dataset: str | None = None
+    metrics: dict[str, Any] = Field(default_factory=dict)
+    key_claims: list[str] = Field(default_factory=list)
+    limitations: list[str] = Field(default_factory=list)
+    evidence_ids: list[str] = Field(default_factory=list)
+    status: str = "needs_review"
+    notes: str | None = None

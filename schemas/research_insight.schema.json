@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ResearchInsight",
+  "type": "object",
+  "required": ["insight_id", "claim", "basis", "confidence", "status"],
+  "properties": {
+    "insight_id": {"type": "string"},
+    "claim": {"type": "string"},
+    "basis": {"type": "array", "items": {"type": "string"}},
+    "confidence": {"type": "string", "enum": ["low", "medium", "high", "unknown"]},
+    "assumptions": {"type": "array", "items": {"type": "string"}},
+    "risk_flags": {"type": "array", "items": {"type": "string"}},
+    "next_checks": {"type": "array", "items": {"type": "string"}},
+    "status": {"type": "string", "enum": ["hypothesis", "needs_review", "accepted", "rejected", "superseded"]}
+  }
+}

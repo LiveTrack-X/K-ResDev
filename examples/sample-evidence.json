@@ -1,0 +1,27 @@
+{
+  "evidence_id": "EVI-2026-0001",
+  "source_file": "metrics_2026_05.xlsx",
+  "source_hash": "sha256:placeholder",
+  "evidence_type": "experiment_result",
+  "project": "ultrasound-ai-rnd",
+  "linked_goal": "GOAL-01",
+  "linked_kpi": "KPI-01",
+  "claim": "Validation Dice score reached 0.83 on validation_set_v2.",
+  "value": {
+    "metric": "Dice",
+    "score": 0.83,
+    "dataset": "validation_set_v2",
+    "baseline": 0.78,
+    "target": 0.85
+  },
+  "confidence": "high",
+  "status": "needs_review",
+  "risk_flags": ["below_target"],
+  "provenance": {
+    "page": null,
+    "sheet": "summary",
+    "cell_range": "B2:D8",
+    "line_range": null,
+    "quote": null
+  }
+}

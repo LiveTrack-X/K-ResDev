@@ -2,7 +2,7 @@
 
 Purpose: 한국형 국책 R&D 환경에서 연구 행정 문서화, 증빙 정합성, 보고서 생성, 논문/데이터 인사이트 보조를 evidence-first 방식으로 지원하는 Codex/Skill 프로젝트입니다.
 
-Current release: `0.1 BETA 3` (`0.1.0b3`).
+Current release: `0.1 BETA 4` (`0.1.0b4`).
 
 Core principle:
 
@@ -39,6 +39,9 @@ This repository does not encode any single ministry/institution form as authorit
 - Paper card extraction from supplied metadata text without citation invention.
 - Data insight candidate reports that keep findings in hypothesis/review state.
 - Experiment comparison table and reproducibility checklist generators.
+- Hypothesis-to-experiment planner for turning `ResearchInsight` records into reviewable validation plans.
+- Generic budget evidence completeness checklist that avoids hardcoding unverified agency rules.
+- Agency profile registry/validator for `templates/agencies/` skeletons.
 - `national-rnd-basic` agency template skeleton for annual/interim/final reports, change requests, and performance registration drafts.
 
 ## Local use
@@ -52,8 +55,12 @@ python -m k_resdev_skill draft-report .\state\evidence-index.json --project-stat
 python -m k_resdev_skill audit-qna .\state\evidence-index.json
 python -m k_resdev_skill paper-card .\inbox\paper-notes.txt --markdown --output .\reports\paper-card.md
 python -m k_resdev_skill data-insights .\inbox\metrics.csv --output .\reports\data-insights.md
+python -m k_resdev_skill plan-experiment .\state\research-insights.json --evidence-index .\state\evidence-index.json --output .\reports\experiment-plan.md
 python -m k_resdev_skill experiment-table .\state\evidence-index.json --output .\reports\experiment-table.md
 python -m k_resdev_skill repro-check .\state\evidence-index.json --output .\reports\repro-check.md
+python -m k_resdev_skill budget-check .\state\evidence-index.json --output .\reports\budget-checklist.md
+python -m k_resdev_skill profiles --markdown --output .\reports\agency-profiles.md
+python -m k_resdev_skill validate-profile .\templates\agencies\national-rnd-basic\project-profile.json
 python -m k_resdev_skill classify .\inbox\plan.pdf --text "연구개발계획서 KPI"
 python -m k_resdev_skill profile .\inbox\metrics.csv
 ```

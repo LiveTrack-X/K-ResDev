@@ -6,15 +6,18 @@ from pathlib import Path
 
 from . import __version__
 from .audit import generate_audit_qna
+from .budget import generate_budget_evidence_checklist
 from .claim_checker import check_unsupported_claims
 from .classifier import classify_file
 from .data_profiler import profile_data_file
 from .evidence_index import load_evidence_index, write_evidence_index
+from .experiment_planner import generate_experiment_plan_bundle
 from .io_utils import read_text_file
 from .intake import run_intake
 from .literature import generate_literature_matrix
-from .models import EvidenceItem, PaperRecord, ProjectState
+from .models import EvidenceItem, PaperRecord, ProjectState, ResearchInsight
 from .plan_mapper import extract_project_state_from_text
+from .profile_registry import generate_profile_registry, list_project_profiles, load_project_profile
 from .research_assistant import (
     generate_data_insight_report,
     generate_experiment_comparison_table,
@@ -90,6 +93,23 @@ def main(argv: list[str] | None = None) -> int:
     repro_parser = subparsers.add_parser("repro-check", help="Generate a reproducibility checklist from evidence index.")
     repro_parser.add_argument("evidence_index_json")
     repro_parser.add_argument("--output", default=None)
+
+    plan_experiment_parser = subparsers.add_parser("plan-experiment", help="Generate validation experiment plans from ResearchInsight JSON.")
+    plan_experiment_parser.add_argument("insights_json", help="One ResearchInsight object or a JSON list.")
+    plan_experiment_parser.add_argument("--evidence-index", default=None)
+    plan_experiment_parser.add_argument("--output", default=None)
+
+    budget_parser = subparsers.add_parser("budget-check", help="Generate a generic budget evidence completeness checklist.")
+    budget_parser.add_argument("evidence_index_json")
+    budget_parser.add_argument("--output", default=None)
+
+    profiles_parser = subparsers.add_parser("profiles", help="List agency profile templates.")
+    profiles_parser.add_argument("--templates-root", default=None)
+    profiles_parser.add_argument("--markdown", action="store_true")
+    profiles_parser.add_argument("--output", default=None)
+
+    validate_profile_parser = subparsers.add_parser("validate-profile", help="Validate a project profile JSON file.")
+    validate_profile_parser.add_argument("profile_json")
 
     args = parser.parse_args(argv)
 
@@ -173,5 +193,31 @@ def main(argv: list[str] | None = None) -> int:
         evidence = load_evidence_index(args.evidence_index_json)
         rendered = generate_reproducibility_checklist(evidence, args.output)
         print(rendered)
+        return 0
+    if args.command == "plan-experiment":
+        payload = json.loads(Path(args.insights_json).read_text(encoding="utf-8"))
+        if isinstance(payload, list):
+            insights = [ResearchInsight.model_validate(item) for item in payload]
+        else:
+            insights = [ResearchInsight.model_validate(payload)]
+        evidence = load_evidence_index(args.evidence_index) if args.evidence_index else []
+        rendered = generate_experiment_plan_bundle(insights, evidence, args.output)
+        print(rendered)
+        return 0
+    if args.command == "budget-check":
+        evidence = load_evidence_index(args.evidence_index_json)
+        rendered = generate_budget_evidence_checklist(evidence, args.output)
+        print(rendered)
+        return 0
+    if args.command == "profiles":
+        if args.markdown or args.output:
+            rendered = generate_profile_registry(args.templates_root, args.output)
+            print(rendered)
+        else:
+            print(json.dumps(list_project_profiles(args.templates_root), ensure_ascii=False, indent=2))
+        return 0
+    if args.command == "validate-profile":
+        profile = load_project_profile(args.profile_json)
+        print(profile.model_dump_json(indent=2))
         return 0
     raise AssertionError(f"Unhandled command: {args.command}")

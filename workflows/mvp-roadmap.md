@@ -23,7 +23,7 @@ P0 intake hardening now includes DOCX/XLSX/HWPX/PDF text extraction, optional HW
 5. Reproducibility checklist.
 6. Hypothesis-to-experiment planner.
 
-Status: paper card extraction, literature matrix, data insight candidate report, experiment comparison table, and reproducibility checklist are implemented. Hypothesis-to-experiment planning remains a next step.
+Status: paper card extraction, literature matrix, data insight candidate report, experiment comparison table, reproducibility checklist, and hypothesis-to-experiment planning are implemented. Generated experiment plans remain validation drafts and require human approval before execution.
 
 ## P2 - Korean R&D specialization
 
@@ -33,7 +33,7 @@ Status: paper card extraction, literature matrix, data insight candidate report,
 4. Audit-defense Q&A generator.
 5. IRIS/NTIS-style field mapper after official template verification.
 
-Status: `national-rnd-basic` is present as a generic needs-review template skeleton only. It is not an official agency profile.
+Status: `national-rnd-basic` is present as a generic needs-review template skeleton only. It is not an official agency profile. A profile registry/validator and generic budget evidence checklist are implemented so local profiles can be inspected without hardcoding unverified rules.
 
 ## P3 - Automation and validation
 

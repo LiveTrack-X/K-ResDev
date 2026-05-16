@@ -129,6 +129,16 @@ Implement:
 - reproducibility checklist generation
 - `national-rnd-basic` agency template skeletons marked `needs_review`
 
+### Task 13: Planning and registry beta workflows
+
+Implement:
+- hypothesis-to-experiment plan generation from `ResearchInsight` JSON
+- generic budget evidence completeness checklist
+- agency profile registry and profile validator for `templates/agencies/`
+- CLI commands for `plan-experiment`, `budget-check`, `profiles`, and `validate-profile`
+
+Keep all outputs as drafts/projections. Do not encode unverified agency rules as authoritative requirements.
+
 ## Safety constraints
 
 - Never alter raw files.

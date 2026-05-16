@@ -1,6 +1,6 @@
 import json
 
-from k_resdev_skill import write_evidence_index
+from k_resdev_skill import load_evidence_index, write_evidence_index
 from k_resdev_skill.models import EvidenceItem
 
 
@@ -26,3 +26,24 @@ def test_evidence_index_writer_outputs_markdown_and_json(tmp_path):
     assert "EvidenceStatus." not in markdown
     assert payload["evidence_count"] == 1
     assert payload["items"][0]["linked_kpi"] == "KPI-01"
+
+
+def test_load_evidence_index_accepts_raw_list(tmp_path):
+    path = tmp_path / "evidence.json"
+    path.write_text(
+        json.dumps(
+            [
+                {
+                    "evidence_id": "EVI-2026-0001",
+                    "source_file": "metrics.csv",
+                    "evidence_type": "experiment_result",
+                    "claim": "Validation Dice reached 0.83.",
+                }
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    items = load_evidence_index(path)
+
+    assert items[0].evidence_id == "EVI-2026-0001"

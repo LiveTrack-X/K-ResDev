@@ -34,7 +34,12 @@ def write_evidence_index(
 
 def load_evidence_index(path: str | Path) -> list[EvidenceItem]:
     payload = json.loads(Path(path).read_text(encoding="utf-8"))
-    items = payload.get("items", payload if isinstance(payload, list) else [])
+    if isinstance(payload, list):
+        items = payload
+    elif isinstance(payload, dict):
+        items = payload.get("items", [])
+    else:
+        items = []
     return [_to_evidence_item(item) for item in items]
 
 

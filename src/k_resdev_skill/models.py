@@ -75,6 +75,23 @@ class InsightStatus(str, Enum):
     SUPERSEDED = "superseded"
 
 
+class ApprovalDecision(str, Enum):
+    APPROVED = "approved"
+    REJECTED = "rejected"
+    NEEDS_CHANGES = "needs_changes"
+    REVOKED = "revoked"
+
+
+class ApprovalTargetType(str, Enum):
+    REPORT = "report"
+    EVIDENCE = "evidence"
+    INSIGHT = "insight"
+    BUDGET = "budget"
+    PROFILE = "profile"
+    BUNDLE = "bundle"
+    OTHER = "other"
+
+
 class FileCategory(str, Enum):
     PLAN = "plan"
     PROGRESS = "progress"
@@ -248,6 +265,26 @@ class IntakeResult(StrictModel):
 class ReportDraftPaths(StrictModel):
     report_path: str
     review_path: str | None = None
+
+
+class ApprovalRecord(StrictModel):
+    approval_id: str
+    target_type: ApprovalTargetType
+    target_id: str
+    target_path: str | None = None
+    decision: ApprovalDecision
+    reviewer: str
+    reviewed_at: str
+    evidence_ids: list[str] = Field(default_factory=list)
+    notes: str | None = None
+    risk_flags: list[str] = Field(default_factory=list)
+
+    @field_validator("approval_id", "target_id", "reviewer", "reviewed_at")
+    @classmethod
+    def _must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
 
 
 class ProjectProfile(StrictModel):

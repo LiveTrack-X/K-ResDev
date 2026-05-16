@@ -37,7 +37,7 @@ def load_evidence_index(path: str | Path) -> list[EvidenceItem]:
     if isinstance(payload, list):
         items = payload
     elif isinstance(payload, dict):
-        items = payload.get("items", [])
+        items = payload.get("items", [payload] if "evidence_id" in payload else [])
     else:
         items = []
     return [_to_evidence_item(item) for item in items]

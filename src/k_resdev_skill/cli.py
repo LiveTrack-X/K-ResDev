@@ -6,10 +6,18 @@ from pathlib import Path
 
 from . import __version__
 from .audit import generate_audit_qna
+from .approval import (
+    approval_gate_status,
+    create_approval_record,
+    generate_approval_summary,
+    load_approval_records,
+    write_approval_record,
+)
 from .budget import generate_budget_evidence_checklist
 from .claim_checker import check_unsupported_claims
 from .classifier import classify_file
 from .data_profiler import profile_data_file
+from .evidence_bundle import generate_evidence_bundle_index
 from .evidence_index import load_evidence_index, write_evidence_index
 from .experiment_planner import generate_experiment_plan_bundle
 from .io_utils import read_text_file
@@ -26,6 +34,7 @@ from .research_assistant import (
     paper_card_from_text,
 )
 from .reporting import write_monthly_report
+from .schema_tools import validate_json_files
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -110,6 +119,37 @@ def main(argv: list[str] | None = None) -> int:
 
     validate_profile_parser = subparsers.add_parser("validate-profile", help="Validate a project profile JSON file.")
     validate_profile_parser.add_argument("profile_json")
+
+    validate_json_parser = subparsers.add_parser("validate-json", help="Validate JSON files against bundled or custom JSON schema.")
+    validate_json_parser.add_argument("schema", help="Schema alias such as evidence, research-insight, project-profile, approval, or a schema path.")
+    validate_json_parser.add_argument("json_paths", nargs="+")
+
+    approval_record_parser = subparsers.add_parser("approval-record", help="Record a supplied human approval/review decision.")
+    approval_record_parser.add_argument("--target-type", required=True, choices=["report", "evidence", "insight", "budget", "profile", "bundle", "other"])
+    approval_record_parser.add_argument("--target-id", required=True)
+    approval_record_parser.add_argument("--decision", required=True, choices=["approved", "rejected", "needs_changes", "revoked"])
+    approval_record_parser.add_argument("--reviewer", required=True)
+    approval_record_parser.add_argument("--target-path", default=None)
+    approval_record_parser.add_argument("--evidence-id", action="append", default=[])
+    approval_record_parser.add_argument("--note", default=None)
+    approval_record_parser.add_argument("--risk-flag", action="append", default=[])
+    approval_record_parser.add_argument("--reviewed-at", default=None)
+    approval_record_parser.add_argument("--approvals-dir", default="state/approvals")
+    approval_record_parser.add_argument("--print-only", action="store_true")
+
+    approval_summary_parser = subparsers.add_parser("approval-summary", help="Render a Markdown summary for approval records.")
+    approval_summary_parser.add_argument("approval_records")
+    approval_summary_parser.add_argument("--output", default=None)
+
+    approval_gate_parser = subparsers.add_parser("approval-gate", help="Check whether the latest supplied decision approves a target.")
+    approval_gate_parser.add_argument("approval_records")
+    approval_gate_parser.add_argument("--target-type", required=True, choices=["report", "evidence", "insight", "budget", "profile", "bundle", "other"])
+    approval_gate_parser.add_argument("--target-id", required=True)
+
+    bundle_parser = subparsers.add_parser("bundle-index", help="Generate an evidence bundle index from evidence and optional approval records.")
+    bundle_parser.add_argument("evidence_index_json")
+    bundle_parser.add_argument("--approval-records", default=None)
+    bundle_parser.add_argument("--output", default=None)
 
     args = parser.parse_args(argv)
 
@@ -219,5 +259,40 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "validate-profile":
         profile = load_project_profile(args.profile_json)
         print(profile.model_dump_json(indent=2))
+        return 0
+    if args.command == "validate-json":
+        result = validate_json_files(args.json_paths, args.schema)
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+        return 0 if result["valid"] else 1
+    if args.command == "approval-record":
+        record = create_approval_record(
+            target_type=args.target_type,
+            target_id=args.target_id,
+            decision=args.decision,
+            reviewer=args.reviewer,
+            evidence_ids=args.evidence_id,
+            target_path=args.target_path,
+            notes=args.note,
+            risk_flags=args.risk_flag,
+            reviewed_at=args.reviewed_at,
+        )
+        if not args.print_only:
+            write_approval_record(record, args.approvals_dir)
+        print(record.model_dump_json(indent=2))
+        return 0
+    if args.command == "approval-summary":
+        records = load_approval_records(args.approval_records)
+        rendered = generate_approval_summary(records, args.output)
+        print(rendered)
+        return 0
+    if args.command == "approval-gate":
+        records = load_approval_records(args.approval_records)
+        print(json.dumps(approval_gate_status(records, args.target_type, args.target_id), ensure_ascii=False, indent=2))
+        return 0
+    if args.command == "bundle-index":
+        evidence = load_evidence_index(args.evidence_index_json)
+        approvals = load_approval_records(args.approval_records) if args.approval_records else []
+        rendered = generate_evidence_bundle_index(evidence, approvals, args.output)
+        print(rendered)
         return 0
     raise AssertionError(f"Unhandled command: {args.command}")

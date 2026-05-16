@@ -42,3 +42,5 @@ Status: `national-rnd-basic` is present as a generic needs-review template skele
 3. Data analysis script generation and execution.
 4. Report export to Markdown/DOCX/HWP-compatible intermediate format.
 5. Human approval workflow.
+
+Status: JSON schema validation, evidence bundle indexes, and human approval records/gates are implemented as a first pass. Data analysis script execution and document export remain future work.

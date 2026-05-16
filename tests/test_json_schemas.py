@@ -28,3 +28,12 @@ def test_national_rnd_basic_profile_matches_json_schema():
         sample = json.load(handle)
 
     jsonschema.validate(sample, schema)
+
+
+def test_approval_record_template_matches_json_schema():
+    with open("schemas/approval_record.schema.json", encoding="utf-8") as handle:
+        schema = json.load(handle)
+    with open("templates/approval-record.json", encoding="utf-8") as handle:
+        sample = json.load(handle)
+
+    jsonschema.validate(sample, schema)

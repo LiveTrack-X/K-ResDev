@@ -1,0 +1,12 @@
+{
+  "approval_id": "APR-YYYY-NEEDSREVIEW",
+  "target_type": "report",
+  "target_id": "monthly-report-YYYY-MM",
+  "target_path": "reports/monthly-report-YYYY-MM.md",
+  "decision": "needs_changes",
+  "reviewer": "human_reviewer",
+  "reviewed_at": "YYYY-MM-DDTHH:MM:SSZ",
+  "evidence_ids": [],
+  "notes": "Human review notes go here.",
+  "risk_flags": ["needs_review"]
+}

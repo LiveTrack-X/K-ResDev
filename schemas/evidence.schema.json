@@ -6,14 +6,14 @@
   "properties": {
     "evidence_id": {"type": "string"},
     "source_file": {"type": "string"},
-    "source_hash": {"type": "string"},
+    "source_hash": {"type": ["string", "null"]},
     "evidence_type": {
       "type": "string",
       "enum": ["plan_goal", "kpi", "milestone", "experiment_result", "budget_evidence", "meeting_decision", "risk", "outcome", "change_request", "paper_claim", "data_profile", "research_insight"]
     },
-    "project": {"type": "string"},
-    "linked_goal": {"type": "string"},
-    "linked_kpi": {"type": "string"},
+    "project": {"type": ["string", "null"]},
+    "linked_goal": {"type": ["string", "null"]},
+    "linked_kpi": {"type": ["string", "null"]},
     "claim": {"type": "string"},
     "value": {"type": "object"},
     "confidence": {"type": "string", "enum": ["low", "medium", "high", "unknown"]},

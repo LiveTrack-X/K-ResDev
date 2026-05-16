@@ -124,6 +124,9 @@ Use the Python package under `src/k_resdev_skill/` for deterministic helpers:
 - `generate_experiment_plan_bundle(insights, evidence_items, output_path)` for hypothesis validation plans.
 - `generate_budget_evidence_checklist(evidence_items, output_path)` for generic budget evidence completeness checks.
 - `generate_profile_registry(templates_root, output_path)` for local agency profile/template registry output.
+- `create_approval_record(...)`, `generate_approval_summary(...)`, and `approval_gate_status(...)` for supplied human review decisions.
+- `generate_evidence_bundle_index(evidence_items, approval_records, output_path)` for audit/review bundle indexes.
+- `validate_json_files(json_paths, schema)` for bundled or custom JSON schema checks.
 
 Implementation guardrails:
 
@@ -133,6 +136,7 @@ Implementation guardrails:
 - Binary `.hwp` extraction is optional. Use `rhwp dump` when an `rhwp` CLI is available; otherwise mark extraction as `needs_review` instead of pretending HWP text was parsed.
 - Paper/research outputs must never invent citations, metrics, or verified conclusions. Keep them as `needs_review` or `hypothesis` until human-reviewed.
 - Agency templates under `templates/agencies/` are draft profile skeletons, not official rules.
+- Approval records must reflect supplied human decisions. The tool must not infer or invent approval.
 
 When running locally, prefer:
 
@@ -146,6 +150,10 @@ python -m k_resdev_skill plan-experiment .\state\research-insights.json --eviden
 python -m k_resdev_skill repro-check .\state\evidence-index.json --output .\reports\repro-check.md
 python -m k_resdev_skill budget-check .\state\evidence-index.json --output .\reports\budget-checklist.md
 python -m k_resdev_skill profiles --markdown --output .\reports\agency-profiles.md
+python -m k_resdev_skill validate-json approval .\state\approvals\APR-2026-EXAMPLE.json
+python -m k_resdev_skill approval-record --target-type report --target-id monthly-2026-05 --decision needs_changes --reviewer reviewer-name
+python -m k_resdev_skill approval-gate .\state\approvals --target-type report --target-id monthly-2026-05
+python -m k_resdev_skill bundle-index .\state\evidence-index.json --approval-records .\state\approvals --output .\reports\evidence-bundle-index.md
 python -m k_resdev_skill classify .\inbox\some-file.pdf --text "..."
 python -m k_resdev_skill profile .\inbox\metrics.csv
 ```

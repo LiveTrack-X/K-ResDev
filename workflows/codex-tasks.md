@@ -139,6 +139,16 @@ Implement:
 
 Keep all outputs as drafts/projections. Do not encode unverified agency rules as authoritative requirements.
 
+### Task 14: Validation and approval beta workflows
+
+Implement:
+- JSON schema validation CLI for bundled and custom schemas
+- approval record creation for supplied human decisions
+- approval summaries and target approval gate checks
+- evidence bundle index generation with unresolved/risk review hints
+
+Approval records are logs of human decisions, not decisions made by the tool. Bundle indexes must never copy, modify, or certify raw source files.
+
 ## Safety constraints
 
 - Never alter raw files.

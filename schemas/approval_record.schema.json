@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ApprovalRecord",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["approval_id", "target_type", "target_id", "decision", "reviewer", "reviewed_at", "evidence_ids", "risk_flags"],
+  "properties": {
+    "approval_id": {"type": "string"},
+    "target_type": {
+      "type": "string",
+      "enum": ["report", "evidence", "insight", "budget", "profile", "bundle", "other"]
+    },
+    "target_id": {"type": "string"},
+    "target_path": {"type": ["string", "null"]},
+    "decision": {
+      "type": "string",
+      "enum": ["approved", "rejected", "needs_changes", "revoked"]
+    },
+    "reviewer": {"type": "string"},
+    "reviewed_at": {"type": "string"},
+    "evidence_ids": {"type": "array", "items": {"type": "string"}},
+    "notes": {"type": ["string", "null"]},
+    "risk_flags": {"type": "array", "items": {"type": "string"}}
+  }
+}

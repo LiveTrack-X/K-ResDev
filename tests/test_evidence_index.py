@@ -47,3 +47,23 @@ def test_load_evidence_index_accepts_raw_list(tmp_path):
     items = load_evidence_index(path)
 
     assert items[0].evidence_id == "EVI-2026-0001"
+
+
+def test_load_evidence_index_accepts_single_item(tmp_path):
+    path = tmp_path / "single-evidence.json"
+    path.write_text(
+        json.dumps(
+            {
+                "evidence_id": "EVI-2026-0001",
+                "source_file": "metrics.csv",
+                "evidence_type": "experiment_result",
+                "claim": "Validation Dice reached 0.83.",
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    items = load_evidence_index(path)
+
+    assert len(items) == 1
+    assert items[0].claim == "Validation Dice reached 0.83."

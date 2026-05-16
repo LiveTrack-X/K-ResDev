@@ -1,0 +1,26 @@
+{
+  "profile_id": "national-rnd-basic",
+  "agency": null,
+  "program": null,
+  "report_cycle": "annual/interim/final needs_review",
+  "required_outputs": [
+    "annual-report",
+    "interim-report",
+    "final-report",
+    "change-request",
+    "performance-registration"
+  ],
+  "budget_categories": [],
+  "field_map": {
+    "project_title": "needs_review",
+    "project_period": "needs_review",
+    "principal_investigator": "needs_review",
+    "participating_researchers": "needs_review",
+    "kpi": "needs_review",
+    "milestone": "needs_review",
+    "budget_category": "needs_review",
+    "evidence_id": "needs_review"
+  },
+  "status": "needs_review",
+  "notes": "Generic Korean national R&D profile skeleton only. Verify official agency/program forms before use."
+}

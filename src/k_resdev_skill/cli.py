@@ -15,6 +15,13 @@ from .intake import run_intake
 from .literature import generate_literature_matrix
 from .models import EvidenceItem, PaperRecord, ProjectState
 from .plan_mapper import extract_project_state_from_text
+from .research_assistant import (
+    generate_data_insight_report,
+    generate_experiment_comparison_table,
+    generate_paper_card_markdown,
+    generate_reproducibility_checklist,
+    paper_card_from_text,
+)
 from .reporting import write_monthly_report
 
 
@@ -63,6 +70,26 @@ def main(argv: list[str] | None = None) -> int:
     lit_parser = subparsers.add_parser("lit-matrix", help="Generate a literature matrix.")
     lit_parser.add_argument("papers_json", help="JSON list of paper records.")
     lit_parser.add_argument("--output", default=None)
+
+    paper_parser = subparsers.add_parser("paper-card", help="Create a conservative paper card from text.")
+    paper_parser.add_argument("paper_text")
+    paper_parser.add_argument("--paper-id", default="PAPER-NEEDS-REVIEW")
+    paper_parser.add_argument("--evidence-id", action="append", default=[])
+    paper_parser.add_argument("--output", default=None)
+    paper_parser.add_argument("--markdown", action="store_true")
+
+    data_insights_parser = subparsers.add_parser("data-insights", help="Generate a data insight candidate report from CSV/XLSX.")
+    data_insights_parser.add_argument("data_file")
+    data_insights_parser.add_argument("--evidence-id", action="append", default=[])
+    data_insights_parser.add_argument("--output", default=None)
+
+    experiment_parser = subparsers.add_parser("experiment-table", help="Generate an experiment comparison table from evidence index.")
+    experiment_parser.add_argument("evidence_index_json")
+    experiment_parser.add_argument("--output", default=None)
+
+    repro_parser = subparsers.add_parser("repro-check", help="Generate a reproducibility checklist from evidence index.")
+    repro_parser.add_argument("evidence_index_json")
+    repro_parser.add_argument("--output", default=None)
 
     args = parser.parse_args(argv)
 
@@ -116,6 +143,35 @@ def main(argv: list[str] | None = None) -> int:
             [PaperRecord.model_validate(item) for item in payload],
             args.output,
         )
+        print(rendered)
+        return 0
+    if args.command == "paper-card":
+        text = read_text_file(args.paper_text)
+        paper = paper_card_from_text(text, args.paper_id, args.evidence_id)
+        if args.markdown:
+            rendered = generate_paper_card_markdown(paper, args.output)
+            print(rendered)
+        else:
+            rendered = paper.model_dump_json(indent=2)
+            if args.output:
+                target = Path(args.output)
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_text(rendered + "\n", encoding="utf-8")
+            print(rendered)
+        return 0
+    if args.command == "data-insights":
+        profile = profile_data_file(args.data_file)
+        rendered = generate_data_insight_report(profile, args.evidence_id, args.output)
+        print(rendered)
+        return 0
+    if args.command == "experiment-table":
+        evidence = load_evidence_index(args.evidence_index_json)
+        rendered = generate_experiment_comparison_table(evidence, args.output)
+        print(rendered)
+        return 0
+    if args.command == "repro-check":
+        evidence = load_evidence_index(args.evidence_index_json)
+        rendered = generate_reproducibility_checklist(evidence, args.output)
         print(rendered)
         return 0
     raise AssertionError(f"Unhandled command: {args.command}")

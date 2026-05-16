@@ -117,6 +117,10 @@ Use the Python package under `src/k_resdev_skill/` for deterministic helpers:
 - `extract_project_state_from_text(text, project_id)` for conservative plan mapping.
 - `write_monthly_report(evidence_items, reports_dir, project_state, period)` for non-final report drafts.
 - `generate_audit_qna(evidence_items, output_path)` for draft audit-defense Q&A.
+- `paper_card_from_text(text, paper_id, evidence_ids)` for supplied paper metadata only.
+- `generate_data_insight_report(profile, basis, output_path)` for hypothesis-level data insight candidates.
+- `generate_experiment_comparison_table(evidence_items, output_path)` for experiment/result comparison.
+- `generate_reproducibility_checklist(evidence_items, output_path)` for missing reproducibility evidence.
 
 Implementation guardrails:
 
@@ -124,6 +128,8 @@ Implementation guardrails:
 - Intake must not scan its own `state/` or `evidence/` outputs even when those folders are inside the inbox.
 - Claim checking must treat evidence IDs as necessary but not sufficient: report numbers still need to match linked evidence values.
 - Binary `.hwp` extraction is optional. Use `rhwp dump` when an `rhwp` CLI is available; otherwise mark extraction as `needs_review` instead of pretending HWP text was parsed.
+- Paper/research outputs must never invent citations, metrics, or verified conclusions. Keep them as `needs_review` or `hypothesis` until human-reviewed.
+- Agency templates under `templates/agencies/` are draft profile skeletons, not official rules.
 
 When running locally, prefer:
 
@@ -132,6 +138,8 @@ python -m pip install -e .
 python -m pytest
 python -m k_resdev_skill intake --inbox .\inbox --project my-rnd-project
 python -m k_resdev_skill draft-report .\state\evidence-index.json --period 2026-05
+python -m k_resdev_skill data-insights .\inbox\metrics.csv --output .\reports\data-insights.md
+python -m k_resdev_skill repro-check .\state\evidence-index.json --output .\reports\repro-check.md
 python -m k_resdev_skill classify .\inbox\some-file.pdf --text "..."
 python -m k_resdev_skill profile .\inbox\metrics.csv
 ```

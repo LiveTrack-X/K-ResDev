@@ -27,6 +27,14 @@ from .models import (
     SourceRecord,
 )
 from .plan_mapper import extract_project_state_from_text
+from .research_assistant import (
+    generate_data_insight_candidates,
+    generate_data_insight_report,
+    generate_experiment_comparison_table,
+    generate_paper_card_markdown,
+    generate_reproducibility_checklist,
+    paper_card_from_text,
+)
 from .reporting import draft_monthly_report, write_monthly_report
 
 __all__ = [
@@ -52,12 +60,18 @@ __all__ = [
     "extract_evidence_items_from_document",
     "extract_project_state_from_text",
     "generate_audit_qna",
+    "generate_data_insight_candidates",
+    "generate_data_insight_report",
+    "generate_experiment_comparison_table",
     "generate_literature_matrix",
+    "generate_paper_card_markdown",
+    "generate_reproducibility_checklist",
     "load_evidence_index",
     "profile_data_file",
+    "paper_card_from_text",
     "run_intake",
     "write_monthly_report",
     "write_evidence_index",
 ]
 
-__version__ = "0.1.0b2"
+__version__ = "0.1.0b3"

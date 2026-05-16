@@ -120,6 +120,15 @@ Implement:
 - document-level evidence candidates with quote/provenance fields
 - project profile template/schema for verified agency profiles later
 
+### Task 12: Research assistant P1 helpers
+
+Implement:
+- paper card extraction from supplied metadata text
+- data insight candidate report generation
+- experiment comparison table generation
+- reproducibility checklist generation
+- `national-rnd-basic` agency template skeletons marked `needs_review`
+
 ## Safety constraints
 
 - Never alter raw files.

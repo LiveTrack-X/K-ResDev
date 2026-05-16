@@ -2,7 +2,7 @@
 
 Purpose: 한국형 국책 R&D 환경에서 연구 행정 문서화, 증빙 정합성, 보고서 생성, 논문/데이터 인사이트 보조를 evidence-first 방식으로 지원하는 Codex/Skill 프로젝트입니다.
 
-Current release: `0.1 BETA 2` (`0.1.0b2`).
+Current release: `0.1 BETA 3` (`0.1.0b3`).
 
 Core principle:
 
@@ -36,6 +36,10 @@ This repository does not encode any single ministry/institution form as authorit
 - Draft audit-defense Q&A writer from evidence metadata.
 - Conservative plan mapper for KPI/milestone draft extraction from text.
 - Numeric evidence-mismatch detection when a report cites an evidence ID but uses unsupported numbers.
+- Paper card extraction from supplied metadata text without citation invention.
+- Data insight candidate reports that keep findings in hypothesis/review state.
+- Experiment comparison table and reproducibility checklist generators.
+- `national-rnd-basic` agency template skeleton for annual/interim/final reports, change requests, and performance registration drafts.
 
 ## Local use
 
@@ -46,6 +50,10 @@ python -m k_resdev_skill intake --inbox .\inbox --project my-rnd-project
 python -m k_resdev_skill map-plan .\inbox\plan.txt --output .\state\project-state.json
 python -m k_resdev_skill draft-report .\state\evidence-index.json --project-state .\state\project-state.json --period 2026-05
 python -m k_resdev_skill audit-qna .\state\evidence-index.json
+python -m k_resdev_skill paper-card .\inbox\paper-notes.txt --markdown --output .\reports\paper-card.md
+python -m k_resdev_skill data-insights .\inbox\metrics.csv --output .\reports\data-insights.md
+python -m k_resdev_skill experiment-table .\state\evidence-index.json --output .\reports\experiment-table.md
+python -m k_resdev_skill repro-check .\state\evidence-index.json --output .\reports\repro-check.md
 python -m k_resdev_skill classify .\inbox\plan.pdf --text "연구개발계획서 KPI"
 python -m k_resdev_skill profile .\inbox\metrics.csv
 ```

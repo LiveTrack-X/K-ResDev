@@ -149,6 +149,15 @@ Implement:
 
 Approval records are logs of human decisions, not decisions made by the tool. Bundle indexes must never copy, modify, or certify raw source files.
 
+### Task 15: Reproducible analysis beta workflow
+
+Implement:
+- deterministic CSV/XLSX analysis run command
+- profile JSON, insight candidate Markdown, replay script, and manifest outputs
+- source hash and safety metadata proving the raw file was not modified
+
+Analysis outputs remain draft candidates. Human review and statistical validation are still required before research or report claims are accepted.
+
 ## Safety constraints
 
 - Never alter raw files.

@@ -13,6 +13,7 @@ from .approval import (
     load_approval_records,
     write_approval_record,
 )
+from .analysis import generate_analysis_script, run_data_analysis
 from .budget import generate_budget_evidence_checklist
 from .claim_checker import check_unsupported_claims
 from .classifier import classify_file
@@ -94,6 +95,18 @@ def main(argv: list[str] | None = None) -> int:
     data_insights_parser.add_argument("data_file")
     data_insights_parser.add_argument("--evidence-id", action="append", default=[])
     data_insights_parser.add_argument("--output", default=None)
+
+    analysis_script_parser = subparsers.add_parser("analysis-script", help="Generate a reproducible analysis script for a CSV/XLSX file.")
+    analysis_script_parser.add_argument("data_file")
+    analysis_script_parser.add_argument("--output-dir", default="reports/analysis")
+    analysis_script_parser.add_argument("--evidence-id", action="append", default=[])
+    analysis_script_parser.add_argument("--output", default=None)
+
+    run_analysis_parser = subparsers.add_parser("run-analysis", help="Run deterministic profile/insight analysis and write a manifest.")
+    run_analysis_parser.add_argument("data_file")
+    run_analysis_parser.add_argument("--output-dir", default="reports/analysis")
+    run_analysis_parser.add_argument("--evidence-id", action="append", default=[])
+    run_analysis_parser.add_argument("--no-script", action="store_true")
 
     experiment_parser = subparsers.add_parser("experiment-table", help="Generate an experiment comparison table from evidence index.")
     experiment_parser.add_argument("evidence_index_json")
@@ -223,6 +236,18 @@ def main(argv: list[str] | None = None) -> int:
         profile = profile_data_file(args.data_file)
         rendered = generate_data_insight_report(profile, args.evidence_id, args.output)
         print(rendered)
+        return 0
+    if args.command == "analysis-script":
+        rendered = generate_analysis_script(args.data_file, args.output_dir, args.evidence_id)
+        if args.output:
+            target = Path(args.output)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(rendered, encoding="utf-8")
+        print(rendered)
+        return 0
+    if args.command == "run-analysis":
+        result = run_data_analysis(args.data_file, args.output_dir, args.evidence_id, write_script=not args.no_script)
+        print(result.model_dump_json(indent=2))
         return 0
     if args.command == "experiment-table":
         evidence = load_evidence_index(args.evidence_index_json)

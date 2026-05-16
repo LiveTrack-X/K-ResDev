@@ -267,6 +267,19 @@ class ReportDraftPaths(StrictModel):
     review_path: str | None = None
 
 
+class AnalysisRunResult(StrictModel):
+    analysis_id: str
+    source_file: str
+    source_hash: str
+    profile_path: str
+    insight_report_path: str
+    script_path: str | None = None
+    manifest_path: str
+    evidence_ids: list[str] = Field(default_factory=list)
+    status: str = "draft"
+    warnings: list[str] = Field(default_factory=list)
+
+
 class ApprovalRecord(StrictModel):
     approval_id: str
     target_type: ApprovalTargetType

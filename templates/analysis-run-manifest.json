@@ -1,0 +1,24 @@
+{
+  "analysis_id": "ANL-YYYY-NEEDSREVIEW",
+  "source_file": "inbox/metrics.csv",
+  "source_hash": "sha256:needs_review",
+  "profile_path": "reports/analysis/metrics-profile.json",
+  "insight_report_path": "reports/analysis/metrics-insights.md",
+  "script_path": "reports/analysis/metrics-analysis.py",
+  "manifest_path": "reports/analysis/metrics-analysis-run.json",
+  "evidence_ids": [],
+  "status": "draft",
+  "warnings": ["needs_review"],
+  "generated_at": "YYYY-MM-DDTHH:MM:SSZ",
+  "profile_summary": {
+    "row_count": "needs_review",
+    "column_count": "needs_review",
+    "columns": [],
+    "possible_metrics": []
+  },
+  "safety": {
+    "raw_file_modified": false,
+    "outputs_are_draft": true,
+    "human_review_required": true
+  }
+}

@@ -8,6 +8,7 @@ from .approval import (
     load_approval_records,
     write_approval_record,
 )
+from .analysis import generate_analysis_script, run_data_analysis
 from .claim_checker import check_unsupported_claims
 from .budget import budget_evidence_gaps, generate_budget_evidence_checklist
 from .classifier import classify_file
@@ -22,6 +23,7 @@ from .intake import run_intake
 from .literature import generate_literature_matrix
 from .models import (
     ApprovalRecord,
+    AnalysisRunResult,
     CheckFinding,
     DataProfile,
     EvidenceItem,
@@ -53,6 +55,7 @@ from .schema_tools import validate_json_file, validate_json_files
 
 __all__ = [
     "ApprovalRecord",
+    "AnalysisRunResult",
     "CheckFinding",
     "DataProfile",
     "EvidenceItem",
@@ -79,6 +82,7 @@ __all__ = [
     "extract_project_state_from_text",
     "generate_audit_qna",
     "generate_approval_summary",
+    "generate_analysis_script",
     "generate_budget_evidence_checklist",
     "generate_data_insight_candidates",
     "generate_data_insight_report",
@@ -98,6 +102,7 @@ __all__ = [
     "profile_data_file",
     "paper_card_from_text",
     "run_intake",
+    "run_data_analysis",
     "write_monthly_report",
     "validate_json_file",
     "validate_json_files",
@@ -105,4 +110,4 @@ __all__ = [
     "write_evidence_index",
 ]
 
-__version__ = "0.1.0b5"
+__version__ = "0.1.0b6"

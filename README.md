@@ -2,7 +2,7 @@
 
 Purpose: 한국형 국책 R&D 환경에서 연구 행정 문서화, 증빙 정합성, 보고서 생성, 논문/데이터 인사이트 보조를 evidence-first 방식으로 지원하는 Codex/Skill 프로젝트입니다.
 
-Current release: `0.1 BETA 5` (`0.1.0b5`).
+Current release: `0.1 BETA 6` (`0.1.0b6`).
 
 Core principle:
 
@@ -45,6 +45,7 @@ This repository does not encode any single ministry/institution form as authorit
 - Human approval record workflow for supplied reviewer decisions, approval summaries, and approval gates.
 - Evidence bundle index generator for audit/review packages without copying or altering raw files.
 - JSON schema validation CLI for bundled schemas such as evidence, project profile, research insight, and approval record.
+- Reproducible CSV/XLSX analysis run workflow that writes profile JSON, insight candidate Markdown, replay script, and manifest.
 - `national-rnd-basic` agency template skeleton for annual/interim/final reports, change requests, and performance registration drafts.
 
 ## Local use
@@ -58,6 +59,8 @@ python -m k_resdev_skill draft-report .\state\evidence-index.json --project-stat
 python -m k_resdev_skill audit-qna .\state\evidence-index.json
 python -m k_resdev_skill paper-card .\inbox\paper-notes.txt --markdown --output .\reports\paper-card.md
 python -m k_resdev_skill data-insights .\inbox\metrics.csv --output .\reports\data-insights.md
+python -m k_resdev_skill run-analysis .\inbox\metrics.csv --output-dir .\reports\analysis --evidence-id EVI-2026-0001
+python -m k_resdev_skill analysis-script .\inbox\metrics.csv --output-dir .\reports\analysis --output .\reports\analysis\metrics-analysis.py
 python -m k_resdev_skill plan-experiment .\state\research-insights.json --evidence-index .\state\evidence-index.json --output .\reports\experiment-plan.md
 python -m k_resdev_skill experiment-table .\state\evidence-index.json --output .\reports\experiment-table.md
 python -m k_resdev_skill repro-check .\state\evidence-index.json --output .\reports\repro-check.md

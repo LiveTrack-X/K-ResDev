@@ -127,6 +127,8 @@ Use the Python package under `src/k_resdev_skill/` for deterministic helpers:
 - `create_approval_record(...)`, `generate_approval_summary(...)`, and `approval_gate_status(...)` for supplied human review decisions.
 - `generate_evidence_bundle_index(evidence_items, approval_records, output_path)` for audit/review bundle indexes.
 - `validate_json_files(json_paths, schema)` for bundled or custom JSON schema checks.
+- `run_data_analysis(data_file, output_dir, evidence_ids)` for reproducible CSV/XLSX profiling, insight report, replay script, and manifest output.
+- `generate_analysis_script(data_file, output_dir, evidence_ids)` for a minimal replay script.
 
 Implementation guardrails:
 
@@ -137,6 +139,7 @@ Implementation guardrails:
 - Paper/research outputs must never invent citations, metrics, or verified conclusions. Keep them as `needs_review` or `hypothesis` until human-reviewed.
 - Agency templates under `templates/agencies/` are draft profile skeletons, not official rules.
 - Approval records must reflect supplied human decisions. The tool must not infer or invent approval.
+- Analysis runs must leave raw data unchanged and mark generated outputs as draft/human-review-required.
 
 When running locally, prefer:
 
@@ -146,6 +149,7 @@ python -m pytest
 python -m k_resdev_skill intake --inbox .\inbox --project my-rnd-project
 python -m k_resdev_skill draft-report .\state\evidence-index.json --period 2026-05
 python -m k_resdev_skill data-insights .\inbox\metrics.csv --output .\reports\data-insights.md
+python -m k_resdev_skill run-analysis .\inbox\metrics.csv --output-dir .\reports\analysis --evidence-id EVI-2026-0001
 python -m k_resdev_skill plan-experiment .\state\research-insights.json --evidence-index .\state\evidence-index.json --output .\reports\experiment-plan.md
 python -m k_resdev_skill repro-check .\state\evidence-index.json --output .\reports\repro-check.md
 python -m k_resdev_skill budget-check .\state\evidence-index.json --output .\reports\budget-checklist.md

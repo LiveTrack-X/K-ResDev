@@ -52,6 +52,8 @@ from .models import (
     WorkspaceDoctorFinding,
     WorkspaceDoctorResult,
     WorkspaceInitResult,
+    WorkspaceReportIntegrityItem,
+    WorkspaceReportIntegrityResult,
     WorkspaceReviewPackResult,
     WorkspaceReviewPackVerificationResult,
     WorkspaceSummaryResult,
@@ -59,6 +61,7 @@ from .models import (
 from .plan_mapper import extract_project_state_from_text
 from .profile_registry import generate_profile_registry, list_project_profiles, load_project_profile
 from .projection_export import export_projection, write_projection_docx, write_projection_html, write_projection_text
+from .report_integrity import generate_workspace_report_integrity, render_report_integrity_markdown
 from .research_assistant import (
     generate_data_insight_candidates,
     generate_data_insight_report,
@@ -109,6 +112,8 @@ __all__ = [
     "WorkspaceDoctorFinding",
     "WorkspaceDoctorResult",
     "WorkspaceInitResult",
+    "WorkspaceReportIntegrityItem",
+    "WorkspaceReportIntegrityResult",
     "WorkspaceReviewPackResult",
     "WorkspaceReviewPackVerificationResult",
     "WorkspaceSummaryResult",
@@ -138,6 +143,7 @@ __all__ = [
     "generate_reproducibility_checklist",
     "generate_workspace_action_plan",
     "generate_workspace_approval_coverage",
+    "generate_workspace_report_integrity",
     "generate_workspace_review_pack",
     "generate_workspace_summary",
     "initialize_workspace",
@@ -155,6 +161,7 @@ __all__ = [
     "render_action_plan_markdown",
     "render_approval_coverage_markdown",
     "render_evidence_source_verification_markdown",
+    "render_report_integrity_markdown",
     "render_workspace_review_pack_markdown",
     "render_workspace_summary_markdown",
     "run_workspace_doctor",
@@ -169,4 +176,4 @@ __all__ = [
     "write_projection_text",
 ]
 
-__version__ = "0.1.0b15"
+__version__ = "0.1.0b16"

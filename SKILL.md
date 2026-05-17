@@ -126,6 +126,7 @@ Use the Python package under `src/k_resdev_skill/` for deterministic helpers:
 - `generate_profile_registry(templates_root, output_path)` for local agency profile/template registry output.
 - `create_approval_record(...)`, `generate_approval_summary(...)`, and `approval_gate_status(...)` for supplied human review decisions.
 - `generate_workspace_approval_coverage(root, output_path, json_path)` for checking report artifacts against supplied human decisions.
+- `generate_workspace_report_integrity(root, output_path, json_path)` for checking Markdown report drafts against indexed evidence claims.
 - `generate_evidence_bundle_index(evidence_items, approval_records, output_path)` for audit/review bundle indexes.
 - `validate_json_files(json_paths, schema)` for bundled or custom JSON schema checks.
 - `run_data_analysis(data_file, output_dir, evidence_ids)` for reproducible CSV/XLSX profiling, insight report, replay script, and manifest output.
@@ -135,7 +136,7 @@ Use the Python package under `src/k_resdev_skill/` for deterministic helpers:
 - `run_workspace_doctor(root, output_path, json_path)` for readiness checks across evidence, profile, approvals, reports, exports, and analysis manifests.
 - `generate_workspace_action_plan(root, doctor_result, output_path, json_path)` for deterministic next actions derived from doctor findings.
 - `generate_workspace_summary(root, output_path, json_path, max_actions)` for one-page operational workspace status reports.
-- `generate_workspace_review_pack(root, reports_dir, state_dir, max_actions)` for bundled readiness, next-action, summary, source-verification, and approval-coverage artifacts.
+- `generate_workspace_review_pack(root, reports_dir, state_dir, max_actions)` for bundled readiness, next-action, summary, source-verification, approval-coverage, and report-integrity artifacts.
 - `verify_workspace_review_pack(manifest_json)` for checking generated review-pack artifacts against saved hashes.
 - `verify_evidence_sources(evidence_index_json, root, inbox, output_path, json_path)` for checking indexed source files against saved source hashes.
 
@@ -158,6 +159,7 @@ Implementation guardrails:
 - Evidence source verification only checks local file presence and hash equality. It does not prove that the source content is officially valid or scientifically correct.
 - Workspace doctor source-integrity findings are operational blockers/warnings only. They do not replace human review, source provenance judgment, or official audit checks.
 - Approval coverage only checks whether local artifacts are linked to supplied human decisions. It does not create, infer, or certify approval.
+- Report integrity checks are draft consistency checks only. They do not certify official compliance, scientific validity, or final approval.
 
 When running locally, prefer:
 
@@ -169,6 +171,7 @@ python -m k_resdev_skill init-workspace --root .\demo-workspace --project-id PRJ
 python -m k_resdev_skill doctor --root .\demo-workspace --output .\demo-workspace\reports\readiness.md --json .\demo-workspace\state\readiness.json
 python -m k_resdev_skill next-actions --root .\demo-workspace --output .\demo-workspace\reports\next-actions.md --json .\demo-workspace\state\next-actions.json
 python -m k_resdev_skill approval-coverage --root .\demo-workspace --output .\demo-workspace\reports\approval-coverage.md --json .\demo-workspace\state\approval-coverage.json
+python -m k_resdev_skill report-integrity --root .\demo-workspace --output .\demo-workspace\reports\report-integrity.md --json .\demo-workspace\state\report-integrity.json
 python -m k_resdev_skill workspace-summary --root .\demo-workspace --output .\demo-workspace\reports\workspace-summary.md --json .\demo-workspace\state\workspace-summary.json
 python -m k_resdev_skill workspace-review-pack --root .\demo-workspace
 python -m k_resdev_skill verify-review-pack .\demo-workspace\state\workspace-review-pack.json

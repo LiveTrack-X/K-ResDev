@@ -81,6 +81,7 @@ def _actions_for_findings(root: Path, findings: list[WorkspaceDoctorFinding]) ->
         _action_for_budget_gaps(root, by_code),
         _action_for_profile(root, by_code),
         _action_for_approval_coverage(root, by_code),
+        _action_for_report_integrity(root, by_code),
         _action_for_reports(root, by_code),
         _action_for_analysis(root, by_code),
         _action_for_exports(root, by_code),
@@ -211,6 +212,22 @@ def _action_for_approval_coverage(root: Path, by_code: dict[str, list[WorkspaceD
         "Review report approval coverage",
         "Report artifacts should be linked to supplied human approval records before official use.",
         f'python -m k_resdev_skill approval-coverage --root "{root}" --output "{root / "reports" / "approval-coverage.md"}" --json "{root / "state" / "approval-coverage.json"}"',
+        by_code,
+        codes,
+    )
+
+
+def _action_for_report_integrity(root: Path, by_code: dict[str, list[WorkspaceDoctorFinding]]) -> WorkspaceActionItem | None:
+    codes = ["report_integrity_unchecked", "report_integrity_high_findings", "report_integrity_review_findings"]
+    if not any(code in by_code for code in codes):
+        return None
+    priority = "high" if any(code in by_code for code in ("report_integrity_unchecked", "report_integrity_high_findings")) else "medium"
+    return _action(
+        root,
+        priority,
+        "Review report claim integrity",
+        "Report drafts should not contain unsupported numbers, missing evidence IDs, or evidence-mismatched claims.",
+        f'python -m k_resdev_skill report-integrity --root "{root}" --output "{root / "reports" / "report-integrity.md"}" --json "{root / "state" / "report-integrity.json"}"',
         by_code,
         codes,
     )

@@ -29,6 +29,7 @@ from .models import EvidenceItem, PaperRecord, ProjectState, ResearchInsight
 from .plan_mapper import extract_project_state_from_text
 from .profile_registry import generate_profile_registry, list_project_profiles, load_project_profile
 from .projection_export import export_projection
+from .report_integrity import generate_workspace_report_integrity
 from .research_assistant import (
     generate_data_insight_report,
     generate_experiment_comparison_table,
@@ -198,6 +199,11 @@ def main(argv: list[str] | None = None) -> int:
     approval_coverage_parser.add_argument("--output", default=None)
     approval_coverage_parser.add_argument("--json", default=None)
 
+    report_integrity_parser = subparsers.add_parser("report-integrity", help="Check report drafts against indexed evidence claims.")
+    report_integrity_parser.add_argument("--root", default=".")
+    report_integrity_parser.add_argument("--output", default=None)
+    report_integrity_parser.add_argument("--json", default=None)
+
     workspace_summary_parser = subparsers.add_parser("workspace-summary", help="Generate a one-page operational workspace summary.")
     workspace_summary_parser.add_argument("--root", default=".")
     workspace_summary_parser.add_argument("--output", default=None)
@@ -206,7 +212,7 @@ def main(argv: list[str] | None = None) -> int:
 
     review_pack_parser = subparsers.add_parser(
         "workspace-review-pack",
-        help="Generate readiness, next-action, summary, source-verification, and approval-coverage artifacts in one local review pack.",
+        help="Generate readiness, next-action, summary, source-verification, approval-coverage, and report-integrity artifacts in one local review pack.",
     )
     review_pack_parser.add_argument("--root", default=".")
     review_pack_parser.add_argument("--reports-dir", default=None)
@@ -397,6 +403,10 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if args.command == "approval-coverage":
         result = generate_workspace_approval_coverage(args.root, output_path=args.output, json_path=args.json)
+        print(result.model_dump_json(indent=2))
+        return 0
+    if args.command == "report-integrity":
+        result = generate_workspace_report_integrity(args.root, output_path=args.output, json_path=args.json)
         print(result.model_dump_json(indent=2))
         return 0
     if args.command == "workspace-summary":

@@ -248,6 +248,17 @@ Implement:
 
 Approval coverage checks supplied human decision records only. It must not infer approval, certify official submission readiness, or treat a generated review pack as approval.
 
+### Task 25: Report integrity in workspace operations
+
+Implement:
+- report-integrity report for Markdown report drafts
+- reuse unsupported-claim checks across workspace report drafts
+- workspace doctor findings for unchecked, high-severity, and review-level report claim issues
+- next-action routing for report-integrity findings
+- report-integrity Markdown/JSON artifacts inside `workspace-review-pack`
+
+Report integrity is a local consistency projection only. It must not certify official compliance, scientific validity, or human approval.
+
 ## Safety constraints
 
 - Never alter raw files.

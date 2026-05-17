@@ -364,6 +364,30 @@ class WorkspaceApprovalCoverageResult(StrictModel):
     warnings: list[str] = Field(default_factory=list)
 
 
+class WorkspaceReportIntegrityItem(StrictModel):
+    path: str
+    finding_count: int = 0
+    high_count: int = 0
+    medium_count: int = 0
+    low_count: int = 0
+    findings: list[CheckFinding] = Field(default_factory=list)
+    warnings: list[str] = Field(default_factory=list)
+
+
+class WorkspaceReportIntegrityResult(StrictModel):
+    root: str
+    status: str
+    report_count: int = 0
+    finding_count: int = 0
+    high_count: int = 0
+    medium_count: int = 0
+    low_count: int = 0
+    items: list[WorkspaceReportIntegrityItem] = Field(default_factory=list)
+    markdown_path: str | None = None
+    json_path: str | None = None
+    warnings: list[str] = Field(default_factory=list)
+
+
 class WorkspaceSummaryResult(StrictModel):
     root: str
     status: str
@@ -443,6 +467,9 @@ class WorkspaceReviewPackResult(StrictModel):
     approval_coverage_status: str | None = None
     approval_missing_count: int = 0
     approval_not_approved_count: int = 0
+    report_integrity_status: str | None = None
+    report_integrity_finding_count: int = 0
+    report_integrity_high_count: int = 0
     generated_paths: list[str] = Field(default_factory=list)
     artifacts: list[ReviewPackArtifact] = Field(default_factory=list)
     index_path: str

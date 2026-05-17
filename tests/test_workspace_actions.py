@@ -80,6 +80,27 @@ def test_workspace_action_plan_maps_approval_coverage_findings(tmp_path):
     assert "approval-coverage" in (coverage_action.command or "")
 
 
+def test_workspace_action_plan_maps_report_integrity_findings(tmp_path):
+    doctor_result = WorkspaceDoctorResult(
+        root=str(tmp_path),
+        status="blocked",
+        findings=[
+            WorkspaceDoctorFinding(
+                code="report_integrity_high_findings",
+                severity="high",
+                message="claim issue",
+                path=str(tmp_path / "reports"),
+            )
+        ],
+    )
+
+    plan = generate_workspace_action_plan(tmp_path, doctor_result=doctor_result)
+    action = next(item for item in plan.actions if item.title == "Review report claim integrity")
+
+    assert action.priority == "high"
+    assert "report-integrity" in (action.command or "")
+
+
 def test_next_actions_cli_writes_outputs(tmp_path, capsys):
     initialize_workspace(tmp_path, "PRJ-2026-0001", "Demo Project")
     output = tmp_path / "reports" / "next-actions.md"

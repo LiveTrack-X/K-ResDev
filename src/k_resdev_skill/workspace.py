@@ -16,6 +16,7 @@ from .models import (
     WorkspaceInitResult,
 )
 from .profile_registry import default_agency_templates_root, load_project_profile
+from .report_integrity import generate_workspace_report_integrity
 from .schema_tools import validate_json_file
 from .source_verification import verify_evidence_sources
 
@@ -36,6 +37,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "evidence-bundle-index.md",
     "next-actions.md",
     "readiness.md",
+    "report-integrity.md",
     "source-verification.md",
     "workspace-review-pack.md",
     "workspace-summary.md",
@@ -118,6 +120,7 @@ def run_workspace_doctor(
     _check_approval_coverage(workspace, findings)
     _check_profile(workspace, findings)
     _check_reports(workspace, findings)
+    _check_report_integrity(workspace, findings)
     _check_exports(workspace, findings)
     _check_analysis(workspace, findings)
 
@@ -399,6 +402,43 @@ def _check_reports(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> N
         findings.append(_finding("report_missing", "low", "No report Markdown drafts found.", reports_dir, "Generate a draft report when evidence is ready."))
 
 
+def _check_report_integrity(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> None:
+    result = generate_workspace_report_integrity(workspace)
+    if result.report_count == 0:
+        return
+    if any(warning.startswith("evidence_index_unreadable:") for warning in result.warnings):
+        findings.append(
+            _finding(
+                "report_integrity_unchecked",
+                "high",
+                "Report integrity could not be checked because the evidence index is unavailable.",
+                workspace / "state" / "evidence-index.json",
+                "Regenerate the evidence index, then rerun report-integrity.",
+            )
+        )
+        return
+    if result.high_count:
+        findings.append(
+            _finding(
+                "report_integrity_high_findings",
+                "high",
+                f"{result.high_count} high-severity report integrity finding(s) were detected.",
+                workspace / "reports",
+                "Run report-integrity and fix unsupported or mismatched claims before approval.",
+            )
+        )
+    if result.medium_count or result.low_count or result.warnings:
+        findings.append(
+            _finding(
+                "report_integrity_review_findings",
+                "medium",
+                f"{result.medium_count + result.low_count} report integrity review finding(s) or warnings were detected.",
+                workspace / "reports",
+                "Review report-integrity output before external use.",
+            )
+        )
+
+
 def _check_exports(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> None:
     reports_dir = workspace / "reports"
     if not reports_dir.exists():
@@ -492,10 +532,11 @@ def _starter_readme(project_id: str, title: str, profile_id: str) -> str:
             "- Run `k-resdev intake --inbox inbox --state-dir state --evidence-dir evidence` to build evidence metadata.",
             "- Run `k-resdev doctor --root . --output reports/readiness.md --json state/readiness.json` before reporting.",
             "- Run `k-resdev workspace-summary --root . --output reports/workspace-summary.md --json state/workspace-summary.json` for a one-page status handoff.",
-            "- Run `k-resdev workspace-review-pack --root .` to refresh readiness, next actions, summary, source-verification, and approval-coverage artifacts together.",
+            "- Run `k-resdev workspace-review-pack --root .` to refresh readiness, next actions, summary, source-verification, approval-coverage, and report-integrity artifacts together.",
             "- Run `k-resdev verify-review-pack state/workspace-review-pack.json` to check saved review-pack artifact hashes.",
             "- Run `k-resdev verify-evidence-sources state/evidence-index.json --root . --output reports/source-verification.md --json state/source-verification.json` to check indexed source hashes.",
             "- Run `k-resdev approval-coverage --root . --output reports/approval-coverage.md --json state/approval-coverage.json` to check report approval coverage.",
+            "- Run `k-resdev report-integrity --root . --output reports/report-integrity.md --json state/report-integrity.json` to check report claims against evidence.",
             "",
         ]
     )

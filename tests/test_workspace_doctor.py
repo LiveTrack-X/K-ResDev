@@ -99,6 +99,30 @@ def test_workspace_doctor_flags_report_approval_coverage(tmp_path):
     assert "report_approval_missing" not in approved_codes
 
 
+def test_workspace_doctor_flags_report_integrity_findings(tmp_path):
+    initialize_workspace(tmp_path, "PRJ-2026-0001", "Demo Project")
+    write_evidence_index(
+        [
+            EvidenceItem(
+                evidence_id="EVI-2026-ABCD1234",
+                source_file="metrics.csv",
+                evidence_type="experiment_result",
+                claim="Metric candidate.",
+                value={"score": 0.81},
+                status="accepted",
+            )
+        ],
+        tmp_path / "state",
+    )
+    (tmp_path / "reports" / "monthly-report-2026-05.md").write_text("Accuracy reached 95%.\n", encoding="utf-8")
+
+    result = run_workspace_doctor(tmp_path)
+    codes = {finding.code for finding in result.findings}
+
+    assert result.status == "blocked"
+    assert "report_integrity_high_findings" in codes
+
+
 def test_workspace_doctor_flags_source_hash_mismatch(tmp_path):
     initialize_workspace(tmp_path, "PRJ-2026-0001", "Demo Project")
     source = tmp_path / "inbox" / "metrics.csv"

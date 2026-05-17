@@ -149,6 +149,7 @@ Implementation guardrails:
 - Paper/research outputs must never invent citations, metrics, or verified conclusions. Keep them as `needs_review` or `hypothesis` until human-reviewed.
 - Agency templates under `templates/agencies/` are draft profile skeletons, not official rules.
 - Approval records must reflect supplied human decisions. The tool must not infer or invent approval.
+- Approval records should include `target_path` when available so the target hash can be captured and later checked for drift.
 - Analysis runs must leave raw data unchanged and mark generated outputs as draft/human-review-required.
 - Projection exports must retain the draft/human-approval notice and must not be described as final official documents.
 - Workspace doctor output is a readiness projection only; it does not certify official agency compliance.
@@ -159,6 +160,7 @@ Implementation guardrails:
 - Evidence source verification only checks local file presence and hash equality. It does not prove that the source content is officially valid or scientifically correct.
 - Workspace doctor source-integrity findings are operational blockers/warnings only. They do not replace human review, source provenance judgment, or official audit checks.
 - Approval coverage only checks whether local artifacts are linked to supplied human decisions. It does not create, infer, or certify approval.
+- Approval target hash verification only detects local artifact drift after approval. It does not prove the approval was valid or sufficient.
 - Report integrity checks are draft consistency checks only. They do not certify official compliance, scientific validity, or final approval.
 - Report drafts that cite `draft`, `needs_review`, `rejected`, or `superseded` evidence must remain review-blocked or clearly disclosed; a known evidence ID is not enough by itself.
 
@@ -185,7 +187,7 @@ python -m k_resdev_skill repro-check .\state\evidence-index.json --output .\repo
 python -m k_resdev_skill budget-check .\state\evidence-index.json --output .\reports\budget-checklist.md
 python -m k_resdev_skill profiles --markdown --output .\reports\agency-profiles.md
 python -m k_resdev_skill validate-json approval .\state\approvals\APR-2026-EXAMPLE.json
-python -m k_resdev_skill approval-record --target-type report --target-id monthly-2026-05 --decision needs_changes --reviewer reviewer-name
+python -m k_resdev_skill approval-record --target-type report --target-id monthly-2026-05 --target-path .\reports\monthly-report-2026-05.md --decision needs_changes --reviewer reviewer-name
 python -m k_resdev_skill approval-gate .\state\approvals --target-type report --target-id monthly-2026-05
 python -m k_resdev_skill bundle-index .\state\evidence-index.json --approval-records .\state\approvals --output .\reports\evidence-bundle-index.md
 python -m k_resdev_skill export-projection .\reports\monthly-report-2026-05.md --output .\reports\monthly-report-2026-05.docx --format docx

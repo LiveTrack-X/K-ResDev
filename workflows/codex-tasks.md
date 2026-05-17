@@ -268,6 +268,16 @@ Implement:
 
 A known evidence ID is necessary but not sufficient for report readiness. The evidence review state must remain visible before approval or external review.
 
+### Task 27: Approval target hash binding
+
+Implement:
+- optional `target_hash` and `target_size_bytes` fields on approval records
+- automatic target hash capture when `approval-record --target-path` points to an existing file
+- approval-coverage detection for approved artifacts changed after approval
+- doctor and next-action routing for approval target hash mismatch/unverified approvals
+
+Approval target hashes only detect local artifact drift after approval. They do not create, infer, or certify human approval.
+
 ## Safety constraints
 
 - Never alter raw files.

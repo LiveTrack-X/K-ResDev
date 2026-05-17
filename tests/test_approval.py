@@ -1,4 +1,5 @@
 import json
+import hashlib
 
 from k_resdev_skill.approval import (
     approval_gate_status,
@@ -29,6 +30,25 @@ def test_approval_record_round_trip_and_gate(tmp_path):
     assert gate["approved"] is True
     assert "Dr. Kim" in summary
     assert "Human decision log only" in (tmp_path / "approval-summary.md").read_text(encoding="utf-8")
+    assert gate["target_hash"] is None
+
+
+def test_approval_record_hashes_existing_target_path(tmp_path):
+    target = tmp_path / "reports" / "monthly-report.md"
+    target.parent.mkdir()
+    target.write_text("# Report\n", encoding="utf-8")
+
+    record = create_approval_record(
+        target_type="report",
+        target_id="monthly-report",
+        decision="approved",
+        reviewer="Dr. Kim",
+        target_path=str(target),
+        reviewed_at="2026-05-17T09:00:00Z",
+    )
+
+    assert record.target_hash == _sha256(target)
+    assert record.target_size_bytes == target.stat().st_size
 
 
 def test_approval_cli_print_only_and_summary(tmp_path, capsys):
@@ -70,8 +90,45 @@ def test_approval_cli_print_only_and_summary(tmp_path, capsys):
     assert gate["decision"] == "needs_changes"
 
 
+def test_approval_cli_records_target_hash(tmp_path, capsys):
+    target = tmp_path / "reports" / "monthly-report.md"
+    target.parent.mkdir()
+    target.write_text("# Report\n", encoding="utf-8")
+    approvals_dir = tmp_path / "approvals"
+
+    assert (
+        main(
+            [
+                "approval-record",
+                "--target-type",
+                "report",
+                "--target-id",
+                "monthly-report",
+                "--target-path",
+                str(target),
+                "--decision",
+                "approved",
+                "--reviewer",
+                "Reviewer",
+                "--reviewed-at",
+                "2026-05-17T09:00:00Z",
+                "--approvals-dir",
+                str(approvals_dir),
+            ]
+        )
+        == 0
+    )
+
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["target_hash"] == _sha256(target)
+
+
 def test_missing_approval_gate_is_explicit():
     gate = approval_gate_status([], "report", "monthly-2026-05")
 
     assert gate["approved"] is False
     assert gate["decision"] == "missing"
+
+
+def _sha256(path):
+    return "sha256:" + hashlib.sha256(path.read_bytes()).hexdigest()

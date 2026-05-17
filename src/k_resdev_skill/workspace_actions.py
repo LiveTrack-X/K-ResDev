@@ -203,12 +203,19 @@ def _action_for_profile(root: Path, by_code: dict[str, list[WorkspaceDoctorFindi
 
 
 def _action_for_approval_coverage(root: Path, by_code: dict[str, list[WorkspaceDoctorFinding]]) -> WorkspaceActionItem | None:
-    codes = ["approval_coverage_unreadable", "report_approval_missing", "report_approval_not_approved"]
+    codes = [
+        "approval_coverage_unreadable",
+        "report_approval_missing",
+        "report_approval_not_approved",
+        "approval_target_hash_mismatch",
+        "approval_target_hash_unverified",
+    ]
     if not any(code in by_code for code in codes):
         return None
+    priority = "high" if "approval_target_hash_mismatch" in by_code else "medium"
     return _action(
         root,
-        "medium",
+        priority,
         "Review report approval coverage",
         "Report artifacts should be linked to supplied human approval records before official use.",
         f'python -m k_resdev_skill approval-coverage --root "{root}" --output "{root / "reports" / "approval-coverage.md"}" --json "{root / "state" / "approval-coverage.json"}"',

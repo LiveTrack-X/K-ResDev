@@ -37,6 +37,7 @@ def test_workspace_approval_coverage_matches_target_id_and_target_path(tmp_path)
         "monthly-2026-05",
         "approved",
         "Reviewer",
+        target_path=str(report),
         reviewed_at="2026-05-17T09:00:00Z",
     )
     target_path_record = create_approval_record(
@@ -44,7 +45,7 @@ def test_workspace_approval_coverage_matches_target_id_and_target_path(tmp_path)
         "monthly-report-2026-05-export",
         "approved",
         "Reviewer",
-        target_path="reports/monthly-report-2026-05.txt",
+        target_path=str(export),
         reviewed_at="2026-05-17T10:00:00Z",
     )
     write_approval_record(target_id_record, tmp_path / "state" / "approvals")
@@ -56,8 +57,57 @@ def test_workspace_approval_coverage_matches_target_id_and_target_path(tmp_path)
     assert result.status == "ready"
     assert result.approved_count == 2
     assert result.missing_count == 0
+    assert result.hash_mismatch_count == 0
+    assert result.hash_unverified_count == 0
     assert decisions[str(report)] is True
     assert decisions[str(export)] is True
+
+
+def test_workspace_approval_coverage_detects_changed_approved_artifact(tmp_path):
+    initialize_workspace(tmp_path, "PRJ-2026-0001", "Demo Project")
+    report = tmp_path / "reports" / "monthly-report-2026-05.md"
+    report.write_text("# Monthly Report\n\nDraft projection only.\n", encoding="utf-8")
+    approval = create_approval_record(
+        "report",
+        "monthly-2026-05",
+        "approved",
+        "Reviewer",
+        target_path=str(report),
+        reviewed_at="2026-05-17T09:00:00Z",
+    )
+    write_approval_record(approval, tmp_path / "state" / "approvals")
+
+    report.write_text("# Monthly Report\n\nChanged after approval.\n", encoding="utf-8")
+
+    result = generate_workspace_approval_coverage(tmp_path)
+    item = result.items[0]
+
+    assert result.status == "blocked"
+    assert result.hash_mismatch_count == 1
+    assert item.hash_status == "mismatch"
+    assert "approval_target_hash_mismatch" in item.warnings
+
+
+def test_workspace_approval_coverage_marks_legacy_approval_hash_unverified(tmp_path):
+    initialize_workspace(tmp_path, "PRJ-2026-0001", "Demo Project")
+    report = tmp_path / "reports" / "monthly-report-2026-05.md"
+    report.write_text("# Monthly Report\n\nDraft projection only.\n", encoding="utf-8")
+    approval = create_approval_record(
+        "report",
+        "monthly-2026-05",
+        "approved",
+        "Reviewer",
+        reviewed_at="2026-05-17T09:00:00Z",
+    )
+    write_approval_record(approval, tmp_path / "state" / "approvals")
+
+    result = generate_workspace_approval_coverage(tmp_path)
+    item = result.items[0]
+
+    assert result.status == "needs_review"
+    assert result.hash_unverified_count == 1
+    assert item.hash_status == "not_recorded"
+    assert "approval_target_hash_unverified" in item.warnings
 
 
 def test_approval_coverage_cli_writes_outputs(tmp_path, capsys):

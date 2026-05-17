@@ -15,6 +15,8 @@ def create_approval_record(
     reviewer: str,
     evidence_ids: list[str] | None = None,
     target_path: str | None = None,
+    target_hash: str | None = None,
+    target_size_bytes: int | None = None,
     notes: str | None = None,
     risk_flags: list[str] | None = None,
     reviewed_at: str | None = None,
@@ -24,12 +26,15 @@ def create_approval_record(
     reviewed = reviewed_at or datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")
     target_type_value = ApprovalTargetType(target_type)
     decision_value = ApprovalDecision(decision)
+    inferred_hash, inferred_size = _target_metadata(target_path)
     approval_id = _approval_id(target_type_value.value, target_id, decision_value.value, reviewer, reviewed)
     return ApprovalRecord(
         approval_id=approval_id,
         target_type=target_type_value,
         target_id=target_id,
         target_path=target_path,
+        target_hash=target_hash or inferred_hash,
+        target_size_bytes=target_size_bytes if target_size_bytes is not None else inferred_size,
         decision=decision_value,
         reviewer=reviewer,
         reviewed_at=reviewed,
@@ -54,7 +59,7 @@ def load_approval_records(path: str | Path) -> list[ApprovalRecord]:
         for record_path in sorted(source.glob("*.json")):
             records.extend(load_approval_records(record_path))
         return records
-    payload = json.loads(source.read_text(encoding="utf-8"))
+    payload = json.loads(source.read_text(encoding="utf-8-sig"))
     if isinstance(payload, list):
         return [ApprovalRecord.model_validate(item) for item in payload]
     if isinstance(payload, dict) and "items" in payload:
@@ -101,6 +106,7 @@ def approval_gate_status(
         "approval_id": latest.approval_id,
         "reviewer": latest.reviewer,
         "reviewed_at": latest.reviewed_at,
+        "target_hash": latest.target_hash,
     }
 
 
@@ -113,19 +119,20 @@ def generate_approval_summary(
         "",
         "> Human decision log only. This file records supplied review decisions; it does not approve anything by itself.",
         "",
-        "| Approval | Target | Decision | Reviewer | Reviewed At | Evidence | Risk Flags |",
-        "|---|---|---|---|---|---|---|",
+        "| Approval | Target | Decision | Reviewer | Reviewed At | Target Hash | Evidence | Risk Flags |",
+        "|---|---|---|---|---|---|---|---|",
     ]
     if not records:
-        lines.append("| needs_approval | needs_review | missing | needs_review | needs_review | needs_evidence | approval_missing |")
+        lines.append("| needs_approval | needs_review | missing | needs_review | needs_review | needs_hash | needs_evidence | approval_missing |")
     for record in sorted(records, key=lambda item: (item.target_type, item.target_id, item.reviewed_at)):
         lines.append(
-            "| {approval} | {target} | {decision} | {reviewer} | {reviewed} | {evidence} | {risk} |".format(
+            "| {approval} | {target} | {decision} | {reviewer} | {reviewed} | {target_hash} | {evidence} | {risk} |".format(
                 approval=_escape(record.approval_id),
                 target=_escape(f"{record.target_type}:{record.target_id}"),
                 decision=_escape(str(record.decision)),
                 reviewer=_escape(record.reviewer),
                 reviewed=_escape(record.reviewed_at),
+                target_hash=_escape(record.target_hash or "-"),
                 evidence=_escape(", ".join(record.evidence_ids) or "needs_evidence"),
                 risk=_escape(", ".join(record.risk_flags) or "-"),
             )
@@ -143,6 +150,23 @@ def _approval_id(target_type: str, target_id: str, decision: str, reviewer: str,
     digest = hashlib.sha256(f"{target_type}|{target_id}|{decision}|{reviewer}|{reviewed_at}".encode("utf-8")).hexdigest()
     year = reviewed_at[:4] if reviewed_at[:4].isdigit() else datetime.now(UTC).strftime("%Y")
     return f"APR-{year}-{digest[:8].upper()}"
+
+
+def _target_metadata(target_path: str | None) -> tuple[str | None, int | None]:
+    if not target_path:
+        return None, None
+    path = Path(target_path)
+    if not path.exists() or not path.is_file():
+        return None, None
+    return _sha256_file(path), path.stat().st_size
+
+
+def _sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return f"sha256:{digest.hexdigest()}"
 
 
 def _escape(value: str) -> str:

@@ -36,6 +36,8 @@ def test_workspace_review_pack_writes_all_review_artifacts(tmp_path):
     assert result.action_count > 0
     assert result.source_verification_valid is False
     assert result.approval_coverage_status == "no_artifacts"
+    assert result.approval_hash_mismatch_count == 0
+    assert result.approval_hash_unverified_count == 0
     assert result.report_integrity_status == "no_reports"
     assert result.artifacts
     assert all(len(artifact.sha256) == 64 for artifact in result.artifacts)
@@ -43,6 +45,7 @@ def test_workspace_review_pack_writes_all_review_artifacts(tmp_path):
     assert "Review pack projection only" in rendered
     assert "Source verification valid" in rendered
     assert "Approval coverage status" in rendered
+    assert "Approval hash mismatch count" in rendered
     assert "Report integrity status" in rendered
     assert "Hashed artifacts" in rendered
     assert json.loads((tmp_path / "state" / "workspace-review-pack.json").read_text(encoding="utf-8"))["index_path"] == str(

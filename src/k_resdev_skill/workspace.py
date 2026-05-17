@@ -371,6 +371,26 @@ def _check_approval_coverage(workspace: Path, findings: list[WorkspaceDoctorFind
                 "Resolve requested changes before official use.",
             )
         )
+    if result.hash_mismatch_count:
+        findings.append(
+            _finding(
+                "approval_target_hash_mismatch",
+                "high",
+                f"{result.hash_mismatch_count} approved report artifact(s) changed after approval.",
+                workspace / "reports",
+                "Re-review changed artifacts and record a new supplied human approval decision.",
+            )
+        )
+    if result.hash_unverified_count:
+        findings.append(
+            _finding(
+                "approval_target_hash_unverified",
+                "medium",
+                f"{result.hash_unverified_count} approved report artifact(s) are not bound to a saved target hash.",
+                workspace / "state" / "approvals",
+                "Record approval decisions with target_path so the artifact hash is captured.",
+            )
+        )
 
 
 def _check_profile(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> None:

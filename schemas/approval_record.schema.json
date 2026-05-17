@@ -12,6 +12,8 @@
     },
     "target_id": {"type": "string"},
     "target_path": {"type": ["string", "null"]},
+    "target_hash": {"type": ["string", "null"]},
+    "target_size_bytes": {"type": ["integer", "null"], "minimum": 0},
     "decision": {
       "type": "string",
       "enum": ["approved", "rejected", "needs_changes", "revoked"]

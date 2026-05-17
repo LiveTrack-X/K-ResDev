@@ -99,6 +99,28 @@ def test_workspace_doctor_flags_report_approval_coverage(tmp_path):
     assert "report_approval_missing" not in approved_codes
 
 
+def test_workspace_doctor_flags_approval_target_hash_mismatch(tmp_path):
+    initialize_workspace(tmp_path, "PRJ-2026-0001", "Demo Project")
+    report = tmp_path / "reports" / "monthly-report-2026-05.md"
+    report.write_text("# Monthly Report\n", encoding="utf-8")
+    approval = create_approval_record(
+        "report",
+        "monthly-2026-05",
+        "approved",
+        "Reviewer",
+        target_path=str(report),
+        reviewed_at="2026-05-17T09:00:00Z",
+    )
+    write_approval_record(approval, tmp_path / "state" / "approvals")
+    report.write_text("# Monthly Report\n\nChanged.\n", encoding="utf-8")
+
+    result = run_workspace_doctor(tmp_path)
+    codes = {finding.code for finding in result.findings}
+
+    assert result.status == "blocked"
+    assert "approval_target_hash_mismatch" in codes
+
+
 def test_workspace_doctor_flags_report_integrity_findings(tmp_path):
     initialize_workspace(tmp_path, "PRJ-2026-0001", "Demo Project")
     write_evidence_index(

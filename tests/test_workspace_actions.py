@@ -80,6 +80,27 @@ def test_workspace_action_plan_maps_approval_coverage_findings(tmp_path):
     assert "approval-coverage" in (coverage_action.command or "")
 
 
+def test_workspace_action_plan_prioritizes_approval_hash_mismatch(tmp_path):
+    doctor_result = WorkspaceDoctorResult(
+        root=str(tmp_path),
+        status="blocked",
+        findings=[
+            WorkspaceDoctorFinding(
+                code="approval_target_hash_mismatch",
+                severity="high",
+                message="changed after approval",
+                path=str(tmp_path / "reports"),
+            )
+        ],
+    )
+
+    plan = generate_workspace_action_plan(tmp_path, doctor_result=doctor_result)
+    action = next(item for item in plan.actions if item.title == "Review report approval coverage")
+
+    assert action.priority == "high"
+    assert "approval_target_hash_mismatch" in action.related_findings
+
+
 def test_workspace_action_plan_maps_report_integrity_findings(tmp_path):
     doctor_result = WorkspaceDoctorResult(
         root=str(tmp_path),

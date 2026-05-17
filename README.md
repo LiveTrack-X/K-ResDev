@@ -2,7 +2,7 @@
 
 Purpose: 한국형 국책 R&D 환경에서 연구 행정 문서화, 증빙 정합성, 보고서 생성, 논문/데이터 인사이트 보조를 evidence-first 방식으로 지원하는 Codex/Skill 프로젝트입니다.
 
-Current release: `0.1 BETA 17` (`0.1.0b17`).
+Current release: `0.1 BETA 18` (`0.1.0b18`).
 
 Core principle:
 
@@ -45,6 +45,7 @@ This repository does not encode any single ministry/institution form as authorit
 - Human approval record workflow for supplied reviewer decisions, approval summaries, and approval gates.
 - Evidence bundle index generator for audit/review packages without copying or altering raw files.
 - Workspace approval coverage checker for report drafts/exports against supplied human decisions.
+- Approval target hash binding so changed report artifacts can be detected after approval.
 - Workspace report integrity checker for Markdown report drafts against indexed evidence claims.
 - Report integrity checks for cited evidence status, including `needs_review`, `draft`, `rejected`, and `superseded` evidence.
 - JSON schema validation CLI for bundled schemas such as evidence, project profile, research insight, and approval record.
@@ -91,7 +92,7 @@ python -m k_resdev_skill budget-check .\state\evidence-index.json --output .\rep
 python -m k_resdev_skill profiles --markdown --output .\reports\agency-profiles.md
 python -m k_resdev_skill validate-profile .\templates\agencies\national-rnd-basic\project-profile.json
 python -m k_resdev_skill validate-json evidence .\state\evidence-index.json
-python -m k_resdev_skill approval-record --target-type report --target-id monthly-2026-05 --decision needs_changes --reviewer reviewer-name --approvals-dir .\state\approvals
+python -m k_resdev_skill approval-record --target-type report --target-id monthly-2026-05 --target-path .\reports\monthly-report-2026-05.md --decision needs_changes --reviewer reviewer-name --approvals-dir .\state\approvals
 python -m k_resdev_skill approval-summary .\state\approvals --output .\reports\approval-summary.md
 python -m k_resdev_skill approval-gate .\state\approvals --target-type report --target-id monthly-2026-05
 python -m k_resdev_skill bundle-index .\state\evidence-index.json --approval-records .\state\approvals --output .\reports\evidence-bundle-index.md

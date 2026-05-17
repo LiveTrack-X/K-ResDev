@@ -348,6 +348,11 @@ class WorkspaceApprovalCoverageItem(StrictModel):
     approval_id: str | None = None
     reviewer: str | None = None
     reviewed_at: str | None = None
+    expected_target_hash: str | None = None
+    actual_target_hash: str | None = None
+    expected_size_bytes: int | None = None
+    actual_size_bytes: int | None = None
+    hash_status: str = "not_checked"
     warnings: list[str] = Field(default_factory=list)
 
 
@@ -358,6 +363,8 @@ class WorkspaceApprovalCoverageResult(StrictModel):
     approved_count: int = 0
     missing_count: int = 0
     not_approved_count: int = 0
+    hash_mismatch_count: int = 0
+    hash_unverified_count: int = 0
     items: list[WorkspaceApprovalCoverageItem] = Field(default_factory=list)
     markdown_path: str | None = None
     json_path: str | None = None
@@ -467,6 +474,8 @@ class WorkspaceReviewPackResult(StrictModel):
     approval_coverage_status: str | None = None
     approval_missing_count: int = 0
     approval_not_approved_count: int = 0
+    approval_hash_mismatch_count: int = 0
+    approval_hash_unverified_count: int = 0
     report_integrity_status: str | None = None
     report_integrity_finding_count: int = 0
     report_integrity_high_count: int = 0
@@ -493,6 +502,8 @@ class ApprovalRecord(StrictModel):
     target_type: ApprovalTargetType
     target_id: str
     target_path: str | None = None
+    target_hash: str | None = None
+    target_size_bytes: int | None = None
     decision: ApprovalDecision
     reviewer: str
     reviewed_at: str

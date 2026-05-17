@@ -3,6 +3,8 @@
   "target_type": "report",
   "target_id": "monthly-report-YYYY-MM",
   "target_path": "reports/monthly-report-YYYY-MM.md",
+  "target_hash": null,
+  "target_size_bytes": null,
   "decision": "needs_changes",
   "reviewer": "human_reviewer",
   "reviewed_at": "YYYY-MM-DDTHH:MM:SSZ",

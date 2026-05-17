@@ -16,6 +16,8 @@
 | Approval coverage status | `{{approval_coverage_status}}` |
 | Approval missing count | `{{approval_missing_count}}` |
 | Approval not approved count | `{{approval_not_approved_count}}` |
+| Approval hash mismatch count | `{{approval_hash_mismatch_count}}` |
+| Approval hash unverified count | `{{approval_hash_unverified_count}}` |
 | Report integrity status | `{{report_integrity_status}}` |
 | Report integrity finding count | `{{report_integrity_finding_count}}` |
 | Report integrity high count | `{{report_integrity_high_count}}` |

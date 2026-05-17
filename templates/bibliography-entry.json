@@ -1,0 +1,20 @@
+{
+  "bibliography_id": "BIB-2026-NEEDSREVIEW",
+  "paper_id": "PAPER-2026-NEEDSREVIEW",
+  "citation_key": null,
+  "entry_type": "article-journal",
+  "title": "title_needs_review",
+  "authors": [],
+  "year": null,
+  "venue": null,
+  "doi": null,
+  "url": null,
+  "abstract": null,
+  "keywords": [],
+  "source_file": "references/library.bib",
+  "source_format": "bibtex",
+  "source_hash": null,
+  "status": "needs_review",
+  "risk_flags": ["imported_bibliography", "needs_human_review"],
+  "notes": "Imported citation metadata. Verify against the source publication before relying on it."
+}

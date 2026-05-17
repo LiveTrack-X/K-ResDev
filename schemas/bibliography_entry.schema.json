@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BibliographyEntry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "bibliography_id",
+    "paper_id",
+    "entry_type",
+    "title",
+    "source_file",
+    "source_format"
+  ],
+  "properties": {
+    "bibliography_id": {"type": "string", "minLength": 1},
+    "paper_id": {"type": "string", "minLength": 1},
+    "citation_key": {"type": ["string", "null"]},
+    "entry_type": {"type": "string", "minLength": 1},
+    "title": {"type": "string", "minLength": 1},
+    "authors": {"type": "array", "items": {"type": "string"}},
+    "year": {"type": ["integer", "null"]},
+    "venue": {"type": ["string", "null"]},
+    "doi": {"type": ["string", "null"]},
+    "url": {"type": ["string", "null"]},
+    "abstract": {"type": ["string", "null"]},
+    "keywords": {"type": "array", "items": {"type": "string"}},
+    "source_file": {"type": "string", "minLength": 1},
+    "source_format": {"type": "string", "minLength": 1},
+    "source_hash": {"type": ["string", "null"]},
+    "status": {"type": "string"},
+    "risk_flags": {"type": "array", "items": {"type": "string"}},
+    "notes": {"type": ["string", "null"]}
+  }
+}

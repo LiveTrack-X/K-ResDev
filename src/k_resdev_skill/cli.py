@@ -15,6 +15,7 @@ from .approval import (
 )
 from .approval_coverage import generate_workspace_approval_coverage
 from .analysis import generate_analysis_script, run_data_analysis
+from .bibliography import import_bibliography, load_bibliography_index, paper_records_from_bibliography
 from .budget import generate_budget_evidence_checklist
 from .claim_checker import check_unsupported_claims
 from .classifier import classify_file
@@ -91,6 +92,15 @@ def main(argv: list[str] | None = None) -> int:
     lit_parser = subparsers.add_parser("lit-matrix", help="Generate a literature matrix.")
     lit_parser.add_argument("papers_json", help="JSON list of paper records.")
     lit_parser.add_argument("--output", default=None)
+
+    bib_import_parser = subparsers.add_parser("bib-import", help="Import BibTeX/RIS/CSL JSON bibliography metadata.")
+    bib_import_parser.add_argument("bibliography_file")
+    bib_import_parser.add_argument("--state-dir", default="state")
+    bib_import_parser.add_argument("--literature-matrix", default=None)
+
+    bib_lit_parser = subparsers.add_parser("bib-lit-matrix", help="Generate a literature matrix from a bibliography index.")
+    bib_lit_parser.add_argument("bibliography_index_json")
+    bib_lit_parser.add_argument("--output", default=None)
 
     paper_parser = subparsers.add_parser("paper-card", help="Create a conservative paper card from text.")
     paper_parser.add_argument("paper_text")
@@ -281,6 +291,15 @@ def main(argv: list[str] | None = None) -> int:
             [PaperRecord.model_validate(item) for item in payload],
             args.output,
         )
+        print(rendered)
+        return 0
+    if args.command == "bib-import":
+        result = import_bibliography(args.bibliography_file, args.state_dir, args.literature_matrix)
+        print(result.model_dump_json(indent=2))
+        return 0
+    if args.command == "bib-lit-matrix":
+        entries = load_bibliography_index(args.bibliography_index_json)
+        rendered = generate_literature_matrix(paper_records_from_bibliography(entries), args.output)
         print(rendered)
         return 0
     if args.command == "paper-card":

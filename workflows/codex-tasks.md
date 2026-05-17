@@ -278,6 +278,17 @@ Implement:
 
 Approval target hashes only detect local artifact drift after approval. They do not create, infer, or certify human approval.
 
+### Task 28: Bibliography management intake
+
+Implement:
+- BibTeX/RIS/CSL JSON bibliography import command
+- `state/bibliography-index.md` and `state/bibliography-index.json` outputs
+- conversion from bibliography entries to literature matrix paper records
+- schema/template coverage for bibliography entry metadata
+- workspace starter support for a `references/` folder
+
+Bibliography intake must never fabricate citation metadata. Missing title, author, year, venue, DOI, or URL fields remain `needs_review` risk flags until a human verifies the source publication.
+
 ## Safety constraints
 
 - Never alter raw files.

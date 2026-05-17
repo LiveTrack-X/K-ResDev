@@ -23,7 +23,7 @@ P0 intake hardening now includes DOCX/XLSX/HWPX/PDF text extraction, optional HW
 5. Reproducibility checklist.
 6. Hypothesis-to-experiment planner.
 
-Status: paper card extraction, literature matrix, data insight candidate report, experiment comparison table, reproducibility checklist, and hypothesis-to-experiment planning are implemented. Generated experiment plans remain validation drafts and require human approval before execution.
+Status: paper card extraction, BibTeX/RIS/CSL JSON bibliography intake, literature matrix, data insight candidate report, experiment comparison table, reproducibility checklist, and hypothesis-to-experiment planning are implemented. Generated experiment plans remain validation drafts and require human approval before execution.
 
 ## P2 - Korean R&D specialization
 
@@ -43,4 +43,4 @@ Status: `national-rnd-basic` is present as a generic needs-review template skele
 4. Report export to Markdown/DOCX/HWP-compatible intermediate format.
 5. Human approval workflow.
 
-Status: JSON schema validation, evidence bundle indexes, human approval records/gates, reproducible CSV/XLSX analysis runs, Markdown projection export to DOCX/HTML/TXT, workspace initialization, readiness doctor checks, doctor-derived next-action plans, one-page workspace summaries, bundled workspace review packs, review-pack artifact hash verification, evidence source hash verification, source-integrity findings inside doctor/review-pack flows, report approval coverage checks, approval target hash binding, workspace report-integrity checks, and cited evidence review-status checks are implemented as a first pass.
+Status: JSON schema validation, evidence bundle indexes, human approval records/gates, reproducible CSV/XLSX analysis runs, Markdown projection export to DOCX/HTML/TXT, workspace initialization, readiness doctor checks, doctor-derived next-action plans, one-page workspace summaries, bundled workspace review packs, review-pack artifact hash verification, evidence source hash verification, source-integrity findings inside doctor/review-pack flows, report approval coverage checks, approval target hash binding, workspace report-integrity checks, cited evidence review-status checks, and bibliography index schema validation are implemented as a first pass.

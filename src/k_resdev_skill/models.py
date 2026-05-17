@@ -290,6 +290,45 @@ class ProjectionExportResult(StrictModel):
     warnings: list[str] = Field(default_factory=list)
 
 
+class BibliographyEntry(StrictModel):
+    bibliography_id: str
+    paper_id: str
+    citation_key: str | None = None
+    entry_type: str
+    title: str
+    authors: list[str] = Field(default_factory=list)
+    year: int | None = None
+    venue: str | None = None
+    doi: str | None = None
+    url: str | None = None
+    abstract: str | None = None
+    keywords: list[str] = Field(default_factory=list)
+    source_file: str
+    source_format: str
+    source_hash: str | None = None
+    status: str = "needs_review"
+    risk_flags: list[str] = Field(default_factory=list)
+    notes: str | None = None
+
+    @field_validator("bibliography_id", "paper_id", "entry_type", "title", "source_file", "source_format")
+    @classmethod
+    def _must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
+class BibliographyImportResult(StrictModel):
+    source_file: str
+    source_hash: str
+    source_format: str
+    entry_count: int = 0
+    bibliography_index_markdown_path: str
+    bibliography_index_json_path: str
+    literature_matrix_path: str | None = None
+    warnings: list[str] = Field(default_factory=list)
+
+
 class WorkspaceInitResult(StrictModel):
     root: str
     project_id: str

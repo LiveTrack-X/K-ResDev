@@ -2,7 +2,7 @@
 
 Purpose: 한국형 국책 R&D 환경에서 연구 행정 문서화, 증빙 정합성, 보고서 생성, 논문/데이터 인사이트 보조를 evidence-first 방식으로 지원하는 Codex/Skill 프로젝트입니다.
 
-Current release: `0.1 BETA 18` (`0.1.0b18`).
+Current release: `0.1 BETA 19` (`0.1.0b19`).
 
 Core principle:
 
@@ -37,6 +37,7 @@ This repository does not encode any single ministry/institution form as authorit
 - Conservative plan mapper for KPI/milestone draft extraction from text.
 - Numeric evidence-mismatch detection when a report cites an evidence ID but uses unsupported numbers.
 - Paper card extraction from supplied metadata text without citation invention.
+- Bibliography management import for BibTeX/RIS/CSL JSON into `state/bibliography-index.*`, with optional literature matrix projection.
 - Data insight candidate reports that keep findings in hypothesis/review state.
 - Experiment comparison table and reproducibility checklist generators.
 - Hypothesis-to-experiment planner for turning `ResearchInsight` records into reviewable validation plans.
@@ -82,6 +83,8 @@ python -m k_resdev_skill map-plan .\inbox\plan.txt --output .\state\project-stat
 python -m k_resdev_skill draft-report .\state\evidence-index.json --project-state .\state\project-state.json --period 2026-05
 python -m k_resdev_skill audit-qna .\state\evidence-index.json
 python -m k_resdev_skill paper-card .\inbox\paper-notes.txt --markdown --output .\reports\paper-card.md
+python -m k_resdev_skill bib-import .\references\library.bib --state-dir .\state --literature-matrix .\reports\literature-review-matrix.md
+python -m k_resdev_skill bib-lit-matrix .\state\bibliography-index.json --output .\reports\literature-review-matrix.md
 python -m k_resdev_skill data-insights .\inbox\metrics.csv --output .\reports\data-insights.md
 python -m k_resdev_skill run-analysis .\inbox\metrics.csv --output-dir .\reports\analysis --evidence-id EVI-2026-0001
 python -m k_resdev_skill analysis-script .\inbox\metrics.csv --output-dir .\reports\analysis --output .\reports\analysis\metrics-analysis.py

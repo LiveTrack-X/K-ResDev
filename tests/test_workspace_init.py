@@ -11,6 +11,7 @@ def test_initialize_workspace_creates_standard_layout(tmp_path):
         "inbox",
         "state",
         "evidence",
+        "references",
         "reports",
         "reports/analysis",
         "state/approvals",
@@ -28,6 +29,7 @@ def test_initialize_workspace_creates_standard_layout(tmp_path):
     assert profile["status"] == "needs_review"
     assert "profile_needs_review" in result.warnings
     assert "Evidence is source of truth" in readme
+    assert "bib-import" in readme
     assert "workspace-summary" in readme
     assert "workspace-review-pack" in readme
     assert "verify-review-pack" in readme

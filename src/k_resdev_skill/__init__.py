@@ -10,6 +10,13 @@ from .approval import (
 )
 from .approval_coverage import generate_workspace_approval_coverage, render_approval_coverage_markdown
 from .analysis import generate_analysis_script, run_data_analysis
+from .bibliography import (
+    import_bibliography,
+    load_bibliography_index,
+    paper_records_from_bibliography,
+    parse_bibliography_file,
+    render_bibliography_index,
+)
 from .claim_checker import check_unsupported_claims
 from .budget import budget_evidence_gaps, generate_budget_evidence_checklist
 from .classifier import classify_file
@@ -25,6 +32,8 @@ from .literature import generate_literature_matrix
 from .models import (
     ApprovalRecord,
     AnalysisRunResult,
+    BibliographyEntry,
+    BibliographyImportResult,
     CheckFinding,
     DataProfile,
     EvidenceSourceVerificationItem,
@@ -85,6 +94,8 @@ from .workspace_summary import generate_workspace_summary, render_workspace_summ
 __all__ = [
     "ApprovalRecord",
     "AnalysisRunResult",
+    "BibliographyEntry",
+    "BibliographyImportResult",
     "CheckFinding",
     "DataProfile",
     "EvidenceSourceVerificationItem",
@@ -146,14 +157,19 @@ __all__ = [
     "generate_workspace_report_integrity",
     "generate_workspace_review_pack",
     "generate_workspace_summary",
+    "import_bibliography",
     "initialize_workspace",
+    "load_bibliography_index",
     "list_project_profiles",
     "latest_approval_for_target",
     "load_approval_records",
     "load_evidence_index",
     "load_project_profile",
     "profile_data_file",
+    "paper_records_from_bibliography",
     "paper_card_from_text",
+    "parse_bibliography_file",
+    "render_bibliography_index",
     "run_intake",
     "run_data_analysis",
     "write_monthly_report",
@@ -176,4 +192,4 @@ __all__ = [
     "write_projection_text",
 ]
 
-__version__ = "0.1.0b18"
+__version__ = "0.1.0b19"

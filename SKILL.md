@@ -129,6 +129,7 @@ Use the Python package under `src/k_resdev_skill/` for deterministic helpers:
 - `validate_json_files(json_paths, schema)` for bundled or custom JSON schema checks.
 - `run_data_analysis(data_file, output_dir, evidence_ids)` for reproducible CSV/XLSX profiling, insight report, replay script, and manifest output.
 - `generate_analysis_script(data_file, output_dir, evidence_ids)` for a minimal replay script.
+- `export_projection(markdown_path, output_path, output_format)` for DOCX/HTML/TXT review exports from Markdown projections.
 
 Implementation guardrails:
 
@@ -140,6 +141,7 @@ Implementation guardrails:
 - Agency templates under `templates/agencies/` are draft profile skeletons, not official rules.
 - Approval records must reflect supplied human decisions. The tool must not infer or invent approval.
 - Analysis runs must leave raw data unchanged and mark generated outputs as draft/human-review-required.
+- Projection exports must retain the draft/human-approval notice and must not be described as final official documents.
 
 When running locally, prefer:
 
@@ -158,6 +160,7 @@ python -m k_resdev_skill validate-json approval .\state\approvals\APR-2026-EXAMP
 python -m k_resdev_skill approval-record --target-type report --target-id monthly-2026-05 --decision needs_changes --reviewer reviewer-name
 python -m k_resdev_skill approval-gate .\state\approvals --target-type report --target-id monthly-2026-05
 python -m k_resdev_skill bundle-index .\state\evidence-index.json --approval-records .\state\approvals --output .\reports\evidence-bundle-index.md
+python -m k_resdev_skill export-projection .\reports\monthly-report-2026-05.md --output .\reports\monthly-report-2026-05.docx --format docx
 python -m k_resdev_skill classify .\inbox\some-file.pdf --text "..."
 python -m k_resdev_skill profile .\inbox\metrics.csv
 ```

@@ -2,7 +2,7 @@
 
 Purpose: 한국형 국책 R&D 환경에서 연구 행정 문서화, 증빙 정합성, 보고서 생성, 논문/데이터 인사이트 보조를 evidence-first 방식으로 지원하는 Codex/Skill 프로젝트입니다.
 
-Current release: `0.1 BETA 6` (`0.1.0b6`).
+Current release: `0.1 BETA 7` (`0.1.0b7`).
 
 Core principle:
 
@@ -46,6 +46,7 @@ This repository does not encode any single ministry/institution form as authorit
 - Evidence bundle index generator for audit/review packages without copying or altering raw files.
 - JSON schema validation CLI for bundled schemas such as evidence, project profile, research insight, and approval record.
 - Reproducible CSV/XLSX analysis run workflow that writes profile JSON, insight candidate Markdown, replay script, and manifest.
+- Projection export workflow for Markdown drafts to DOCX, TXT, HTML, or HWPX-compatible HTML review files.
 - `national-rnd-basic` agency template skeleton for annual/interim/final reports, change requests, and performance registration drafts.
 
 ## Local use
@@ -72,6 +73,8 @@ python -m k_resdev_skill approval-record --target-type report --target-id monthl
 python -m k_resdev_skill approval-summary .\state\approvals --output .\reports\approval-summary.md
 python -m k_resdev_skill approval-gate .\state\approvals --target-type report --target-id monthly-2026-05
 python -m k_resdev_skill bundle-index .\state\evidence-index.json --approval-records .\state\approvals --output .\reports\evidence-bundle-index.md
+python -m k_resdev_skill export-projection .\reports\monthly-report-2026-05.md --output .\reports\monthly-report-2026-05.docx --format docx
+python -m k_resdev_skill export-projection .\reports\monthly-report-2026-05.md --output .\reports\monthly-report-2026-05.hwpx.html --format hwpx-html
 python -m k_resdev_skill classify .\inbox\plan.pdf --text "연구개발계획서 KPI"
 python -m k_resdev_skill profile .\inbox\metrics.csv
 ```

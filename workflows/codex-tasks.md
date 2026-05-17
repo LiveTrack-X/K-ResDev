@@ -158,6 +158,15 @@ Implement:
 
 Analysis outputs remain draft candidates. Human review and statistical validation are still required before research or report claims are accepted.
 
+### Task 16: Projection export beta workflow
+
+Implement:
+- Markdown projection export to DOCX, HTML, TXT, and HWPX-compatible HTML intermediate
+- automatic draft/human-approval notice in exported documents
+- source hash and export metadata for traceability
+
+Exports are review artifacts. They are not final official submissions or verified agency forms.
+
 ## Safety constraints
 
 - Never alter raw files.

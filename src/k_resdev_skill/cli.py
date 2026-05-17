@@ -27,6 +27,7 @@ from .literature import generate_literature_matrix
 from .models import EvidenceItem, PaperRecord, ProjectState, ResearchInsight
 from .plan_mapper import extract_project_state_from_text
 from .profile_registry import generate_profile_registry, list_project_profiles, load_project_profile
+from .projection_export import export_projection
 from .research_assistant import (
     generate_data_insight_report,
     generate_experiment_comparison_table,
@@ -163,6 +164,12 @@ def main(argv: list[str] | None = None) -> int:
     bundle_parser.add_argument("evidence_index_json")
     bundle_parser.add_argument("--approval-records", default=None)
     bundle_parser.add_argument("--output", default=None)
+
+    export_parser = subparsers.add_parser("export-projection", help="Export a Markdown projection to DOCX/HTML/TXT review format.")
+    export_parser.add_argument("markdown_path")
+    export_parser.add_argument("--output", required=True)
+    export_parser.add_argument("--format", choices=["docx", "html", "hwpx-html", "txt"], default=None)
+    export_parser.add_argument("--title", default=None)
 
     args = parser.parse_args(argv)
 
@@ -319,5 +326,9 @@ def main(argv: list[str] | None = None) -> int:
         approvals = load_approval_records(args.approval_records) if args.approval_records else []
         rendered = generate_evidence_bundle_index(evidence, approvals, args.output)
         print(rendered)
+        return 0
+    if args.command == "export-projection":
+        result = export_projection(args.markdown_path, args.output, args.format, args.title)
+        print(result.model_dump_json(indent=2))
         return 0
     raise AssertionError(f"Unhandled command: {args.command}")

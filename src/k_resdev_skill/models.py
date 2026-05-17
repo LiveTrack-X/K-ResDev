@@ -280,6 +280,16 @@ class AnalysisRunResult(StrictModel):
     warnings: list[str] = Field(default_factory=list)
 
 
+class ProjectionExportResult(StrictModel):
+    export_id: str
+    source_path: str
+    source_hash: str
+    output_path: str
+    output_format: str
+    status: str = "draft"
+    warnings: list[str] = Field(default_factory=list)
+
+
 class ApprovalRecord(StrictModel):
     approval_id: str
     target_type: ApprovalTargetType

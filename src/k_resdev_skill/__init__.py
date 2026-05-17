@@ -36,12 +36,14 @@ from .models import (
     PaperRecord,
     ProjectState,
     ProjectProfile,
+    ProjectionExportResult,
     ReportDraftPaths,
     ResearchInsight,
     SourceRecord,
 )
 from .plan_mapper import extract_project_state_from_text
 from .profile_registry import generate_profile_registry, list_project_profiles, load_project_profile
+from .projection_export import export_projection, write_projection_docx, write_projection_html, write_projection_text
 from .research_assistant import (
     generate_data_insight_candidates,
     generate_data_insight_report,
@@ -68,6 +70,7 @@ __all__ = [
     "PaperRecord",
     "ProjectState",
     "ProjectProfile",
+    "ProjectionExportResult",
     "ReportDraftPaths",
     "ResearchInsight",
     "SourceRecord",
@@ -80,6 +83,7 @@ __all__ = [
     "extract_document_text",
     "extract_evidence_items_from_document",
     "extract_project_state_from_text",
+    "export_projection",
     "generate_audit_qna",
     "generate_approval_summary",
     "generate_analysis_script",
@@ -108,6 +112,9 @@ __all__ = [
     "validate_json_files",
     "write_approval_record",
     "write_evidence_index",
+    "write_projection_docx",
+    "write_projection_html",
+    "write_projection_text",
 ]
 
-__version__ = "0.1.0b6"
+__version__ = "0.1.0b7"

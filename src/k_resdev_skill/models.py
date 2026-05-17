@@ -337,6 +337,28 @@ class WorkspaceActionPlan(StrictModel):
     json_path: str | None = None
 
 
+class WorkspaceSummaryResult(StrictModel):
+    root: str
+    status: str
+    profile_id: str | None = None
+    profile_status: str | None = None
+    evidence_count: int = 0
+    approval_count: int = 0
+    finding_count: int = 0
+    action_count: int = 0
+    evidence_by_type: dict[str, int] = Field(default_factory=dict)
+    evidence_by_status: dict[str, int] = Field(default_factory=dict)
+    risk_flag_counts: dict[str, int] = Field(default_factory=dict)
+    findings_by_severity: dict[str, int] = Field(default_factory=dict)
+    actions_by_priority: dict[str, int] = Field(default_factory=dict)
+    report_paths: list[str] = Field(default_factory=list)
+    export_paths: list[str] = Field(default_factory=list)
+    analysis_manifest_paths: list[str] = Field(default_factory=list)
+    top_actions: list[WorkspaceActionItem] = Field(default_factory=list)
+    markdown_path: str | None = None
+    json_path: str | None = None
+
+
 class ApprovalRecord(StrictModel):
     approval_id: str
     target_type: ApprovalTargetType

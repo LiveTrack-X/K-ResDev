@@ -186,6 +186,16 @@ Implement:
 
 Action plans are operational suggestions only. Generated commands must be reviewed before execution and do not replace human approval or official agency checks.
 
+### Task 19: Workspace summary report
+
+Implement:
+- one-page workspace summary across doctor status, next actions, evidence counts, approvals, reports, exports, and analysis manifests
+- Markdown and JSON outputs
+- CLI command for `workspace-summary`
+- public API model/result for handoff-friendly status reporting
+
+Workspace summaries are local operational projections. They do not certify official submission readiness, agency compliance, or scientific validity.
+
 ## Safety constraints
 
 - Never alter raw files.

@@ -45,6 +45,7 @@ from .models import (
     WorkspaceDoctorFinding,
     WorkspaceDoctorResult,
     WorkspaceInitResult,
+    WorkspaceSummaryResult,
 )
 from .plan_mapper import extract_project_state_from_text
 from .profile_registry import generate_profile_registry, list_project_profiles, load_project_profile
@@ -61,6 +62,7 @@ from .reporting import draft_monthly_report, write_monthly_report
 from .schema_tools import validate_json_file, validate_json_files
 from .workspace import initialize_workspace, render_doctor_markdown, run_workspace_doctor
 from .workspace_actions import generate_workspace_action_plan, render_action_plan_markdown
+from .workspace_summary import generate_workspace_summary, render_workspace_summary_markdown
 
 __all__ = [
     "ApprovalRecord",
@@ -86,6 +88,7 @@ __all__ = [
     "WorkspaceDoctorFinding",
     "WorkspaceDoctorResult",
     "WorkspaceInitResult",
+    "WorkspaceSummaryResult",
     "approval_gate_status",
     "budget_evidence_gaps",
     "create_approval_record",
@@ -111,6 +114,7 @@ __all__ = [
     "generate_profile_registry",
     "generate_reproducibility_checklist",
     "generate_workspace_action_plan",
+    "generate_workspace_summary",
     "initialize_workspace",
     "list_project_profiles",
     "latest_approval_for_target",
@@ -124,6 +128,7 @@ __all__ = [
     "write_monthly_report",
     "render_doctor_markdown",
     "render_action_plan_markdown",
+    "render_workspace_summary_markdown",
     "run_workspace_doctor",
     "validate_json_file",
     "validate_json_files",
@@ -134,4 +139,4 @@ __all__ = [
     "write_projection_text",
 ]
 
-__version__ = "0.1.0b9"
+__version__ = "0.1.0b10"

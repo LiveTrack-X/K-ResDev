@@ -39,6 +39,7 @@ from .reporting import write_monthly_report
 from .schema_tools import validate_json_files
 from .workspace import initialize_workspace, run_workspace_doctor
 from .workspace_actions import generate_workspace_action_plan
+from .workspace_summary import generate_workspace_summary
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -188,6 +189,12 @@ def main(argv: list[str] | None = None) -> int:
     next_actions_parser.add_argument("--root", default=".")
     next_actions_parser.add_argument("--output", default=None)
     next_actions_parser.add_argument("--json", default=None)
+
+    workspace_summary_parser = subparsers.add_parser("workspace-summary", help="Generate a one-page operational workspace summary.")
+    workspace_summary_parser.add_argument("--root", default=".")
+    workspace_summary_parser.add_argument("--output", default=None)
+    workspace_summary_parser.add_argument("--json", default=None)
+    workspace_summary_parser.add_argument("--max-actions", type=int, default=5)
 
     args = parser.parse_args(argv)
 
@@ -359,6 +366,10 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if args.command == "next-actions":
         result = generate_workspace_action_plan(args.root, output_path=args.output, json_path=args.json)
+        print(result.model_dump_json(indent=2))
+        return 0
+    if args.command == "workspace-summary":
+        result = generate_workspace_summary(args.root, output_path=args.output, json_path=args.json, max_actions=args.max_actions)
         print(result.model_dump_json(indent=2))
         return 0
     raise AssertionError(f"Unhandled command: {args.command}")

@@ -379,6 +379,7 @@ def _starter_readme(project_id: str, title: str, profile_id: str) -> str:
             "- Put raw files in `inbox/`.",
             "- Run `k-resdev intake --inbox inbox --state-dir state --evidence-dir evidence` to build evidence metadata.",
             "- Run `k-resdev doctor --root . --output reports/readiness.md --json state/readiness.json` before reporting.",
+            "- Run `k-resdev workspace-summary --root . --output reports/workspace-summary.md --json state/workspace-summary.json` for a one-page status handoff.",
             "",
         ]
     )

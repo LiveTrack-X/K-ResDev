@@ -237,6 +237,17 @@ Implement:
 
 Doctor/review-pack integration is still local operational readiness only. It does not certify official compliance, scientific validity, or human approval.
 
+### Task 24: Report approval coverage in workspace operations
+
+Implement:
+- approval-coverage report for Markdown report drafts and projection exports
+- target matching by report target ID candidates and supplied `target_path`
+- workspace doctor findings for missing or not-approved report artifacts
+- next-action routing for approval-coverage findings
+- approval-coverage Markdown/JSON artifacts inside `workspace-review-pack`
+
+Approval coverage checks supplied human decision records only. It must not infer approval, certify official submission readiness, or treat a generated review pack as approval.
+
 ## Safety constraints
 
 - Never alter raw files.

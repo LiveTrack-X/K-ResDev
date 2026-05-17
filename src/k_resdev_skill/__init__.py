@@ -8,6 +8,7 @@ from .approval import (
     load_approval_records,
     write_approval_record,
 )
+from .approval_coverage import generate_workspace_approval_coverage, render_approval_coverage_markdown
 from .analysis import generate_analysis_script, run_data_analysis
 from .claim_checker import check_unsupported_claims
 from .budget import budget_evidence_gaps, generate_budget_evidence_checklist
@@ -46,6 +47,8 @@ from .models import (
     SourceRecord,
     WorkspaceActionItem,
     WorkspaceActionPlan,
+    WorkspaceApprovalCoverageItem,
+    WorkspaceApprovalCoverageResult,
     WorkspaceDoctorFinding,
     WorkspaceDoctorResult,
     WorkspaceInitResult,
@@ -101,6 +104,8 @@ __all__ = [
     "SourceRecord",
     "WorkspaceActionItem",
     "WorkspaceActionPlan",
+    "WorkspaceApprovalCoverageItem",
+    "WorkspaceApprovalCoverageResult",
     "WorkspaceDoctorFinding",
     "WorkspaceDoctorResult",
     "WorkspaceInitResult",
@@ -132,6 +137,7 @@ __all__ = [
     "generate_profile_registry",
     "generate_reproducibility_checklist",
     "generate_workspace_action_plan",
+    "generate_workspace_approval_coverage",
     "generate_workspace_review_pack",
     "generate_workspace_summary",
     "initialize_workspace",
@@ -147,6 +153,7 @@ __all__ = [
     "write_monthly_report",
     "render_doctor_markdown",
     "render_action_plan_markdown",
+    "render_approval_coverage_markdown",
     "render_evidence_source_verification_markdown",
     "render_workspace_review_pack_markdown",
     "render_workspace_summary_markdown",
@@ -162,4 +169,4 @@ __all__ = [
     "write_projection_text",
 ]
 
-__version__ = "0.1.0b14"
+__version__ = "0.1.0b15"

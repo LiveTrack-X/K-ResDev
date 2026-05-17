@@ -13,6 +13,7 @@ from .approval import (
     load_approval_records,
     write_approval_record,
 )
+from .approval_coverage import generate_workspace_approval_coverage
 from .analysis import generate_analysis_script, run_data_analysis
 from .budget import generate_budget_evidence_checklist
 from .claim_checker import check_unsupported_claims
@@ -192,6 +193,11 @@ def main(argv: list[str] | None = None) -> int:
     next_actions_parser.add_argument("--output", default=None)
     next_actions_parser.add_argument("--json", default=None)
 
+    approval_coverage_parser = subparsers.add_parser("approval-coverage", help="Check report artifacts against supplied human approval records.")
+    approval_coverage_parser.add_argument("--root", default=".")
+    approval_coverage_parser.add_argument("--output", default=None)
+    approval_coverage_parser.add_argument("--json", default=None)
+
     workspace_summary_parser = subparsers.add_parser("workspace-summary", help="Generate a one-page operational workspace summary.")
     workspace_summary_parser.add_argument("--root", default=".")
     workspace_summary_parser.add_argument("--output", default=None)
@@ -200,7 +206,7 @@ def main(argv: list[str] | None = None) -> int:
 
     review_pack_parser = subparsers.add_parser(
         "workspace-review-pack",
-        help="Generate readiness, next-action, summary, and source-verification artifacts in one local review pack.",
+        help="Generate readiness, next-action, summary, source-verification, and approval-coverage artifacts in one local review pack.",
     )
     review_pack_parser.add_argument("--root", default=".")
     review_pack_parser.add_argument("--reports-dir", default=None)
@@ -387,6 +393,10 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if args.command == "next-actions":
         result = generate_workspace_action_plan(args.root, output_path=args.output, json_path=args.json)
+        print(result.model_dump_json(indent=2))
+        return 0
+    if args.command == "approval-coverage":
+        result = generate_workspace_approval_coverage(args.root, output_path=args.output, json_path=args.json)
         print(result.model_dump_json(indent=2))
         return 0
     if args.command == "workspace-summary":

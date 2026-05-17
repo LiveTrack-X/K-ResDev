@@ -5,6 +5,7 @@ import zipfile
 from pathlib import Path
 
 from .approval import load_approval_records
+from .approval_coverage import generate_workspace_approval_coverage
 from .budget import budget_evidence_gaps
 from .evidence_index import load_evidence_index
 from .models import (
@@ -29,6 +30,7 @@ STANDARD_DIRS = (
 )
 OPERATIONAL_MARKDOWN_NAMES = {
     "agency-profiles.md",
+    "approval-coverage.md",
     "approval-summary.md",
     "budget-checklist.md",
     "evidence-bundle-index.md",
@@ -113,6 +115,7 @@ def run_workspace_doctor(
     findings: list[WorkspaceDoctorFinding] = []
     evidence_count = _check_evidence(workspace, findings)
     approval_count = _check_approvals(workspace, findings)
+    _check_approval_coverage(workspace, findings)
     _check_profile(workspace, findings)
     _check_reports(workspace, findings)
     _check_exports(workspace, findings)
@@ -332,6 +335,41 @@ def _check_approvals(workspace: Path, findings: list[WorkspaceDoctorFinding]) ->
     return len(approvals)
 
 
+def _check_approval_coverage(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> None:
+    result = generate_workspace_approval_coverage(workspace)
+    if result.warnings and result.artifact_count:
+        findings.append(
+            _finding(
+                "approval_coverage_unreadable",
+                "medium",
+                "Report approval coverage could not read approval records.",
+                workspace / "state" / "approvals",
+                "Fix approval records, then regenerate approval coverage.",
+            )
+        )
+        return
+    if result.missing_count:
+        findings.append(
+            _finding(
+                "report_approval_missing",
+                "medium",
+                f"{result.missing_count} report artifact(s) have no supplied human approval record.",
+                workspace / "reports",
+                "Record supplied human decisions or keep artifacts clearly disclosed as draft.",
+            )
+        )
+    if result.not_approved_count:
+        findings.append(
+            _finding(
+                "report_approval_not_approved",
+                "medium",
+                f"{result.not_approved_count} report artifact(s) have latest decisions that are not approved.",
+                workspace / "state" / "approvals",
+                "Resolve requested changes before official use.",
+            )
+        )
+
+
 def _check_profile(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> None:
     profile_path = workspace / "state" / "project-profile.json"
     if not profile_path.exists():
@@ -454,9 +492,10 @@ def _starter_readme(project_id: str, title: str, profile_id: str) -> str:
             "- Run `k-resdev intake --inbox inbox --state-dir state --evidence-dir evidence` to build evidence metadata.",
             "- Run `k-resdev doctor --root . --output reports/readiness.md --json state/readiness.json` before reporting.",
             "- Run `k-resdev workspace-summary --root . --output reports/workspace-summary.md --json state/workspace-summary.json` for a one-page status handoff.",
-            "- Run `k-resdev workspace-review-pack --root .` to refresh readiness, next actions, summary, and source-verification artifacts together.",
+            "- Run `k-resdev workspace-review-pack --root .` to refresh readiness, next actions, summary, source-verification, and approval-coverage artifacts together.",
             "- Run `k-resdev verify-review-pack state/workspace-review-pack.json` to check saved review-pack artifact hashes.",
             "- Run `k-resdev verify-evidence-sources state/evidence-index.json --root . --output reports/source-verification.md --json state/source-verification.json` to check indexed source hashes.",
+            "- Run `k-resdev approval-coverage --root . --output reports/approval-coverage.md --json state/approval-coverage.json` to check report approval coverage.",
             "",
         ]
     )

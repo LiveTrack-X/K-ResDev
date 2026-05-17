@@ -10,6 +10,7 @@ from .models import (
     WorkspaceReviewPackResult,
     WorkspaceReviewPackVerificationResult,
 )
+from .approval_coverage import generate_workspace_approval_coverage
 from .source_verification import verify_evidence_sources
 from .workspace import run_workspace_doctor
 from .workspace_actions import generate_workspace_action_plan
@@ -22,7 +23,7 @@ def generate_workspace_review_pack(
     state_dir: str | Path | None = None,
     max_actions: int = 5,
 ) -> WorkspaceReviewPackResult:
-    """Generate a bundled local review pack for readiness, actions, and status handoff."""
+    """Generate a bundled local review pack for readiness, actions, status, source, and approval checks."""
 
     workspace = Path(root)
     reports = Path(reports_dir) if reports_dir is not None else workspace / "reports"
@@ -38,11 +39,14 @@ def generate_workspace_review_pack(
     summary_json = state / "workspace-summary.json"
     source_md = reports / "source-verification.md"
     source_json = state / "source-verification.json"
+    approval_md = reports / "approval-coverage.md"
+    approval_json = state / "approval-coverage.json"
     index_md = reports / "workspace-review-pack.md"
     index_json = state / "workspace-review-pack.json"
 
     doctor = run_workspace_doctor(workspace, readiness_md, readiness_json)
     source_verification = verify_evidence_sources(state / "evidence-index.json", root=workspace, output_path=source_md, json_path=source_json)
+    approval_coverage = generate_workspace_approval_coverage(workspace, output_path=approval_md, json_path=approval_json)
     actions = generate_workspace_action_plan(workspace, doctor_result=doctor, output_path=actions_md, json_path=actions_json)
     summary = generate_workspace_summary(
         workspace,
@@ -61,6 +65,8 @@ def generate_workspace_review_pack(
         str(summary_json),
         str(source_md),
         str(source_json),
+        str(approval_md),
+        str(approval_json),
         str(index_md),
         str(index_json),
     ]
@@ -74,6 +80,9 @@ def generate_workspace_review_pack(
         source_verification_valid=source_verification.valid,
         source_missing_count=source_verification.missing_count,
         source_mismatch_count=source_verification.mismatch_count,
+        approval_coverage_status=approval_coverage.status,
+        approval_missing_count=approval_coverage.missing_count,
+        approval_not_approved_count=approval_coverage.not_approved_count,
         generated_paths=generated_paths,
         index_path=str(index_md),
         json_path=str(index_json),
@@ -128,7 +137,7 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
     lines = [
         "# K-ResDev Workspace Review Pack",
         "",
-        "> Review pack projection only. It bundles local readiness, next-action, and summary artifacts; it does not certify official agency compliance.",
+        "> Review pack projection only. It bundles local readiness, next-action, summary, source-verification, and approval-coverage artifacts; it does not certify official agency compliance.",
         "",
         "| Field | Value |",
         "|---|---|",
@@ -141,6 +150,9 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
         f"| Source verification valid | {result.source_verification_valid} |",
         f"| Source missing count | {result.source_missing_count} |",
         f"| Source mismatch count | {result.source_mismatch_count} |",
+        f"| Approval coverage status | {_escape(result.approval_coverage_status or '-')} |",
+        f"| Approval missing count | {result.approval_missing_count} |",
+        f"| Approval not approved count | {result.approval_not_approved_count} |",
         "",
         "## Generated Artifacts",
         "",
@@ -164,6 +176,7 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
             "- Use `next-actions.md` as a reviewable command plan.",
             "- Use `workspace-summary.md` as a one-page handoff/status snapshot.",
             "- Use `source-verification.md` to check local source presence and hash drift.",
+            "- Use `approval-coverage.md` to check report artifacts against supplied human decisions.",
             "- Run `verify-review-pack state/workspace-review-pack.json` before relying on a saved pack.",
             "- Keep official reports and scientific claims human-approved.",
             "",
@@ -183,6 +196,8 @@ def _artifact_label(path: str) -> str:
         "workspace-summary.json": "Workspace summary JSON",
         "source-verification.md": "Evidence source verification",
         "source-verification.json": "Evidence source verification JSON",
+        "approval-coverage.md": "Approval coverage",
+        "approval-coverage.json": "Approval coverage JSON",
         "workspace-review-pack.md": "Review pack index",
         "workspace-review-pack.json": "Review pack JSON",
     }

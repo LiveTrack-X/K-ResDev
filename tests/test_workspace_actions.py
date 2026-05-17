@@ -57,6 +57,29 @@ def test_workspace_action_plan_maps_source_integrity_findings(tmp_path):
     assert "verify-evidence-sources" in (action.command or "")
 
 
+def test_workspace_action_plan_maps_approval_coverage_findings(tmp_path):
+    doctor_result = WorkspaceDoctorResult(
+        root=str(tmp_path),
+        status="needs_review",
+        findings=[
+            WorkspaceDoctorFinding(
+                code="report_approval_missing",
+                severity="medium",
+                message="approval missing",
+                path=str(tmp_path / "reports"),
+            )
+        ],
+    )
+
+    plan = generate_workspace_action_plan(tmp_path, doctor_result=doctor_result)
+    titles = {item.title for item in plan.actions}
+    coverage_action = next(item for item in plan.actions if item.title == "Review report approval coverage")
+
+    assert "Review report approval coverage" in titles
+    assert "Record supplied human review decisions" in titles
+    assert "approval-coverage" in (coverage_action.command or "")
+
+
 def test_next_actions_cli_writes_outputs(tmp_path, capsys):
     initialize_workspace(tmp_path, "PRJ-2026-0001", "Demo Project")
     output = tmp_path / "reports" / "next-actions.md"

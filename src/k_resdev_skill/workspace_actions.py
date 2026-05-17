@@ -80,6 +80,7 @@ def _actions_for_findings(root: Path, findings: list[WorkspaceDoctorFinding]) ->
         _action_for_review_evidence(root, by_code),
         _action_for_budget_gaps(root, by_code),
         _action_for_profile(root, by_code),
+        _action_for_approval_coverage(root, by_code),
         _action_for_reports(root, by_code),
         _action_for_analysis(root, by_code),
         _action_for_exports(root, by_code),
@@ -200,6 +201,21 @@ def _action_for_profile(root: Path, by_code: dict[str, list[WorkspaceDoctorFindi
     )
 
 
+def _action_for_approval_coverage(root: Path, by_code: dict[str, list[WorkspaceDoctorFinding]]) -> WorkspaceActionItem | None:
+    codes = ["approval_coverage_unreadable", "report_approval_missing", "report_approval_not_approved"]
+    if not any(code in by_code for code in codes):
+        return None
+    return _action(
+        root,
+        "medium",
+        "Review report approval coverage",
+        "Report artifacts should be linked to supplied human approval records before official use.",
+        f'python -m k_resdev_skill approval-coverage --root "{root}" --output "{root / "reports" / "approval-coverage.md"}" --json "{root / "state" / "approval-coverage.json"}"',
+        by_code,
+        codes,
+    )
+
+
 def _action_for_reports(root: Path, by_code: dict[str, list[WorkspaceDoctorFinding]]) -> WorkspaceActionItem | None:
     if "report_missing" not in by_code:
         return None
@@ -243,7 +259,7 @@ def _action_for_exports(root: Path, by_code: dict[str, list[WorkspaceDoctorFindi
 
 
 def _action_for_approvals(root: Path, by_code: dict[str, list[WorkspaceDoctorFinding]]) -> WorkspaceActionItem | None:
-    if "approval_missing" not in by_code and "approval_unreadable" not in by_code:
+    if not any(code in by_code for code in ("approval_missing", "approval_unreadable", "report_approval_missing", "report_approval_not_approved")):
         return None
     return _action(
         root,
@@ -252,7 +268,7 @@ def _action_for_approvals(root: Path, by_code: dict[str, list[WorkspaceDoctorFin
         "K-ResDev does not infer approval; human decisions must be recorded explicitly.",
         f'python -m k_resdev_skill approval-record --target-type report --target-id monthly-report --decision needs_changes --reviewer "<reviewer>" --approvals-dir "{root / "state" / "approvals"}"',
         by_code,
-        ["approval_missing", "approval_unreadable"],
+        ["approval_missing", "approval_unreadable", "report_approval_missing", "report_approval_not_approved"],
     )
 
 

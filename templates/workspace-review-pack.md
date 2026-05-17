@@ -1,6 +1,6 @@
 # K-ResDev Workspace Review Pack
 
-> Review pack projection only. It bundles local readiness, next-action, summary, and source-verification artifacts; it does not certify official agency compliance.
+> Review pack projection only. It bundles local readiness, next-action, summary, source-verification, and approval-coverage artifacts; it does not certify official agency compliance.
 
 | Field | Value |
 |---|---|
@@ -13,6 +13,9 @@
 | Source verification valid | `{{source_verification_valid}}` |
 | Source missing count | `{{source_missing_count}}` |
 | Source mismatch count | `{{source_mismatch_count}}` |
+| Approval coverage status | `{{approval_coverage_status}}` |
+| Approval missing count | `{{approval_missing_count}}` |
+| Approval not approved count | `{{approval_not_approved_count}}` |
 
 ## Generated Artifacts
 
@@ -22,6 +25,7 @@
 | Next actions | `reports/next-actions.md` |
 | Workspace summary | `reports/workspace-summary.md` |
 | Evidence source verification | `reports/source-verification.md` |
+| Approval coverage | `reports/approval-coverage.md` |
 | Review pack index | `reports/workspace-review-pack.md` |
 
 ## Manifest

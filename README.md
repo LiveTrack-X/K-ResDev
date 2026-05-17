@@ -2,7 +2,7 @@
 
 Purpose: 한국형 국책 R&D 환경에서 연구 행정 문서화, 증빙 정합성, 보고서 생성, 논문/데이터 인사이트 보조를 evidence-first 방식으로 지원하는 Codex/Skill 프로젝트입니다.
 
-Current release: `0.1 BETA 14` (`0.1.0b14`).
+Current release: `0.1 BETA 15` (`0.1.0b15`).
 
 Core principle:
 
@@ -44,17 +44,19 @@ This repository does not encode any single ministry/institution form as authorit
 - Agency profile registry/validator for `templates/agencies/` skeletons.
 - Human approval record workflow for supplied reviewer decisions, approval summaries, and approval gates.
 - Evidence bundle index generator for audit/review packages without copying or altering raw files.
+- Workspace approval coverage checker for report drafts/exports against supplied human decisions.
 - JSON schema validation CLI for bundled schemas such as evidence, project profile, research insight, and approval record.
 - Reproducible CSV/XLSX analysis run workflow that writes profile JSON, insight candidate Markdown, replay script, and manifest.
 - Projection export workflow for Markdown drafts to DOCX, TXT, HTML, or HWPX-compatible HTML review files.
 - Workspace initializer and readiness doctor for standard local workspace setup and pre-reporting checks.
 - Workspace next-action planner that converts doctor findings into deterministic, reviewable commands.
 - Workspace summary report that combines readiness, next actions, evidence counts, approvals, reports, exports, and analysis manifests.
-- Workspace review pack command that refreshes readiness, next actions, workspace summary, and source-verification artifacts together.
+- Workspace review pack command that refreshes readiness, next actions, workspace summary, source-verification, and approval-coverage artifacts together.
 - Review pack artifact hash manifest and verifier for detecting missing or changed generated artifacts.
 - Evidence source verifier that checks indexed source files against saved source hashes.
 - Workspace doctor and review pack integration for local evidence-source presence/hash drift checks.
 - Next-action routing for source-integrity findings.
+- Workspace doctor and review pack integration for report approval coverage.
 - `national-rnd-basic` agency template skeleton for annual/interim/final reports, change requests, and performance registration drafts.
 
 ## Local use
@@ -66,6 +68,7 @@ python -m k_resdev_skill intake --inbox .\inbox --project my-rnd-project
 python -m k_resdev_skill init-workspace --root .\demo-workspace --project-id PRJ-2026-0001 --title "Demo R&D Project"
 python -m k_resdev_skill doctor --root .\demo-workspace --output .\demo-workspace\reports\readiness.md --json .\demo-workspace\state\readiness.json
 python -m k_resdev_skill next-actions --root .\demo-workspace --output .\demo-workspace\reports\next-actions.md --json .\demo-workspace\state\next-actions.json
+python -m k_resdev_skill approval-coverage --root .\demo-workspace --output .\demo-workspace\reports\approval-coverage.md --json .\demo-workspace\state\approval-coverage.json
 python -m k_resdev_skill workspace-summary --root .\demo-workspace --output .\demo-workspace\reports\workspace-summary.md --json .\demo-workspace\state\workspace-summary.json
 python -m k_resdev_skill workspace-review-pack --root .\demo-workspace
 python -m k_resdev_skill verify-review-pack .\demo-workspace\state\workspace-review-pack.json

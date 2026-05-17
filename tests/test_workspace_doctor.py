@@ -74,6 +74,31 @@ def test_workspace_doctor_approval_record_reduces_approval_missing(tmp_path):
     assert "approval_missing" not in codes
 
 
+def test_workspace_doctor_flags_report_approval_coverage(tmp_path):
+    initialize_workspace(tmp_path, "PRJ-2026-0001", "Demo Project")
+    (tmp_path / "reports" / "monthly-report-2026-05.md").write_text("# Monthly Report\n", encoding="utf-8")
+
+    result = run_workspace_doctor(tmp_path)
+    codes = {finding.code for finding in result.findings}
+
+    assert "report_approval_missing" in codes
+
+    approval = create_approval_record(
+        "report",
+        "monthly-2026-05",
+        "approved",
+        "Reviewer",
+        target_path="reports/monthly-report-2026-05.md",
+        reviewed_at="2026-05-17T09:00:00Z",
+    )
+    write_approval_record(approval, tmp_path / "state" / "approvals")
+
+    approved_result = run_workspace_doctor(tmp_path)
+    approved_codes = {finding.code for finding in approved_result.findings}
+
+    assert "report_approval_missing" not in approved_codes
+
+
 def test_workspace_doctor_flags_source_hash_mismatch(tmp_path):
     initialize_workspace(tmp_path, "PRJ-2026-0001", "Demo Project")
     source = tmp_path / "inbox" / "metrics.csv"

@@ -337,6 +337,33 @@ class WorkspaceActionPlan(StrictModel):
     json_path: str | None = None
 
 
+class WorkspaceApprovalCoverageItem(StrictModel):
+    path: str
+    artifact_type: str
+    target_type: str = "report"
+    target_id: str
+    target_id_candidates: list[str] = Field(default_factory=list)
+    approved: bool = False
+    decision: str = "missing"
+    approval_id: str | None = None
+    reviewer: str | None = None
+    reviewed_at: str | None = None
+    warnings: list[str] = Field(default_factory=list)
+
+
+class WorkspaceApprovalCoverageResult(StrictModel):
+    root: str
+    status: str
+    artifact_count: int = 0
+    approved_count: int = 0
+    missing_count: int = 0
+    not_approved_count: int = 0
+    items: list[WorkspaceApprovalCoverageItem] = Field(default_factory=list)
+    markdown_path: str | None = None
+    json_path: str | None = None
+    warnings: list[str] = Field(default_factory=list)
+
+
 class WorkspaceSummaryResult(StrictModel):
     root: str
     status: str
@@ -413,6 +440,9 @@ class WorkspaceReviewPackResult(StrictModel):
     source_verification_valid: bool | None = None
     source_missing_count: int = 0
     source_mismatch_count: int = 0
+    approval_coverage_status: str | None = None
+    approval_missing_count: int = 0
+    approval_not_approved_count: int = 0
     generated_paths: list[str] = Field(default_factory=list)
     artifacts: list[ReviewPackArtifact] = Field(default_factory=list)
     index_path: str

@@ -259,6 +259,15 @@ Implement:
 
 Report integrity is a local consistency projection only. It must not certify official compliance, scientific validity, or human approval.
 
+### Task 26: Evidence review status in report integrity
+
+Implement:
+- report-integrity findings when report drafts cite evidence that is not `accepted`
+- medium-severity findings for `draft` and `needs_review` evidence citations
+- high-severity findings for `rejected` and `superseded` evidence citations
+
+A known evidence ID is necessary but not sufficient for report readiness. The evidence review state must remain visible before approval or external review.
+
 ## Safety constraints
 
 - Never alter raw files.

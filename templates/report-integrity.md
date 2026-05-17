@@ -1,6 +1,6 @@
 # Workspace Report Integrity
 
-> Report integrity projection only. This checks local Markdown report drafts against indexed evidence; it does not certify official compliance, scientific validity, or human approval.
+> Report integrity projection only. This checks local Markdown report drafts against indexed evidence and cited evidence review status; it does not certify official compliance, scientific validity, or human approval.
 
 | Field | Value |
 |---|---|

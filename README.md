@@ -2,7 +2,7 @@
 
 Purpose: 한국형 국책 R&D 환경에서 연구 행정 문서화, 증빙 정합성, 보고서 생성, 논문/데이터 인사이트 보조를 evidence-first 방식으로 지원하는 Codex/Skill 프로젝트입니다.
 
-Current release: `0.1 BETA 16` (`0.1.0b16`).
+Current release: `0.1 BETA 17` (`0.1.0b17`).
 
 Core principle:
 
@@ -46,6 +46,7 @@ This repository does not encode any single ministry/institution form as authorit
 - Evidence bundle index generator for audit/review packages without copying or altering raw files.
 - Workspace approval coverage checker for report drafts/exports against supplied human decisions.
 - Workspace report integrity checker for Markdown report drafts against indexed evidence claims.
+- Report integrity checks for cited evidence status, including `needs_review`, `draft`, `rejected`, and `superseded` evidence.
 - JSON schema validation CLI for bundled schemas such as evidence, project profile, research insight, and approval record.
 - Reproducible CSV/XLSX analysis run workflow that writes profile JSON, insight candidate Markdown, replay script, and manifest.
 - Projection export workflow for Markdown drafts to DOCX, TXT, HTML, or HWPX-compatible HTML review files.

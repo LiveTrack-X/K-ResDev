@@ -126,7 +126,7 @@ Use the Python package under `src/k_resdev_skill/` for deterministic helpers:
 - `generate_profile_registry(templates_root, output_path)` for local agency profile/template registry output.
 - `create_approval_record(...)`, `generate_approval_summary(...)`, and `approval_gate_status(...)` for supplied human review decisions.
 - `generate_workspace_approval_coverage(root, output_path, json_path)` for checking report artifacts against supplied human decisions.
-- `generate_workspace_report_integrity(root, output_path, json_path)` for checking Markdown report drafts against indexed evidence claims.
+- `generate_workspace_report_integrity(root, output_path, json_path)` for checking Markdown report drafts against indexed evidence claims and cited evidence review status.
 - `generate_evidence_bundle_index(evidence_items, approval_records, output_path)` for audit/review bundle indexes.
 - `validate_json_files(json_paths, schema)` for bundled or custom JSON schema checks.
 - `run_data_analysis(data_file, output_dir, evidence_ids)` for reproducible CSV/XLSX profiling, insight report, replay script, and manifest output.
@@ -160,6 +160,7 @@ Implementation guardrails:
 - Workspace doctor source-integrity findings are operational blockers/warnings only. They do not replace human review, source provenance judgment, or official audit checks.
 - Approval coverage only checks whether local artifacts are linked to supplied human decisions. It does not create, infer, or certify approval.
 - Report integrity checks are draft consistency checks only. They do not certify official compliance, scientific validity, or final approval.
+- Report drafts that cite `draft`, `needs_review`, `rejected`, or `superseded` evidence must remain review-blocked or clearly disclosed; a known evidence ID is not enough by itself.
 
 When running locally, prefer:
 

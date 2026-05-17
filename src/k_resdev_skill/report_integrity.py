@@ -1,10 +1,15 @@
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 from .claim_checker import check_unsupported_claims
 from .evidence_index import load_evidence_index
-from .models import CheckFinding, KPI, ProjectState, WorkspaceReportIntegrityItem, WorkspaceReportIntegrityResult
+from .models import CheckFinding, EvidenceItem, KPI, ProjectState, WorkspaceReportIntegrityItem, WorkspaceReportIntegrityResult
+
+EVIDENCE_ID_RE = re.compile(r"\b(?:EVI|DATA|INS|PAPER)-\d{4}-[A-Z0-9]{4,12}\b")
+BLOCKING_EVIDENCE_STATUSES = {"rejected", "superseded"}
+REVIEW_EVIDENCE_STATUSES = {"draft", "needs_review"}
 
 OPERATIONAL_MARKDOWN_NAMES = {
     "agency-profiles.md",
@@ -31,7 +36,7 @@ def generate_workspace_report_integrity(
     workspace = Path(root)
     warnings: list[str] = []
     report_paths = _report_drafts(workspace)
-    evidence = []
+    evidence: list[EvidenceItem] = []
     kpis: list[KPI] = []
     evidence_unreadable = False
 
@@ -164,6 +169,7 @@ def _check_report(
         findings: list[CheckFinding] = []
     else:
         findings = check_unsupported_claims(text, evidence, kpis)
+        findings.extend(_evidence_status_findings(text, evidence))
     high_count = sum(1 for finding in findings if finding.severity == "high")
     medium_count = sum(1 for finding in findings if finding.severity == "medium")
     low_count = sum(1 for finding in findings if finding.severity == "low")
@@ -183,6 +189,63 @@ def _report_drafts(workspace: Path) -> list[Path]:
     if not reports_dir.exists():
         return []
     return [path for path in sorted(reports_dir.glob("*.md")) if path.name not in OPERATIONAL_MARKDOWN_NAMES]
+
+
+def _evidence_status_findings(text: str, evidence: list[EvidenceItem]) -> list[CheckFinding]:
+    evidence_by_id = {item.evidence_id: item for item in evidence}
+    findings: list[CheckFinding] = []
+    for line in _claim_lines_with_ids(text):
+        for evidence_id in EVIDENCE_ID_RE.findall(line):
+            item = evidence_by_id.get(evidence_id)
+            if item is None:
+                continue
+            status = str(item.status)
+            if status in BLOCKING_EVIDENCE_STATUSES:
+                findings.append(
+                    CheckFinding(
+                        code="invalid_evidence_status_citation",
+                        severity="high",
+                        message=f"Report cites {status} evidence: {evidence_id}",
+                        claim=line,
+                        evidence_ids=[evidence_id],
+                        suggested_action="Remove the claim, replace the evidence, or document why the rejected/superseded evidence is no longer cited.",
+                    )
+                )
+            elif status in REVIEW_EVIDENCE_STATUSES:
+                findings.append(
+                    CheckFinding(
+                        code="unreviewed_evidence_citation",
+                        severity="medium",
+                        message=f"Report cites evidence that is not accepted yet: {evidence_id} ({status}).",
+                        claim=line,
+                        evidence_ids=[evidence_id],
+                        suggested_action="Accept, reject, or disclose the evidence review state before official use.",
+                    )
+                )
+    return _dedupe_findings(findings)
+
+
+def _claim_lines_with_ids(text: str) -> list[str]:
+    lines: list[str] = []
+    for raw_line in text.splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or line.startswith(">"):
+            continue
+        if EVIDENCE_ID_RE.search(line):
+            lines.append(line)
+    return lines
+
+
+def _dedupe_findings(findings: list[CheckFinding]) -> list[CheckFinding]:
+    seen: set[tuple[str, str, tuple[str, ...]]] = set()
+    unique: list[CheckFinding] = []
+    for finding in findings:
+        key = (finding.code, finding.claim, tuple(finding.evidence_ids))
+        if key in seen:
+            continue
+        seen.add(key)
+        unique.append(finding)
+    return unique
 
 
 def _escape(value: str) -> str:

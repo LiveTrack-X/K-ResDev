@@ -242,7 +242,7 @@ def main(argv: list[str] | None = None) -> int:
         print(result.model_dump_json(indent=2))
         return 0
     if args.command == "index":
-        payload = json.loads(Path(args.evidence_json).read_text(encoding="utf-8"))
+        payload = _load_json(args.evidence_json)
         paths = write_evidence_index([EvidenceItem.model_validate(item) for item in payload], args.state_dir)
         print(paths.model_dump_json(indent=2))
         return 0
@@ -276,7 +276,7 @@ def main(argv: list[str] | None = None) -> int:
         print(rendered)
         return 0
     if args.command == "lit-matrix":
-        payload = json.loads(Path(args.papers_json).read_text(encoding="utf-8"))
+        payload = _load_json(args.papers_json)
         rendered = generate_literature_matrix(
             [PaperRecord.model_validate(item) for item in payload],
             args.output,
@@ -325,7 +325,7 @@ def main(argv: list[str] | None = None) -> int:
         print(rendered)
         return 0
     if args.command == "plan-experiment":
-        payload = json.loads(Path(args.insights_json).read_text(encoding="utf-8"))
+        payload = _load_json(args.insights_json)
         if isinstance(payload, list):
             insights = [ResearchInsight.model_validate(item) for item in payload]
         else:
@@ -426,3 +426,7 @@ def main(argv: list[str] | None = None) -> int:
         print(result.model_dump_json(indent=2))
         return 0 if result.valid else 1
     raise AssertionError(f"Unhandled command: {args.command}")
+
+
+def _load_json(path: str | Path):
+    return json.loads(Path(path).read_text(encoding="utf-8-sig"))

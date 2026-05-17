@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "k-resdev-skill"
-version = "0.1.0b16"
+version = "0.1.0b17"
 description = "K-ResDev evidence-first Korean R&D administration and research copilot skill pack."
 readme = "README.md"
 requires-python = ">=3.11"

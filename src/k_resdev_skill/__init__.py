@@ -176,4 +176,4 @@ __all__ = [
     "write_projection_text",
 ]
 
-__version__ = "0.1.0b16"
+__version__ = "0.1.0b17"

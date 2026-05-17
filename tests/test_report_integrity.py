@@ -60,6 +60,60 @@ def test_workspace_report_integrity_no_reports_is_explicit(tmp_path):
     assert result.report_count == 0
 
 
+def test_workspace_report_integrity_flags_unreviewed_evidence_citation(tmp_path):
+    initialize_workspace(tmp_path, "PRJ-2026-0001", "Demo Project")
+    write_evidence_index(
+        [
+            EvidenceItem(
+                evidence_id="EVI-2026-REVIEW01",
+                source_file="metrics.csv",
+                evidence_type="experiment_result",
+                claim="Metric candidate.",
+                status="needs_review",
+            )
+        ],
+        tmp_path / "state",
+    )
+    (tmp_path / "reports" / "monthly-report-2026-05.md").write_text(
+        "Metric evidence is attached as EVI-2026-REVIEW01.\n",
+        encoding="utf-8",
+    )
+
+    result = generate_workspace_report_integrity(tmp_path)
+    codes = {finding.code for item in result.items for finding in item.findings}
+
+    assert result.status == "needs_review"
+    assert result.medium_count == 1
+    assert "unreviewed_evidence_citation" in codes
+
+
+def test_workspace_report_integrity_flags_rejected_evidence_citation(tmp_path):
+    initialize_workspace(tmp_path, "PRJ-2026-0001", "Demo Project")
+    write_evidence_index(
+        [
+            EvidenceItem(
+                evidence_id="EVI-2026-REJECT1",
+                source_file="metrics.csv",
+                evidence_type="experiment_result",
+                claim="Rejected metric.",
+                status="rejected",
+            )
+        ],
+        tmp_path / "state",
+    )
+    (tmp_path / "reports" / "monthly-report-2026-05.md").write_text(
+        "Rejected evidence is still cited as EVI-2026-REJECT1.\n",
+        encoding="utf-8",
+    )
+
+    result = generate_workspace_report_integrity(tmp_path)
+    codes = {finding.code for item in result.items for finding in item.findings}
+
+    assert result.status == "blocked"
+    assert result.high_count == 1
+    assert "invalid_evidence_status_citation" in codes
+
+
 def test_report_integrity_cli_writes_outputs(tmp_path, capsys):
     initialize_workspace(tmp_path, "PRJ-2026-0001", "Demo Project")
     write_evidence_index([], tmp_path / "state")

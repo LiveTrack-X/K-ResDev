@@ -2,6 +2,7 @@ import hashlib
 import json
 
 from k_resdev_skill.approval import create_approval_record, write_approval_record
+from k_resdev_skill.bibliography import import_bibliography
 from k_resdev_skill.cli import main
 from k_resdev_skill.evidence_index import write_evidence_index
 from k_resdev_skill.models import EvidenceItem
@@ -154,6 +155,28 @@ def test_workspace_doctor_flags_bibliography_integrity_findings(tmp_path):
 
     assert result.status == "blocked"
     assert "bibliography_integrity_high_findings" in codes
+
+
+def test_workspace_doctor_flags_citation_support_findings(tmp_path):
+    initialize_workspace(tmp_path, "PRJ-2026-0001", "Demo Project")
+    bib = tmp_path / "references" / "library.bib"
+    bib.write_text(
+        """@article{kim2026,
+  title = {Small Lesion Evidence},
+  author = {Kim, Mina},
+  year = {2026},
+  journal = {Journal of Research Operations}
+}
+""",
+        encoding="utf-8",
+    )
+    import_bibliography(bib, tmp_path / "state")
+    (tmp_path / "reports" / "manuscript.md").write_text("See [@kim2026].\n", encoding="utf-8")
+
+    result = run_workspace_doctor(tmp_path)
+    codes = {finding.code for finding in result.findings}
+
+    assert "citation_support_review_findings" in codes
 
 
 def test_workspace_doctor_flags_source_hash_mismatch(tmp_path):

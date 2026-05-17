@@ -12,6 +12,7 @@ from .models import (
 )
 from .approval_coverage import generate_workspace_approval_coverage
 from .bibliography_integrity import generate_workspace_bibliography_integrity
+from .citation_support import generate_workspace_citation_support_integrity
 from .report_integrity import generate_workspace_report_integrity
 from .source_verification import verify_evidence_sources
 from .workspace import run_workspace_doctor
@@ -25,7 +26,7 @@ def generate_workspace_review_pack(
     state_dir: str | Path | None = None,
     max_actions: int = 5,
 ) -> WorkspaceReviewPackResult:
-    """Generate a bundled local review pack for readiness, actions, source, approval, report, and bibliography checks."""
+    """Generate a bundled local review pack for readiness, actions, source, approval, report, bibliography, and citation-support checks."""
 
     workspace = Path(root)
     reports = Path(reports_dir) if reports_dir is not None else workspace / "reports"
@@ -47,6 +48,8 @@ def generate_workspace_review_pack(
     report_integrity_json = state / "report-integrity.json"
     bibliography_integrity_md = reports / "bibliography-integrity.md"
     bibliography_integrity_json = state / "bibliography-integrity.json"
+    citation_support_md = reports / "citation-support.md"
+    citation_support_json = state / "citation-support.json"
     index_md = reports / "workspace-review-pack.md"
     index_json = state / "workspace-review-pack.json"
 
@@ -55,6 +58,7 @@ def generate_workspace_review_pack(
     approval_coverage = generate_workspace_approval_coverage(workspace, output_path=approval_md, json_path=approval_json)
     report_integrity = generate_workspace_report_integrity(workspace, output_path=report_integrity_md, json_path=report_integrity_json)
     bibliography_integrity = generate_workspace_bibliography_integrity(workspace, output_path=bibliography_integrity_md, json_path=bibliography_integrity_json)
+    citation_support = generate_workspace_citation_support_integrity(workspace, output_path=citation_support_md, json_path=citation_support_json)
     actions = generate_workspace_action_plan(workspace, doctor_result=doctor, output_path=actions_md, json_path=actions_json)
     summary = generate_workspace_summary(
         workspace,
@@ -79,6 +83,8 @@ def generate_workspace_review_pack(
         str(report_integrity_json),
         str(bibliography_integrity_md),
         str(bibliography_integrity_json),
+        str(citation_support_md),
+        str(citation_support_json),
         str(index_md),
         str(index_json),
     ]
@@ -106,6 +112,11 @@ def generate_workspace_review_pack(
         bibliography_citation_count=bibliography_integrity.citation_count,
         bibliography_integrity_finding_count=bibliography_integrity.finding_count,
         bibliography_integrity_high_count=bibliography_integrity.high_count,
+        citation_support_status=citation_support.status,
+        citation_support_count=citation_support.support_count,
+        citation_support_citation_count=citation_support.citation_count,
+        citation_support_finding_count=citation_support.finding_count,
+        citation_support_high_count=citation_support.high_count,
         generated_paths=generated_paths,
         index_path=str(index_md),
         json_path=str(index_json),
@@ -160,7 +171,7 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
     lines = [
         "# K-ResDev Workspace Review Pack",
         "",
-        "> Review pack projection only. It bundles local readiness, next-action, summary, source-verification, approval-coverage, report-integrity, and bibliography-integrity artifacts; it does not certify official agency compliance.",
+        "> Review pack projection only. It bundles local readiness, next-action, summary, source-verification, approval-coverage, report-integrity, bibliography-integrity, and citation-support artifacts; it does not certify official agency compliance.",
         "",
         "| Field | Value |",
         "|---|---|",
@@ -187,6 +198,11 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
         f"| Bibliography citation count | {result.bibliography_citation_count} |",
         f"| Bibliography integrity finding count | {result.bibliography_integrity_finding_count} |",
         f"| Bibliography integrity high count | {result.bibliography_integrity_high_count} |",
+        f"| Citation support status | {_escape(result.citation_support_status or '-')} |",
+        f"| Citation support records | {result.citation_support_count} |",
+        f"| Citation support citation count | {result.citation_support_citation_count} |",
+        f"| Citation support finding count | {result.citation_support_finding_count} |",
+        f"| Citation support high count | {result.citation_support_high_count} |",
         "",
         "## Generated Artifacts",
         "",
@@ -213,6 +229,7 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
             "- Use `approval-coverage.md` to check report artifacts against supplied human decisions.",
             "- Use `report-integrity.md` to check draft report claims against indexed evidence.",
             "- Use `bibliography-integrity.md` to check local citation keys and bibliography source hashes.",
+            "- Use `citation-support.md` to check cited papers against supplied paper-claim support records.",
             "- Run `verify-review-pack state/workspace-review-pack.json` before relying on a saved pack.",
             "- Keep official reports and scientific claims human-approved.",
             "",
@@ -238,6 +255,8 @@ def _artifact_label(path: str) -> str:
         "report-integrity.json": "Report integrity JSON",
         "bibliography-integrity.md": "Bibliography integrity",
         "bibliography-integrity.json": "Bibliography integrity JSON",
+        "citation-support.md": "Citation support",
+        "citation-support.json": "Citation support JSON",
         "workspace-review-pack.md": "Review pack index",
         "workspace-review-pack.json": "Review pack JSON",
     }

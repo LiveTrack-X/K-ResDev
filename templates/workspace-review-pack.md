@@ -1,6 +1,6 @@
 # K-ResDev Workspace Review Pack
 
-> Review pack projection only. It bundles local readiness, next-action, summary, source-verification, approval-coverage, report-integrity, and bibliography-integrity artifacts; it does not certify official agency compliance.
+> Review pack projection only. It bundles local readiness, next-action, summary, source-verification, approval-coverage, report-integrity, bibliography-integrity, and citation-support artifacts; it does not certify official agency compliance.
 
 | Field | Value |
 |---|---|
@@ -27,6 +27,11 @@
 | Bibliography citation count | `{{bibliography_citation_count}}` |
 | Bibliography integrity finding count | `{{bibliography_integrity_finding_count}}` |
 | Bibliography integrity high count | `{{bibliography_integrity_high_count}}` |
+| Citation support status | `{{citation_support_status}}` |
+| Citation support records | `{{citation_support_count}}` |
+| Citation support citation count | `{{citation_support_citation_count}}` |
+| Citation support finding count | `{{citation_support_finding_count}}` |
+| Citation support high count | `{{citation_support_high_count}}` |
 
 ## Generated Artifacts
 
@@ -39,6 +44,7 @@
 | Approval coverage | `reports/approval-coverage.md` |
 | Report integrity | `reports/report-integrity.md` |
 | Bibliography integrity | `reports/bibliography-integrity.md` |
+| Citation support | `reports/citation-support.md` |
 | Review pack index | `reports/workspace-review-pack.md` |
 
 ## Manifest

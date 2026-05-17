@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CitationSupportRecord",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "support_id",
+    "bibliography_id",
+    "claim",
+    "decision",
+    "reviewer",
+    "reviewed_at"
+  ],
+  "properties": {
+    "support_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "bibliography_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "claim": {
+      "type": "string",
+      "minLength": 1
+    },
+    "decision": {
+      "type": "string",
+      "enum": [
+        "supports",
+        "partially_supports",
+        "does_not_support",
+        "needs_review",
+        "superseded"
+      ]
+    },
+    "reviewer": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reviewed_at": {
+      "type": "string",
+      "minLength": 1
+    },
+    "citation_key": {
+      "type": ["string", "null"]
+    },
+    "paper_id": {
+      "type": ["string", "null"]
+    },
+    "locator": {
+      "type": ["string", "null"]
+    },
+    "quote": {
+      "type": ["string", "null"]
+    },
+    "evidence_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "notes": {
+      "type": ["string", "null"]
+    },
+    "risk_flags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    }
+  }
+}

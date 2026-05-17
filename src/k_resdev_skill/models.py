@@ -89,6 +89,14 @@ class BibliographyReviewDecision(str, Enum):
     SUPERSEDED = "superseded"
 
 
+class CitationSupportDecision(str, Enum):
+    SUPPORTS = "supports"
+    PARTIALLY_SUPPORTS = "partially_supports"
+    DOES_NOT_SUPPORT = "does_not_support"
+    NEEDS_REVIEW = "needs_review"
+    SUPERSEDED = "superseded"
+
+
 class ApprovalTargetType(str, Enum):
     REPORT = "report"
     EVIDENCE = "evidence"
@@ -355,6 +363,29 @@ class BibliographyReviewRecord(StrictModel):
         return value.strip()
 
 
+class CitationSupportRecord(StrictModel):
+    support_id: str
+    bibliography_id: str
+    claim: str
+    decision: CitationSupportDecision
+    reviewer: str
+    reviewed_at: str
+    citation_key: str | None = None
+    paper_id: str | None = None
+    locator: str | None = None
+    quote: str | None = None
+    evidence_ids: list[str] = Field(default_factory=list)
+    notes: str | None = None
+    risk_flags: list[str] = Field(default_factory=list)
+
+    @field_validator("support_id", "bibliography_id", "claim", "reviewer", "reviewed_at")
+    @classmethod
+    def _must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
 class BibliographyIntegrityFinding(StrictModel):
     code: str
     severity: str
@@ -376,6 +407,32 @@ class WorkspaceBibliographyIntegrityResult(StrictModel):
     medium_count: int = 0
     low_count: int = 0
     findings: list[BibliographyIntegrityFinding] = Field(default_factory=list)
+    markdown_path: str | None = None
+    json_path: str | None = None
+    warnings: list[str] = Field(default_factory=list)
+
+
+class CitationSupportFinding(StrictModel):
+    code: str
+    severity: str
+    message: str
+    path: str | None = None
+    citation_key: str | None = None
+    bibliography_id: str | None = None
+    support_id: str | None = None
+    suggested_action: str | None = None
+
+
+class WorkspaceCitationSupportResult(StrictModel):
+    root: str
+    status: str
+    support_count: int = 0
+    citation_count: int = 0
+    finding_count: int = 0
+    high_count: int = 0
+    medium_count: int = 0
+    low_count: int = 0
+    findings: list[CitationSupportFinding] = Field(default_factory=list)
     markdown_path: str | None = None
     json_path: str | None = None
     warnings: list[str] = Field(default_factory=list)
@@ -576,6 +633,11 @@ class WorkspaceReviewPackResult(StrictModel):
     bibliography_citation_count: int = 0
     bibliography_integrity_finding_count: int = 0
     bibliography_integrity_high_count: int = 0
+    citation_support_status: str | None = None
+    citation_support_count: int = 0
+    citation_support_citation_count: int = 0
+    citation_support_finding_count: int = 0
+    citation_support_high_count: int = 0
     generated_paths: list[str] = Field(default_factory=list)
     artifacts: list[ReviewPackArtifact] = Field(default_factory=list)
     index_path: str

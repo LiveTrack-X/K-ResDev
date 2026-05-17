@@ -83,6 +83,7 @@ def _actions_for_findings(root: Path, findings: list[WorkspaceDoctorFinding]) ->
         _action_for_approval_coverage(root, by_code),
         _action_for_report_integrity(root, by_code),
         _action_for_bibliography_integrity(root, by_code),
+        _action_for_citation_support_integrity(root, by_code),
         _action_for_reports(root, by_code),
         _action_for_analysis(root, by_code),
         _action_for_exports(root, by_code),
@@ -252,6 +253,22 @@ def _action_for_bibliography_integrity(root: Path, by_code: dict[str, list[Works
         "Review bibliography integrity",
         "Bibliography metadata and Markdown citation keys should be present, reviewed, and source-hash-consistent before external manuscript or report use.",
         f'python -m k_resdev_skill bib-integrity --root "{root}" --output "{root / "reports" / "bibliography-integrity.md"}" --json "{root / "state" / "bibliography-integrity.json"}"',
+        by_code,
+        codes,
+    )
+
+
+def _action_for_citation_support_integrity(root: Path, by_code: dict[str, list[WorkspaceDoctorFinding]]) -> WorkspaceActionItem | None:
+    codes = ["citation_support_high_findings", "citation_support_review_findings"]
+    if not any(code in by_code for code in codes):
+        return None
+    priority = "high" if "citation_support_high_findings" in by_code else "medium"
+    return _action(
+        root,
+        priority,
+        "Review citation support",
+        "Cited papers should have supplied human paper-claim support records before external manuscript or report use.",
+        f'python -m k_resdev_skill citation-support-integrity --root "{root}" --output "{root / "reports" / "citation-support.md"}" --json "{root / "state" / "citation-support.json"}"',
         by_code,
         codes,
     )

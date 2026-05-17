@@ -26,6 +26,14 @@ from .bibliography_review import (
 )
 from .budget import generate_budget_evidence_checklist
 from .claim_checker import check_unsupported_claims
+from .citation_support import (
+    citation_support_status,
+    create_citation_support_record,
+    generate_citation_support_summary,
+    generate_workspace_citation_support_integrity,
+    load_citation_support_records,
+    write_citation_support_record,
+)
 from .classifier import classify_file
 from .data_profiler import profile_data_file
 from .evidence_bundle import generate_evidence_bundle_index
@@ -134,6 +142,52 @@ def main(argv: list[str] | None = None) -> int:
     bib_review_status_parser = subparsers.add_parser("bib-review-status", help="Check latest supplied bibliography metadata review decision.")
     bib_review_status_parser.add_argument("review_records")
     bib_review_status_parser.add_argument("--bibliography-id", required=True)
+
+    citation_support_record_parser = subparsers.add_parser(
+        "citation-support-record",
+        help="Record a supplied human paper-claim citation support decision.",
+    )
+    citation_support_record_parser.add_argument("--bibliography-id", required=True)
+    citation_support_record_parser.add_argument("--claim", required=True)
+    citation_support_record_parser.add_argument(
+        "--decision",
+        required=True,
+        choices=["supports", "partially_supports", "does_not_support", "needs_review", "superseded"],
+    )
+    citation_support_record_parser.add_argument("--reviewer", required=True)
+    citation_support_record_parser.add_argument("--citation-key", default=None)
+    citation_support_record_parser.add_argument("--paper-id", default=None)
+    citation_support_record_parser.add_argument("--locator", default=None)
+    citation_support_record_parser.add_argument("--quote", default=None)
+    citation_support_record_parser.add_argument("--evidence-id", action="append", default=[])
+    citation_support_record_parser.add_argument("--note", default=None)
+    citation_support_record_parser.add_argument("--risk-flag", action="append", default=[])
+    citation_support_record_parser.add_argument("--reviewed-at", default=None)
+    citation_support_record_parser.add_argument("--support-dir", default="state/citation-support")
+    citation_support_record_parser.add_argument("--print-only", action="store_true")
+
+    citation_support_summary_parser = subparsers.add_parser(
+        "citation-support-summary",
+        help="Render a Markdown summary for paper-claim citation support records.",
+    )
+    citation_support_summary_parser.add_argument("support_records")
+    citation_support_summary_parser.add_argument("--output", default=None)
+
+    citation_support_status_parser = subparsers.add_parser(
+        "citation-support-status",
+        help="Check latest supplied citation support decision for a bibliography entry and optional claim.",
+    )
+    citation_support_status_parser.add_argument("support_records")
+    citation_support_status_parser.add_argument("--bibliography-id", required=True)
+    citation_support_status_parser.add_argument("--claim", default=None)
+
+    citation_support_integrity_parser = subparsers.add_parser(
+        "citation-support-integrity",
+        help="Check Markdown citations against supplied paper-claim support records.",
+    )
+    citation_support_integrity_parser.add_argument("--root", default=".")
+    citation_support_integrity_parser.add_argument("--output", default=None)
+    citation_support_integrity_parser.add_argument("--json", default=None)
 
     paper_parser = subparsers.add_parser("paper-card", help="Create a conservative paper card from text.")
     paper_parser.add_argument("paper_text")
@@ -362,6 +416,38 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "bib-review-status":
         records = load_bibliography_review_records(args.review_records)
         print(json.dumps(bibliography_review_status(records, args.bibliography_id), ensure_ascii=False, indent=2))
+        return 0
+    if args.command == "citation-support-record":
+        record = create_citation_support_record(
+            bibliography_id=args.bibliography_id,
+            claim=args.claim,
+            decision=args.decision,
+            reviewer=args.reviewer,
+            citation_key=args.citation_key,
+            paper_id=args.paper_id,
+            locator=args.locator,
+            quote=args.quote,
+            evidence_ids=args.evidence_id,
+            notes=args.note,
+            risk_flags=args.risk_flag,
+            reviewed_at=args.reviewed_at,
+        )
+        if not args.print_only:
+            write_citation_support_record(record, args.support_dir)
+        print(record.model_dump_json(indent=2))
+        return 0
+    if args.command == "citation-support-summary":
+        records = load_citation_support_records(args.support_records)
+        rendered = generate_citation_support_summary(records, args.output)
+        print(rendered)
+        return 0
+    if args.command == "citation-support-status":
+        records = load_citation_support_records(args.support_records)
+        print(json.dumps(citation_support_status(records, args.bibliography_id, args.claim), ensure_ascii=False, indent=2))
+        return 0
+    if args.command == "citation-support-integrity":
+        result = generate_workspace_citation_support_integrity(args.root, output_path=args.output, json_path=args.json)
+        print(result.model_dump_json(indent=2))
         return 0
     if args.command == "paper-card":
         text = read_text_file(args.paper_text)

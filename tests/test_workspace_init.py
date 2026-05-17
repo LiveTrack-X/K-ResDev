@@ -16,6 +16,7 @@ def test_initialize_workspace_creates_standard_layout(tmp_path):
         "reports/analysis",
         "state/approvals",
         "state/bibliography-reviews",
+        "state/citation-support",
     ]:
         assert (tmp_path / relative).is_dir()
 
@@ -33,6 +34,8 @@ def test_initialize_workspace_creates_standard_layout(tmp_path):
     assert "bib-import" in readme
     assert "bib-review-record" in readme
     assert "bib-integrity" in readme
+    assert "citation-support-record" in readme
+    assert "citation-support-integrity" in readme
     assert "workspace-summary" in readme
     assert "workspace-review-pack" in readme
     assert "verify-review-pack" in readme

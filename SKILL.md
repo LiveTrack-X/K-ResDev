@@ -118,6 +118,8 @@ Use the Python package under `src/k_resdev_skill/` for deterministic helpers:
 - `load_bibliography_index(path)` and `paper_records_from_bibliography(entries)` for bibliography-to-literature-matrix projection.
 - `create_bibliography_review_record(...)`, `generate_bibliography_review_summary(...)`, and `bibliography_review_status(...)` for supplied human bibliography metadata decisions.
 - `generate_workspace_bibliography_integrity(root, output_path, json_path)` for checking Markdown citation keys, duplicate bibliography metadata, and bibliography source hash drift.
+- `create_citation_support_record(...)`, `generate_citation_support_summary(...)`, and `citation_support_status(...)` for supplied human paper-claim support decisions.
+- `generate_workspace_citation_support_integrity(root, output_path, json_path)` for checking Markdown citations against supplied paper-claim support records.
 - `extract_project_state_from_text(text, project_id)` for conservative plan mapping.
 - `write_monthly_report(evidence_items, reports_dir, project_state, period)` for non-final report drafts.
 - `generate_audit_qna(evidence_items, output_path)` for draft audit-defense Q&A.
@@ -154,6 +156,8 @@ Implementation guardrails:
 - Bibliography imports must preserve supplied metadata only. Missing titles, authors, years, venues, DOI, or URL must remain review flags instead of being filled in.
 - Bibliography review records must reflect supplied human decisions. The tool must not infer citation acceptance from import alone.
 - Bibliography integrity checks only validate local citation metadata, citation-key presence, review status, and source hash drift. They do not prove that a cited paper supports a claim.
+- Citation support records must reflect supplied human paper-claim review decisions. The tool must not infer that a paper supports a claim from bibliography metadata alone.
+- Citation support integrity checks only inspect supplied support records for cited papers. They do not independently prove scientific truth.
 - Agency templates under `templates/agencies/` are draft profile skeletons, not official rules.
 - Approval records must reflect supplied human decisions. The tool must not infer or invent approval.
 - Approval records should include `target_path` when available so the target hash can be captured and later checked for drift.
@@ -192,6 +196,10 @@ python -m k_resdev_skill bib-review-summary .\state\bibliography-reviews --outpu
 python -m k_resdev_skill bib-review-status .\state\bibliography-reviews --bibliography-id BIB-2026-ABCD1234
 python -m k_resdev_skill bib-lit-matrix .\state\bibliography-index.json --output .\reports\literature-review-matrix.md
 python -m k_resdev_skill bib-integrity --root . --output .\reports\bibliography-integrity.md --json .\state\bibliography-integrity.json
+python -m k_resdev_skill citation-support-record --bibliography-id BIB-2026-ABCD1234 --citation-key kim2026 --claim "Model A underperforms on small-lesion cases." --decision needs_review --reviewer reviewer-name --support-dir .\state\citation-support
+python -m k_resdev_skill citation-support-summary .\state\citation-support --output .\reports\citation-support-summary.md
+python -m k_resdev_skill citation-support-status .\state\citation-support --bibliography-id BIB-2026-ABCD1234 --claim "Model A underperforms on small-lesion cases."
+python -m k_resdev_skill citation-support-integrity --root . --output .\reports\citation-support.md --json .\state\citation-support.json
 python -m k_resdev_skill draft-report .\state\evidence-index.json --period 2026-05
 python -m k_resdev_skill data-insights .\inbox\metrics.csv --output .\reports\data-insights.md
 python -m k_resdev_skill run-analysis .\inbox\metrics.csv --output-dir .\reports\analysis --evidence-id EVI-2026-0001

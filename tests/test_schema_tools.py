@@ -54,6 +54,13 @@ def test_validate_json_file_accepts_generated_evidence_index(tmp_path):
     assert result["error_count"] == 0
 
 
+def test_validate_json_file_accepts_citation_support_alias():
+    result = validate_json_file("templates/citation-support-record.json", "citation-support")
+
+    assert result["valid"] is True
+    assert result["error_count"] == 0
+
+
 def test_validate_json_cli_returns_nonzero_for_invalid(tmp_path, capsys):
     path = tmp_path / "bad-approval.json"
     path.write_text(json.dumps({"approval_id": "APR-2026-BAD"}), encoding="utf-8")

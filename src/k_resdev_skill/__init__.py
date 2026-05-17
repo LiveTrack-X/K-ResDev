@@ -32,6 +32,16 @@ from .bibliography_review import (
 )
 from .claim_checker import check_unsupported_claims
 from .budget import budget_evidence_gaps, generate_budget_evidence_checklist
+from .citation_support import (
+    citation_support_status,
+    create_citation_support_record,
+    generate_citation_support_summary,
+    generate_workspace_citation_support_integrity,
+    latest_citation_support,
+    load_citation_support_records,
+    render_citation_support_integrity_markdown,
+    write_citation_support_record,
+)
 from .classifier import classify_file
 from .data_profiler import profile_data_file
 from .document_extractors import extract_document_text
@@ -51,6 +61,9 @@ from .models import (
     BibliographyReviewDecision,
     BibliographyReviewRecord,
     CheckFinding,
+    CitationSupportDecision,
+    CitationSupportFinding,
+    CitationSupportRecord,
     DataProfile,
     EvidenceSourceVerificationItem,
     EvidenceSourceVerificationResult,
@@ -75,6 +88,7 @@ from .models import (
     WorkspaceApprovalCoverageItem,
     WorkspaceApprovalCoverageResult,
     WorkspaceBibliographyIntegrityResult,
+    WorkspaceCitationSupportResult,
     WorkspaceDoctorFinding,
     WorkspaceDoctorResult,
     WorkspaceInitResult,
@@ -117,6 +131,9 @@ __all__ = [
     "BibliographyReviewDecision",
     "BibliographyReviewRecord",
     "CheckFinding",
+    "CitationSupportDecision",
+    "CitationSupportFinding",
+    "CitationSupportRecord",
     "DataProfile",
     "EvidenceSourceVerificationItem",
     "EvidenceSourceVerificationResult",
@@ -141,6 +158,7 @@ __all__ = [
     "WorkspaceApprovalCoverageItem",
     "WorkspaceApprovalCoverageResult",
     "WorkspaceBibliographyIntegrityResult",
+    "WorkspaceCitationSupportResult",
     "WorkspaceDoctorFinding",
     "WorkspaceDoctorResult",
     "WorkspaceInitResult",
@@ -152,8 +170,10 @@ __all__ = [
     "approval_gate_status",
     "bibliography_review_status",
     "budget_evidence_gaps",
+    "citation_support_status",
     "create_approval_record",
     "create_bibliography_review_record",
+    "create_citation_support_record",
     "check_unsupported_claims",
     "classify_file",
     "draft_monthly_report",
@@ -167,6 +187,7 @@ __all__ = [
     "generate_analysis_script",
     "generate_budget_evidence_checklist",
     "generate_bibliography_review_summary",
+    "generate_citation_support_summary",
     "generate_data_insight_candidates",
     "generate_data_insight_report",
     "generate_experiment_plan",
@@ -180,6 +201,7 @@ __all__ = [
     "generate_workspace_action_plan",
     "generate_workspace_approval_coverage",
     "generate_workspace_bibliography_integrity",
+    "generate_workspace_citation_support_integrity",
     "generate_workspace_report_integrity",
     "generate_workspace_review_pack",
     "generate_workspace_summary",
@@ -189,8 +211,10 @@ __all__ = [
     "list_project_profiles",
     "latest_approval_for_target",
     "latest_bibliography_review",
+    "latest_citation_support",
     "load_approval_records",
     "load_bibliography_review_records",
+    "load_citation_support_records",
     "load_evidence_index",
     "load_project_profile",
     "profile_data_file",
@@ -199,6 +223,7 @@ __all__ = [
     "parse_bibliography_file",
     "render_bibliography_index",
     "render_bibliography_integrity_markdown",
+    "render_citation_support_integrity_markdown",
     "run_intake",
     "run_data_analysis",
     "write_monthly_report",
@@ -216,10 +241,11 @@ __all__ = [
     "verify_workspace_review_pack",
     "write_approval_record",
     "write_bibliography_review_record",
+    "write_citation_support_record",
     "write_evidence_index",
     "write_projection_docx",
     "write_projection_html",
     "write_projection_text",
 ]
 
-__version__ = "0.1.0b21"
+__version__ = "0.1.0b22"

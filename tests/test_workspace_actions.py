@@ -143,6 +143,27 @@ def test_workspace_action_plan_maps_bibliography_integrity_findings(tmp_path):
     assert "bib-integrity" in (action.command or "")
 
 
+def test_workspace_action_plan_maps_citation_support_findings(tmp_path):
+    doctor_result = WorkspaceDoctorResult(
+        root=str(tmp_path),
+        status="blocked",
+        findings=[
+            WorkspaceDoctorFinding(
+                code="citation_support_high_findings",
+                severity="high",
+                message="citation support issue",
+                path=str(tmp_path / "state" / "citation-support"),
+            )
+        ],
+    )
+
+    plan = generate_workspace_action_plan(tmp_path, doctor_result=doctor_result)
+    action = next(item for item in plan.actions if item.title == "Review citation support")
+
+    assert action.priority == "high"
+    assert "citation-support-integrity" in (action.command or "")
+
+
 def test_next_actions_cli_writes_outputs(tmp_path, capsys):
     initialize_workspace(tmp_path, "PRJ-2026-0001", "Demo Project")
     output = tmp_path / "reports" / "next-actions.md"

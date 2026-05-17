@@ -1,0 +1,15 @@
+{
+  "support_id": "CITSUP-2026-NEEDSREVIEW",
+  "bibliography_id": "BIB-2026-NEEDSREVIEW",
+  "claim": "claim_needs_review",
+  "decision": "needs_review",
+  "reviewer": "reviewer_needs_review",
+  "reviewed_at": "2026-05-17T00:00:00Z",
+  "citation_key": null,
+  "paper_id": null,
+  "locator": null,
+  "quote": null,
+  "evidence_ids": [],
+  "notes": "Human paper-claim support decision. Verify against the source publication before external use.",
+  "risk_flags": ["citation_support_needs_review"]
+}

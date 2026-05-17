@@ -22,6 +22,14 @@ from .bibliography_integrity import (
     generate_workspace_bibliography_integrity,
     render_bibliography_integrity_markdown,
 )
+from .bibliography_review import (
+    bibliography_review_status,
+    create_bibliography_review_record,
+    generate_bibliography_review_summary,
+    latest_bibliography_review,
+    load_bibliography_review_records,
+    write_bibliography_review_record,
+)
 from .claim_checker import check_unsupported_claims
 from .budget import budget_evidence_gaps, generate_budget_evidence_checklist
 from .classifier import classify_file
@@ -40,6 +48,8 @@ from .models import (
     BibliographyEntry,
     BibliographyIntegrityFinding,
     BibliographyImportResult,
+    BibliographyReviewDecision,
+    BibliographyReviewRecord,
     CheckFinding,
     DataProfile,
     EvidenceSourceVerificationItem,
@@ -104,6 +114,8 @@ __all__ = [
     "BibliographyEntry",
     "BibliographyIntegrityFinding",
     "BibliographyImportResult",
+    "BibliographyReviewDecision",
+    "BibliographyReviewRecord",
     "CheckFinding",
     "DataProfile",
     "EvidenceSourceVerificationItem",
@@ -138,8 +150,10 @@ __all__ = [
     "WorkspaceReviewPackVerificationResult",
     "WorkspaceSummaryResult",
     "approval_gate_status",
+    "bibliography_review_status",
     "budget_evidence_gaps",
     "create_approval_record",
+    "create_bibliography_review_record",
     "check_unsupported_claims",
     "classify_file",
     "draft_monthly_report",
@@ -152,6 +166,7 @@ __all__ = [
     "generate_approval_summary",
     "generate_analysis_script",
     "generate_budget_evidence_checklist",
+    "generate_bibliography_review_summary",
     "generate_data_insight_candidates",
     "generate_data_insight_report",
     "generate_experiment_plan",
@@ -173,7 +188,9 @@ __all__ = [
     "load_bibliography_index",
     "list_project_profiles",
     "latest_approval_for_target",
+    "latest_bibliography_review",
     "load_approval_records",
+    "load_bibliography_review_records",
     "load_evidence_index",
     "load_project_profile",
     "profile_data_file",
@@ -198,10 +215,11 @@ __all__ = [
     "verify_evidence_sources",
     "verify_workspace_review_pack",
     "write_approval_record",
+    "write_bibliography_review_record",
     "write_evidence_index",
     "write_projection_docx",
     "write_projection_html",
     "write_projection_text",
 ]
 
-__version__ = "0.1.0b20"
+__version__ = "0.1.0b21"

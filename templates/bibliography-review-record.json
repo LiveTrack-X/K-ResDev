@@ -1,0 +1,11 @@
+{
+  "review_id": "BIBREV-2026-NEEDSREVIEW",
+  "bibliography_id": "BIB-2026-NEEDSREVIEW",
+  "decision": "needs_review",
+  "reviewer": "reviewer-name",
+  "reviewed_at": "2026-05-17T09:00:00Z",
+  "citation_key": null,
+  "paper_id": null,
+  "notes": "Human bibliography metadata review decision. This does not certify citation correctness or paper relevance.",
+  "risk_flags": []
+}

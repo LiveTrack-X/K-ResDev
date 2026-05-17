@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BibliographyReviewRecord",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "review_id",
+    "bibliography_id",
+    "decision",
+    "reviewer",
+    "reviewed_at"
+  ],
+  "properties": {
+    "review_id": {"type": "string", "minLength": 1},
+    "bibliography_id": {"type": "string", "minLength": 1},
+    "decision": {"type": "string", "enum": ["accepted", "rejected", "needs_review", "superseded"]},
+    "reviewer": {"type": "string", "minLength": 1},
+    "reviewed_at": {"type": "string", "minLength": 1},
+    "citation_key": {"type": ["string", "null"]},
+    "paper_id": {"type": ["string", "null"]},
+    "notes": {"type": ["string", "null"]},
+    "risk_flags": {"type": "array", "items": {"type": "string"}}
+  }
+}

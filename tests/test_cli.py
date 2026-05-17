@@ -8,7 +8,7 @@ def test_cli_version(capsys):
         main(["--version"])
 
     assert exc.value.code == 0
-    assert "k-resdev 0.1.0b20" in capsys.readouterr().out
+    assert "k-resdev 0.1.0b21" in capsys.readouterr().out
 
 
 def test_index_cli_accepts_utf8_bom_json(tmp_path, capsys):

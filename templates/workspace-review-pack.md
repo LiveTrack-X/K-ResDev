@@ -1,6 +1,6 @@
 # K-ResDev Workspace Review Pack
 
-> Review pack projection only. It bundles local readiness, next-action, summary, source-verification, approval-coverage, and report-integrity artifacts; it does not certify official agency compliance.
+> Review pack projection only. It bundles local readiness, next-action, summary, source-verification, approval-coverage, report-integrity, and bibliography-integrity artifacts; it does not certify official agency compliance.
 
 | Field | Value |
 |---|---|
@@ -23,6 +23,7 @@
 | Report integrity high count | `{{report_integrity_high_count}}` |
 | Bibliography integrity status | `{{bibliography_integrity_status}}` |
 | Bibliography entry count | `{{bibliography_entry_count}}` |
+| Bibliography review count | `{{bibliography_review_count}}` |
 | Bibliography citation count | `{{bibliography_citation_count}}` |
 | Bibliography integrity finding count | `{{bibliography_integrity_finding_count}}` |
 | Bibliography integrity high count | `{{bibliography_integrity_high_count}}` |

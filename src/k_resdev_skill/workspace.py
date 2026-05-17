@@ -30,6 +30,7 @@ STANDARD_DIRS = (
     "reports",
     "reports/analysis",
     "state/approvals",
+    "state/bibliography-reviews",
 )
 OPERATIONAL_MARKDOWN_NAMES = {
     "agency-profiles.md",
@@ -583,6 +584,7 @@ def _starter_readme(project_id: str, title: str, profile_id: str) -> str:
             "- Put BibTeX/RIS/CSL JSON bibliography files in `references/`.",
             "- Run `k-resdev intake --inbox inbox --state-dir state --evidence-dir evidence` to build evidence metadata.",
             "- Run `k-resdev bib-import references/library.bib --state-dir state --literature-matrix reports/literature-review-matrix.md` to build bibliography metadata.",
+            "- Run `k-resdev bib-review-record --bibliography-id <BIB-ID> --decision accepted --reviewer <reviewer> --reviews-dir state/bibliography-reviews` to record supplied bibliography metadata review decisions.",
             "- Run `k-resdev bib-integrity --root . --output reports/bibliography-integrity.md --json state/bibliography-integrity.json` to check citation keys and bibliography source hashes.",
             "- Run `k-resdev doctor --root . --output reports/readiness.md --json state/readiness.json` before reporting.",
             "- Run `k-resdev workspace-summary --root . --output reports/workspace-summary.md --json state/workspace-summary.json` for a one-page status handoff.",

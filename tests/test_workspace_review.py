@@ -42,6 +42,7 @@ def test_workspace_review_pack_writes_all_review_artifacts(tmp_path):
     assert result.approval_hash_unverified_count == 0
     assert result.report_integrity_status == "no_reports"
     assert result.bibliography_integrity_status == "not_configured"
+    assert result.bibliography_review_count == 0
     assert result.bibliography_integrity_finding_count == 0
     assert result.artifacts
     assert all(len(artifact.sha256) == 64 for artifact in result.artifacts)

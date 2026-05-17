@@ -116,6 +116,7 @@ Use the Python package under `src/k_resdev_skill/` for deterministic helpers:
 - `generate_literature_matrix(papers, output_path=None)` for paper comparison tables.
 - `import_bibliography(bibliography_file, state_dir, literature_matrix_path)` for BibTeX/RIS/CSL JSON bibliography intake without citation invention.
 - `load_bibliography_index(path)` and `paper_records_from_bibliography(entries)` for bibliography-to-literature-matrix projection.
+- `create_bibliography_review_record(...)`, `generate_bibliography_review_summary(...)`, and `bibliography_review_status(...)` for supplied human bibliography metadata decisions.
 - `generate_workspace_bibliography_integrity(root, output_path, json_path)` for checking Markdown citation keys, duplicate bibliography metadata, and bibliography source hash drift.
 - `extract_project_state_from_text(text, project_id)` for conservative plan mapping.
 - `write_monthly_report(evidence_items, reports_dir, project_state, period)` for non-final report drafts.
@@ -139,7 +140,7 @@ Use the Python package under `src/k_resdev_skill/` for deterministic helpers:
 - `run_workspace_doctor(root, output_path, json_path)` for readiness checks across evidence, profile, approvals, reports, exports, and analysis manifests.
 - `generate_workspace_action_plan(root, doctor_result, output_path, json_path)` for deterministic next actions derived from doctor findings.
 - `generate_workspace_summary(root, output_path, json_path, max_actions)` for one-page operational workspace status reports.
-- `generate_workspace_review_pack(root, reports_dir, state_dir, max_actions)` for bundled readiness, next-action, summary, source-verification, approval-coverage, and report-integrity artifacts.
+- `generate_workspace_review_pack(root, reports_dir, state_dir, max_actions)` for bundled readiness, next-action, summary, source-verification, approval-coverage, report-integrity, and bibliography-integrity artifacts.
 - `verify_workspace_review_pack(manifest_json)` for checking generated review-pack artifacts against saved hashes.
 - `verify_evidence_sources(evidence_index_json, root, inbox, output_path, json_path)` for checking indexed source files against saved source hashes.
 
@@ -151,6 +152,7 @@ Implementation guardrails:
 - Binary `.hwp` extraction is optional. Use `rhwp dump` when an `rhwp` CLI is available; otherwise mark extraction as `needs_review` instead of pretending HWP text was parsed.
 - Paper/research outputs must never invent citations, metrics, or verified conclusions. Keep them as `needs_review` or `hypothesis` until human-reviewed.
 - Bibliography imports must preserve supplied metadata only. Missing titles, authors, years, venues, DOI, or URL must remain review flags instead of being filled in.
+- Bibliography review records must reflect supplied human decisions. The tool must not infer citation acceptance from import alone.
 - Bibliography integrity checks only validate local citation metadata, citation-key presence, review status, and source hash drift. They do not prove that a cited paper supports a claim.
 - Agency templates under `templates/agencies/` are draft profile skeletons, not official rules.
 - Approval records must reflect supplied human decisions. The tool must not infer or invent approval.
@@ -185,6 +187,9 @@ python -m k_resdev_skill workspace-review-pack --root .\demo-workspace
 python -m k_resdev_skill verify-review-pack .\demo-workspace\state\workspace-review-pack.json
 python -m k_resdev_skill verify-evidence-sources .\demo-workspace\state\evidence-index.json --root .\demo-workspace --output .\demo-workspace\reports\source-verification.md --json .\demo-workspace\state\source-verification.json
 python -m k_resdev_skill bib-import .\references\library.bib --state-dir .\state --literature-matrix .\reports\literature-review-matrix.md
+python -m k_resdev_skill bib-review-record --bibliography-id BIB-2026-ABCD1234 --decision accepted --reviewer reviewer-name --citation-key kim2026 --reviews-dir .\state\bibliography-reviews
+python -m k_resdev_skill bib-review-summary .\state\bibliography-reviews --output .\reports\bibliography-review-summary.md
+python -m k_resdev_skill bib-review-status .\state\bibliography-reviews --bibliography-id BIB-2026-ABCD1234
 python -m k_resdev_skill bib-lit-matrix .\state\bibliography-index.json --output .\reports\literature-review-matrix.md
 python -m k_resdev_skill bib-integrity --root . --output .\reports\bibliography-integrity.md --json .\state\bibliography-integrity.json
 python -m k_resdev_skill draft-report .\state\evidence-index.json --period 2026-05

@@ -17,6 +17,13 @@ from .approval_coverage import generate_workspace_approval_coverage
 from .analysis import generate_analysis_script, run_data_analysis
 from .bibliography import import_bibliography, load_bibliography_index, paper_records_from_bibliography
 from .bibliography_integrity import generate_workspace_bibliography_integrity
+from .bibliography_review import (
+    bibliography_review_status,
+    create_bibliography_review_record,
+    generate_bibliography_review_summary,
+    load_bibliography_review_records,
+    write_bibliography_review_record,
+)
 from .budget import generate_budget_evidence_checklist
 from .claim_checker import check_unsupported_claims
 from .classifier import classify_file
@@ -107,6 +114,26 @@ def main(argv: list[str] | None = None) -> int:
     bib_integrity_parser.add_argument("--root", default=".")
     bib_integrity_parser.add_argument("--output", default=None)
     bib_integrity_parser.add_argument("--json", default=None)
+
+    bib_review_record_parser = subparsers.add_parser("bib-review-record", help="Record a supplied human bibliography metadata review decision.")
+    bib_review_record_parser.add_argument("--bibliography-id", required=True)
+    bib_review_record_parser.add_argument("--decision", required=True, choices=["accepted", "rejected", "needs_review", "superseded"])
+    bib_review_record_parser.add_argument("--reviewer", required=True)
+    bib_review_record_parser.add_argument("--citation-key", default=None)
+    bib_review_record_parser.add_argument("--paper-id", default=None)
+    bib_review_record_parser.add_argument("--note", default=None)
+    bib_review_record_parser.add_argument("--risk-flag", action="append", default=[])
+    bib_review_record_parser.add_argument("--reviewed-at", default=None)
+    bib_review_record_parser.add_argument("--reviews-dir", default="state/bibliography-reviews")
+    bib_review_record_parser.add_argument("--print-only", action="store_true")
+
+    bib_review_summary_parser = subparsers.add_parser("bib-review-summary", help="Render a Markdown summary for bibliography review records.")
+    bib_review_summary_parser.add_argument("review_records")
+    bib_review_summary_parser.add_argument("--output", default=None)
+
+    bib_review_status_parser = subparsers.add_parser("bib-review-status", help="Check latest supplied bibliography metadata review decision.")
+    bib_review_status_parser.add_argument("review_records")
+    bib_review_status_parser.add_argument("--bibliography-id", required=True)
 
     paper_parser = subparsers.add_parser("paper-card", help="Create a conservative paper card from text.")
     paper_parser.add_argument("paper_text")
@@ -311,6 +338,30 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "bib-integrity":
         result = generate_workspace_bibliography_integrity(args.root, output_path=args.output, json_path=args.json)
         print(result.model_dump_json(indent=2))
+        return 0
+    if args.command == "bib-review-record":
+        record = create_bibliography_review_record(
+            bibliography_id=args.bibliography_id,
+            decision=args.decision,
+            reviewer=args.reviewer,
+            citation_key=args.citation_key,
+            paper_id=args.paper_id,
+            notes=args.note,
+            risk_flags=args.risk_flag,
+            reviewed_at=args.reviewed_at,
+        )
+        if not args.print_only:
+            write_bibliography_review_record(record, args.reviews_dir)
+        print(record.model_dump_json(indent=2))
+        return 0
+    if args.command == "bib-review-summary":
+        records = load_bibliography_review_records(args.review_records)
+        rendered = generate_bibliography_review_summary(records, args.output)
+        print(rendered)
+        return 0
+    if args.command == "bib-review-status":
+        records = load_bibliography_review_records(args.review_records)
+        print(json.dumps(bibliography_review_status(records, args.bibliography_id), ensure_ascii=False, indent=2))
         return 0
     if args.command == "paper-card":
         text = read_text_file(args.paper_text)

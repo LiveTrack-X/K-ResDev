@@ -7,6 +7,7 @@ from k_resdev_skill.bibliography_integrity import (
     generate_workspace_bibliography_integrity,
     render_bibliography_integrity_markdown,
 )
+from k_resdev_skill.bibliography_review import create_bibliography_review_record, write_bibliography_review_record
 from k_resdev_skill.cli import main
 from k_resdev_skill.workspace import initialize_workspace
 
@@ -98,6 +99,70 @@ def test_bibliography_integrity_detects_duplicate_citation_key(tmp_path):
 
     assert result.status == "needs_review"
     assert "duplicate_citation_key" in codes
+
+
+def test_bibliography_integrity_accepts_human_reviewed_citation(tmp_path):
+    initialize_workspace(tmp_path, "PRJ-2026-0001", "Demo Project")
+    bib = tmp_path / "references" / "library.bib"
+    bib.write_text(
+        """@article{kim2026,
+  title = {Evidence-First R&D Reporting},
+  author = {Kim, Mina},
+  year = {2026}
+}
+""",
+        encoding="utf-8",
+    )
+    import_bibliography(bib, tmp_path / "state", run_date=date(2026, 5, 17))
+    entry = json.loads((tmp_path / "state" / "bibliography-index.json").read_text(encoding="utf-8"))["items"][0]
+    review = create_bibliography_review_record(
+        bibliography_id=entry["bibliography_id"],
+        decision="accepted",
+        reviewer="Dr. Kim",
+        citation_key="kim2026",
+        paper_id=entry["paper_id"],
+        reviewed_at="2026-05-17T09:00:00Z",
+    )
+    write_bibliography_review_record(review, tmp_path / "state" / "bibliography-reviews")
+    (tmp_path / "reports" / "manuscript.md").write_text("See [@kim2026].\n", encoding="utf-8")
+
+    result = generate_workspace_bibliography_integrity(tmp_path)
+
+    assert result.status == "ready"
+    assert result.review_count == 1
+    assert not result.findings
+
+
+def test_bibliography_integrity_blocks_rejected_human_reviewed_citation(tmp_path):
+    initialize_workspace(tmp_path, "PRJ-2026-0001", "Demo Project")
+    bib = tmp_path / "references" / "library.bib"
+    bib.write_text(
+        """@article{kim2026,
+  title = {Evidence-First R&D Reporting},
+  author = {Kim, Mina},
+  year = {2026}
+}
+""",
+        encoding="utf-8",
+    )
+    import_bibliography(bib, tmp_path / "state", run_date=date(2026, 5, 17))
+    entry = json.loads((tmp_path / "state" / "bibliography-index.json").read_text(encoding="utf-8"))["items"][0]
+    review = create_bibliography_review_record(
+        bibliography_id=entry["bibliography_id"],
+        decision="rejected",
+        reviewer="Dr. Kim",
+        citation_key="kim2026",
+        paper_id=entry["paper_id"],
+        reviewed_at="2026-05-17T09:00:00Z",
+    )
+    write_bibliography_review_record(review, tmp_path / "state" / "bibliography-reviews")
+    (tmp_path / "reports" / "manuscript.md").write_text("See [@kim2026].\n", encoding="utf-8")
+
+    result = generate_workspace_bibliography_integrity(tmp_path)
+    codes = {finding.code for finding in result.findings}
+
+    assert result.status == "blocked"
+    assert "invalid_bibliography_review_citation" in codes
 
 
 def test_bib_integrity_cli_writes_outputs(tmp_path, capsys):

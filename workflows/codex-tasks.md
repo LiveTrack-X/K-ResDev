@@ -300,6 +300,17 @@ Implement:
 
 Bibliography integrity is a local metadata consistency check only. It must not certify citation correctness, paper relevance, or whether cited papers support the manuscript/report claim.
 
+### Task 30: Bibliography review records
+
+Implement:
+- `bib-review-record` for supplied human bibliography metadata decisions
+- `bib-review-summary` and `bib-review-status` commands
+- JSON schema and template coverage for bibliography review records
+- workspace skeleton support for `state/bibliography-reviews/`
+- bibliography integrity status resolution from latest review records
+
+Bibliography review records are human decision metadata only. They must not be inferred from import, and an accepted bibliography review still does not prove that the cited paper supports a report or manuscript claim.
+
 ## Safety constraints
 
 - Never alter raw files.

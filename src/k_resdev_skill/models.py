@@ -82,6 +82,13 @@ class ApprovalDecision(str, Enum):
     REVOKED = "revoked"
 
 
+class BibliographyReviewDecision(str, Enum):
+    ACCEPTED = "accepted"
+    REJECTED = "rejected"
+    NEEDS_REVIEW = "needs_review"
+    SUPERSEDED = "superseded"
+
+
 class ApprovalTargetType(str, Enum):
     REPORT = "report"
     EVIDENCE = "evidence"
@@ -329,6 +336,25 @@ class BibliographyImportResult(StrictModel):
     warnings: list[str] = Field(default_factory=list)
 
 
+class BibliographyReviewRecord(StrictModel):
+    review_id: str
+    bibliography_id: str
+    decision: BibliographyReviewDecision
+    reviewer: str
+    reviewed_at: str
+    citation_key: str | None = None
+    paper_id: str | None = None
+    notes: str | None = None
+    risk_flags: list[str] = Field(default_factory=list)
+
+    @field_validator("review_id", "bibliography_id", "reviewer", "reviewed_at")
+    @classmethod
+    def _must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
 class BibliographyIntegrityFinding(StrictModel):
     code: str
     severity: str
@@ -343,6 +369,7 @@ class WorkspaceBibliographyIntegrityResult(StrictModel):
     root: str
     status: str
     entry_count: int = 0
+    review_count: int = 0
     citation_count: int = 0
     finding_count: int = 0
     high_count: int = 0
@@ -545,6 +572,7 @@ class WorkspaceReviewPackResult(StrictModel):
     report_integrity_high_count: int = 0
     bibliography_integrity_status: str | None = None
     bibliography_entry_count: int = 0
+    bibliography_review_count: int = 0
     bibliography_citation_count: int = 0
     bibliography_integrity_finding_count: int = 0
     bibliography_integrity_high_count: int = 0

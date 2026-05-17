@@ -7,6 +7,7 @@
 | Root | `{{root}}` |
 | Status | `{{status}}` |
 | Bibliography entries | `{{entry_count}}` |
+| Bibliography reviews | `{{review_count}}` |
 | Markdown citations | `{{citation_count}}` |
 | Finding count | `{{finding_count}}` |
 | High findings | `{{high_count}}` |

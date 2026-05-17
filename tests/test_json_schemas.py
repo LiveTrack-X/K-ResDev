@@ -46,3 +46,12 @@ def test_bibliography_entry_template_matches_json_schema():
         sample = json.load(handle)
 
     jsonschema.validate(sample, schema)
+
+
+def test_bibliography_review_record_template_matches_json_schema():
+    with open("schemas/bibliography_review_record.schema.json", encoding="utf-8") as handle:
+        schema = json.load(handle)
+    with open("templates/bibliography-review-record.json", encoding="utf-8") as handle:
+        sample = json.load(handle)
+
+    jsonschema.validate(sample, schema)

@@ -25,7 +25,7 @@ def generate_workspace_review_pack(
     state_dir: str | Path | None = None,
     max_actions: int = 5,
 ) -> WorkspaceReviewPackResult:
-    """Generate a bundled local review pack for readiness, actions, status, source, and approval checks."""
+    """Generate a bundled local review pack for readiness, actions, source, approval, report, and bibliography checks."""
 
     workspace = Path(root)
     reports = Path(reports_dir) if reports_dir is not None else workspace / "reports"
@@ -102,6 +102,7 @@ def generate_workspace_review_pack(
         report_integrity_high_count=report_integrity.high_count,
         bibliography_integrity_status=bibliography_integrity.status,
         bibliography_entry_count=bibliography_integrity.entry_count,
+        bibliography_review_count=bibliography_integrity.review_count,
         bibliography_citation_count=bibliography_integrity.citation_count,
         bibliography_integrity_finding_count=bibliography_integrity.finding_count,
         bibliography_integrity_high_count=bibliography_integrity.high_count,
@@ -159,7 +160,7 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
     lines = [
         "# K-ResDev Workspace Review Pack",
         "",
-        "> Review pack projection only. It bundles local readiness, next-action, summary, source-verification, approval-coverage, and report-integrity artifacts; it does not certify official agency compliance.",
+        "> Review pack projection only. It bundles local readiness, next-action, summary, source-verification, approval-coverage, report-integrity, and bibliography-integrity artifacts; it does not certify official agency compliance.",
         "",
         "| Field | Value |",
         "|---|---|",
@@ -182,6 +183,7 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
         f"| Report integrity high count | {result.report_integrity_high_count} |",
         f"| Bibliography integrity status | {_escape(result.bibliography_integrity_status or '-')} |",
         f"| Bibliography entry count | {result.bibliography_entry_count} |",
+        f"| Bibliography review count | {result.bibliography_review_count} |",
         f"| Bibliography citation count | {result.bibliography_citation_count} |",
         f"| Bibliography integrity finding count | {result.bibliography_integrity_finding_count} |",
         f"| Bibliography integrity high count | {result.bibliography_integrity_high_count} |",

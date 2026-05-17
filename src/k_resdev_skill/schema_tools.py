@@ -11,6 +11,8 @@ SCHEMA_ALIASES = {
     "approval": "approval_record.schema.json",
     "bibliography": "bibliography_entry.schema.json",
     "bibliography-entry": "bibliography_entry.schema.json",
+    "bibliography-review": "bibliography_review_record.schema.json",
+    "bibliography_review": "bibliography_review_record.schema.json",
     "evidence": "evidence.schema.json",
     "project-profile": "project_profile.schema.json",
     "project_state": "project_state.schema.json",
@@ -64,7 +66,7 @@ def validate_json_files(json_paths: list[str | Path], schema: str | Path) -> dic
 
 def _validation_targets(document: Any, schema_payload: dict[str, Any]) -> list[tuple[str, Any]]:
     title = schema_payload.get("title")
-    if title in {"ApprovalRecord", "BibliographyEntry", "EvidenceItem", "ResearchInsight"}:
+    if title in {"ApprovalRecord", "BibliographyEntry", "BibliographyReviewRecord", "EvidenceItem", "ResearchInsight"}:
         if isinstance(document, list):
             return [(f"$[{index}]", item) for index, item in enumerate(document)]
         if isinstance(document, dict) and isinstance(document.get("items"), list):

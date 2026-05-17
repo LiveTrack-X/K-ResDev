@@ -5,7 +5,14 @@ import re
 from pathlib import Path
 
 from .bibliography import load_bibliography_index
-from .models import BibliographyEntry, BibliographyIntegrityFinding, WorkspaceBibliographyIntegrityResult
+from .bibliography_review import latest_bibliography_review, load_bibliography_review_records
+from .models import (
+    BibliographyEntry,
+    BibliographyIntegrityFinding,
+    BibliographyReviewDecision,
+    BibliographyReviewRecord,
+    WorkspaceBibliographyIntegrityResult,
+)
 
 BIBLIOGRAPHY_OPERATIONAL_NAMES = {
     "agency-profiles.md",
@@ -41,6 +48,8 @@ def generate_workspace_bibliography_integrity(
     report_citations = _citations_by_report(workspace)
     citation_count = sum(len(keys) for keys in report_citations.values())
     index_path = workspace / "state" / "bibliography-index.json"
+    reviews, review_warnings = _load_review_records(workspace)
+    warnings.extend(review_warnings)
 
     entries: list[BibliographyEntry] = []
     if not index_path.exists():
@@ -56,7 +65,7 @@ def generate_workspace_bibliography_integrity(
             )
         else:
             warnings.append("bibliography_index_missing")
-        return _result(workspace, entries, citation_count, findings, warnings, output_path, json_path)
+        return _result(workspace, entries, reviews, citation_count, findings, warnings, output_path, json_path)
 
     try:
         entries = load_bibliography_index(index_path)
@@ -70,7 +79,7 @@ def generate_workspace_bibliography_integrity(
                 suggested_action="Regenerate or repair state/bibliography-index.json.",
             )
         )
-        return _result(workspace, entries, citation_count, findings, warnings, output_path, json_path)
+        return _result(workspace, entries, reviews, citation_count, findings, warnings, output_path, json_path)
 
     if not entries:
         findings.append(
@@ -135,12 +144,25 @@ def generate_workspace_bibliography_integrity(
                     )
                 )
                 continue
-            if entry.status != "accepted":
+            effective_status = _effective_review_status(entry, reviews)
+            if effective_status == BibliographyReviewDecision.REJECTED.value or effective_status == BibliographyReviewDecision.SUPERSEDED.value:
+                findings.append(
+                    _finding(
+                        "invalid_bibliography_review_citation",
+                        "high",
+                        f"Markdown citation `@{key}` points to bibliography entry `{entry.bibliography_id}` with latest review status `{effective_status}`.",
+                        report_path,
+                        citation_key=key,
+                        bibliography_id=entry.bibliography_id,
+                        suggested_action="Remove or replace citations whose bibliography metadata was rejected or superseded.",
+                    )
+                )
+            elif effective_status != BibliographyReviewDecision.ACCEPTED.value:
                 findings.append(
                     _finding(
                         "unreviewed_bibliography_citation",
                         "medium",
-                        f"Markdown citation `@{key}` points to bibliography entry `{entry.bibliography_id}` with status `{entry.status}`.",
+                        f"Markdown citation `@{key}` points to bibliography entry `{entry.bibliography_id}` with latest review status `{effective_status}`.",
                         report_path,
                         citation_key=key,
                         bibliography_id=entry.bibliography_id,
@@ -148,7 +170,7 @@ def generate_workspace_bibliography_integrity(
                     )
                 )
 
-    return _result(workspace, entries, citation_count, findings, warnings, output_path, json_path)
+    return _result(workspace, entries, reviews, citation_count, findings, warnings, output_path, json_path)
 
 
 def render_bibliography_integrity_markdown(result: WorkspaceBibliographyIntegrityResult) -> str:
@@ -162,6 +184,7 @@ def render_bibliography_integrity_markdown(result: WorkspaceBibliographyIntegrit
         f"| Root | `{_escape(result.root)}` |",
         f"| Status | {_escape(result.status)} |",
         f"| Bibliography entries | {result.entry_count} |",
+        f"| Bibliography reviews | {result.review_count} |",
         f"| Markdown citations | {result.citation_count} |",
         f"| Finding count | {result.finding_count} |",
         f"| High findings | {result.high_count} |",
@@ -197,6 +220,7 @@ def render_bibliography_integrity_markdown(result: WorkspaceBibliographyIntegrit
 def _result(
     workspace: Path,
     entries: list[BibliographyEntry],
+    reviews: list[BibliographyReviewRecord],
     citation_count: int,
     findings: list[BibliographyIntegrityFinding],
     warnings: list[str],
@@ -220,6 +244,7 @@ def _result(
         root=str(workspace),
         status=status,
         entry_count=len(entries),
+        review_count=len(reviews),
         citation_count=citation_count,
         finding_count=len(findings),
         high_count=high_count,
@@ -239,6 +264,23 @@ def _result(
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(result.model_dump_json(indent=2) + "\n", encoding="utf-8")
     return result
+
+
+def _load_review_records(workspace: Path) -> tuple[list[BibliographyReviewRecord], list[str]]:
+    reviews_dir = workspace / "state" / "bibliography-reviews"
+    if not reviews_dir.exists():
+        return [], []
+    try:
+        return load_bibliography_review_records(reviews_dir), []
+    except Exception as exc:
+        return [], [f"bibliography_reviews_unreadable:{exc}"]
+
+
+def _effective_review_status(entry: BibliographyEntry, reviews: list[BibliographyReviewRecord]) -> str:
+    latest = latest_bibliography_review(reviews, entry.bibliography_id)
+    if latest is not None:
+        return str(latest.decision)
+    return str(entry.status or "needs_review")
 
 
 def _source_findings(workspace: Path, entry: BibliographyEntry) -> list[BibliographyIntegrityFinding]:

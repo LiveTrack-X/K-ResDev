@@ -1,0 +1,54 @@
+import json
+
+from k_resdev_skill.cli import main
+from k_resdev_skill.workspace import initialize_workspace, run_workspace_doctor
+from k_resdev_skill.workspace_review import generate_workspace_review_pack, render_workspace_review_pack_markdown
+
+
+def test_workspace_review_pack_writes_all_review_artifacts(tmp_path):
+    initialize_workspace(tmp_path, "PRJ-2026-0001", "Demo Project")
+
+    result = generate_workspace_review_pack(tmp_path, max_actions=2)
+    rendered = render_workspace_review_pack_markdown(result)
+
+    expected = [
+        tmp_path / "reports" / "readiness.md",
+        tmp_path / "state" / "readiness.json",
+        tmp_path / "reports" / "next-actions.md",
+        tmp_path / "state" / "next-actions.json",
+        tmp_path / "reports" / "workspace-summary.md",
+        tmp_path / "state" / "workspace-summary.json",
+        tmp_path / "reports" / "workspace-review-pack.md",
+        tmp_path / "state" / "workspace-review-pack.json",
+    ]
+
+    assert result.status == "blocked"
+    assert result.action_count > 0
+    assert all(path.exists() for path in expected)
+    assert "Review pack projection only" in rendered
+    assert json.loads((tmp_path / "state" / "workspace-review-pack.json").read_text(encoding="utf-8"))["index_path"] == str(
+        tmp_path / "reports" / "workspace-review-pack.md"
+    )
+    assert json.loads((tmp_path / "state" / "workspace-summary.json").read_text(encoding="utf-8"))["report_paths"] == []
+
+
+def test_workspace_review_pack_cli(tmp_path, capsys):
+    initialize_workspace(tmp_path, "PRJ-2026-0001", "Demo Project")
+
+    assert main(["workspace-review-pack", "--root", str(tmp_path), "--max-actions", "2"]) == 0
+
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["root"] == str(tmp_path)
+    assert (tmp_path / "reports" / "workspace-review-pack.md").exists()
+    assert (tmp_path / "state" / "workspace-review-pack.json").exists()
+
+
+def test_operational_markdown_does_not_satisfy_report_draft_check(tmp_path):
+    initialize_workspace(tmp_path, "PRJ-2026-0001", "Demo Project")
+    for name in ["readiness.md", "next-actions.md", "workspace-summary.md", "workspace-review-pack.md"]:
+        (tmp_path / "reports" / name).write_text("# Operational\n", encoding="utf-8")
+
+    result = run_workspace_doctor(tmp_path)
+    codes = {finding.code for finding in result.findings}
+
+    assert "report_missing" in codes

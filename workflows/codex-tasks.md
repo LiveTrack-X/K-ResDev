@@ -196,6 +196,16 @@ Implement:
 
 Workspace summaries are local operational projections. They do not certify official submission readiness, agency compliance, or scientific validity.
 
+### Task 20: Workspace review pack
+
+Implement:
+- one-command generation for readiness, next actions, workspace summary, and review-pack index artifacts
+- Markdown and JSON pack index outputs
+- CLI command for `workspace-review-pack`
+- report-draft detection hardening so operational Markdown files do not satisfy the missing report draft check
+
+Review packs are local operational bundles only. They must not be treated as official submissions, agency compliance evidence, or human approval.
+
 ## Safety constraints
 
 - Never alter raw files.

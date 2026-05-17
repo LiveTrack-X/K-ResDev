@@ -359,6 +359,18 @@ class WorkspaceSummaryResult(StrictModel):
     json_path: str | None = None
 
 
+class WorkspaceReviewPackResult(StrictModel):
+    root: str
+    status: str
+    evidence_count: int = 0
+    approval_count: int = 0
+    finding_count: int = 0
+    action_count: int = 0
+    generated_paths: list[str] = Field(default_factory=list)
+    index_path: str
+    json_path: str
+
+
 class ApprovalRecord(StrictModel):
     approval_id: str
     target_type: ApprovalTargetType

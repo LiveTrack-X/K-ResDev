@@ -26,6 +26,16 @@ STANDARD_DIRS = (
     "reports/analysis",
     "state/approvals",
 )
+OPERATIONAL_MARKDOWN_NAMES = {
+    "agency-profiles.md",
+    "approval-summary.md",
+    "budget-checklist.md",
+    "evidence-bundle-index.md",
+    "next-actions.md",
+    "readiness.md",
+    "workspace-review-pack.md",
+    "workspace-summary.md",
+}
 
 
 def initialize_workspace(
@@ -282,7 +292,7 @@ def _check_profile(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> N
 
 def _check_reports(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> None:
     reports_dir = workspace / "reports"
-    reports = [path for path in reports_dir.glob("*.md") if path.name != "readiness.md"] if reports_dir.exists() else []
+    reports = [path for path in reports_dir.glob("*.md") if path.name not in OPERATIONAL_MARKDOWN_NAMES] if reports_dir.exists() else []
     if not reports:
         findings.append(_finding("report_missing", "low", "No report Markdown drafts found.", reports_dir, "Generate a draft report when evidence is ready."))
 
@@ -380,6 +390,7 @@ def _starter_readme(project_id: str, title: str, profile_id: str) -> str:
             "- Run `k-resdev intake --inbox inbox --state-dir state --evidence-dir evidence` to build evidence metadata.",
             "- Run `k-resdev doctor --root . --output reports/readiness.md --json state/readiness.json` before reporting.",
             "- Run `k-resdev workspace-summary --root . --output reports/workspace-summary.md --json state/workspace-summary.json` for a one-page status handoff.",
+            "- Run `k-resdev workspace-review-pack --root .` to refresh readiness, next actions, and summary artifacts together.",
             "",
         ]
     )

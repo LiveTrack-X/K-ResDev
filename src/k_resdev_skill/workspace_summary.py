@@ -13,7 +13,7 @@ from .models import (
     WorkspaceSummaryResult,
 )
 from .profile_registry import load_project_profile
-from .workspace import run_workspace_doctor
+from .workspace import OPERATIONAL_MARKDOWN_NAMES, run_workspace_doctor
 from .workspace_actions import generate_workspace_action_plan
 
 
@@ -34,7 +34,7 @@ def generate_workspace_summary(
     evidence = _load_evidence(workspace)
     approvals = _load_approvals(workspace)
     profile = _load_profile(workspace)
-    reports = _sorted_paths(workspace / "reports", ["*.md"])
+    reports = _report_paths(workspace / "reports")
     exports = _sorted_paths(workspace / "reports", ["*.docx", "*.html", "*.txt"])
     manifests = _sorted_paths(workspace / "reports" / "analysis", ["*-analysis-run.json"])
 
@@ -157,6 +157,13 @@ def _sorted_paths(root: Path, patterns: list[str]) -> list[str]:
     paths: list[Path] = []
     for pattern in patterns:
         paths.extend(root.glob(pattern))
+    return [str(path) for path in sorted(paths, key=lambda item: item.as_posix())]
+
+
+def _report_paths(root: Path) -> list[str]:
+    if not root.exists():
+        return []
+    paths = [path for path in root.glob("*.md") if path.name not in OPERATIONAL_MARKDOWN_NAMES]
     return [str(path) for path in sorted(paths, key=lambda item: item.as_posix())]
 
 

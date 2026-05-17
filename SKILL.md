@@ -134,6 +134,7 @@ Use the Python package under `src/k_resdev_skill/` for deterministic helpers:
 - `run_workspace_doctor(root, output_path, json_path)` for readiness checks across evidence, profile, approvals, reports, exports, and analysis manifests.
 - `generate_workspace_action_plan(root, doctor_result, output_path, json_path)` for deterministic next actions derived from doctor findings.
 - `generate_workspace_summary(root, output_path, json_path, max_actions)` for one-page operational workspace status reports.
+- `generate_workspace_review_pack(root, reports_dir, state_dir, max_actions)` for bundled readiness, next-action, and summary artifacts.
 
 Implementation guardrails:
 
@@ -149,6 +150,7 @@ Implementation guardrails:
 - Workspace doctor output is a readiness projection only; it does not certify official agency compliance.
 - Workspace next actions are suggestions for human review. Do not execute generated commands automatically as proof of readiness.
 - Workspace summaries are handoff/status projections only. They must not be used as final submission readiness certification.
+- Workspace review packs are local review bundles only. They must not be treated as official submissions or compliance evidence by themselves.
 
 When running locally, prefer:
 
@@ -160,6 +162,7 @@ python -m k_resdev_skill init-workspace --root .\demo-workspace --project-id PRJ
 python -m k_resdev_skill doctor --root .\demo-workspace --output .\demo-workspace\reports\readiness.md --json .\demo-workspace\state\readiness.json
 python -m k_resdev_skill next-actions --root .\demo-workspace --output .\demo-workspace\reports\next-actions.md --json .\demo-workspace\state\next-actions.json
 python -m k_resdev_skill workspace-summary --root .\demo-workspace --output .\demo-workspace\reports\workspace-summary.md --json .\demo-workspace\state\workspace-summary.json
+python -m k_resdev_skill workspace-review-pack --root .\demo-workspace
 python -m k_resdev_skill draft-report .\state\evidence-index.json --period 2026-05
 python -m k_resdev_skill data-insights .\inbox\metrics.csv --output .\reports\data-insights.md
 python -m k_resdev_skill run-analysis .\inbox\metrics.csv --output-dir .\reports\analysis --evidence-id EVI-2026-0001

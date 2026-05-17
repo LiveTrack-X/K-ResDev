@@ -22,7 +22,21 @@ def verify_evidence_sources(
     index_path = Path(evidence_index_json)
     root_path = Path(root) if root is not None else None
     inbox_path = Path(inbox) if inbox is not None else None
-    evidence = load_evidence_index(index_path)
+    try:
+        evidence = load_evidence_index(index_path)
+    except Exception as exc:
+        result = EvidenceSourceVerificationResult(
+            evidence_index_path=str(index_path),
+            root=str(root_path) if root_path is not None else None,
+            inbox=str(inbox_path) if inbox_path is not None else None,
+            valid=False,
+            markdown_path=str(output_path) if output_path else None,
+            json_path=str(json_path) if json_path else None,
+            warnings=[f"evidence_index_unreadable:{exc}"],
+        )
+        _write_result(result, output_path, json_path)
+        return result
+
     items = [_verify_source_group(source_file, source_items, root_path, inbox_path) for source_file, source_items in _group_by_source(evidence).items()]
 
     result = EvidenceSourceVerificationResult(
@@ -40,6 +54,15 @@ def verify_evidence_sources(
         markdown_path=str(output_path) if output_path else None,
         json_path=str(json_path) if json_path else None,
     )
+    _write_result(result, output_path, json_path)
+    return result
+
+
+def _write_result(
+    result: EvidenceSourceVerificationResult,
+    output_path: str | Path | None,
+    json_path: str | Path | None,
+) -> None:
     if output_path is not None:
         target = Path(output_path)
         target.parent.mkdir(parents=True, exist_ok=True)
@@ -48,7 +71,6 @@ def verify_evidence_sources(
         target = Path(json_path)
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(result.model_dump_json(indent=2) + "\n", encoding="utf-8")
-    return result
 
 
 def render_evidence_source_verification_markdown(result: EvidenceSourceVerificationResult) -> str:
@@ -69,6 +91,7 @@ def render_evidence_source_verification_markdown(result: EvidenceSourceVerificat
         f"| Mismatch | {result.mismatch_count} |",
         f"| No expected hash | {result.no_hash_count} |",
         f"| Conflicting hashes | {result.conflict_count} |",
+        f"| Warnings | {_escape(', '.join(result.warnings) or '-')} |",
         "",
         "## Sources",
         "",
@@ -76,7 +99,8 @@ def render_evidence_source_verification_markdown(result: EvidenceSourceVerificat
         "|---|---|---|---|---|---|---|",
     ]
     if not result.items:
-        lines.append("| no_sources | - | - | - | - | - | evidence_index_empty |")
+        warnings = ", ".join(result.warnings) or "evidence_index_empty"
+        lines.append(f"| no_sources | - | - | - | - | - | {_escape(warnings)} |")
     for item in result.items:
         lines.append(
             "| {status} | {source} | {path} | {evidence} | {expected} | {actual} | {warnings} |".format(

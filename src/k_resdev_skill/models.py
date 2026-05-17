@@ -400,6 +400,7 @@ class EvidenceSourceVerificationResult(StrictModel):
     items: list[EvidenceSourceVerificationItem] = Field(default_factory=list)
     markdown_path: str | None = None
     json_path: str | None = None
+    warnings: list[str] = Field(default_factory=list)
 
 
 class WorkspaceReviewPackResult(StrictModel):
@@ -409,6 +410,9 @@ class WorkspaceReviewPackResult(StrictModel):
     approval_count: int = 0
     finding_count: int = 0
     action_count: int = 0
+    source_verification_valid: bool | None = None
+    source_missing_count: int = 0
+    source_mismatch_count: int = 0
     generated_paths: list[str] = Field(default_factory=list)
     artifacts: list[ReviewPackArtifact] = Field(default_factory=list)
     index_path: str

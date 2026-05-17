@@ -227,6 +227,16 @@ Implement:
 
 Evidence source verification checks local file presence and hash equality only. It does not prove official validity, scientific correctness, or human approval.
 
+### Task 23: Source integrity in doctor and review pack
+
+Implement:
+- workspace doctor findings for missing hashed sources, source hash mismatches, conflicting hashes, and unverifiable hashes
+- next-action routing for source-integrity findings
+- source-verification Markdown/JSON artifacts inside `workspace-review-pack`
+- review-pack manifest hashing for generated source-verification artifacts
+
+Doctor/review-pack integration is still local operational readiness only. It does not certify official compliance, scientific validity, or human approval.
+
 ## Safety constraints
 
 - Never alter raw files.

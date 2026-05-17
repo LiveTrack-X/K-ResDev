@@ -1,7 +1,7 @@
 import json
 
 from k_resdev_skill.cli import main
-from k_resdev_skill.models import WorkspaceDoctorResult
+from k_resdev_skill.models import WorkspaceDoctorFinding, WorkspaceDoctorResult
 from k_resdev_skill.workspace import initialize_workspace
 from k_resdev_skill.workspace_actions import generate_workspace_action_plan, render_action_plan_markdown
 
@@ -33,6 +33,28 @@ def test_workspace_action_plan_can_render_ready_state_without_actions(tmp_path):
     assert plan.status == "ready"
     assert plan.action_count == 0
     assert "No action needed" in rendered
+
+
+def test_workspace_action_plan_maps_source_integrity_findings(tmp_path):
+    doctor_result = WorkspaceDoctorResult(
+        root=str(tmp_path),
+        status="blocked",
+        findings=[
+            WorkspaceDoctorFinding(
+                code="source_hash_mismatch",
+                severity="high",
+                message="source changed",
+                path=str(tmp_path / "state" / "evidence-index.json"),
+            )
+        ],
+    )
+
+    plan = generate_workspace_action_plan(tmp_path, doctor_result=doctor_result)
+    action = next(item for item in plan.actions if item.title == "Verify indexed source files")
+
+    assert action.priority == "high"
+    assert "source_hash_mismatch" in action.related_findings
+    assert "verify-evidence-sources" in (action.command or "")
 
 
 def test_next_actions_cli_writes_outputs(tmp_path, capsys):

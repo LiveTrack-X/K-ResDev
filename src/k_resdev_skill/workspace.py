@@ -16,6 +16,7 @@ from .models import (
 )
 from .profile_registry import default_agency_templates_root, load_project_profile
 from .schema_tools import validate_json_file
+from .source_verification import verify_evidence_sources
 
 DRAFT_NOTICE = "Draft projection only"
 STANDARD_DIRS = (
@@ -33,6 +34,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "evidence-bundle-index.md",
     "next-actions.md",
     "readiness.md",
+    "source-verification.md",
     "workspace-review-pack.md",
     "workspace-summary.md",
 }
@@ -234,7 +236,69 @@ def _check_evidence(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> 
                 "Complete generic budget metadata and verify official agency guidance.",
             )
         )
+    _check_source_integrity(workspace, index_path, findings)
     return len(evidence)
+
+
+def _check_source_integrity(workspace: Path, index_path: Path, findings: list[WorkspaceDoctorFinding]) -> None:
+    result = verify_evidence_sources(index_path, root=workspace)
+    if result.warnings:
+        findings.append(
+            _finding(
+                "source_verification_unreadable",
+                "high",
+                "Evidence source verification could not read the evidence index.",
+                index_path,
+                "Regenerate the evidence index before reporting.",
+            )
+        )
+        return
+
+    missing_hashed = [item for item in result.items if item.status == "missing" and item.expected_hashes]
+    missing_unhashed = [item for item in result.items if item.status == "missing" and not item.expected_hashes]
+    no_hash_existing = [item for item in result.items if item.status == "no_expected_hash"]
+
+    if missing_hashed:
+        findings.append(
+            _finding(
+                "source_file_missing",
+                "high",
+                f"{len(missing_hashed)} indexed hashed source file(s) are missing.",
+                index_path,
+                "Restore raw sources, rerun intake, or document source replacement before reporting.",
+            )
+        )
+    if result.mismatch_count:
+        findings.append(
+            _finding(
+                "source_hash_mismatch",
+                "high",
+                f"{result.mismatch_count} indexed source file(s) changed after evidence indexing.",
+                index_path,
+                "Restore the original raw file or rerun intake and review changed evidence.",
+            )
+        )
+    if result.conflict_count:
+        findings.append(
+            _finding(
+                "source_hash_conflict",
+                "medium",
+                f"{result.conflict_count} source file(s) have conflicting expected hashes across evidence items.",
+                index_path,
+                "Split or regenerate conflicting evidence records before relying on the index.",
+            )
+        )
+    if no_hash_existing or missing_unhashed:
+        unverified_count = len(no_hash_existing) + len(missing_unhashed)
+        findings.append(
+            _finding(
+                "source_hash_unverified",
+                "low",
+                f"{unverified_count} source file(s) cannot be verified with a saved source hash.",
+                index_path,
+                "Prefer intake-generated evidence with source hashes for audit-sensitive use.",
+            )
+        )
 
 
 def _check_approvals(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> int:
@@ -390,7 +454,7 @@ def _starter_readme(project_id: str, title: str, profile_id: str) -> str:
             "- Run `k-resdev intake --inbox inbox --state-dir state --evidence-dir evidence` to build evidence metadata.",
             "- Run `k-resdev doctor --root . --output reports/readiness.md --json state/readiness.json` before reporting.",
             "- Run `k-resdev workspace-summary --root . --output reports/workspace-summary.md --json state/workspace-summary.json` for a one-page status handoff.",
-            "- Run `k-resdev workspace-review-pack --root .` to refresh readiness, next actions, and summary artifacts together.",
+            "- Run `k-resdev workspace-review-pack --root .` to refresh readiness, next actions, summary, and source-verification artifacts together.",
             "- Run `k-resdev verify-review-pack state/workspace-review-pack.json` to check saved review-pack artifact hashes.",
             "- Run `k-resdev verify-evidence-sources state/evidence-index.json --root . --output reports/source-verification.md --json state/source-verification.json` to check indexed source hashes.",
             "",

@@ -10,6 +10,7 @@ from .models import (
     WorkspaceReviewPackResult,
     WorkspaceReviewPackVerificationResult,
 )
+from .source_verification import verify_evidence_sources
 from .workspace import run_workspace_doctor
 from .workspace_actions import generate_workspace_action_plan
 from .workspace_summary import generate_workspace_summary
@@ -35,10 +36,13 @@ def generate_workspace_review_pack(
     actions_json = state / "next-actions.json"
     summary_md = reports / "workspace-summary.md"
     summary_json = state / "workspace-summary.json"
+    source_md = reports / "source-verification.md"
+    source_json = state / "source-verification.json"
     index_md = reports / "workspace-review-pack.md"
     index_json = state / "workspace-review-pack.json"
 
     doctor = run_workspace_doctor(workspace, readiness_md, readiness_json)
+    source_verification = verify_evidence_sources(state / "evidence-index.json", root=workspace, output_path=source_md, json_path=source_json)
     actions = generate_workspace_action_plan(workspace, doctor_result=doctor, output_path=actions_md, json_path=actions_json)
     summary = generate_workspace_summary(
         workspace,
@@ -55,6 +59,8 @@ def generate_workspace_review_pack(
         str(actions_json),
         str(summary_md),
         str(summary_json),
+        str(source_md),
+        str(source_json),
         str(index_md),
         str(index_json),
     ]
@@ -65,6 +71,9 @@ def generate_workspace_review_pack(
         approval_count=summary.approval_count,
         finding_count=doctor.finding_count,
         action_count=actions.action_count,
+        source_verification_valid=source_verification.valid,
+        source_missing_count=source_verification.missing_count,
+        source_mismatch_count=source_verification.mismatch_count,
         generated_paths=generated_paths,
         index_path=str(index_md),
         json_path=str(index_json),
@@ -129,6 +138,9 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
         f"| Approval count | {result.approval_count} |",
         f"| Finding count | {result.finding_count} |",
         f"| Action count | {result.action_count} |",
+        f"| Source verification valid | {result.source_verification_valid} |",
+        f"| Source missing count | {result.source_missing_count} |",
+        f"| Source mismatch count | {result.source_mismatch_count} |",
         "",
         "## Generated Artifacts",
         "",
@@ -151,6 +163,7 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
             "- Start with `readiness.md` for blockers and warnings.",
             "- Use `next-actions.md` as a reviewable command plan.",
             "- Use `workspace-summary.md` as a one-page handoff/status snapshot.",
+            "- Use `source-verification.md` to check local source presence and hash drift.",
             "- Run `verify-review-pack state/workspace-review-pack.json` before relying on a saved pack.",
             "- Keep official reports and scientific claims human-approved.",
             "",
@@ -168,6 +181,8 @@ def _artifact_label(path: str) -> str:
         "next-actions.json": "Next actions JSON",
         "workspace-summary.md": "Workspace summary",
         "workspace-summary.json": "Workspace summary JSON",
+        "source-verification.md": "Evidence source verification",
+        "source-verification.json": "Evidence source verification JSON",
         "workspace-review-pack.md": "Review pack index",
         "workspace-review-pack.json": "Review pack JSON",
     }

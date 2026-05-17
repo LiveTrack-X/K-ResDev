@@ -76,6 +76,7 @@ def _actions_for_findings(root: Path, findings: list[WorkspaceDoctorFinding]) ->
         _action_for_workspace_skeleton(root, by_code),
         _action_for_missing_evidence(root, by_code),
         _action_for_invalid_evidence(root, by_code),
+        _action_for_source_integrity(root, by_code),
         _action_for_review_evidence(root, by_code),
         _action_for_budget_gaps(root, by_code),
         _action_for_profile(root, by_code),
@@ -130,6 +131,30 @@ def _action_for_invalid_evidence(root: Path, by_code: dict[str, list[WorkspaceDo
         f'python -m k_resdev_skill validate-json evidence "{root / "state" / "evidence-index.json"}"',
         by_code,
         ["invalid_evidence_index_schema"],
+    )
+
+
+def _action_for_source_integrity(root: Path, by_code: dict[str, list[WorkspaceDoctorFinding]]) -> WorkspaceActionItem | None:
+    codes = [
+        "source_verification_unreadable",
+        "source_file_missing",
+        "source_hash_mismatch",
+        "source_hash_conflict",
+        "source_hash_unverified",
+    ]
+    if not any(code in by_code for code in codes):
+        return None
+    priority = "high" if any(code in by_code for code in ("source_verification_unreadable", "source_file_missing", "source_hash_mismatch")) else "medium"
+    if priority == "medium" and "source_hash_conflict" not in by_code:
+        priority = "low"
+    return _action(
+        root,
+        priority,
+        "Verify indexed source files",
+        "Evidence source files should be present and hash-consistent before audit-sensitive reports or bundles are used.",
+        f'python -m k_resdev_skill verify-evidence-sources "{root / "state" / "evidence-index.json"}" --root "{root}" --output "{root / "reports" / "source-verification.md"}" --json "{root / "state" / "source-verification.json"}"',
+        by_code,
+        codes,
     )
 
 

@@ -1,3 +1,4 @@
+import hashlib
 import json
 
 from k_resdev_skill.approval import create_approval_record, write_approval_record
@@ -73,6 +74,57 @@ def test_workspace_doctor_approval_record_reduces_approval_missing(tmp_path):
     assert "approval_missing" not in codes
 
 
+def test_workspace_doctor_flags_source_hash_mismatch(tmp_path):
+    initialize_workspace(tmp_path, "PRJ-2026-0001", "Demo Project")
+    source = tmp_path / "inbox" / "metrics.csv"
+    source.write_text("case_id,dice\nA,0.81\n", encoding="utf-8")
+    original_hash = _sha256(source)
+    write_evidence_index(
+        [
+            EvidenceItem(
+                evidence_id="EVI-2026-ABCD1234",
+                source_file="inbox/metrics.csv",
+                source_hash=original_hash,
+                evidence_type="experiment_result",
+                claim="Metric candidate.",
+                status="accepted",
+            )
+        ],
+        tmp_path / "state",
+    )
+
+    source.write_text("case_id,dice\nA,0.12\n", encoding="utf-8")
+
+    result = run_workspace_doctor(tmp_path)
+    codes = {finding.code for finding in result.findings}
+
+    assert result.status == "blocked"
+    assert "source_hash_mismatch" in codes
+
+
+def test_workspace_doctor_flags_missing_hashed_source(tmp_path):
+    initialize_workspace(tmp_path, "PRJ-2026-0001", "Demo Project")
+    write_evidence_index(
+        [
+            EvidenceItem(
+                evidence_id="EVI-2026-ABCD1234",
+                source_file="inbox/missing.csv",
+                source_hash="sha256:" + "0" * 64,
+                evidence_type="experiment_result",
+                claim="Metric candidate.",
+                status="accepted",
+            )
+        ],
+        tmp_path / "state",
+    )
+
+    result = run_workspace_doctor(tmp_path)
+    codes = {finding.code for finding in result.findings}
+
+    assert result.status == "blocked"
+    assert "source_file_missing" in codes
+
+
 def test_doctor_cli_writes_outputs(tmp_path, capsys):
     initialize_workspace(tmp_path, "PRJ-2026-0001", "Demo Project")
     output = tmp_path / "reports" / "readiness.md"
@@ -84,3 +136,8 @@ def test_doctor_cli_writes_outputs(tmp_path, capsys):
     assert payload["root"] == str(tmp_path)
     assert output.exists()
     assert json_output.exists()
+
+
+def _sha256(path):
+    digest = hashlib.sha256(path.read_bytes()).hexdigest()
+    return f"sha256:{digest}"

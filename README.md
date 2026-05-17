@@ -2,7 +2,7 @@
 
 Purpose: 한국형 국책 R&D 환경에서 연구 행정 문서화, 증빙 정합성, 보고서 생성, 논문/데이터 인사이트 보조를 evidence-first 방식으로 지원하는 Codex/Skill 프로젝트입니다.
 
-Current release: `0.1 BETA 13` (`0.1.0b13`).
+Current release: `0.1 BETA 14` (`0.1.0b14`).
 
 Core principle:
 
@@ -50,9 +50,11 @@ This repository does not encode any single ministry/institution form as authorit
 - Workspace initializer and readiness doctor for standard local workspace setup and pre-reporting checks.
 - Workspace next-action planner that converts doctor findings into deterministic, reviewable commands.
 - Workspace summary report that combines readiness, next actions, evidence counts, approvals, reports, exports, and analysis manifests.
-- Workspace review pack command that refreshes readiness, next actions, and workspace summary artifacts together.
+- Workspace review pack command that refreshes readiness, next actions, workspace summary, and source-verification artifacts together.
 - Review pack artifact hash manifest and verifier for detecting missing or changed generated artifacts.
 - Evidence source verifier that checks indexed source files against saved source hashes.
+- Workspace doctor and review pack integration for local evidence-source presence/hash drift checks.
+- Next-action routing for source-integrity findings.
 - `national-rnd-basic` agency template skeleton for annual/interim/final reports, change requests, and performance registration drafts.
 
 ## Local use

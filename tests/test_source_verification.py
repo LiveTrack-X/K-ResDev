@@ -105,6 +105,24 @@ def test_verify_evidence_sources_cli_exit_codes(tmp_path, capsys):
     assert json.loads(capsys.readouterr().out)["mismatch_count"] == 1
 
 
+def test_verify_evidence_sources_handles_unreadable_index_with_outputs(tmp_path):
+    markdown_path = tmp_path / "reports" / "source-verification.md"
+    json_path = tmp_path / "state" / "source-verification.json"
+
+    result = verify_evidence_sources(
+        tmp_path / "state" / "missing-evidence-index.json",
+        root=tmp_path,
+        output_path=markdown_path,
+        json_path=json_path,
+    )
+
+    assert result.valid is False
+    assert result.warnings
+    assert result.warnings[0].startswith("evidence_index_unreadable:")
+    assert markdown_path.exists()
+    assert json.loads(json_path.read_text(encoding="utf-8"))["warnings"][0].startswith("evidence_index_unreadable:")
+
+
 def _sha256(path):
     digest = hashlib.sha256(path.read_bytes()).hexdigest()
     return f"sha256:{digest}"

@@ -198,7 +198,10 @@ def main(argv: list[str] | None = None) -> int:
     workspace_summary_parser.add_argument("--json", default=None)
     workspace_summary_parser.add_argument("--max-actions", type=int, default=5)
 
-    review_pack_parser = subparsers.add_parser("workspace-review-pack", help="Generate readiness, next-action, and summary artifacts in one local review pack.")
+    review_pack_parser = subparsers.add_parser(
+        "workspace-review-pack",
+        help="Generate readiness, next-action, summary, and source-verification artifacts in one local review pack.",
+    )
     review_pack_parser.add_argument("--root", default=".")
     review_pack_parser.add_argument("--reports-dir", default=None)
     review_pack_parser.add_argument("--state-dir", default=None)

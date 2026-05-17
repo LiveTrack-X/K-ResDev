@@ -22,21 +22,26 @@ def test_workspace_review_pack_writes_all_review_artifacts(tmp_path):
         tmp_path / "state" / "next-actions.json",
         tmp_path / "reports" / "workspace-summary.md",
         tmp_path / "state" / "workspace-summary.json",
+        tmp_path / "reports" / "source-verification.md",
+        tmp_path / "state" / "source-verification.json",
         tmp_path / "reports" / "workspace-review-pack.md",
         tmp_path / "state" / "workspace-review-pack.json",
     ]
 
     assert result.status == "blocked"
     assert result.action_count > 0
+    assert result.source_verification_valid is False
     assert result.artifacts
     assert all(len(artifact.sha256) == 64 for artifact in result.artifacts)
     assert all(path.exists() for path in expected)
     assert "Review pack projection only" in rendered
+    assert "Source verification valid" in rendered
     assert "Hashed artifacts" in rendered
     assert json.loads((tmp_path / "state" / "workspace-review-pack.json").read_text(encoding="utf-8"))["index_path"] == str(
         tmp_path / "reports" / "workspace-review-pack.md"
     )
     assert json.loads((tmp_path / "state" / "workspace-summary.json").read_text(encoding="utf-8"))["report_paths"] == []
+    assert json.loads((tmp_path / "state" / "source-verification.json").read_text(encoding="utf-8"))["valid"] is False
     assert verify_workspace_review_pack(tmp_path / "state" / "workspace-review-pack.json").valid is True
 
 
@@ -49,6 +54,7 @@ def test_workspace_review_pack_cli(tmp_path, capsys):
     assert payload["root"] == str(tmp_path)
     assert (tmp_path / "reports" / "workspace-review-pack.md").exists()
     assert (tmp_path / "state" / "workspace-review-pack.json").exists()
+    assert (tmp_path / "reports" / "source-verification.md").exists()
 
 
 def test_verify_review_pack_cli_detects_tampering(tmp_path, capsys):
@@ -70,7 +76,7 @@ def test_verify_review_pack_cli_detects_tampering(tmp_path, capsys):
 
 def test_operational_markdown_does_not_satisfy_report_draft_check(tmp_path):
     initialize_workspace(tmp_path, "PRJ-2026-0001", "Demo Project")
-    for name in ["readiness.md", "next-actions.md", "workspace-summary.md", "workspace-review-pack.md"]:
+    for name in ["readiness.md", "next-actions.md", "workspace-summary.md", "source-verification.md", "workspace-review-pack.md"]:
         (tmp_path / "reports" / name).write_text("# Operational\n", encoding="utf-8")
 
     result = run_workspace_doctor(tmp_path)

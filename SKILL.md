@@ -134,7 +134,7 @@ Use the Python package under `src/k_resdev_skill/` for deterministic helpers:
 - `run_workspace_doctor(root, output_path, json_path)` for readiness checks across evidence, profile, approvals, reports, exports, and analysis manifests.
 - `generate_workspace_action_plan(root, doctor_result, output_path, json_path)` for deterministic next actions derived from doctor findings.
 - `generate_workspace_summary(root, output_path, json_path, max_actions)` for one-page operational workspace status reports.
-- `generate_workspace_review_pack(root, reports_dir, state_dir, max_actions)` for bundled readiness, next-action, and summary artifacts.
+- `generate_workspace_review_pack(root, reports_dir, state_dir, max_actions)` for bundled readiness, next-action, summary, and source-verification artifacts.
 - `verify_workspace_review_pack(manifest_json)` for checking generated review-pack artifacts against saved hashes.
 - `verify_evidence_sources(evidence_index_json, root, inbox, output_path, json_path)` for checking indexed source files against saved source hashes.
 
@@ -155,6 +155,7 @@ Implementation guardrails:
 - Workspace review packs are local review bundles only. They must not be treated as official submissions or compliance evidence by themselves.
 - Review-pack verification only checks generated artifact presence and hashes. It does not validate raw evidence truth, official compliance, or human approval.
 - Evidence source verification only checks local file presence and hash equality. It does not prove that the source content is officially valid or scientifically correct.
+- Workspace doctor source-integrity findings are operational blockers/warnings only. They do not replace human review, source provenance judgment, or official audit checks.
 
 When running locally, prefer:
 

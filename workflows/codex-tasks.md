@@ -216,6 +216,17 @@ Implement:
 
 Verification only checks generated artifact integrity. It does not validate raw source truth, official agency compliance, human approval, or scientific validity.
 
+### Task 22: Evidence source hash verification
+
+Implement:
+- evidence-index source grouping by `source_file`
+- local path resolution using absolute path, workspace root, and inbox hints
+- SHA-256 comparison against `source_hash`
+- CLI command for `verify-evidence-sources`
+- Markdown and JSON verification outputs
+
+Evidence source verification checks local file presence and hash equality only. It does not prove official validity, scientific correctness, or human approval.
+
 ## Safety constraints
 
 - Never alter raw files.

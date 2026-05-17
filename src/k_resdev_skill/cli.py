@@ -37,6 +37,7 @@ from .research_assistant import (
 )
 from .reporting import write_monthly_report
 from .schema_tools import validate_json_files
+from .source_verification import verify_evidence_sources
 from .workspace import initialize_workspace, run_workspace_doctor
 from .workspace_actions import generate_workspace_action_plan
 from .workspace_review import generate_workspace_review_pack, verify_workspace_review_pack
@@ -205,6 +206,13 @@ def main(argv: list[str] | None = None) -> int:
 
     verify_review_pack_parser = subparsers.add_parser("verify-review-pack", help="Verify review-pack generated artifacts against saved hashes.")
     verify_review_pack_parser.add_argument("manifest_json")
+
+    verify_sources_parser = subparsers.add_parser("verify-evidence-sources", help="Verify evidence index source files against saved source hashes.")
+    verify_sources_parser.add_argument("evidence_index_json")
+    verify_sources_parser.add_argument("--root", default=None)
+    verify_sources_parser.add_argument("--inbox", default=None)
+    verify_sources_parser.add_argument("--output", default=None)
+    verify_sources_parser.add_argument("--json", default=None)
 
     args = parser.parse_args(argv)
 
@@ -388,6 +396,10 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if args.command == "verify-review-pack":
         result = verify_workspace_review_pack(args.manifest_json)
+        print(result.model_dump_json(indent=2))
+        return 0 if result.valid else 1
+    if args.command == "verify-evidence-sources":
+        result = verify_evidence_sources(args.evidence_index_json, root=args.root, inbox=args.inbox, output_path=args.output, json_path=args.json)
         print(result.model_dump_json(indent=2))
         return 0 if result.valid else 1
     raise AssertionError(f"Unhandled command: {args.command}")

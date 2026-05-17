@@ -26,6 +26,8 @@ from .models import (
     AnalysisRunResult,
     CheckFinding,
     DataProfile,
+    EvidenceSourceVerificationItem,
+    EvidenceSourceVerificationResult,
     EvidenceItem,
     ExtractedDocument,
     ExtractedSegment,
@@ -64,6 +66,7 @@ from .research_assistant import (
 )
 from .reporting import draft_monthly_report, write_monthly_report
 from .schema_tools import validate_json_file, validate_json_files
+from .source_verification import render_evidence_source_verification_markdown, verify_evidence_sources
 from .workspace import initialize_workspace, render_doctor_markdown, run_workspace_doctor
 from .workspace_actions import generate_workspace_action_plan, render_action_plan_markdown
 from .workspace_review import (
@@ -78,6 +81,8 @@ __all__ = [
     "AnalysisRunResult",
     "CheckFinding",
     "DataProfile",
+    "EvidenceSourceVerificationItem",
+    "EvidenceSourceVerificationResult",
     "EvidenceItem",
     "ExtractedDocument",
     "ExtractedSegment",
@@ -142,11 +147,13 @@ __all__ = [
     "write_monthly_report",
     "render_doctor_markdown",
     "render_action_plan_markdown",
+    "render_evidence_source_verification_markdown",
     "render_workspace_review_pack_markdown",
     "render_workspace_summary_markdown",
     "run_workspace_doctor",
     "validate_json_file",
     "validate_json_files",
+    "verify_evidence_sources",
     "verify_workspace_review_pack",
     "write_approval_record",
     "write_evidence_index",
@@ -155,4 +162,4 @@ __all__ = [
     "write_projection_text",
 ]
 
-__version__ = "0.1.0b12"
+__version__ = "0.1.0b13"

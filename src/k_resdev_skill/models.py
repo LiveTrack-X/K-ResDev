@@ -375,6 +375,33 @@ class ReviewPackVerificationItem(StrictModel):
     status: str
 
 
+class EvidenceSourceVerificationItem(StrictModel):
+    source_file: str
+    resolved_path: str | None = None
+    evidence_ids: list[str] = Field(default_factory=list)
+    expected_hashes: list[str] = Field(default_factory=list)
+    actual_hash: str | None = None
+    byte_count: int | None = None
+    status: str
+    warnings: list[str] = Field(default_factory=list)
+
+
+class EvidenceSourceVerificationResult(StrictModel):
+    evidence_index_path: str
+    root: str | None = None
+    inbox: str | None = None
+    valid: bool
+    source_count: int = 0
+    ok_count: int = 0
+    missing_count: int = 0
+    mismatch_count: int = 0
+    no_hash_count: int = 0
+    conflict_count: int = 0
+    items: list[EvidenceSourceVerificationItem] = Field(default_factory=list)
+    markdown_path: str | None = None
+    json_path: str | None = None
+
+
 class WorkspaceReviewPackResult(StrictModel):
     root: str
     status: str

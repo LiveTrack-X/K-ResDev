@@ -40,6 +40,8 @@ from .models import (
     ReportDraftPaths,
     ResearchInsight,
     SourceRecord,
+    WorkspaceActionItem,
+    WorkspaceActionPlan,
     WorkspaceDoctorFinding,
     WorkspaceDoctorResult,
     WorkspaceInitResult,
@@ -58,6 +60,7 @@ from .research_assistant import (
 from .reporting import draft_monthly_report, write_monthly_report
 from .schema_tools import validate_json_file, validate_json_files
 from .workspace import initialize_workspace, render_doctor_markdown, run_workspace_doctor
+from .workspace_actions import generate_workspace_action_plan, render_action_plan_markdown
 
 __all__ = [
     "ApprovalRecord",
@@ -78,6 +81,8 @@ __all__ = [
     "ReportDraftPaths",
     "ResearchInsight",
     "SourceRecord",
+    "WorkspaceActionItem",
+    "WorkspaceActionPlan",
     "WorkspaceDoctorFinding",
     "WorkspaceDoctorResult",
     "WorkspaceInitResult",
@@ -105,6 +110,7 @@ __all__ = [
     "generate_paper_card_markdown",
     "generate_profile_registry",
     "generate_reproducibility_checklist",
+    "generate_workspace_action_plan",
     "initialize_workspace",
     "list_project_profiles",
     "latest_approval_for_target",
@@ -117,6 +123,7 @@ __all__ = [
     "run_data_analysis",
     "write_monthly_report",
     "render_doctor_markdown",
+    "render_action_plan_markdown",
     "run_workspace_doctor",
     "validate_json_file",
     "validate_json_files",
@@ -127,4 +134,4 @@ __all__ = [
     "write_projection_text",
 ]
 
-__version__ = "0.1.0b8"
+__version__ = "0.1.0b9"

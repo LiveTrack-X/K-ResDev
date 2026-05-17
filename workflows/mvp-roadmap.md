@@ -43,4 +43,4 @@ Status: `national-rnd-basic` is present as a generic needs-review template skele
 4. Report export to Markdown/DOCX/HWP-compatible intermediate format.
 5. Human approval workflow.
 
-Status: JSON schema validation, evidence bundle indexes, human approval records/gates, reproducible CSV/XLSX analysis runs, Markdown projection export to DOCX/HTML/TXT, workspace initialization, and readiness doctor checks are implemented as a first pass.
+Status: JSON schema validation, evidence bundle indexes, human approval records/gates, reproducible CSV/XLSX analysis runs, Markdown projection export to DOCX/HTML/TXT, workspace initialization, readiness doctor checks, and doctor-derived next-action plans are implemented as a first pass.

@@ -318,6 +318,25 @@ class WorkspaceDoctorResult(StrictModel):
     json_path: str | None = None
 
 
+class WorkspaceActionItem(StrictModel):
+    action_id: str
+    priority: str
+    title: str
+    rationale: str
+    command: str | None = None
+    related_findings: list[str] = Field(default_factory=list)
+    status: str = "pending"
+
+
+class WorkspaceActionPlan(StrictModel):
+    root: str
+    status: str
+    action_count: int = 0
+    actions: list[WorkspaceActionItem] = Field(default_factory=list)
+    markdown_path: str | None = None
+    json_path: str | None = None
+
+
 class ApprovalRecord(StrictModel):
     approval_id: str
     target_type: ApprovalTargetType

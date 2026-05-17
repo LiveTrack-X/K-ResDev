@@ -176,6 +176,16 @@ Implement:
 
 Doctor output is a readiness projection only and must not certify official IRIS/NTIS or agency compliance.
 
+### Task 18: Workspace next-action planner
+
+Implement:
+- doctor finding to action-plan conversion
+- Markdown and JSON action-plan outputs
+- CLI command for `next-actions`
+- deterministic IDs and priority ordering for reviewable next steps
+
+Action plans are operational suggestions only. Generated commands must be reviewed before execution and do not replace human approval or official agency checks.
+
 ## Safety constraints
 
 - Never alter raw files.

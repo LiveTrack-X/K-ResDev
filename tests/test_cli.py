@@ -8,4 +8,4 @@ def test_cli_version(capsys):
         main(["--version"])
 
     assert exc.value.code == 0
-    assert "k-resdev 0.1.0b8" in capsys.readouterr().out
+    assert "k-resdev 0.1.0b9" in capsys.readouterr().out

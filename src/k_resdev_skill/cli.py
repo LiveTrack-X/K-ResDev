@@ -38,6 +38,7 @@ from .research_assistant import (
 from .reporting import write_monthly_report
 from .schema_tools import validate_json_files
 from .workspace import initialize_workspace, run_workspace_doctor
+from .workspace_actions import generate_workspace_action_plan
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -182,6 +183,11 @@ def main(argv: list[str] | None = None) -> int:
     doctor_parser.add_argument("--root", default=".")
     doctor_parser.add_argument("--output", default=None)
     doctor_parser.add_argument("--json", default=None)
+
+    next_actions_parser = subparsers.add_parser("next-actions", help="Generate a safe next-action plan from workspace doctor findings.")
+    next_actions_parser.add_argument("--root", default=".")
+    next_actions_parser.add_argument("--output", default=None)
+    next_actions_parser.add_argument("--json", default=None)
 
     args = parser.parse_args(argv)
 
@@ -349,6 +355,10 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if args.command == "doctor":
         result = run_workspace_doctor(args.root, args.output, args.json)
+        print(result.model_dump_json(indent=2))
+        return 0
+    if args.command == "next-actions":
+        result = generate_workspace_action_plan(args.root, output_path=args.output, json_path=args.json)
         print(result.model_dump_json(indent=2))
         return 0
     raise AssertionError(f"Unhandled command: {args.command}")

@@ -145,6 +145,17 @@ def test_workspace_doctor_flags_report_integrity_findings(tmp_path):
     assert "report_integrity_high_findings" in codes
 
 
+def test_workspace_doctor_flags_bibliography_integrity_findings(tmp_path):
+    initialize_workspace(tmp_path, "PRJ-2026-0001", "Demo Project")
+    (tmp_path / "reports" / "manuscript.md").write_text("See [@missing2024].\n", encoding="utf-8")
+
+    result = run_workspace_doctor(tmp_path)
+    codes = {finding.code for finding in result.findings}
+
+    assert result.status == "blocked"
+    assert "bibliography_integrity_high_findings" in codes
+
+
 def test_workspace_doctor_flags_source_hash_mismatch(tmp_path):
     initialize_workspace(tmp_path, "PRJ-2026-0001", "Demo Project")
     source = tmp_path / "inbox" / "metrics.csv"

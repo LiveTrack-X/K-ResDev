@@ -17,6 +17,11 @@ from .bibliography import (
     parse_bibliography_file,
     render_bibliography_index,
 )
+from .bibliography_integrity import (
+    extract_markdown_citation_keys,
+    generate_workspace_bibliography_integrity,
+    render_bibliography_integrity_markdown,
+)
 from .claim_checker import check_unsupported_claims
 from .budget import budget_evidence_gaps, generate_budget_evidence_checklist
 from .classifier import classify_file
@@ -33,6 +38,7 @@ from .models import (
     ApprovalRecord,
     AnalysisRunResult,
     BibliographyEntry,
+    BibliographyIntegrityFinding,
     BibliographyImportResult,
     CheckFinding,
     DataProfile,
@@ -58,6 +64,7 @@ from .models import (
     WorkspaceActionPlan,
     WorkspaceApprovalCoverageItem,
     WorkspaceApprovalCoverageResult,
+    WorkspaceBibliographyIntegrityResult,
     WorkspaceDoctorFinding,
     WorkspaceDoctorResult,
     WorkspaceInitResult,
@@ -95,6 +102,7 @@ __all__ = [
     "ApprovalRecord",
     "AnalysisRunResult",
     "BibliographyEntry",
+    "BibliographyIntegrityFinding",
     "BibliographyImportResult",
     "CheckFinding",
     "DataProfile",
@@ -120,6 +128,7 @@ __all__ = [
     "WorkspaceActionPlan",
     "WorkspaceApprovalCoverageItem",
     "WorkspaceApprovalCoverageResult",
+    "WorkspaceBibliographyIntegrityResult",
     "WorkspaceDoctorFinding",
     "WorkspaceDoctorResult",
     "WorkspaceInitResult",
@@ -138,6 +147,7 @@ __all__ = [
     "extract_evidence_items_from_document",
     "extract_project_state_from_text",
     "export_projection",
+    "extract_markdown_citation_keys",
     "generate_audit_qna",
     "generate_approval_summary",
     "generate_analysis_script",
@@ -154,6 +164,7 @@ __all__ = [
     "generate_reproducibility_checklist",
     "generate_workspace_action_plan",
     "generate_workspace_approval_coverage",
+    "generate_workspace_bibliography_integrity",
     "generate_workspace_report_integrity",
     "generate_workspace_review_pack",
     "generate_workspace_summary",
@@ -170,6 +181,7 @@ __all__ = [
     "paper_card_from_text",
     "parse_bibliography_file",
     "render_bibliography_index",
+    "render_bibliography_integrity_markdown",
     "run_intake",
     "run_data_analysis",
     "write_monthly_report",
@@ -192,4 +204,4 @@ __all__ = [
     "write_projection_text",
 ]
 
-__version__ = "0.1.0b19"
+__version__ = "0.1.0b20"

@@ -21,6 +21,11 @@
 | Report integrity status | `{{report_integrity_status}}` |
 | Report integrity finding count | `{{report_integrity_finding_count}}` |
 | Report integrity high count | `{{report_integrity_high_count}}` |
+| Bibliography integrity status | `{{bibliography_integrity_status}}` |
+| Bibliography entry count | `{{bibliography_entry_count}}` |
+| Bibliography citation count | `{{bibliography_citation_count}}` |
+| Bibliography integrity finding count | `{{bibliography_integrity_finding_count}}` |
+| Bibliography integrity high count | `{{bibliography_integrity_high_count}}` |
 
 ## Generated Artifacts
 
@@ -32,6 +37,7 @@
 | Evidence source verification | `reports/source-verification.md` |
 | Approval coverage | `reports/approval-coverage.md` |
 | Report integrity | `reports/report-integrity.md` |
+| Bibliography integrity | `reports/bibliography-integrity.md` |
 | Review pack index | `reports/workspace-review-pack.md` |
 
 ## Manifest

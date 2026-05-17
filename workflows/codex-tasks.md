@@ -289,6 +289,17 @@ Implement:
 
 Bibliography intake must never fabricate citation metadata. Missing title, author, year, venue, DOI, or URL fields remain `needs_review` risk flags until a human verifies the source publication.
 
+### Task 29: Bibliography integrity in workspace operations
+
+Implement:
+- bibliography-integrity report for Markdown citation keys and bibliography index metadata
+- source hash drift checks for imported bibliography files
+- duplicate citation key and duplicate DOI detection
+- workspace doctor findings for missing citation keys, source drift, and review-level bibliography warnings
+- next-action routing and review-pack artifacts for bibliography integrity
+
+Bibliography integrity is a local metadata consistency check only. It must not certify citation correctness, paper relevance, or whether cited papers support the manuscript/report claim.
+
 ## Safety constraints
 
 - Never alter raw files.

@@ -329,6 +329,31 @@ class BibliographyImportResult(StrictModel):
     warnings: list[str] = Field(default_factory=list)
 
 
+class BibliographyIntegrityFinding(StrictModel):
+    code: str
+    severity: str
+    message: str
+    path: str | None = None
+    citation_key: str | None = None
+    bibliography_id: str | None = None
+    suggested_action: str | None = None
+
+
+class WorkspaceBibliographyIntegrityResult(StrictModel):
+    root: str
+    status: str
+    entry_count: int = 0
+    citation_count: int = 0
+    finding_count: int = 0
+    high_count: int = 0
+    medium_count: int = 0
+    low_count: int = 0
+    findings: list[BibliographyIntegrityFinding] = Field(default_factory=list)
+    markdown_path: str | None = None
+    json_path: str | None = None
+    warnings: list[str] = Field(default_factory=list)
+
+
 class WorkspaceInitResult(StrictModel):
     root: str
     project_id: str
@@ -518,6 +543,11 @@ class WorkspaceReviewPackResult(StrictModel):
     report_integrity_status: str | None = None
     report_integrity_finding_count: int = 0
     report_integrity_high_count: int = 0
+    bibliography_integrity_status: str | None = None
+    bibliography_entry_count: int = 0
+    bibliography_citation_count: int = 0
+    bibliography_integrity_finding_count: int = 0
+    bibliography_integrity_high_count: int = 0
     generated_paths: list[str] = Field(default_factory=list)
     artifacts: list[ReviewPackArtifact] = Field(default_factory=list)
     index_path: str

@@ -6,6 +6,7 @@ from pathlib import Path
 
 from .approval import load_approval_records
 from .approval_coverage import generate_workspace_approval_coverage
+from .bibliography_integrity import generate_workspace_bibliography_integrity
 from .budget import budget_evidence_gaps
 from .evidence_index import load_evidence_index
 from .models import (
@@ -34,6 +35,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "agency-profiles.md",
     "approval-coverage.md",
     "approval-summary.md",
+    "bibliography-integrity.md",
     "budget-checklist.md",
     "evidence-bundle-index.md",
     "next-actions.md",
@@ -122,6 +124,7 @@ def run_workspace_doctor(
     _check_profile(workspace, findings)
     _check_reports(workspace, findings)
     _check_report_integrity(workspace, findings)
+    _check_bibliography_integrity(workspace, findings)
     _check_exports(workspace, findings)
     _check_analysis(workspace, findings)
 
@@ -460,6 +463,33 @@ def _check_report_integrity(workspace: Path, findings: list[WorkspaceDoctorFindi
         )
 
 
+def _check_bibliography_integrity(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> None:
+    result = generate_workspace_bibliography_integrity(workspace)
+    if result.status == "not_configured":
+        return
+    path = workspace / "state" / "bibliography-index.json"
+    if result.high_count:
+        findings.append(
+            _finding(
+                "bibliography_integrity_high_findings",
+                "high",
+                f"{result.high_count} high-severity bibliography integrity finding(s) were detected.",
+                path,
+                "Run bib-integrity and resolve missing citations or bibliography source drift.",
+            )
+        )
+    if result.medium_count or result.low_count:
+        findings.append(
+            _finding(
+                "bibliography_integrity_review_findings",
+                "medium",
+                f"{result.medium_count + result.low_count} bibliography integrity review finding(s) were detected.",
+                path,
+                "Review bib-integrity output before external manuscript or report use.",
+            )
+        )
+
+
 def _check_exports(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> None:
     reports_dir = workspace / "reports"
     if not reports_dir.exists():
@@ -553,6 +583,7 @@ def _starter_readme(project_id: str, title: str, profile_id: str) -> str:
             "- Put BibTeX/RIS/CSL JSON bibliography files in `references/`.",
             "- Run `k-resdev intake --inbox inbox --state-dir state --evidence-dir evidence` to build evidence metadata.",
             "- Run `k-resdev bib-import references/library.bib --state-dir state --literature-matrix reports/literature-review-matrix.md` to build bibliography metadata.",
+            "- Run `k-resdev bib-integrity --root . --output reports/bibliography-integrity.md --json state/bibliography-integrity.json` to check citation keys and bibliography source hashes.",
             "- Run `k-resdev doctor --root . --output reports/readiness.md --json state/readiness.json` before reporting.",
             "- Run `k-resdev workspace-summary --root . --output reports/workspace-summary.md --json state/workspace-summary.json` for a one-page status handoff.",
             "- Run `k-resdev workspace-review-pack --root .` to refresh readiness, next actions, summary, source-verification, approval-coverage, and report-integrity artifacts together.",

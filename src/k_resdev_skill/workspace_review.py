@@ -11,6 +11,7 @@ from .models import (
     WorkspaceReviewPackVerificationResult,
 )
 from .approval_coverage import generate_workspace_approval_coverage
+from .bibliography_integrity import generate_workspace_bibliography_integrity
 from .report_integrity import generate_workspace_report_integrity
 from .source_verification import verify_evidence_sources
 from .workspace import run_workspace_doctor
@@ -44,6 +45,8 @@ def generate_workspace_review_pack(
     approval_json = state / "approval-coverage.json"
     report_integrity_md = reports / "report-integrity.md"
     report_integrity_json = state / "report-integrity.json"
+    bibliography_integrity_md = reports / "bibliography-integrity.md"
+    bibliography_integrity_json = state / "bibliography-integrity.json"
     index_md = reports / "workspace-review-pack.md"
     index_json = state / "workspace-review-pack.json"
 
@@ -51,6 +54,7 @@ def generate_workspace_review_pack(
     source_verification = verify_evidence_sources(state / "evidence-index.json", root=workspace, output_path=source_md, json_path=source_json)
     approval_coverage = generate_workspace_approval_coverage(workspace, output_path=approval_md, json_path=approval_json)
     report_integrity = generate_workspace_report_integrity(workspace, output_path=report_integrity_md, json_path=report_integrity_json)
+    bibliography_integrity = generate_workspace_bibliography_integrity(workspace, output_path=bibliography_integrity_md, json_path=bibliography_integrity_json)
     actions = generate_workspace_action_plan(workspace, doctor_result=doctor, output_path=actions_md, json_path=actions_json)
     summary = generate_workspace_summary(
         workspace,
@@ -73,6 +77,8 @@ def generate_workspace_review_pack(
         str(approval_json),
         str(report_integrity_md),
         str(report_integrity_json),
+        str(bibliography_integrity_md),
+        str(bibliography_integrity_json),
         str(index_md),
         str(index_json),
     ]
@@ -94,6 +100,11 @@ def generate_workspace_review_pack(
         report_integrity_status=report_integrity.status,
         report_integrity_finding_count=report_integrity.finding_count,
         report_integrity_high_count=report_integrity.high_count,
+        bibliography_integrity_status=bibliography_integrity.status,
+        bibliography_entry_count=bibliography_integrity.entry_count,
+        bibliography_citation_count=bibliography_integrity.citation_count,
+        bibliography_integrity_finding_count=bibliography_integrity.finding_count,
+        bibliography_integrity_high_count=bibliography_integrity.high_count,
         generated_paths=generated_paths,
         index_path=str(index_md),
         json_path=str(index_json),
@@ -169,6 +180,11 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
         f"| Report integrity status | {_escape(result.report_integrity_status or '-')} |",
         f"| Report integrity finding count | {result.report_integrity_finding_count} |",
         f"| Report integrity high count | {result.report_integrity_high_count} |",
+        f"| Bibliography integrity status | {_escape(result.bibliography_integrity_status or '-')} |",
+        f"| Bibliography entry count | {result.bibliography_entry_count} |",
+        f"| Bibliography citation count | {result.bibliography_citation_count} |",
+        f"| Bibliography integrity finding count | {result.bibliography_integrity_finding_count} |",
+        f"| Bibliography integrity high count | {result.bibliography_integrity_high_count} |",
         "",
         "## Generated Artifacts",
         "",
@@ -194,6 +210,7 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
             "- Use `source-verification.md` to check local source presence and hash drift.",
             "- Use `approval-coverage.md` to check report artifacts against supplied human decisions.",
             "- Use `report-integrity.md` to check draft report claims against indexed evidence.",
+            "- Use `bibliography-integrity.md` to check local citation keys and bibliography source hashes.",
             "- Run `verify-review-pack state/workspace-review-pack.json` before relying on a saved pack.",
             "- Keep official reports and scientific claims human-approved.",
             "",
@@ -217,6 +234,8 @@ def _artifact_label(path: str) -> str:
         "approval-coverage.json": "Approval coverage JSON",
         "report-integrity.md": "Report integrity",
         "report-integrity.json": "Report integrity JSON",
+        "bibliography-integrity.md": "Bibliography integrity",
+        "bibliography-integrity.json": "Bibliography integrity JSON",
         "workspace-review-pack.md": "Review pack index",
         "workspace-review-pack.json": "Review pack JSON",
     }

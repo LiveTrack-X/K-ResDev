@@ -82,6 +82,7 @@ def _actions_for_findings(root: Path, findings: list[WorkspaceDoctorFinding]) ->
         _action_for_profile(root, by_code),
         _action_for_approval_coverage(root, by_code),
         _action_for_report_integrity(root, by_code),
+        _action_for_bibliography_integrity(root, by_code),
         _action_for_reports(root, by_code),
         _action_for_analysis(root, by_code),
         _action_for_exports(root, by_code),
@@ -235,6 +236,22 @@ def _action_for_report_integrity(root: Path, by_code: dict[str, list[WorkspaceDo
         "Review report claim integrity",
         "Report drafts should not contain unsupported numbers, missing evidence IDs, or evidence-mismatched claims.",
         f'python -m k_resdev_skill report-integrity --root "{root}" --output "{root / "reports" / "report-integrity.md"}" --json "{root / "state" / "report-integrity.json"}"',
+        by_code,
+        codes,
+    )
+
+
+def _action_for_bibliography_integrity(root: Path, by_code: dict[str, list[WorkspaceDoctorFinding]]) -> WorkspaceActionItem | None:
+    codes = ["bibliography_integrity_high_findings", "bibliography_integrity_review_findings"]
+    if not any(code in by_code for code in codes):
+        return None
+    priority = "high" if "bibliography_integrity_high_findings" in by_code else "medium"
+    return _action(
+        root,
+        priority,
+        "Review bibliography integrity",
+        "Bibliography metadata and Markdown citation keys should be present, reviewed, and source-hash-consistent before external manuscript or report use.",
+        f'python -m k_resdev_skill bib-integrity --root "{root}" --output "{root / "reports" / "bibliography-integrity.md"}" --json "{root / "state" / "bibliography-integrity.json"}"',
         by_code,
         codes,
     )

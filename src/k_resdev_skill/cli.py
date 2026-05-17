@@ -16,6 +16,7 @@ from .approval import (
 from .approval_coverage import generate_workspace_approval_coverage
 from .analysis import generate_analysis_script, run_data_analysis
 from .bibliography import import_bibliography, load_bibliography_index, paper_records_from_bibliography
+from .bibliography_integrity import generate_workspace_bibliography_integrity
 from .budget import generate_budget_evidence_checklist
 from .claim_checker import check_unsupported_claims
 from .classifier import classify_file
@@ -101,6 +102,11 @@ def main(argv: list[str] | None = None) -> int:
     bib_lit_parser = subparsers.add_parser("bib-lit-matrix", help="Generate a literature matrix from a bibliography index.")
     bib_lit_parser.add_argument("bibliography_index_json")
     bib_lit_parser.add_argument("--output", default=None)
+
+    bib_integrity_parser = subparsers.add_parser("bib-integrity", help="Check bibliography metadata and Markdown citation keys.")
+    bib_integrity_parser.add_argument("--root", default=".")
+    bib_integrity_parser.add_argument("--output", default=None)
+    bib_integrity_parser.add_argument("--json", default=None)
 
     paper_parser = subparsers.add_parser("paper-card", help="Create a conservative paper card from text.")
     paper_parser.add_argument("paper_text")
@@ -301,6 +307,10 @@ def main(argv: list[str] | None = None) -> int:
         entries = load_bibliography_index(args.bibliography_index_json)
         rendered = generate_literature_matrix(paper_records_from_bibliography(entries), args.output)
         print(rendered)
+        return 0
+    if args.command == "bib-integrity":
+        result = generate_workspace_bibliography_integrity(args.root, output_path=args.output, json_path=args.json)
+        print(result.model_dump_json(indent=2))
         return 0
     if args.command == "paper-card":
         text = read_text_file(args.paper_text)

@@ -116,6 +116,7 @@ Use the Python package under `src/k_resdev_skill/` for deterministic helpers:
 - `generate_literature_matrix(papers, output_path=None)` for paper comparison tables.
 - `import_bibliography(bibliography_file, state_dir, literature_matrix_path)` for BibTeX/RIS/CSL JSON bibliography intake without citation invention.
 - `load_bibliography_index(path)` and `paper_records_from_bibliography(entries)` for bibliography-to-literature-matrix projection.
+- `generate_workspace_bibliography_integrity(root, output_path, json_path)` for checking Markdown citation keys, duplicate bibliography metadata, and bibliography source hash drift.
 - `extract_project_state_from_text(text, project_id)` for conservative plan mapping.
 - `write_monthly_report(evidence_items, reports_dir, project_state, period)` for non-final report drafts.
 - `generate_audit_qna(evidence_items, output_path)` for draft audit-defense Q&A.
@@ -150,6 +151,7 @@ Implementation guardrails:
 - Binary `.hwp` extraction is optional. Use `rhwp dump` when an `rhwp` CLI is available; otherwise mark extraction as `needs_review` instead of pretending HWP text was parsed.
 - Paper/research outputs must never invent citations, metrics, or verified conclusions. Keep them as `needs_review` or `hypothesis` until human-reviewed.
 - Bibliography imports must preserve supplied metadata only. Missing titles, authors, years, venues, DOI, or URL must remain review flags instead of being filled in.
+- Bibliography integrity checks only validate local citation metadata, citation-key presence, review status, and source hash drift. They do not prove that a cited paper supports a claim.
 - Agency templates under `templates/agencies/` are draft profile skeletons, not official rules.
 - Approval records must reflect supplied human decisions. The tool must not infer or invent approval.
 - Approval records should include `target_path` when available so the target hash can be captured and later checked for drift.
@@ -184,6 +186,7 @@ python -m k_resdev_skill verify-review-pack .\demo-workspace\state\workspace-rev
 python -m k_resdev_skill verify-evidence-sources .\demo-workspace\state\evidence-index.json --root .\demo-workspace --output .\demo-workspace\reports\source-verification.md --json .\demo-workspace\state\source-verification.json
 python -m k_resdev_skill bib-import .\references\library.bib --state-dir .\state --literature-matrix .\reports\literature-review-matrix.md
 python -m k_resdev_skill bib-lit-matrix .\state\bibliography-index.json --output .\reports\literature-review-matrix.md
+python -m k_resdev_skill bib-integrity --root . --output .\reports\bibliography-integrity.md --json .\state\bibliography-integrity.json
 python -m k_resdev_skill draft-report .\state\evidence-index.json --period 2026-05
 python -m k_resdev_skill data-insights .\inbox\metrics.csv --output .\reports\data-insights.md
 python -m k_resdev_skill run-analysis .\inbox\metrics.csv --output-dir .\reports\analysis --evidence-id EVI-2026-0001

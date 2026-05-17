@@ -2,7 +2,7 @@
 
 Purpose: 한국형 국책 R&D 환경에서 연구 행정 문서화, 증빙 정합성, 보고서 생성, 논문/데이터 인사이트 보조를 evidence-first 방식으로 지원하는 Codex/Skill 프로젝트입니다.
 
-Current release: `0.1 BETA 7` (`0.1.0b7`).
+Current release: `0.1 BETA 8` (`0.1.0b8`).
 
 Core principle:
 
@@ -47,6 +47,7 @@ This repository does not encode any single ministry/institution form as authorit
 - JSON schema validation CLI for bundled schemas such as evidence, project profile, research insight, and approval record.
 - Reproducible CSV/XLSX analysis run workflow that writes profile JSON, insight candidate Markdown, replay script, and manifest.
 - Projection export workflow for Markdown drafts to DOCX, TXT, HTML, or HWPX-compatible HTML review files.
+- Workspace initializer and readiness doctor for standard local workspace setup and pre-reporting checks.
 - `national-rnd-basic` agency template skeleton for annual/interim/final reports, change requests, and performance registration drafts.
 
 ## Local use
@@ -55,6 +56,8 @@ This repository does not encode any single ministry/institution form as authorit
 python -m pip install -e .
 python -m pytest
 python -m k_resdev_skill intake --inbox .\inbox --project my-rnd-project
+python -m k_resdev_skill init-workspace --root .\demo-workspace --project-id PRJ-2026-0001 --title "Demo R&D Project"
+python -m k_resdev_skill doctor --root .\demo-workspace --output .\demo-workspace\reports\readiness.md --json .\demo-workspace\state\readiness.json
 python -m k_resdev_skill map-plan .\inbox\plan.txt --output .\state\project-state.json
 python -m k_resdev_skill draft-report .\state\evidence-index.json --project-state .\state\project-state.json --period 2026-05
 python -m k_resdev_skill audit-qna .\state\evidence-index.json

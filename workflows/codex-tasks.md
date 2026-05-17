@@ -167,6 +167,15 @@ Implement:
 
 Exports are review artifacts. They are not final official submissions or verified agency forms.
 
+### Task 17: Workspace init and readiness doctor
+
+Implement:
+- standard workspace initializer for `inbox/`, `state/`, `evidence/`, `reports/`, `reports/analysis/`, and `state/approvals/`
+- starter `project-state.json`, `project-profile.json`, and `README.k-resdev.md` without overwriting existing files
+- readiness doctor for evidence index, profile status, approvals, reports, exports, analysis manifests, and budget metadata gaps
+
+Doctor output is a readiness projection only and must not certify official IRIS/NTIS or agency compliance.
+
 ## Safety constraints
 
 - Never alter raw files.

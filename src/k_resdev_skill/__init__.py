@@ -40,6 +40,9 @@ from .models import (
     ReportDraftPaths,
     ResearchInsight,
     SourceRecord,
+    WorkspaceDoctorFinding,
+    WorkspaceDoctorResult,
+    WorkspaceInitResult,
 )
 from .plan_mapper import extract_project_state_from_text
 from .profile_registry import generate_profile_registry, list_project_profiles, load_project_profile
@@ -54,6 +57,7 @@ from .research_assistant import (
 )
 from .reporting import draft_monthly_report, write_monthly_report
 from .schema_tools import validate_json_file, validate_json_files
+from .workspace import initialize_workspace, render_doctor_markdown, run_workspace_doctor
 
 __all__ = [
     "ApprovalRecord",
@@ -74,6 +78,9 @@ __all__ = [
     "ReportDraftPaths",
     "ResearchInsight",
     "SourceRecord",
+    "WorkspaceDoctorFinding",
+    "WorkspaceDoctorResult",
+    "WorkspaceInitResult",
     "approval_gate_status",
     "budget_evidence_gaps",
     "create_approval_record",
@@ -98,6 +105,7 @@ __all__ = [
     "generate_paper_card_markdown",
     "generate_profile_registry",
     "generate_reproducibility_checklist",
+    "initialize_workspace",
     "list_project_profiles",
     "latest_approval_for_target",
     "load_approval_records",
@@ -108,6 +116,8 @@ __all__ = [
     "run_intake",
     "run_data_analysis",
     "write_monthly_report",
+    "render_doctor_markdown",
+    "run_workspace_doctor",
     "validate_json_file",
     "validate_json_files",
     "write_approval_record",
@@ -117,4 +127,4 @@ __all__ = [
     "write_projection_text",
 ]
 
-__version__ = "0.1.0b7"
+__version__ = "0.1.0b8"

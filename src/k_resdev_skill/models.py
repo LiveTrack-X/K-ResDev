@@ -290,6 +290,34 @@ class ProjectionExportResult(StrictModel):
     warnings: list[str] = Field(default_factory=list)
 
 
+class WorkspaceInitResult(StrictModel):
+    root: str
+    project_id: str
+    profile_id: str
+    created_paths: list[str] = Field(default_factory=list)
+    skipped_existing: list[str] = Field(default_factory=list)
+    warnings: list[str] = Field(default_factory=list)
+
+
+class WorkspaceDoctorFinding(StrictModel):
+    code: str
+    severity: str
+    message: str
+    path: str | None = None
+    suggested_action: str | None = None
+
+
+class WorkspaceDoctorResult(StrictModel):
+    root: str
+    status: str
+    evidence_count: int = 0
+    approval_count: int = 0
+    finding_count: int = 0
+    findings: list[WorkspaceDoctorFinding] = Field(default_factory=list)
+    markdown_path: str | None = None
+    json_path: str | None = None
+
+
 class ApprovalRecord(StrictModel):
     approval_id: str
     target_type: ApprovalTargetType

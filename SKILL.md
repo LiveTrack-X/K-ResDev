@@ -130,6 +130,8 @@ Use the Python package under `src/k_resdev_skill/` for deterministic helpers:
 - `run_data_analysis(data_file, output_dir, evidence_ids)` for reproducible CSV/XLSX profiling, insight report, replay script, and manifest output.
 - `generate_analysis_script(data_file, output_dir, evidence_ids)` for a minimal replay script.
 - `export_projection(markdown_path, output_path, output_format)` for DOCX/HTML/TXT review exports from Markdown projections.
+- `initialize_workspace(root, project_id, title, profile_id)` for standard local workspace scaffolding.
+- `run_workspace_doctor(root, output_path, json_path)` for readiness checks across evidence, profile, approvals, reports, exports, and analysis manifests.
 
 Implementation guardrails:
 
@@ -142,6 +144,7 @@ Implementation guardrails:
 - Approval records must reflect supplied human decisions. The tool must not infer or invent approval.
 - Analysis runs must leave raw data unchanged and mark generated outputs as draft/human-review-required.
 - Projection exports must retain the draft/human-approval notice and must not be described as final official documents.
+- Workspace doctor output is a readiness projection only; it does not certify official agency compliance.
 
 When running locally, prefer:
 
@@ -149,6 +152,8 @@ When running locally, prefer:
 python -m pip install -e .
 python -m pytest
 python -m k_resdev_skill intake --inbox .\inbox --project my-rnd-project
+python -m k_resdev_skill init-workspace --root .\demo-workspace --project-id PRJ-2026-0001 --title "Demo R&D Project"
+python -m k_resdev_skill doctor --root .\demo-workspace --output .\demo-workspace\reports\readiness.md --json .\demo-workspace\state\readiness.json
 python -m k_resdev_skill draft-report .\state\evidence-index.json --period 2026-05
 python -m k_resdev_skill data-insights .\inbox\metrics.csv --output .\reports\data-insights.md
 python -m k_resdev_skill run-analysis .\inbox\metrics.csv --output-dir .\reports\analysis --evidence-id EVI-2026-0001

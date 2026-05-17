@@ -37,6 +37,7 @@ from .research_assistant import (
 )
 from .reporting import write_monthly_report
 from .schema_tools import validate_json_files
+from .workspace import initialize_workspace, run_workspace_doctor
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -170,6 +171,17 @@ def main(argv: list[str] | None = None) -> int:
     export_parser.add_argument("--output", required=True)
     export_parser.add_argument("--format", choices=["docx", "html", "hwpx-html", "txt"], default=None)
     export_parser.add_argument("--title", default=None)
+
+    init_workspace_parser = subparsers.add_parser("init-workspace", help="Create a standard K-ResDev workspace skeleton.")
+    init_workspace_parser.add_argument("--root", default=".")
+    init_workspace_parser.add_argument("--project-id", required=True)
+    init_workspace_parser.add_argument("--title", required=True)
+    init_workspace_parser.add_argument("--profile", default="national-rnd-basic")
+
+    doctor_parser = subparsers.add_parser("doctor", help="Inspect workspace readiness across evidence/report/approval/export/analysis metadata.")
+    doctor_parser.add_argument("--root", default=".")
+    doctor_parser.add_argument("--output", default=None)
+    doctor_parser.add_argument("--json", default=None)
 
     args = parser.parse_args(argv)
 
@@ -329,6 +341,14 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if args.command == "export-projection":
         result = export_projection(args.markdown_path, args.output, args.format, args.title)
+        print(result.model_dump_json(indent=2))
+        return 0
+    if args.command == "init-workspace":
+        result = initialize_workspace(args.root, args.project_id, args.title, args.profile)
+        print(result.model_dump_json(indent=2))
+        return 0
+    if args.command == "doctor":
+        result = run_workspace_doctor(args.root, args.output, args.json)
         print(result.model_dump_json(indent=2))
         return 0
     raise AssertionError(f"Unhandled command: {args.command}")

@@ -30,6 +30,7 @@ def test_initialize_workspace_creates_standard_layout(tmp_path):
     assert "Evidence is source of truth" in readme
     assert "workspace-summary" in readme
     assert "workspace-review-pack" in readme
+    assert "verify-review-pack" in readme
 
 
 def test_initialize_workspace_does_not_overwrite_existing_files(tmp_path):

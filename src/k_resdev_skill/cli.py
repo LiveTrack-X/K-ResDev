@@ -39,7 +39,7 @@ from .reporting import write_monthly_report
 from .schema_tools import validate_json_files
 from .workspace import initialize_workspace, run_workspace_doctor
 from .workspace_actions import generate_workspace_action_plan
-from .workspace_review import generate_workspace_review_pack
+from .workspace_review import generate_workspace_review_pack, verify_workspace_review_pack
 from .workspace_summary import generate_workspace_summary
 
 
@@ -202,6 +202,9 @@ def main(argv: list[str] | None = None) -> int:
     review_pack_parser.add_argument("--reports-dir", default=None)
     review_pack_parser.add_argument("--state-dir", default=None)
     review_pack_parser.add_argument("--max-actions", type=int, default=5)
+
+    verify_review_pack_parser = subparsers.add_parser("verify-review-pack", help="Verify review-pack generated artifacts against saved hashes.")
+    verify_review_pack_parser.add_argument("manifest_json")
 
     args = parser.parse_args(argv)
 
@@ -383,4 +386,8 @@ def main(argv: list[str] | None = None) -> int:
         result = generate_workspace_review_pack(args.root, reports_dir=args.reports_dir, state_dir=args.state_dir, max_actions=args.max_actions)
         print(result.model_dump_json(indent=2))
         return 0
+    if args.command == "verify-review-pack":
+        result = verify_workspace_review_pack(args.manifest_json)
+        print(result.model_dump_json(indent=2))
+        return 0 if result.valid else 1
     raise AssertionError(f"Unhandled command: {args.command}")

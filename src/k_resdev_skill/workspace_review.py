@@ -1,8 +1,15 @@
 from __future__ import annotations
 
+import hashlib
+import json
 from pathlib import Path
 
-from .models import WorkspaceReviewPackResult
+from .models import (
+    ReviewPackArtifact,
+    ReviewPackVerificationItem,
+    WorkspaceReviewPackResult,
+    WorkspaceReviewPackVerificationResult,
+)
 from .workspace import run_workspace_doctor
 from .workspace_actions import generate_workspace_action_plan
 from .workspace_summary import generate_workspace_summary
@@ -62,9 +69,50 @@ def generate_workspace_review_pack(
         index_path=str(index_md),
         json_path=str(index_json),
     )
+    result = result.model_copy(update={"artifacts": _artifact_manifest(generated_paths, exclude={str(index_md), str(index_json)})})
     index_md.write_text(render_workspace_review_pack_markdown(result), encoding="utf-8")
     index_json.write_text(result.model_dump_json(indent=2) + "\n", encoding="utf-8")
     return result
+
+
+def verify_workspace_review_pack(manifest_json: str | Path) -> WorkspaceReviewPackVerificationResult:
+    """Verify review-pack generated artifacts against the saved manifest hashes."""
+
+    manifest_path = Path(manifest_json)
+    warnings: list[str] = []
+    try:
+        payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+        pack = WorkspaceReviewPackResult.model_validate(payload)
+    except Exception as exc:
+        return WorkspaceReviewPackVerificationResult(
+            manifest_path=str(manifest_path),
+            valid=False,
+            warnings=[f"manifest_unreadable:{exc}"],
+        )
+
+    if not pack.artifacts:
+        warnings.append("manifest_has_no_artifact_hashes")
+    items = [_verify_artifact(artifact) for artifact in pack.artifacts]
+    ok_count = sum(1 for item in items if item.status == "ok")
+    missing_count = sum(1 for item in items if item.status == "missing")
+    mismatch_count = sum(1 for item in items if item.status == "mismatch")
+    unchecked_count = len(pack.generated_paths) - len(pack.artifacts)
+    if str(manifest_path) in pack.generated_paths:
+        unchecked_count = max(unchecked_count, 1)
+        warnings.append("manifest_file_hash_not_self_checked")
+    if unchecked_count:
+        warnings.append("some_generated_paths_are_not_hash_checked")
+    return WorkspaceReviewPackVerificationResult(
+        manifest_path=str(manifest_path),
+        valid=bool(items) and missing_count == 0 and mismatch_count == 0,
+        checked_count=len(items),
+        ok_count=ok_count,
+        missing_count=missing_count,
+        mismatch_count=mismatch_count,
+        unchecked_count=unchecked_count,
+        items=items,
+        warnings=warnings,
+    )
 
 
 def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> str:
@@ -92,11 +140,18 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
     lines.append("")
     lines.extend(
         [
+            "## Manifest",
+            "",
+            f"- Hashed artifacts: {len(result.artifacts)}",
+            f"- Manifest JSON: `{_escape(result.json_path)}`",
+            "- The manifest JSON is not self-hashed; use `verify-review-pack` to check the other generated artifacts.",
+            "",
             "## Use",
             "",
             "- Start with `readiness.md` for blockers and warnings.",
             "- Use `next-actions.md` as a reviewable command plan.",
             "- Use `workspace-summary.md` as a one-page handoff/status snapshot.",
+            "- Run `verify-review-pack state/workspace-review-pack.json` before relying on a saved pack.",
             "- Keep official reports and scientific claims human-approved.",
             "",
         ]
@@ -117,6 +172,54 @@ def _artifact_label(path: str) -> str:
         "workspace-review-pack.json": "Review pack JSON",
     }
     return labels.get(name, name)
+
+
+def _artifact_manifest(paths: list[str], exclude: set[str]) -> list[ReviewPackArtifact]:
+    artifacts: list[ReviewPackArtifact] = []
+    for path in paths:
+        if path in exclude:
+            continue
+        target = Path(path)
+        if not target.exists():
+            continue
+        artifacts.append(
+            ReviewPackArtifact(
+                path=str(target),
+                artifact_type=_artifact_label(str(target)),
+                sha256=_sha256_file(target),
+                byte_count=target.stat().st_size,
+            )
+        )
+    return artifacts
+
+
+def _verify_artifact(artifact: ReviewPackArtifact) -> ReviewPackVerificationItem:
+    path = Path(artifact.path)
+    if not path.exists():
+        return ReviewPackVerificationItem(
+            path=artifact.path,
+            artifact_type=artifact.artifact_type,
+            expected_sha256=artifact.sha256,
+            status="missing",
+        )
+    actual = _sha256_file(path)
+    status = "ok" if actual == artifact.sha256 else "mismatch"
+    return ReviewPackVerificationItem(
+        path=artifact.path,
+        artifact_type=artifact.artifact_type,
+        expected_sha256=artifact.sha256,
+        actual_sha256=actual,
+        byte_count=path.stat().st_size,
+        status=status,
+    )
+
+
+def _sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
 def _escape(value: str) -> str:

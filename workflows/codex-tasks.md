@@ -206,6 +206,16 @@ Implement:
 
 Review packs are local operational bundles only. They must not be treated as official submissions, agency compliance evidence, or human approval.
 
+### Task 21: Review-pack manifest verification
+
+Implement:
+- generated artifact manifest entries with path, artifact type, SHA-256, and byte count
+- review-pack verifier for missing or changed generated artifacts
+- CLI command for `verify-review-pack`
+- tests for valid packs and tampered generated artifacts
+
+Verification only checks generated artifact integrity. It does not validate raw source truth, official agency compliance, human approval, or scientific validity.
+
 ## Safety constraints
 
 - Never alter raw files.

@@ -38,6 +38,8 @@ from .models import (
     ProjectProfile,
     ProjectionExportResult,
     ReportDraftPaths,
+    ReviewPackArtifact,
+    ReviewPackVerificationItem,
     ResearchInsight,
     SourceRecord,
     WorkspaceActionItem,
@@ -46,6 +48,7 @@ from .models import (
     WorkspaceDoctorResult,
     WorkspaceInitResult,
     WorkspaceReviewPackResult,
+    WorkspaceReviewPackVerificationResult,
     WorkspaceSummaryResult,
 )
 from .plan_mapper import extract_project_state_from_text
@@ -63,7 +66,11 @@ from .reporting import draft_monthly_report, write_monthly_report
 from .schema_tools import validate_json_file, validate_json_files
 from .workspace import initialize_workspace, render_doctor_markdown, run_workspace_doctor
 from .workspace_actions import generate_workspace_action_plan, render_action_plan_markdown
-from .workspace_review import generate_workspace_review_pack, render_workspace_review_pack_markdown
+from .workspace_review import (
+    generate_workspace_review_pack,
+    render_workspace_review_pack_markdown,
+    verify_workspace_review_pack,
+)
 from .workspace_summary import generate_workspace_summary, render_workspace_summary_markdown
 
 __all__ = [
@@ -83,6 +90,8 @@ __all__ = [
     "ProjectProfile",
     "ProjectionExportResult",
     "ReportDraftPaths",
+    "ReviewPackArtifact",
+    "ReviewPackVerificationItem",
     "ResearchInsight",
     "SourceRecord",
     "WorkspaceActionItem",
@@ -91,6 +100,7 @@ __all__ = [
     "WorkspaceDoctorResult",
     "WorkspaceInitResult",
     "WorkspaceReviewPackResult",
+    "WorkspaceReviewPackVerificationResult",
     "WorkspaceSummaryResult",
     "approval_gate_status",
     "budget_evidence_gaps",
@@ -137,6 +147,7 @@ __all__ = [
     "run_workspace_doctor",
     "validate_json_file",
     "validate_json_files",
+    "verify_workspace_review_pack",
     "write_approval_record",
     "write_evidence_index",
     "write_projection_docx",
@@ -144,4 +155,4 @@ __all__ = [
     "write_projection_text",
 ]
 
-__version__ = "0.1.0b11"
+__version__ = "0.1.0b12"

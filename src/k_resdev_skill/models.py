@@ -359,6 +359,22 @@ class WorkspaceSummaryResult(StrictModel):
     json_path: str | None = None
 
 
+class ReviewPackArtifact(StrictModel):
+    path: str
+    artifact_type: str
+    sha256: str
+    byte_count: int
+
+
+class ReviewPackVerificationItem(StrictModel):
+    path: str
+    artifact_type: str
+    expected_sha256: str | None = None
+    actual_sha256: str | None = None
+    byte_count: int | None = None
+    status: str
+
+
 class WorkspaceReviewPackResult(StrictModel):
     root: str
     status: str
@@ -367,8 +383,21 @@ class WorkspaceReviewPackResult(StrictModel):
     finding_count: int = 0
     action_count: int = 0
     generated_paths: list[str] = Field(default_factory=list)
+    artifacts: list[ReviewPackArtifact] = Field(default_factory=list)
     index_path: str
     json_path: str
+
+
+class WorkspaceReviewPackVerificationResult(StrictModel):
+    manifest_path: str
+    valid: bool
+    checked_count: int = 0
+    ok_count: int = 0
+    missing_count: int = 0
+    mismatch_count: int = 0
+    unchecked_count: int = 0
+    items: list[ReviewPackVerificationItem] = Field(default_factory=list)
+    warnings: list[str] = Field(default_factory=list)
 
 
 class ApprovalRecord(StrictModel):

@@ -404,6 +404,7 @@ Recommended order after the traceability graph, research-claim matrix, trace-pas
 5. Narrow source-backed IRIS/Innopolis profile seed intake is implemented as Task 44.
 6. Profile promotion review is implemented as Task 45.
 7. Profile promotion record workflow is implemented as Task 46.
+8. Profile promotion apply-plan workflow is implemented as Task 47.
 
 ## Open Questions
 
@@ -431,3 +432,4 @@ Recommended order after the traceability graph, research-claim matrix, trace-pas
 | Source-backed profile seed intake | Task 44 |
 | Profile promotion review | Task 45 |
 | Profile promotion records | Task 46 |
+| Profile promotion apply plans | Task 47 |

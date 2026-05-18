@@ -21,6 +21,7 @@ from .models import (
     BudgetLedgerItem,
     CitationSupportRecord,
     EvidenceItem,
+    ProfilePromotionApplyPlanResult,
     ProfileSource,
     ReferenceCorpusItem,
     ResearchClaim,
@@ -52,6 +53,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "goals-review.md",
     "next-actions.md",
     "profile-integrity.md",
+    "profile-promotion-apply-plan.md",
     "profile-promotion-summary.md",
     "profile-review.md",
     "profile-source-summary.md",
@@ -88,6 +90,7 @@ def generate_workspace_trace(
     builder.add_profile_sources()
     builder.add_profile_review()
     builder.add_profile_promotions()
+    builder.add_profile_promotion_apply_plan()
     builder.add_bibliography()
     builder.add_reference_corpus()
     builder.add_reports()
@@ -598,6 +601,50 @@ class _TraceBuilder:
                     path=record.profile_review_path,
                     suggested_action="Keep the profile in needs_review unless a verified supplied human promotion decision exists.",
                 )
+
+    def add_profile_promotion_apply_plan(self) -> None:
+        path = self.workspace / "state" / "profile-promotion-apply-plan.json"
+        if not path.exists():
+            return
+        try:
+            plan = ProfilePromotionApplyPlanResult.model_validate_json(path.read_text(encoding="utf-8-sig"))
+        except Exception as exc:
+            self.finding(
+                "trace_profile_promotion_apply_plan_unreadable",
+                "medium",
+                f"Profile promotion apply plan could not be read: {exc}",
+                path=path,
+                suggested_action="Regenerate profile-promotion-apply-plan before relying on profile promotion trace state.",
+            )
+            return
+        node = self.node(
+            "profile_promotion_apply_plan",
+            "profile-promotion-apply-plan",
+            "Profile promotion apply plan",
+            status=plan.status,
+            path=str(path),
+            metadata={
+                "profile_id": plan.profile_id,
+                "can_apply": plan.can_apply,
+                "promotion_id": plan.promotion_id,
+                "change_count": plan.change_count,
+                "current_profile_status": plan.current_profile_status,
+                "proposed_profile_status": plan.proposed_profile_status,
+            },
+        )
+        if plan.profile_id:
+            self.edge(node.node_id, _node_id("profile", plan.profile_id), "plans_profile_change")
+        if plan.promotion_id:
+            self.edge(node.node_id, _node_id("profile_promotion", plan.promotion_id), "based_on_promotion")
+        if plan.status == "ready_to_apply":
+            self.finding(
+                "trace_profile_promotion_apply_pending",
+                "low",
+                "A verified profile promotion decision has a pending non-destructive apply plan.",
+                node_id=node.node_id,
+                path=str(path),
+                suggested_action="Review the apply plan before any profile status change.",
+            )
 
     def add_approvals(self) -> None:
         approvals_dir = self.workspace / "state" / "approvals"

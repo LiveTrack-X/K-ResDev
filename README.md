@@ -2,7 +2,7 @@
 
 Purpose: 한국형 국책 R&D 환경에서 연구 행정 문서화, 증빙 정합성, 보고서 생성, 논문/데이터 인사이트 보조를 evidence-first 방식으로 지원하는 Codex/Skill 프로젝트입니다.
 
-Current release: `0.1 BETA 36` (`0.1.0b36`).
+Current release: `0.1 BETA 37` (`0.1.0b37`).
 
 Core principle:
 
@@ -71,9 +71,10 @@ This repository does not encode any single ministry/institution form as authorit
 - Narrow IRIS/Innopolis 2026 source-backed profile seed that installs hash-backed profile source notes while keeping official-use status as `needs_review`.
 - Profile promotion review workflow that checks source hashes, reviewer identity, applicability notes, and unresolved risk flags before any profile can be treated as ready for human-controlled promotion.
 - Profile promotion record workflow for supplied human decisions bound to a passing `state/profile-review.json` SHA-256 hash, without mutating project profiles by default.
+- Profile promotion apply-plan workflow that proposes exact `project-profile.json` field changes without writing them.
 - Workspace next-action planner that converts doctor findings into deterministic, reviewable commands.
 - Workspace summary report that combines readiness, next actions, evidence counts, approvals, reports, exports, and analysis manifests.
-- Workspace review pack command that refreshes discovery, readiness, next actions, workspace summary, artifact-authority, goals-review, weekly-review, workspace-dashboard, budget-ledger, profile-integrity, profile-promotion-summary, source-verification, approval-coverage, report-integrity, bibliography-integrity, reference-corpus, citation-support, research-claim-matrix, and workspace-trace artifacts together.
+- Workspace review pack command that refreshes discovery, readiness, next actions, workspace summary, artifact-authority, goals-review, weekly-review, workspace-dashboard, budget-ledger, profile-integrity, profile-promotion-summary, profile-promotion-apply-plan, source-verification, approval-coverage, report-integrity, bibliography-integrity, reference-corpus, citation-support, research-claim-matrix, and workspace-trace artifacts together.
 - Review pack artifact hash manifest and verifier for detecting missing or changed generated artifacts.
 - Evidence source verifier that checks indexed source files against saved source hashes.
 - Workspace doctor and review pack integration for local evidence-source presence/hash drift checks.
@@ -145,6 +146,7 @@ python -m k_resdev_skill profile-integrity --root . --output .\reports\profile-i
 python -m k_resdev_skill profile-review --root . --output .\reports\profile-review.md --json .\state\profile-review.json
 python -m k_resdev_skill profile-promotion-record --root . --decision verified --reviewer reviewer-name --profile-review .\state\profile-review.json --profile-review-hash <sha256>
 python -m k_resdev_skill profile-promotion-summary --root . --output .\reports\profile-promotion-summary.md --json .\state\profile-promotion-summary.json
+python -m k_resdev_skill profile-promotion-apply-plan --root . --output .\reports\profile-promotion-apply-plan.md --json .\state\profile-promotion-apply-plan.json
 python -m k_resdev_skill workspace-trace --root . --output .\reports\workspace-trace.md --json .\state\workspace-trace.json
 python -m k_resdev_skill budget-ledger-import .\references\budget-ledger.csv --state-dir .\state --markdown .\reports\budget-ledger-import.md
 python -m k_resdev_skill budget-ledger-integrity --root . --output .\reports\budget-ledger.md --json .\state\budget-ledger-integrity.json
@@ -159,6 +161,7 @@ python -m k_resdev_skill profiles --markdown --output .\reports\agency-profiles.
 python -m k_resdev_skill validate-profile .\templates\agencies\national-rnd-basic\project-profile.json
 python -m k_resdev_skill validate-profile .\templates\agencies\iris-innopolis-2026-017795\project-profile.json
 python -m k_resdev_skill validate-json profile-source .\state\profile-sources.json
+python -m k_resdev_skill validate-json profile-promotion-apply-plan .\state\profile-promotion-apply-plan.json
 python -m k_resdev_skill validate-json budget-ledger .\state\budget-ledger.json
 python -m k_resdev_skill validate-json research-claim .\state\research-claims.json
 python -m k_resdev_skill validate-json checkpoint .\templates\trace-passport-entry.json

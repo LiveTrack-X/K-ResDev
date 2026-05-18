@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ProfilePromotionApplyPlanResult",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["root", "status", "can_apply", "change_count", "changes", "proposed_profile", "warnings"],
+  "properties": {
+    "root": {"type": "string"},
+    "status": {"type": "string"},
+    "can_apply": {"type": "boolean"},
+    "profile_id": {"type": ["string", "null"]},
+    "profile_path": {"type": ["string", "null"]},
+    "current_profile_status": {"type": ["string", "null"]},
+    "proposed_profile_status": {"type": ["string", "null"]},
+    "profile_review_path": {"type": ["string", "null"]},
+    "profile_review_hash": {"type": ["string", "null"]},
+    "promotion_id": {"type": ["string", "null"]},
+    "promotion_decision": {"type": ["string", "null"]},
+    "reviewer": {"type": ["string", "null"]},
+    "reviewed_at": {"type": ["string", "null"]},
+    "rollback_note": {"type": ["string", "null"]},
+    "change_count": {"type": "integer", "minimum": 0},
+    "changes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["field", "rationale"],
+        "properties": {
+          "field": {"type": "string"},
+          "before": {},
+          "after": {},
+          "rationale": {"type": "string"}
+        }
+      }
+    },
+    "proposed_profile": {"type": "object"},
+    "markdown_path": {"type": ["string", "null"]},
+    "json_path": {"type": ["string", "null"]},
+    "warnings": {"type": "array", "items": {"type": "string"}}
+  }
+}

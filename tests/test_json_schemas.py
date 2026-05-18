@@ -110,6 +110,15 @@ def test_profile_promotion_record_template_matches_json_schema():
     jsonschema.validate(sample, schema)
 
 
+def test_profile_promotion_apply_plan_template_matches_json_schema():
+    with open("schemas/profile_promotion_apply_plan.schema.json", encoding="utf-8") as handle:
+        schema = json.load(handle)
+    with open("templates/profile-promotion-apply-plan.json", encoding="utf-8") as handle:
+        sample = json.load(handle)
+
+    jsonschema.validate(sample, schema)
+
+
 def test_budget_ledger_item_template_matches_json_schema():
     with open("schemas/budget_ledger_item.schema.json", encoding="utf-8") as handle:
         schema = json.load(handle)

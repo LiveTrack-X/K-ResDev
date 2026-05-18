@@ -85,6 +85,7 @@ def _actions_for_findings(root: Path, findings: list[WorkspaceDoctorFinding]) ->
         _action_for_profile_integrity(root, by_code),
         _action_for_profile_review(root, by_code),
         _action_for_profile_promotion(root, by_code),
+        _action_for_profile_promotion_apply(root, by_code),
         _action_for_approval_coverage(root, by_code),
         _action_for_report_integrity(root, by_code),
         _action_for_artifact_authority(root, by_code),
@@ -296,6 +297,22 @@ def _action_for_profile_promotion(root: Path, by_code: dict[str, list[WorkspaceD
         "Record profile promotion decision",
         "Profile promotion should be a supplied human decision bound to a passing profile-review artifact hash.",
         f'python -m k_resdev_skill profile-promotion-summary --root "{root}" --output "{root / "reports" / "profile-promotion-summary.md"}" --json "{root / "state" / "profile-promotion-summary.json"}"',
+        by_code,
+        codes,
+    )
+
+
+def _action_for_profile_promotion_apply(root: Path, by_code: dict[str, list[WorkspaceDoctorFinding]]) -> WorkspaceActionItem | None:
+    codes = ["profile_promotion_apply_plan_missing", "profile_verified_without_apply_plan"]
+    if not any(code in by_code for code in codes):
+        return None
+    priority = "medium" if "profile_promotion_apply_plan_missing" in by_code else "low"
+    return _action(
+        root,
+        priority,
+        "Generate profile promotion apply plan",
+        "Profile status changes should be reviewed as a non-destructive plan before state/project-profile.json is changed.",
+        f'python -m k_resdev_skill profile-promotion-apply-plan --root "{root}" --output "{root / "reports" / "profile-promotion-apply-plan.md"}" --json "{root / "state" / "profile-promotion-apply-plan.json"}"',
         by_code,
         codes,
     )

@@ -504,12 +504,26 @@ Profile promotion records are supplied human decision metadata only. They do not
 
 ### Task 47: Profile promotion apply proposal
 
+Implemented:
+- `ProfilePromotionApplyChange` and `ProfilePromotionApplyPlanResult` models
+- `profile-promotion-apply-plan` command and public API
+- proposal-only field changes for `state/project-profile.json`
+- blocking unless the latest promotion record is `verified` and hash-matches the current `state/profile-review.json`
+- `reports/profile-promotion-apply-plan.md` and `state/profile-promotion-apply-plan.json`
+- schema/template coverage and validation aliases
+- doctor, next-action, workspace-summary, review-pack, operational Markdown filtering, and trace integration
+- tests proving that generating an apply plan does not mutate `state/project-profile.json`
+
+Profile promotion apply plans are proposed diffs only. They do not rewrite profile files, infer official verification, create approvals, or certify agency compliance.
+
+### Task 48: Guarded profile promotion apply command
+
 Planned:
-- add a proposal-only command that turns a current verified profile-promotion record into a reviewable profile-status change plan
-- block proposals unless the latest promotion record is `verified` and hash-matches the current `state/profile-review.json`
-- write `reports/profile-promotion-apply-plan.md` and `state/profile-promotion-apply-plan.json`
-- show exact proposed field changes without rewriting `state/project-profile.json`
-- keep any future write/apply operation explicit, opt-in, and non-destructive
+- add an explicit apply command that requires a current apply-plan artifact and matching SHA-256 hash
+- write a backup copy of `state/project-profile.json` before any mutation
+- apply only existing `ProjectProfile` fields listed in the apply plan
+- write an apply result Markdown/JSON artifact with backup path, applied fields, reviewer metadata, and rollback instructions
+- integrate apply results into doctor, next-action, summary, review-pack, and trace
 
 ## Safety constraints
 

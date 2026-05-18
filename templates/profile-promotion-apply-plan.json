@@ -1,0 +1,32 @@
+{
+  "root": ".",
+  "status": "ready_to_apply",
+  "can_apply": true,
+  "profile_id": "iris-innopolis-2026-017795",
+  "profile_path": "state/project-profile.json",
+  "current_profile_status": "needs_review",
+  "proposed_profile_status": "verified",
+  "profile_review_path": "state/profile-review.json",
+  "profile_review_hash": "sha256:abcd1234",
+  "promotion_id": "PPR-2026-ABCD1234",
+  "promotion_decision": "verified",
+  "reviewer": "project-owner",
+  "reviewed_at": "2026-05-19T09:00:00Z",
+  "rollback_note": "Restore status and notes from the before values in this plan if the supplied human decision is revoked.",
+  "change_count": 1,
+  "changes": [
+    {
+      "field": "status",
+      "before": "needs_review",
+      "after": "verified",
+      "rationale": "Latest supplied profile promotion record is verified and bound to the current profile-review hash."
+    }
+  ],
+  "proposed_profile": {
+    "profile_id": "iris-innopolis-2026-017795",
+    "status": "verified"
+  },
+  "markdown_path": "reports/profile-promotion-apply-plan.md",
+  "json_path": "state/profile-promotion-apply-plan.json",
+  "warnings": []
+}

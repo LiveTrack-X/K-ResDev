@@ -1130,6 +1130,9 @@ class WorkspaceSummaryResult(StrictModel):
     profile_promotion_status: str | None = None
     profile_promotion_record_count: int = 0
     latest_profile_promotion_decision: str | None = None
+    profile_promotion_apply_status: str | None = None
+    profile_promotion_apply_can_apply: bool = False
+    profile_promotion_apply_change_count: int = 0
     trace_status: str | None = None
     trace_node_count: int = 0
     trace_edge_count: int = 0
@@ -1383,6 +1386,9 @@ class WorkspaceReviewPackResult(StrictModel):
     profile_promotion_status: str | None = None
     profile_promotion_record_count: int = 0
     latest_profile_promotion_decision: str | None = None
+    profile_promotion_apply_status: str | None = None
+    profile_promotion_apply_can_apply: bool = False
+    profile_promotion_apply_change_count: int = 0
     workspace_trace_status: str | None = None
     workspace_trace_node_count: int = 0
     workspace_trace_edge_count: int = 0
@@ -1582,6 +1588,43 @@ class ProfilePromotionSummaryResult(StrictModel):
     current_profile_review_hash: str | None = None
     hash_mismatch_count: int = 0
     records: list[ProfilePromotionRecord] = Field(default_factory=list)
+    markdown_path: str | None = None
+    json_path: str | None = None
+    warnings: list[str] = Field(default_factory=list)
+
+
+class ProfilePromotionApplyChange(StrictModel):
+    field: str
+    before: Any = None
+    after: Any = None
+    rationale: str
+
+    @field_validator("field", "rationale")
+    @classmethod
+    def _profile_apply_change_field_must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
+class ProfilePromotionApplyPlanResult(StrictModel):
+    root: str
+    status: str
+    can_apply: bool = False
+    profile_id: str | None = None
+    profile_path: str | None = None
+    current_profile_status: str | None = None
+    proposed_profile_status: str | None = None
+    profile_review_path: str | None = None
+    profile_review_hash: str | None = None
+    promotion_id: str | None = None
+    promotion_decision: str | None = None
+    reviewer: str | None = None
+    reviewed_at: str | None = None
+    rollback_note: str | None = None
+    change_count: int = 0
+    changes: list[ProfilePromotionApplyChange] = Field(default_factory=list)
+    proposed_profile: dict[str, Any] = Field(default_factory=dict)
     markdown_path: str | None = None
     json_path: str | None = None
     warnings: list[str] = Field(default_factory=list)

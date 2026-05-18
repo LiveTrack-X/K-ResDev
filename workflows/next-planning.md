@@ -1,12 +1,12 @@
 # K-ResDev Next Planning
 
-This planning note starts after `0.1.0b36`.
+This planning note starts after `0.1.0b37`.
 
 ## Current Diagnosis
 
-K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, budget ledger review, bibliography metadata, reference corpus adapters, read-only workspace discovery, bibliography review, citation support, research claim matrices, profile source records, profile integrity, a narrow source-backed IRIS/Innopolis profile seed, profile promotion review, hash-bound profile promotion records, workspace traceability graph, trace passport checkpoints, artifact authority labels, goals/deadline review, weekly operating reviews, workspace dashboards, thin local workflow router, workspace doctor, next actions, workspace summary, and review packs.
+K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, budget ledger review, bibliography metadata, reference corpus adapters, read-only workspace discovery, bibliography review, citation support, research claim matrices, profile source records, profile integrity, a narrow source-backed IRIS/Innopolis profile seed, profile promotion review, hash-bound profile promotion records, non-destructive profile promotion apply plans, workspace traceability graph, trace passport checkpoints, artifact authority labels, goals/deadline review, weekly operating reviews, workspace dashboards, thin local workflow router, workspace doctor, next actions, workspace summary, and review packs.
 
-The next bottleneck is controlled application of supplied human promotion decisions. K-ResDev can now record a verified human promotion decision against a passing `profile-review` artifact hash, but project profiles still remain unchanged by default. The next high-value move is a non-destructive apply proposal that shows exactly how `state/project-profile.json` would change before any opt-in mutation.
+The next bottleneck is controlled, reversible profile-status mutation. K-ResDev can now record a verified human promotion decision and generate a non-destructive apply plan, but it still intentionally does not rewrite `state/project-profile.json`. The next high-value move is a guarded apply command that only runs from a current apply-plan hash and writes a backup before changing any profile status.
 
 ## Planning Principles
 
@@ -266,15 +266,31 @@ Safety boundary:
 
 Goal: make a verified profile-promotion record operationally usable without silent profile mutation.
 
+Status: implemented as a proposal-only workflow in `src/k_resdev_skill/profile_promotion_apply.py`, with CLI/API, schema/template, doctor, next-action, workspace-summary, review-pack, operational Markdown filtering, and trace integration.
+
 Expected scope:
 - `profile-promotion-apply-plan` command that reads `state/project-profile.json`, `state/profile-review.json`, and `state/profile-promotions/`;
 - generate `reports/profile-promotion-apply-plan.md` and `state/profile-promotion-apply-plan.json`;
 - show the exact proposed field changes, especially `status: needs_review -> verified`, reviewer metadata, source review hash, and rollback note;
 - block the plan unless the latest promotion record is `verified` and hash-matches the current profile-review artifact;
-- optional `--write` mode may be considered later, but beta.37 should stay proposal-only unless explicitly approved.
 
 Safety boundary:
 - Apply plans are proposed diffs only. They must not rewrite profile files or certify official agency compliance.
+
+### Beta 38 - Guarded Profile Promotion Apply Command
+
+Goal: optionally apply a human-reviewed profile-promotion plan with a backup and hash guard.
+
+Expected scope:
+- `profile-promotion-apply` command that requires `--apply-plan state/profile-promotion-apply-plan.json` and `--apply-plan-hash <sha256>`;
+- refuse to run unless the apply plan status is `ready_to_apply`, `can_apply=true`, and the hash matches the supplied apply-plan artifact;
+- write a timestamped backup under `state/profile-backups/` before changing `state/project-profile.json`;
+- apply only the field changes listed in the plan, initially limited to existing `ProjectProfile` schema fields;
+- write `state/profile-promotion-apply-result.json` and `reports/profile-promotion-apply-result.md`;
+- integrate apply results into doctor, next actions, summary, review pack, and trace.
+
+Safety boundary:
+- The apply command must be explicit and hash-guarded. It must never infer official agency compliance or change raw source files.
 
 ## Deferred Ideas
 
@@ -288,6 +304,6 @@ These should wait until traceability, impact analysis, and verified profile sour
 
 ## Recommended Next Slice
 
-Implement Beta 37 next.
+Implement Beta 38 next.
 
-Beta 37 should make profile promotion operationally reviewable by producing a non-destructive apply plan from a current verified promotion record.
+Beta 38 should make profile promotion application possible only through a current, hash-matched, human-reviewed apply plan with a backup and audit trail.

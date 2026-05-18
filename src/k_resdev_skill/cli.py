@@ -53,6 +53,7 @@ from .profile_promotion import (
     summarize_profile_promotions,
     write_profile_promotion_record,
 )
+from .profile_promotion_apply import generate_profile_promotion_apply_plan
 from .profile_sources import (
     create_profile_source_record,
     default_profile_sources_path,
@@ -347,6 +348,11 @@ def main(argv: list[str] | None = None) -> int:
     profile_promotion_summary_parser.add_argument("--promotions-dir", default=None)
     profile_promotion_summary_parser.add_argument("--output", default=None)
     profile_promotion_summary_parser.add_argument("--json", default=None)
+
+    profile_promotion_apply_parser = subparsers.add_parser("profile-promotion-apply-plan", help="Generate a non-destructive profile promotion apply plan.")
+    profile_promotion_apply_parser.add_argument("--root", default=".")
+    profile_promotion_apply_parser.add_argument("--output", default=None)
+    profile_promotion_apply_parser.add_argument("--json", default=None)
 
     validate_json_parser = subparsers.add_parser("validate-json", help="Validate JSON files against bundled or custom JSON schema.")
     validate_json_parser.add_argument(
@@ -802,6 +808,10 @@ def main(argv: list[str] | None = None) -> int:
         )
         print(result.model_dump_json(indent=2))
         return 0
+    if args.command == "profile-promotion-apply-plan":
+        result = generate_profile_promotion_apply_plan(args.root, output_path=args.output, json_path=args.json)
+        print(result.model_dump_json(indent=2))
+        return 0 if result.status in {"ready_to_apply", "already_applied"} else 1
     if args.command == "validate-json":
         result = validate_json_files(args.json_paths, args.schema)
         print(json.dumps(result, ensure_ascii=False, indent=2))

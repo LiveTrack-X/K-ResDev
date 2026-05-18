@@ -15,6 +15,7 @@ from .models import (
 )
 from .profile_registry import load_project_profile
 from .profile_promotion import summarize_profile_promotions
+from .profile_promotion_apply import generate_profile_promotion_apply_plan
 from .profile_review import generate_profile_review
 from .profile_sources import generate_profile_integrity
 from .budget_ledger import generate_workspace_budget_ledger
@@ -58,6 +59,7 @@ def generate_workspace_summary(
     profile_integrity = generate_profile_integrity(workspace)
     profile_review = generate_profile_review(workspace)
     profile_promotion = summarize_profile_promotions(workspace)
+    profile_apply = generate_profile_promotion_apply_plan(workspace)
     trace = generate_workspace_trace(workspace)
     trace_passport = generate_trace_passport(workspace)
     weekly_review = load_latest_weekly_review(workspace)
@@ -124,6 +126,9 @@ def generate_workspace_summary(
         profile_promotion_status=profile_promotion.status,
         profile_promotion_record_count=profile_promotion.record_count,
         latest_profile_promotion_decision=profile_promotion.latest_decision,
+        profile_promotion_apply_status=profile_apply.status,
+        profile_promotion_apply_can_apply=profile_apply.can_apply,
+        profile_promotion_apply_change_count=profile_apply.change_count,
         trace_status=trace.status,
         trace_node_count=trace.node_count,
         trace_edge_count=trace.edge_count,
@@ -166,6 +171,8 @@ def render_workspace_summary_markdown(summary: WorkspaceSummaryResult) -> str:
         f"| Profile can promote | {summary.profile_review_can_promote} |",
         f"| Profile promotion | {_escape(summary.profile_promotion_status or '-')} |",
         f"| Profile promotion records | {summary.profile_promotion_record_count} |",
+        f"| Profile promotion apply plan | {_escape(summary.profile_promotion_apply_status or '-')} |",
+        f"| Profile promotion can apply | {summary.profile_promotion_apply_can_apply} |",
         f"| Profile sources | {summary.profile_source_count} |",
         f"| Verified profile sources | {summary.profile_verified_source_count} |",
         f"| Workspace discovery | {_escape(summary.discovery_status or '-')} |",
@@ -230,6 +237,7 @@ def render_workspace_summary_markdown(summary: WorkspaceSummaryResult) -> str:
         f"| Profile integrity | {summary.profile_integrity_finding_count} | status: {_escape(summary.profile_integrity_status or '-')}; verified sources: {summary.profile_verified_source_count} |",
         f"| Profile review | {summary.profile_review_failed_count} | status: {_escape(summary.profile_review_status or '-')}; can promote: {summary.profile_review_can_promote} |",
         f"| Profile promotion | {summary.profile_promotion_record_count} | status: {_escape(summary.profile_promotion_status or '-')}; latest decision: {_escape(summary.latest_profile_promotion_decision or '-')} |",
+        f"| Profile promotion apply plan | {summary.profile_promotion_apply_change_count} | status: {_escape(summary.profile_promotion_apply_status or '-')}; can apply: {summary.profile_promotion_apply_can_apply} |",
         f"| Workspace trace | {summary.trace_node_count} | status: {_escape(summary.trace_status or '-')}; findings: {summary.trace_finding_count} |",
         f"| Trace passport | {summary.checkpoint_count} | status: {_escape(summary.trace_passport_status or '-')}; latest: {_escape(summary.latest_checkpoint_id or '-')}; findings: {summary.trace_passport_finding_count} |",
         "",

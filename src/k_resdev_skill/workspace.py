@@ -23,6 +23,7 @@ from .models import (
     WorkspaceInitResult,
 )
 from .profile_promotion import summarize_profile_promotions
+from .profile_promotion_apply import generate_profile_promotion_apply_plan
 from .profile_registry import default_agency_templates_root, load_project_profile
 from .profile_review import generate_profile_review
 from .profile_sources import generate_profile_integrity, load_profile_sources
@@ -65,6 +66,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "goals-review.md",
     "next-actions.md",
     "profile-integrity.md",
+    "profile-promotion-apply-plan.md",
     "profile-promotion-summary.md",
     "profile-review.md",
     "profile-source-summary.md",
@@ -184,6 +186,7 @@ def run_workspace_doctor(
     _check_profile_integrity(workspace, findings)
     _check_profile_review(workspace, findings)
     _check_profile_promotion(workspace, findings)
+    _check_profile_promotion_apply(workspace, findings)
     _check_reports(workspace, findings)
     _check_report_integrity(workspace, findings)
     _check_artifact_authority(workspace, findings)
@@ -640,6 +643,31 @@ def _check_profile_promotion(workspace: Path, findings: list[WorkspaceDoctorFind
                 "Profile review is ready for human promotion but no verified promotion record exists.",
                 path,
                 "Run profile-promotion-record with the profile-review hash after supplied human verification.",
+            )
+        )
+
+
+def _check_profile_promotion_apply(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> None:
+    plan = generate_profile_promotion_apply_plan(workspace)
+    path = workspace / "state" / "profile-promotion-apply-plan.json"
+    if plan.status == "ready_to_apply" and not path.exists():
+        findings.append(
+            _finding(
+                "profile_promotion_apply_plan_missing",
+                "medium",
+                "A current verified profile promotion record exists, but no non-destructive apply plan has been generated.",
+                path,
+                "Run profile-promotion-apply-plan before changing state/project-profile.json.",
+            )
+        )
+    if plan.current_profile_status == "verified" and plan.promotion_id and not path.exists():
+        findings.append(
+            _finding(
+                "profile_verified_without_apply_plan",
+                "low",
+                "The project profile is already verified, but no profile promotion apply-plan artifact was found.",
+                path,
+                "Generate profile-promotion-apply-plan to preserve the promotion decision trail.",
             )
         )
 
@@ -1141,6 +1169,7 @@ def _starter_readme(project_id: str, title: str, profile_id: str) -> str:
             "- Run `k-resdev profile-integrity --root . --output reports/profile-integrity.md --json state/profile-integrity.json` to check profile source records.",
             "- Run `k-resdev profile-review --root . --output reports/profile-review.md --json state/profile-review.json` before promoting any profile to verified.",
             "- Run `k-resdev profile-promotion-record --root . --decision verified --reviewer <reviewer> --profile-review-hash <sha256>` only after a supplied human promotion decision.",
+            "- Run `k-resdev profile-promotion-apply-plan --root . --output reports/profile-promotion-apply-plan.md --json state/profile-promotion-apply-plan.json` before changing any profile status.",
             "- Run `k-resdev budget-ledger-import references/budget-ledger.csv --state-dir state --markdown reports/budget-ledger-import.md` to import a reviewable budget ledger.",
             "- Run `k-resdev budget-ledger-integrity --root . --output reports/budget-ledger.md --json state/budget-ledger-integrity.json` to check ledger proof, approval, duplicate, and evidence-link gaps.",
             "- Run `k-resdev checkpoint-create --root . --stage review-pack --summary \"<summary>\" --status needs_review` to create a hash-backed resume checkpoint.",

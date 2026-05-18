@@ -381,12 +381,13 @@ This SPEC is planning input only. It must not be treated as implemented runtime 
 
 ### Task 37: Trace passport and checkpoint ledger
 
-Planned:
-- `TracePassportEntry` and `WorkspaceTracePassport` models
-- checkpoint creation, summary, and resume-plan commands
-- `state/trace-passport.json`, `state/checkpoints/`, and `reports/trace-passport.md`
-- stale checkpoint detection from changed artifact hashes
-- review-pack inclusion after traceability graph support lands
+Implemented:
+- `TracePassportEntry`, `WorkspaceTracePassport`, `CheckpointCreateResult`, and `CheckpointResumePlan` models
+- `checkpoint-create`, `checkpoint-summary`, and `checkpoint-resume-plan` commands
+- `state/checkpoints/`, `state/trace-passport.json`, `reports/trace-passport.md`, and optional checkpoint resume-plan artifacts
+- hash-backed artifact capture without copying raw artifact bodies
+- stale/missing artifact detection when checkpoint artifacts change or disappear
+- workspace doctor, next-action, summary, review-pack, schema, template, and trace integration
 
 Trace passports are resume aids only. They must not copy raw restricted source bodies or certify compliance, approval, or scientific truth.
 

@@ -88,6 +88,7 @@ def _actions_for_findings(root: Path, findings: list[WorkspaceDoctorFinding]) ->
         _action_for_citation_support_integrity(root, by_code),
         _action_for_research_claim_matrix(root, by_code),
         _action_for_workspace_trace(root, by_code),
+        _action_for_trace_passport(root, by_code),
         _action_for_reports(root, by_code),
         _action_for_analysis(root, by_code),
         _action_for_exports(root, by_code),
@@ -337,6 +338,32 @@ def _action_for_workspace_trace(root: Path, by_code: dict[str, list[WorkspaceDoc
         "Review workspace trace impact",
         "Trace impact review shows changed, missing, or unresolved upstream artifacts that may affect downstream reports, approvals, bibliography, or citation support.",
         f'python -m k_resdev_skill workspace-trace --root "{root}" --output "{root / "reports" / "workspace-trace.md"}" --json "{root / "state" / "workspace-trace.json"}"',
+        by_code,
+        codes,
+    )
+
+
+def _action_for_trace_passport(root: Path, by_code: dict[str, list[WorkspaceDoctorFinding]]) -> WorkspaceActionItem | None:
+    codes = ["trace_passport_missing", "trace_passport_high_findings", "trace_passport_review_findings"]
+    if not any(code in by_code for code in codes):
+        return None
+    if "trace_passport_missing" in by_code:
+        return _action(
+            root,
+            "low",
+            "Create a trace passport checkpoint",
+            "A compact checkpoint helps future sessions resume without loading every workspace artifact.",
+            f'python -m k_resdev_skill checkpoint-create --root "{root}" --stage review-pack --summary "<summary>" --status needs_review',
+            by_code,
+            codes,
+        )
+    priority = "high" if "trace_passport_high_findings" in by_code else "medium"
+    return _action(
+        root,
+        priority,
+        "Review trace passport checkpoints",
+        "Checkpoint artifacts may be stale, missing, or still waiting for review.",
+        f'python -m k_resdev_skill checkpoint-summary --root "{root}" --output "{root / "reports" / "trace-passport.md"}" --json "{root / "state" / "trace-passport.json"}"',
         by_code,
         codes,
     )

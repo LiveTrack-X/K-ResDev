@@ -1,6 +1,6 @@
 # K-ResDev Workspace Review Pack
 
-> Review pack projection only. It bundles local readiness, next-action, summary, source-verification, budget-ledger, approval-coverage, report-integrity, bibliography-integrity, citation-support, research-claim-matrix, profile-integrity, and trace artifacts; it does not certify official agency compliance.
+> Review pack projection only. It bundles local readiness, next-action, summary, source-verification, budget-ledger, approval-coverage, report-integrity, bibliography-integrity, citation-support, research-claim-matrix, trace-passport, profile-integrity, and trace artifacts; it does not certify official agency compliance.
 
 | Field | Value |
 |---|---|
@@ -47,6 +47,11 @@
 | Profile integrity high count | `{{profile_integrity_high_count}}` |
 | Workspace trace status | `{{workspace_trace_status}}` |
 | Workspace trace finding count | `{{workspace_trace_finding_count}}` |
+| Trace passport status | `{{trace_passport_status}}` |
+| Checkpoint count | `{{checkpoint_count}}` |
+| Latest checkpoint | `{{latest_checkpoint_id}}` |
+| Trace passport finding count | `{{trace_passport_finding_count}}` |
+| Trace passport high count | `{{trace_passport_high_count}}` |
 
 ## Generated Artifacts
 
@@ -64,6 +69,7 @@
 | Research claim matrix | `reports/research-claim-matrix.md` |
 | Profile integrity | `reports/profile-integrity.md` |
 | Workspace trace | `reports/workspace-trace.md` |
+| Trace passport | `reports/trace-passport.md` |
 | Review pack index | `reports/workspace-review-pack.md` |
 
 ## Manifest

@@ -18,6 +18,7 @@ from .profile_sources import generate_profile_integrity
 from .research_claims import generate_research_claim_matrix
 from .report_integrity import generate_workspace_report_integrity
 from .source_verification import verify_evidence_sources
+from .trace_passport import generate_trace_passport
 from .workspace import run_workspace_doctor
 from .workspace_actions import generate_workspace_action_plan
 from .workspace_summary import generate_workspace_summary
@@ -30,7 +31,7 @@ def generate_workspace_review_pack(
     state_dir: str | Path | None = None,
     max_actions: int = 5,
 ) -> WorkspaceReviewPackResult:
-    """Generate a bundled local review pack for readiness, traceability, budget, profile, source, approval, report, bibliography, citation-support, and research-claim checks."""
+    """Generate a bundled local review pack for readiness, traceability, checkpoint, budget, profile, source, approval, report, bibliography, citation-support, and research-claim checks."""
 
     workspace = Path(root)
     reports = Path(reports_dir) if reports_dir is not None else workspace / "reports"
@@ -62,6 +63,8 @@ def generate_workspace_review_pack(
     profile_integrity_json = state / "profile-integrity.json"
     workspace_trace_md = reports / "workspace-trace.md"
     workspace_trace_json = state / "workspace-trace.json"
+    trace_passport_md = reports / "trace-passport.md"
+    trace_passport_json = state / "trace-passport.json"
     index_md = reports / "workspace-review-pack.md"
     index_json = state / "workspace-review-pack.json"
 
@@ -75,6 +78,7 @@ def generate_workspace_review_pack(
     research_claim_matrix = generate_research_claim_matrix(workspace, output_path=research_claim_md, json_path=research_claim_json)
     profile_integrity = generate_profile_integrity(workspace, output_path=profile_integrity_md, json_path=profile_integrity_json)
     workspace_trace = generate_workspace_trace(workspace, output_path=workspace_trace_md, json_path=workspace_trace_json)
+    trace_passport = generate_trace_passport(workspace, output_path=trace_passport_md, json_path=trace_passport_json)
     actions = generate_workspace_action_plan(workspace, doctor_result=doctor, output_path=actions_md, json_path=actions_json)
     summary = generate_workspace_summary(
         workspace,
@@ -109,6 +113,8 @@ def generate_workspace_review_pack(
         str(profile_integrity_json),
         str(workspace_trace_md),
         str(workspace_trace_json),
+        str(trace_passport_md),
+        str(trace_passport_json),
         str(index_md),
         str(index_json),
     ]
@@ -159,6 +165,11 @@ def generate_workspace_review_pack(
         workspace_trace_edge_count=workspace_trace.edge_count,
         workspace_trace_finding_count=workspace_trace.finding_count,
         workspace_trace_high_count=workspace_trace.high_count,
+        trace_passport_status=trace_passport.status,
+        checkpoint_count=trace_passport.checkpoint_count,
+        latest_checkpoint_id=trace_passport.latest_checkpoint_id,
+        trace_passport_finding_count=trace_passport.finding_count,
+        trace_passport_high_count=trace_passport.high_count,
         generated_paths=generated_paths,
         index_path=str(index_md),
         json_path=str(index_json),
@@ -213,7 +224,7 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
     lines = [
         "# K-ResDev Workspace Review Pack",
         "",
-        "> Review pack projection only. It bundles local readiness, next-action, summary, source-verification, budget-ledger, approval-coverage, report-integrity, bibliography-integrity, citation-support, research-claim-matrix, profile-integrity, and trace artifacts; it does not certify official agency compliance.",
+        "> Review pack projection only. It bundles local readiness, next-action, summary, source-verification, budget-ledger, approval-coverage, report-integrity, bibliography-integrity, citation-support, research-claim-matrix, trace-passport, profile-integrity, and trace artifacts; it does not certify official agency compliance.",
         "",
         "| Field | Value |",
         "|---|---|",
@@ -263,6 +274,11 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
         f"| Workspace trace edges | {result.workspace_trace_edge_count} |",
         f"| Workspace trace finding count | {result.workspace_trace_finding_count} |",
         f"| Workspace trace high count | {result.workspace_trace_high_count} |",
+        f"| Trace passport status | {_escape(result.trace_passport_status or '-')} |",
+        f"| Checkpoint count | {result.checkpoint_count} |",
+        f"| Latest checkpoint | {_escape(result.latest_checkpoint_id or '-')} |",
+        f"| Trace passport finding count | {result.trace_passport_finding_count} |",
+        f"| Trace passport high count | {result.trace_passport_high_count} |",
         "",
         "## Generated Artifacts",
         "",
@@ -294,6 +310,7 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
             "- Use `research-claim-matrix.md` to check supplied research claims against evidence, bibliography, and citation-support records.",
             "- Use `profile-integrity.md` to check project/agency profile source records and drift.",
             "- Use `workspace-trace.md` to inspect cross-artifact traceability and impact findings.",
+            "- Use `trace-passport.md` to inspect checkpoint freshness before resuming long-running work.",
             "- Run `verify-review-pack state/workspace-review-pack.json` before relying on a saved pack.",
             "- Keep official reports and scientific claims human-approved.",
             "",
@@ -329,6 +346,8 @@ def _artifact_label(path: str) -> str:
         "profile-integrity.json": "Profile integrity JSON",
         "workspace-trace.md": "Workspace trace",
         "workspace-trace.json": "Workspace trace JSON",
+        "trace-passport.md": "Trace passport",
+        "trace-passport.json": "Trace passport JSON",
         "workspace-review-pack.md": "Review pack index",
         "workspace-review-pack.json": "Review pack JSON",
     }

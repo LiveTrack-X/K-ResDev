@@ -24,6 +24,7 @@ from .research_claims import generate_research_claim_matrix
 from .report_integrity import generate_workspace_report_integrity
 from .schema_tools import validate_json_file
 from .source_verification import verify_evidence_sources
+from .trace_passport import generate_trace_passport
 from .workspace_trace import generate_workspace_trace
 
 DRAFT_NOTICE = "Draft projection only"
@@ -37,6 +38,7 @@ STANDARD_DIRS = (
     "state/approvals",
     "state/bibliography-reviews",
     "state/citation-support",
+    "state/checkpoints",
 )
 OPERATIONAL_MARKDOWN_NAMES = {
     "agency-profiles.md",
@@ -45,6 +47,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "bibliography-integrity.md",
     "budget-ledger.md",
     "budget-checklist.md",
+    "checkpoint-resume-plan.md",
     "citation-support.md",
     "citation-support-summary.md",
     "evidence-bundle-index.md",
@@ -56,6 +59,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "research-claims.md",
     "report-integrity.md",
     "source-verification.md",
+    "trace-passport.md",
     "workspace-review-pack.md",
     "workspace-summary.md",
     "workspace-trace.md",
@@ -151,6 +155,7 @@ def run_workspace_doctor(
     _check_citation_support_integrity(workspace, findings)
     _check_research_claim_matrix(workspace, findings)
     _check_workspace_trace(workspace, findings)
+    _check_trace_passport(workspace, findings)
     _check_exports(workspace, findings)
     _check_analysis(workspace, findings)
 
@@ -647,6 +652,42 @@ def _check_workspace_trace(workspace: Path, findings: list[WorkspaceDoctorFindin
         )
 
 
+def _check_trace_passport(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> None:
+    result = generate_trace_passport(workspace)
+    path = workspace / "state" / "trace-passport.json"
+    if result.status == "not_configured":
+        findings.append(
+            _finding(
+                "trace_passport_missing",
+                "low",
+                "No trace passport checkpoints found.",
+                workspace / "state" / "checkpoints",
+                "Run checkpoint-create after a meaningful review boundary to preserve a compact resume point.",
+            )
+        )
+        return
+    if result.high_count:
+        findings.append(
+            _finding(
+                "trace_passport_high_findings",
+                "high",
+                f"{result.high_count} high-severity trace passport finding(s) were detected.",
+                path,
+                "Run checkpoint-summary and refresh stale or missing artifacts before resuming from that checkpoint.",
+            )
+        )
+    if result.medium_count or result.low_count or result.warnings:
+        findings.append(
+            _finding(
+                "trace_passport_review_findings",
+                "medium",
+                f"{result.medium_count + result.low_count} trace passport review finding(s) or warnings were detected.",
+                path,
+                "Review checkpoint status and create a fresh accepted checkpoint when the workspace is stable.",
+            )
+        )
+
+
 def _check_exports(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> None:
     reports_dir = workspace / "reports"
     if not reports_dir.exists():
@@ -750,9 +791,12 @@ def _starter_readme(project_id: str, title: str, profile_id: str) -> str:
             "- Run `k-resdev profile-integrity --root . --output reports/profile-integrity.md --json state/profile-integrity.json` to check profile source records.",
             "- Run `k-resdev budget-ledger-import references/budget-ledger.csv --state-dir state --markdown reports/budget-ledger-import.md` to import a reviewable budget ledger.",
             "- Run `k-resdev budget-ledger-integrity --root . --output reports/budget-ledger.md --json state/budget-ledger-integrity.json` to check ledger proof, approval, duplicate, and evidence-link gaps.",
+            "- Run `k-resdev checkpoint-create --root . --stage review-pack --summary \"<summary>\" --status needs_review` to create a hash-backed resume checkpoint.",
+            "- Run `k-resdev checkpoint-summary --root . --output reports/trace-passport.md --json state/trace-passport.json` to review checkpoint freshness.",
+            "- Run `k-resdev checkpoint-resume-plan --root . --output reports/checkpoint-resume-plan.md --json state/checkpoint-resume-plan.json` before resuming from a saved checkpoint.",
             "- Run `k-resdev doctor --root . --output reports/readiness.md --json state/readiness.json` before reporting.",
             "- Run `k-resdev workspace-summary --root . --output reports/workspace-summary.md --json state/workspace-summary.json` for a one-page status handoff.",
-            "- Run `k-resdev workspace-review-pack --root .` to refresh readiness, next actions, summary, source-verification, budget-ledger, approval-coverage, report-integrity, bibliography-integrity, citation-support, research-claim-matrix, and trace artifacts together.",
+            "- Run `k-resdev workspace-review-pack --root .` to refresh readiness, next actions, summary, source-verification, budget-ledger, approval-coverage, report-integrity, bibliography-integrity, citation-support, research-claim-matrix, trace-passport, and trace artifacts together.",
             "- Run `k-resdev verify-review-pack state/workspace-review-pack.json` to check saved review-pack artifact hashes.",
             "- Run `k-resdev verify-evidence-sources state/evidence-index.json --root . --output reports/source-verification.md --json state/source-verification.json` to check indexed source hashes.",
             "- Run `k-resdev approval-coverage --root . --output reports/approval-coverage.md --json state/approval-coverage.json` to check report approval coverage.",

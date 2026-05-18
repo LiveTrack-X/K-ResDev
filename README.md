@@ -2,7 +2,7 @@
 
 Purpose: 한국형 국책 R&D 환경에서 연구 행정 문서화, 증빙 정합성, 보고서 생성, 논문/데이터 인사이트 보조를 evidence-first 방식으로 지원하는 Codex/Skill 프로젝트입니다.
 
-Current release: `0.1 BETA 26` (`0.1.0b26`).
+Current release: `0.1 BETA 27` (`0.1.0b27`).
 
 Core principle:
 
@@ -77,6 +77,7 @@ This repository does not encode any single ministry/institution form as authorit
 - Workspace doctor, next-action, summary, review-pack, and trace integration for research claim matrix findings.
 - Workspace doctor, next-action, summary, and review-pack integration for profile source integrity findings.
 - Workspace doctor, next-action, summary, and review-pack integration for trace impact findings.
+- Trace passport and checkpoint ledger for compact resume checkpoints, artifact hash drift detection, and checkpoint-based resume plans.
 - `national-rnd-basic` agency template skeleton for annual/interim/final reports, change requests, and performance registration drafts.
 
 ## Local use
@@ -93,6 +94,9 @@ python -m k_resdev_skill report-integrity --root .\demo-workspace --output .\dem
 python -m k_resdev_skill workspace-summary --root .\demo-workspace --output .\demo-workspace\reports\workspace-summary.md --json .\demo-workspace\state\workspace-summary.json
 python -m k_resdev_skill workspace-review-pack --root .\demo-workspace
 python -m k_resdev_skill verify-review-pack .\demo-workspace\state\workspace-review-pack.json
+python -m k_resdev_skill checkpoint-create --root .\demo-workspace --stage beta-review --summary "Reviewed beta workspace state" --status needs_review
+python -m k_resdev_skill checkpoint-summary --root .\demo-workspace --output .\demo-workspace\reports\trace-passport.md --json .\demo-workspace\state\trace-passport.json
+python -m k_resdev_skill checkpoint-resume-plan --root .\demo-workspace --output .\demo-workspace\reports\checkpoint-resume-plan.md --json .\demo-workspace\state\checkpoint-resume-plan.json
 python -m k_resdev_skill verify-evidence-sources .\demo-workspace\state\evidence-index.json --root .\demo-workspace --output .\demo-workspace\reports\source-verification.md --json .\demo-workspace\state\source-verification.json
 python -m k_resdev_skill map-plan .\inbox\plan.txt --output .\state\project-state.json
 python -m k_resdev_skill draft-report .\state\evidence-index.json --project-state .\state\project-state.json --period 2026-05
@@ -129,6 +133,7 @@ python -m k_resdev_skill validate-profile .\templates\agencies\national-rnd-basi
 python -m k_resdev_skill validate-json profile-source .\state\profile-sources.json
 python -m k_resdev_skill validate-json budget-ledger .\state\budget-ledger.json
 python -m k_resdev_skill validate-json research-claim .\state\research-claims.json
+python -m k_resdev_skill validate-json checkpoint .\templates\trace-passport-entry.json
 python -m k_resdev_skill validate-json evidence .\state\evidence-index.json
 python -m k_resdev_skill validate-json bibliography-review .\templates\bibliography-review-record.json
 python -m k_resdev_skill approval-record --target-type report --target-id monthly-2026-05 --target-path .\reports\monthly-report-2026-05.md --decision needs_changes --reviewer reviewer-name --approvals-dir .\state\approvals

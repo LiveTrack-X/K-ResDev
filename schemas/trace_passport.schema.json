@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "WorkspaceTracePassport",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "workspace_root",
+    "generated_at",
+    "status",
+    "entries",
+    "checkpoint_count",
+    "finding_count",
+    "high_count",
+    "medium_count",
+    "low_count",
+    "findings",
+    "warnings"
+  ],
+  "properties": {
+    "workspace_root": {
+      "type": "string"
+    },
+    "project_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "generated_at": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string"
+    },
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "latest_checkpoint_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "checkpoint_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "finding_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "high_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "medium_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "low_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "markdown_path": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "json_path": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

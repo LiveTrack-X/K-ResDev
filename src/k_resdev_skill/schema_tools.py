@@ -28,6 +28,11 @@ SCHEMA_ALIASES = {
     "research_insight": "research_insight.schema.json",
     "research-claim": "research_claim.schema.json",
     "research_claim": "research_claim.schema.json",
+    "trace-passport": "trace_passport.schema.json",
+    "trace_passport": "trace_passport.schema.json",
+    "checkpoint": "trace_passport_entry.schema.json",
+    "trace-passport-entry": "trace_passport_entry.schema.json",
+    "trace_passport_entry": "trace_passport_entry.schema.json",
 }
 
 
@@ -85,6 +90,7 @@ def _validation_targets(document: Any, schema_payload: dict[str, Any]) -> list[t
         "ProfileSource",
         "ResearchClaim",
         "ResearchInsight",
+        "TracePassportEntry",
     }:
         if isinstance(document, list):
             return [(f"$[{index}]", item) for index, item in enumerate(document)]

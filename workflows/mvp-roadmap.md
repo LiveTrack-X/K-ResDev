@@ -53,7 +53,7 @@ Status: JSON schema validation, evidence bundle indexes, human approval records/
 4. Budget evidence ledger with category rollups and proof completeness checks.
 5. Research claim matrix connecting paper claims, experiment evidence, citation support, and insight candidates.
 
-Status: workspace traceability graph and impact review are implemented as a local first pass. Generic profile source records, budget ledgers, and research claim matrices now plug into the same doctor/review-pack/trace layer. Verified agency-specific packs should continue to plug into that trace layer instead of becoming separate disconnected checklists.
+Status: workspace traceability graph and impact review are implemented as a local first pass. Generic profile source records, budget ledgers, research claim matrices, and trace passport checkpoints now plug into the same doctor/review-pack/trace layer. Verified agency-specific packs should continue to plug into that trace layer instead of becoming separate disconnected checklists.
 
 ## P5 - Research operations workflow layer
 
@@ -65,4 +65,4 @@ Status: workspace traceability graph and impact review are implemented as a loca
 6. Local weekly review and workspace dashboard generated from K-ResDev artifacts.
 7. Thin workflow router for Admin, Research, Integrity, and Weekly review paths after concrete commands are stable.
 
-Status: specified in `workflows/external-academic-workflow-ideas-spec.md`. This layer adapts external academic workflow ideas into K-ResDev-native, evidence-first behavior without vendoring external skill content.
+Status: trace passport and checkpoint ledger are implemented as a local first pass. The remaining workflow-layer items are specified in `workflows/external-academic-workflow-ideas-spec.md` and should continue to adapt external academic workflow ideas into K-ResDev-native, evidence-first behavior without vendoring external skill content.

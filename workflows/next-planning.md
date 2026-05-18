@@ -1,12 +1,12 @@
 # K-ResDev Next Planning
 
-This planning note starts after `0.1.0b26`.
+This planning note starts after `0.1.0b27`.
 
 ## Current Diagnosis
 
-K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, budget ledger review, bibliography metadata, bibliography review, citation support, research claim matrices, profile source records, profile integrity, workspace traceability graph, workspace doctor, next actions, workspace summary, and review packs.
+K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, budget ledger review, bibliography metadata, bibliography review, citation support, research claim matrices, profile source records, profile integrity, workspace traceability graph, trace passport checkpoints, workspace doctor, next actions, workspace summary, and review packs.
 
-The next bottleneck is still operational continuity, but the first traceability, profile-source, budget-ledger, and research-claim layers now exist. A real R&D workspace next needs compact checkpoints, explicit artifact authority levels, and eventually verified agency profile packs based on current official sources.
+The next bottleneck is expanding the research-reference operating layer without weakening the evidence-first boundary. A real R&D workspace next needs local corpus adapters, explicit rejection logs, artifact authority levels, and eventually verified agency profile packs based on current official sources.
 
 ## Planning Principles
 
@@ -119,6 +119,8 @@ Safety boundary:
 
 Goal: create compact, hash-backed resume checkpoints so a fresh session can understand the current workspace without loading every report, manifest, and evidence file.
 
+Status: implemented as a local first pass in `src/k_resdev_skill/trace_passport.py`, with CLI/API, doctor, next-action, summary, review-pack, schema, template, and trace integration.
+
 Expected scope:
 - `TracePassportEntry` and `WorkspaceTracePassport` models.
 - `checkpoint-create`, `checkpoint-summary`, and `checkpoint-resume-plan` commands.
@@ -178,6 +180,6 @@ These should wait until traceability, impact analysis, and verified profile sour
 
 ## Recommended Next Slice
 
-Implement Beta 27 next.
+Implement Beta 28 next.
 
-Beta 27 should add a trace passport and checkpoint ledger so long-running K-ResDev workspaces can create compact, hash-backed resume points without copying raw restricted source bodies. Checkpoints should remain operational aids only and must not certify compliance, approval, or scientific truth.
+Beta 28 should add a reference corpus adapter bridge so local PDFs, exported Zotero JSON, and Markdown notes can be scanned into reviewable metadata and rejection logs without default Web API access or fabricated citation details.

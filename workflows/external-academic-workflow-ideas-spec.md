@@ -395,23 +395,20 @@ Safety rule:
 
 ## Implementation Order
 
-Recommended order after the current traceability graph work:
+Recommended order after the traceability graph, research-claim matrix, and trace-passport first passes:
 
-1. Finish `workspace-trace` and impact review.
+1. Implement corpus adapter bridge for folder, Zotero JSON export, and Markdown notes.
 2. Add `artifact_authority_level` to trace nodes and generated artifact metadata.
-3. Implement trace passport and checkpoint ledger.
-4. Implement claim registry and claim matrix on top of trace graph and citation support.
-5. Implement corpus adapter bridge for folder, Zotero JSON export, and Markdown notes.
-6. Implement workspace discovery and setup proposal.
-7. Implement goals/deadline operating file and goals review.
-8. Implement local weekly review and dashboard.
-9. Add thin workflow router only after the concrete commands are stable.
+3. Implement workspace discovery and setup proposal.
+4. Implement goals/deadline operating file and goals review.
+5. Implement local weekly review and dashboard.
+6. Add thin workflow router only after the concrete commands are stable.
 
 ## Open Questions
 
 1. Should `project-goals.json` be a new file, or should it extend `project-state.json`?
-2. Should checkpoints be created manually only, or should `workspace-review-pack` create one automatically?
-3. Should the claim registry support administrative and paper claims in one model, or two models with a shared base?
+2. Should `workspace-review-pack` stay checkpoint-neutral, or should a separate opt-in flag create a checkpoint?
+3. Should artifact authority levels be represented as trace-node metadata only, or also as a standalone schema for generated artifacts?
 4. Should Zotero import support only exported files, or later add an optional Web API connector?
 5. Should weekly review stay Markdown-only, or should DOCX/HTML export be added after the projection exporter?
 
@@ -423,7 +420,7 @@ Recommended order after the current traceability graph work:
 | Verified profile sources | Task 33 |
 | Budget ledger | Task 34 |
 | Research claim matrix | Task 35 |
-| Trace passport and checkpoints | New Task 37 |
+| Trace passport and checkpoints | Task 37 |
 | Corpus adapter bridge | New Task 38 |
 | Workspace discovery and setup proposal | New Task 39 |
 | Goals/deadline operating file | New Task 39 |

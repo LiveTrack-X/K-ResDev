@@ -73,6 +73,9 @@ from .models import (
     BudgetLedgerImportResult,
     BudgetLedgerItem,
     CheckFinding,
+    CheckpointCreateResult,
+    CheckpointResumeAction,
+    CheckpointResumePlan,
     CitationSupportDecision,
     CitationSupportFinding,
     CitationSupportRecord,
@@ -102,6 +105,9 @@ from .models import (
     ResearchInsight,
     ResearchClaimStatus,
     SourceRecord,
+    TracePassportEntry,
+    TracePassportFinding,
+    TracePassportStatus,
     WorkspaceActionItem,
     WorkspaceActionPlan,
     WorkspaceApprovalCoverageItem,
@@ -118,6 +124,7 @@ from .models import (
     WorkspaceReviewPackResult,
     WorkspaceReviewPackVerificationResult,
     WorkspaceSummaryResult,
+    WorkspaceTracePassport,
     WorkspaceTraceEdge,
     WorkspaceTraceFinding,
     WorkspaceTraceNode,
@@ -159,6 +166,14 @@ from .research_assistant import (
 from .reporting import draft_monthly_report, write_monthly_report
 from .schema_tools import validate_json_file, validate_json_files
 from .source_verification import render_evidence_source_verification_markdown, verify_evidence_sources
+from .trace_passport import (
+    create_checkpoint,
+    generate_checkpoint_resume_plan,
+    generate_trace_passport,
+    load_checkpoint_entries,
+    render_checkpoint_resume_plan_markdown,
+    render_trace_passport_markdown,
+)
 from .workspace import initialize_workspace, render_doctor_markdown, run_workspace_doctor
 from .workspace_actions import generate_workspace_action_plan, render_action_plan_markdown
 from .workspace_review import (
@@ -181,6 +196,9 @@ __all__ = [
     "BudgetLedgerImportResult",
     "BudgetLedgerItem",
     "CheckFinding",
+    "CheckpointCreateResult",
+    "CheckpointResumeAction",
+    "CheckpointResumePlan",
     "CitationSupportDecision",
     "CitationSupportFinding",
     "CitationSupportRecord",
@@ -211,6 +229,9 @@ __all__ = [
     "ResearchInsight",
     "ResearchClaimStatus",
     "SourceRecord",
+    "TracePassportEntry",
+    "TracePassportFinding",
+    "TracePassportStatus",
     "WorkspaceActionItem",
     "WorkspaceActionPlan",
     "WorkspaceApprovalCoverageItem",
@@ -227,6 +248,7 @@ __all__ = [
     "WorkspaceReviewPackResult",
     "WorkspaceReviewPackVerificationResult",
     "WorkspaceSummaryResult",
+    "WorkspaceTracePassport",
     "WorkspaceTraceEdge",
     "WorkspaceTraceFinding",
     "WorkspaceTraceNode",
@@ -240,6 +262,7 @@ __all__ = [
     "create_bibliography_review_record",
     "create_citation_support_record",
     "create_profile_source_record",
+    "create_checkpoint",
     "check_unsupported_claims",
     "classify_file",
     "draft_monthly_report",
@@ -267,6 +290,8 @@ __all__ = [
     "generate_profile_registry",
     "generate_reproducibility_checklist",
     "generate_research_claim_matrix",
+    "generate_checkpoint_resume_plan",
+    "generate_trace_passport",
     "generate_workspace_action_plan",
     "generate_workspace_approval_coverage",
     "generate_workspace_bibliography_integrity",
@@ -292,6 +317,7 @@ __all__ = [
     "load_project_profile",
     "load_profile_sources",
     "load_research_claims",
+    "load_checkpoint_entries",
     "profile_data_file",
     "paper_records_from_bibliography",
     "parse_budget_ledger_file",
@@ -315,6 +341,8 @@ __all__ = [
     "render_report_integrity_markdown",
     "render_research_claim_matrix_markdown",
     "render_research_claims_markdown",
+    "render_checkpoint_resume_plan_markdown",
+    "render_trace_passport_markdown",
     "render_workspace_review_pack_markdown",
     "render_workspace_summary_markdown",
     "render_workspace_trace_markdown",
@@ -337,4 +365,4 @@ __all__ = [
     "write_research_claims",
 ]
 
-__version__ = "0.1.0b26"
+__version__ = "0.1.0b27"

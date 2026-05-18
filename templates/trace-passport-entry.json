@@ -1,0 +1,16 @@
+{
+  "checkpoint_id": "CHK-20260518-000000-NEEDSREV",
+  "created_at": "2026-05-18T00:00:00Z",
+  "stage": "review-pack",
+  "summary": "checkpoint_summary_needs_review",
+  "artifact_paths": [
+    "reports/workspace-review-pack.md"
+  ],
+  "artifact_hashes": {
+    "reports/workspace-review-pack.md": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "unresolved_findings": [],
+  "pending_human_decisions": [],
+  "resume_hint": "Run checkpoint-summary before resuming.",
+  "status": "needs_review"
+}

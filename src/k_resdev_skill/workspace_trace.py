@@ -29,6 +29,7 @@ from .models import (
 )
 from .profile_sources import load_profile_sources
 from .research_claims import generate_research_claim_matrix, load_research_claims
+from .trace_passport import generate_trace_passport, load_checkpoint_entries
 
 OPERATIONAL_MARKDOWN_NAMES = {
     "agency-profiles.md",
@@ -37,6 +38,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "bibliography-integrity.md",
     "budget-ledger.md",
     "budget-checklist.md",
+    "checkpoint-resume-plan.md",
     "citation-support.md",
     "citation-support-summary.md",
     "evidence-bundle-index.md",
@@ -48,6 +50,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "research-claims.md",
     "report-integrity.md",
     "source-verification.md",
+    "trace-passport.md",
     "workspace-review-pack.md",
     "workspace-summary.md",
     "workspace-trace.md",
@@ -76,6 +79,7 @@ def generate_workspace_trace(
     builder.add_research_claims()
     builder.add_analysis_manifests()
     builder.add_review_pack()
+    builder.add_trace_passport()
 
     findings = _dedupe_findings(builder.findings)
     status = _status_from_findings(findings)
@@ -644,6 +648,48 @@ class _TraceBuilder:
                     path=artifact_path,
                     suggested_action="Regenerate or verify the workspace review pack.",
                 )
+
+    def add_trace_passport(self) -> None:
+        checkpoints_dir = self.workspace / "state" / "checkpoints"
+        if not checkpoints_dir.exists():
+            return
+        try:
+            entries = load_checkpoint_entries(checkpoints_dir)
+        except Exception as exc:
+            self.finding(
+                "trace_passport_unreadable",
+                "medium",
+                f"Trace passport checkpoints could not be read: {exc}",
+                path=checkpoints_dir,
+                suggested_action="Fix checkpoint JSON before relying on trace passport review.",
+            )
+            return
+        for entry in entries:
+            node = self.node(
+                "checkpoint",
+                entry.checkpoint_id,
+                entry.checkpoint_id,
+                ref_id=entry.checkpoint_id,
+                status=str(entry.status),
+                path=str(checkpoints_dir / f"{entry.checkpoint_id}.json"),
+                metadata={"stage": entry.stage, "summary": entry.summary, "created_at": entry.created_at},
+            )
+            for artifact_path in entry.artifact_paths:
+                artifact_node = self.node("artifact", artifact_path, Path(artifact_path).name, path=artifact_path)
+                self.edge(node.node_id, artifact_node.node_id, "captures_artifact")
+        passport = generate_trace_passport(self.workspace)
+        if passport.status == "not_configured":
+            return
+        for finding in passport.findings:
+            severity = "high" if finding.severity == "high" else "medium" if finding.severity == "medium" else "low"
+            self.finding(
+                "trace_passport_finding",
+                severity,
+                finding.message,
+                node_id=_node_id("checkpoint", finding.checkpoint_id) if finding.checkpoint_id else None,
+                path=finding.path,
+                suggested_action=finding.suggested_action or "Review trace passport before resuming from this checkpoint.",
+            )
 
     def _add_citation_support_record(self, record: CitationSupportRecord) -> None:
         node = self.node(

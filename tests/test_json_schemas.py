@@ -91,3 +91,12 @@ def test_research_claim_template_matches_json_schema():
         sample = json.load(handle)
 
     jsonschema.validate(sample, schema)
+
+
+def test_trace_passport_entry_template_matches_json_schema():
+    with open("schemas/trace_passport_entry.schema.json", encoding="utf-8") as handle:
+        schema = json.load(handle)
+    with open("templates/trace-passport-entry.json", encoding="utf-8") as handle:
+        sample = json.load(handle)
+
+    jsonschema.validate(sample, schema)

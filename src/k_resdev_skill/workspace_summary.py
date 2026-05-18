@@ -16,6 +16,7 @@ from .profile_registry import load_project_profile
 from .profile_sources import generate_profile_integrity
 from .budget_ledger import generate_workspace_budget_ledger
 from .research_claims import generate_research_claim_matrix
+from .trace_passport import generate_trace_passport
 from .workspace import OPERATIONAL_MARKDOWN_NAMES, run_workspace_doctor
 from .workspace_actions import generate_workspace_action_plan
 from .workspace_trace import generate_workspace_trace
@@ -45,6 +46,7 @@ def generate_workspace_summary(
     research_claim_matrix = generate_research_claim_matrix(workspace)
     profile_integrity = generate_profile_integrity(workspace)
     trace = generate_workspace_trace(workspace)
+    trace_passport = generate_trace_passport(workspace)
 
     summary = WorkspaceSummaryResult(
         root=str(workspace),
@@ -78,6 +80,10 @@ def generate_workspace_summary(
         trace_node_count=trace.node_count,
         trace_edge_count=trace.edge_count,
         trace_finding_count=trace.finding_count,
+        trace_passport_status=trace_passport.status,
+        checkpoint_count=trace_passport.checkpoint_count,
+        latest_checkpoint_id=trace_passport.latest_checkpoint_id,
+        trace_passport_finding_count=trace_passport.finding_count,
         top_actions=actions.actions[:action_limit],
         markdown_path=str(output_path) if output_path else None,
         json_path=str(json_path) if json_path else None,
@@ -121,6 +127,9 @@ def render_workspace_summary_markdown(summary: WorkspaceSummaryResult) -> str:
         f"| Trace status | {_escape(summary.trace_status or '-')} |",
         f"| Trace nodes | {summary.trace_node_count} |",
         f"| Trace findings | {summary.trace_finding_count} |",
+        f"| Trace passport | {_escape(summary.trace_passport_status or '-')} |",
+        f"| Checkpoints | {summary.checkpoint_count} |",
+        f"| Latest checkpoint | {_escape(summary.latest_checkpoint_id or '-')} |",
         "",
         "## Evidence",
         "",
@@ -143,6 +152,7 @@ def render_workspace_summary_markdown(summary: WorkspaceSummaryResult) -> str:
         f"| Research claim matrix | {summary.research_claim_count} | status: {_escape(summary.research_claim_matrix_status or '-')}; findings: {summary.research_claim_matrix_finding_count} |",
         f"| Profile integrity | {summary.profile_integrity_finding_count} | status: {_escape(summary.profile_integrity_status or '-')}; verified sources: {summary.profile_verified_source_count} |",
         f"| Workspace trace | {summary.trace_node_count} | status: {_escape(summary.trace_status or '-')}; findings: {summary.trace_finding_count} |",
+        f"| Trace passport | {summary.checkpoint_count} | status: {_escape(summary.trace_passport_status or '-')}; latest: {_escape(summary.latest_checkpoint_id or '-')}; findings: {summary.trace_passport_finding_count} |",
         "",
         "## Top Actions",
         "",

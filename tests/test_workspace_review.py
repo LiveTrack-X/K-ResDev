@@ -40,6 +40,8 @@ def test_workspace_review_pack_writes_all_review_artifacts(tmp_path):
         tmp_path / "state" / "profile-integrity.json",
         tmp_path / "reports" / "workspace-trace.md",
         tmp_path / "state" / "workspace-trace.json",
+        tmp_path / "reports" / "trace-passport.md",
+        tmp_path / "state" / "trace-passport.json",
         tmp_path / "reports" / "workspace-review-pack.md",
         tmp_path / "state" / "workspace-review-pack.json",
     ]
@@ -67,6 +69,9 @@ def test_workspace_review_pack_writes_all_review_artifacts(tmp_path):
     assert result.profile_source_count == 0
     assert result.profile_integrity_finding_count >= 1
     assert result.workspace_trace_node_count >= 0
+    assert result.trace_passport_status == "not_configured"
+    assert result.checkpoint_count == 0
+    assert result.trace_passport_finding_count == 0
     assert result.artifacts
     assert all(len(artifact.sha256) == 64 for artifact in result.artifacts)
     assert all(path.exists() for path in expected)
@@ -81,6 +86,7 @@ def test_workspace_review_pack_writes_all_review_artifacts(tmp_path):
     assert "Research claim matrix status" in rendered
     assert "Profile integrity status" in rendered
     assert "Workspace trace status" in rendered
+    assert "Trace passport status" in rendered
     assert "Hashed artifacts" in rendered
     assert json.loads((tmp_path / "state" / "workspace-review-pack.json").read_text(encoding="utf-8"))["index_path"] == str(
         tmp_path / "reports" / "workspace-review-pack.md"
@@ -95,6 +101,7 @@ def test_workspace_review_pack_writes_all_review_artifacts(tmp_path):
     assert json.loads((tmp_path / "state" / "research-claim-matrix.json").read_text(encoding="utf-8"))["status"] == "not_configured"
     assert json.loads((tmp_path / "state" / "profile-integrity.json").read_text(encoding="utf-8"))["status"] == "needs_review"
     assert json.loads((tmp_path / "state" / "workspace-trace.json").read_text(encoding="utf-8"))["node_count"] == result.workspace_trace_node_count
+    assert json.loads((tmp_path / "state" / "trace-passport.json").read_text(encoding="utf-8"))["status"] == "not_configured"
     assert verify_workspace_review_pack(tmp_path / "state" / "workspace-review-pack.json").valid is True
 
 
@@ -116,6 +123,7 @@ def test_workspace_review_pack_cli(tmp_path, capsys):
     assert (tmp_path / "reports" / "research-claim-matrix.md").exists()
     assert (tmp_path / "reports" / "profile-integrity.md").exists()
     assert (tmp_path / "reports" / "workspace-trace.md").exists()
+    assert (tmp_path / "reports" / "trace-passport.md").exists()
 
 
 def test_verify_review_pack_cli_detects_tampering(tmp_path, capsys):
@@ -150,6 +158,8 @@ def test_operational_markdown_does_not_satisfy_report_draft_check(tmp_path):
         "citation-support-summary.md",
         "research-claim-matrix.md",
         "research-claims.md",
+        "trace-passport.md",
+        "checkpoint-resume-plan.md",
         "profile-integrity.md",
         "profile-source-summary.md",
         "workspace-trace.md",

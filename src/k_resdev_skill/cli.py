@@ -67,6 +67,7 @@ from .research_assistant import (
 from .reporting import write_monthly_report
 from .schema_tools import validate_json_files
 from .source_verification import verify_evidence_sources
+from .trace_passport import create_checkpoint, generate_checkpoint_resume_plan, generate_trace_passport
 from .workspace import initialize_workspace, run_workspace_doctor
 from .workspace_actions import generate_workspace_action_plan
 from .workspace_review import generate_workspace_review_pack, verify_workspace_review_pack
@@ -380,9 +381,30 @@ def main(argv: list[str] | None = None) -> int:
     workspace_trace_parser.add_argument("--output", default=None)
     workspace_trace_parser.add_argument("--json", default=None)
 
+    checkpoint_create_parser = subparsers.add_parser("checkpoint-create", help="Create a hash-backed local trace passport checkpoint.")
+    checkpoint_create_parser.add_argument("--root", default=".")
+    checkpoint_create_parser.add_argument("--stage", required=True)
+    checkpoint_create_parser.add_argument("--summary", required=True)
+    checkpoint_create_parser.add_argument("--artifact", action="append", default=[])
+    checkpoint_create_parser.add_argument("--status", default="needs_review", choices=["draft", "needs_review", "accepted", "superseded"])
+    checkpoint_create_parser.add_argument("--resume-hint", default=None)
+    checkpoint_create_parser.add_argument("--unresolved-finding", action="append", default=[])
+    checkpoint_create_parser.add_argument("--pending-human-decision", action="append", default=[])
+
+    checkpoint_summary_parser = subparsers.add_parser("checkpoint-summary", help="Summarize trace passport checkpoints and stale artifacts.")
+    checkpoint_summary_parser.add_argument("--root", default=".")
+    checkpoint_summary_parser.add_argument("--output", default=None)
+    checkpoint_summary_parser.add_argument("--json", default=None)
+
+    checkpoint_resume_parser = subparsers.add_parser("checkpoint-resume-plan", help="Generate a compact resume plan from the latest or selected checkpoint.")
+    checkpoint_resume_parser.add_argument("--root", default=".")
+    checkpoint_resume_parser.add_argument("--checkpoint-id", default=None)
+    checkpoint_resume_parser.add_argument("--output", default=None)
+    checkpoint_resume_parser.add_argument("--json", default=None)
+
     review_pack_parser = subparsers.add_parser(
         "workspace-review-pack",
-        help="Generate readiness, next-action, summary, profile, source, approval, report, bibliography, citation-support, and trace artifacts in one local review pack.",
+        help="Generate readiness, next-action, summary, profile, source, approval, report, bibliography, citation-support, trace-passport, and trace artifacts in one local review pack.",
     )
     review_pack_parser.add_argument("--root", default=".")
     review_pack_parser.add_argument("--reports-dir", default=None)
@@ -715,6 +737,27 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if args.command == "workspace-trace":
         result = generate_workspace_trace(args.root, output_path=args.output, json_path=args.json)
+        print(result.model_dump_json(indent=2))
+        return 0
+    if args.command == "checkpoint-create":
+        result = create_checkpoint(
+            args.root,
+            stage=args.stage,
+            summary=args.summary,
+            artifact_paths=args.artifact,
+            status=args.status,
+            resume_hint=args.resume_hint,
+            unresolved_findings=args.unresolved_finding,
+            pending_human_decisions=args.pending_human_decision,
+        )
+        print(result.model_dump_json(indent=2))
+        return 0
+    if args.command == "checkpoint-summary":
+        result = generate_trace_passport(args.root, output_path=args.output, json_path=args.json)
+        print(result.model_dump_json(indent=2))
+        return 0
+    if args.command == "checkpoint-resume-plan":
+        result = generate_checkpoint_resume_plan(args.root, checkpoint_id=args.checkpoint_id, output_path=args.output, json_path=args.json)
         print(result.model_dump_json(indent=2))
         return 0
     if args.command == "workspace-review-pack":

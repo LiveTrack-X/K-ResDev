@@ -106,6 +106,13 @@ class ResearchClaimStatus(str, Enum):
     SUPERSEDED = "superseded"
 
 
+class TracePassportStatus(str, Enum):
+    DRAFT = "draft"
+    NEEDS_REVIEW = "needs_review"
+    ACCEPTED = "accepted"
+    SUPERSEDED = "superseded"
+
+
 class ApprovalTargetType(str, Enum):
     REPORT = "report"
     EVIDENCE = "evidence"
@@ -707,6 +714,10 @@ class WorkspaceSummaryResult(StrictModel):
     trace_node_count: int = 0
     trace_edge_count: int = 0
     trace_finding_count: int = 0
+    trace_passport_status: str | None = None
+    checkpoint_count: int = 0
+    latest_checkpoint_id: str | None = None
+    trace_passport_finding_count: int = 0
     top_actions: list[WorkspaceActionItem] = Field(default_factory=list)
     markdown_path: str | None = None
     json_path: str | None = None
@@ -800,6 +811,84 @@ class WorkspaceTraceResult(StrictModel):
     warnings: list[str] = Field(default_factory=list)
 
 
+class TracePassportEntry(StrictModel):
+    checkpoint_id: str
+    created_at: str
+    stage: str
+    summary: str
+    artifact_paths: list[str] = Field(default_factory=list)
+    artifact_hashes: dict[str, str] = Field(default_factory=dict)
+    unresolved_findings: list[str] = Field(default_factory=list)
+    pending_human_decisions: list[str] = Field(default_factory=list)
+    resume_hint: str | None = None
+    status: TracePassportStatus = TracePassportStatus.NEEDS_REVIEW
+
+    @field_validator("checkpoint_id", "created_at", "stage", "summary")
+    @classmethod
+    def _must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
+class TracePassportFinding(StrictModel):
+    code: str
+    severity: str
+    message: str
+    checkpoint_id: str | None = None
+    path: str | None = None
+    suggested_action: str | None = None
+
+
+class WorkspaceTracePassport(StrictModel):
+    workspace_root: str
+    project_id: str | None = None
+    generated_at: str
+    status: str
+    entries: list[TracePassportEntry] = Field(default_factory=list)
+    latest_checkpoint_id: str | None = None
+    checkpoint_count: int = 0
+    finding_count: int = 0
+    high_count: int = 0
+    medium_count: int = 0
+    low_count: int = 0
+    findings: list[TracePassportFinding] = Field(default_factory=list)
+    markdown_path: str | None = None
+    json_path: str | None = None
+    warnings: list[str] = Field(default_factory=list)
+
+
+class CheckpointCreateResult(StrictModel):
+    root: str
+    checkpoint_id: str
+    checkpoint_path: str
+    passport_json_path: str
+    stage: str
+    artifact_count: int = 0
+    status: str = "needs_review"
+    warnings: list[str] = Field(default_factory=list)
+
+
+class CheckpointResumeAction(StrictModel):
+    priority: str
+    title: str
+    rationale: str
+    command: str | None = None
+
+
+class CheckpointResumePlan(StrictModel):
+    root: str
+    status: str
+    checkpoint_id: str | None = None
+    artifact_count: int = 0
+    stale_count: int = 0
+    missing_count: int = 0
+    actions: list[CheckpointResumeAction] = Field(default_factory=list)
+    markdown_path: str | None = None
+    json_path: str | None = None
+    warnings: list[str] = Field(default_factory=list)
+
+
 class WorkspaceReviewPackResult(StrictModel):
     root: str
     status: str
@@ -847,6 +936,11 @@ class WorkspaceReviewPackResult(StrictModel):
     workspace_trace_edge_count: int = 0
     workspace_trace_finding_count: int = 0
     workspace_trace_high_count: int = 0
+    trace_passport_status: str | None = None
+    checkpoint_count: int = 0
+    latest_checkpoint_id: str | None = None
+    trace_passport_finding_count: int = 0
+    trace_passport_high_count: int = 0
     generated_paths: list[str] = Field(default_factory=list)
     artifacts: list[ReviewPackArtifact] = Field(default_factory=list)
     index_path: str

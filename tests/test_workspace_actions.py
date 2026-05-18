@@ -164,6 +164,48 @@ def test_workspace_action_plan_maps_citation_support_findings(tmp_path):
     assert "citation-support-integrity" in (action.command or "")
 
 
+def test_workspace_action_plan_maps_trace_passport_findings(tmp_path):
+    doctor_result = WorkspaceDoctorResult(
+        root=str(tmp_path),
+        status="blocked",
+        findings=[
+            WorkspaceDoctorFinding(
+                code="trace_passport_high_findings",
+                severity="high",
+                message="checkpoint stale",
+                path=str(tmp_path / "state" / "trace-passport.json"),
+            )
+        ],
+    )
+
+    plan = generate_workspace_action_plan(tmp_path, doctor_result=doctor_result)
+    action = next(item for item in plan.actions if item.title == "Review trace passport checkpoints")
+
+    assert action.priority == "high"
+    assert "checkpoint-summary" in (action.command or "")
+
+
+def test_workspace_action_plan_maps_missing_trace_passport_to_create_command(tmp_path):
+    doctor_result = WorkspaceDoctorResult(
+        root=str(tmp_path),
+        status="ready_with_notes",
+        findings=[
+            WorkspaceDoctorFinding(
+                code="trace_passport_missing",
+                severity="low",
+                message="checkpoint missing",
+                path=str(tmp_path / "state" / "checkpoints"),
+            )
+        ],
+    )
+
+    plan = generate_workspace_action_plan(tmp_path, doctor_result=doctor_result)
+    action = next(item for item in plan.actions if item.title == "Create a trace passport checkpoint")
+
+    assert action.priority == "low"
+    assert "checkpoint-create" in (action.command or "")
+
+
 def test_next_actions_cli_writes_outputs(tmp_path, capsys):
     initialize_workspace(tmp_path, "PRJ-2026-0001", "Demo Project")
     output = tmp_path / "reports" / "next-actions.md"

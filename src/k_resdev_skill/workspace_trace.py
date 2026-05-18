@@ -29,6 +29,7 @@ from .models import (
     WorkspaceTraceNode,
     WorkspaceTraceResult,
 )
+from .profile_promotion import load_profile_promotion_records
 from .profile_review import load_profile_review
 from .profile_sources import load_profile_sources
 from .project_goals import generate_goals_review
@@ -51,6 +52,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "goals-review.md",
     "next-actions.md",
     "profile-integrity.md",
+    "profile-promotion-summary.md",
     "profile-review.md",
     "profile-source-summary.md",
     "readiness.md",
@@ -85,6 +87,7 @@ def generate_workspace_trace(
     builder.add_budget_ledger()
     builder.add_profile_sources()
     builder.add_profile_review()
+    builder.add_profile_promotions()
     builder.add_bibliography()
     builder.add_reference_corpus()
     builder.add_reports()
@@ -550,6 +553,51 @@ class _TraceBuilder:
                 path=str(path),
                 suggested_action="Run profile-review and resolve promotion blockers before marking any profile verified.",
             )
+
+    def add_profile_promotions(self) -> None:
+        path = self.workspace / "state" / "profile-promotions"
+        if not path.exists():
+            return
+        try:
+            records = load_profile_promotion_records(path)
+        except Exception as exc:
+            self.finding(
+                "trace_profile_promotions_unreadable",
+                "medium",
+                f"Profile promotion records could not be read: {exc}",
+                path=path,
+                suggested_action="Fix state/profile-promotions before relying on profile promotion trace state.",
+            )
+            return
+        for record in records:
+            node = self.node(
+                "profile_promotion",
+                record.promotion_id,
+                record.promotion_id,
+                ref_id=record.promotion_id,
+                status=record.decision,
+                path=record.profile_review_path,
+                sha256=record.profile_review_hash,
+                metadata={
+                    "profile_id": record.profile_id,
+                    "reviewer": record.reviewer,
+                    "reviewed_at": record.reviewed_at,
+                    "profile_review_status": record.profile_review_status,
+                    "profile_review_can_promote": record.profile_review_can_promote,
+                    "risk_flags": record.risk_flags,
+                },
+            )
+            self.edge(node.node_id, _node_id("profile", record.profile_id), "promotes_profile")
+            self.edge(node.node_id, _node_id("profile_review", "profile-review"), "based_on_review")
+            if record.decision != "verified":
+                self.finding(
+                    "trace_profile_promotion_not_verified",
+                    "medium",
+                    f"Latest profile promotion decision `{record.promotion_id}` is `{record.decision}`.",
+                    node_id=node.node_id,
+                    path=record.profile_review_path,
+                    suggested_action="Keep the profile in needs_review unless a verified supplied human promotion decision exists.",
+                )
 
     def add_approvals(self) -> None:
         approvals_dir = self.workspace / "state" / "approvals"

@@ -22,6 +22,7 @@ from .models import (
     WorkspaceDoctorResult,
     WorkspaceInitResult,
 )
+from .profile_promotion import summarize_profile_promotions
 from .profile_registry import default_agency_templates_root, load_project_profile
 from .profile_review import generate_profile_review
 from .profile_sources import generate_profile_integrity, load_profile_sources
@@ -47,6 +48,7 @@ STANDARD_DIRS = (
     "state/bibliography-reviews",
     "state/citation-support",
     "state/checkpoints",
+    "state/profile-promotions",
 )
 OPERATIONAL_MARKDOWN_NAMES = {
     "agency-profiles.md",
@@ -63,6 +65,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "goals-review.md",
     "next-actions.md",
     "profile-integrity.md",
+    "profile-promotion-summary.md",
     "profile-review.md",
     "profile-source-summary.md",
     "readiness.md",
@@ -180,6 +183,7 @@ def run_workspace_doctor(
     _check_profile(workspace, findings)
     _check_profile_integrity(workspace, findings)
     _check_profile_review(workspace, findings)
+    _check_profile_promotion(workspace, findings)
     _check_reports(workspace, findings)
     _check_report_integrity(workspace, findings)
     _check_artifact_authority(workspace, findings)
@@ -593,6 +597,49 @@ def _check_profile_review(workspace: Path, findings: list[WorkspaceDoctorFinding
                 f"{result.failed_count} profile promotion review check(s) still require human/source metadata.",
                 path,
                 "Run profile-review before marking any profile as verified.",
+            )
+        )
+
+
+def _check_profile_promotion(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> None:
+    review = generate_profile_review(workspace)
+    summary = summarize_profile_promotions(workspace)
+    profile_path = workspace / "state" / "project-profile.json"
+    profile: ProjectProfile | None = None
+    if profile_path.exists():
+        try:
+            profile = load_project_profile(profile_path)
+        except Exception:
+            profile = None
+    path = workspace / "state" / "profile-promotions"
+    if profile is not None and profile.status == "verified" and summary.status != "verified_recorded":
+        findings.append(
+            _finding(
+                "profile_verified_without_promotion_record",
+                "high",
+                f"Profile {profile.profile_id} is marked verified but no current verified promotion record was found.",
+                path,
+                "Record a supplied human profile-promotion decision or set the profile back to needs_review.",
+            )
+        )
+    if summary.status == "stale_review_hash":
+        findings.append(
+            _finding(
+                "profile_promotion_review_hash_mismatch",
+                "high",
+                "The latest profile promotion record points to a stale profile-review hash.",
+                path,
+                "Re-run profile-review and record a fresh supplied human promotion decision.",
+            )
+        )
+    if review.can_promote and summary.status != "verified_recorded":
+        findings.append(
+            _finding(
+                "profile_promotion_record_missing",
+                "medium",
+                "Profile review is ready for human promotion but no verified promotion record exists.",
+                path,
+                "Run profile-promotion-record with the profile-review hash after supplied human verification.",
             )
         )
 
@@ -1093,6 +1140,7 @@ def _starter_readme(project_id: str, title: str, profile_id: str) -> str:
             "- Run `k-resdev profile-source-record --profile-id <profile-id> --title \"<official source title>\" --source-url <url> --review-status needs_review` to record official-source metadata for profile review.",
             "- Run `k-resdev profile-integrity --root . --output reports/profile-integrity.md --json state/profile-integrity.json` to check profile source records.",
             "- Run `k-resdev profile-review --root . --output reports/profile-review.md --json state/profile-review.json` before promoting any profile to verified.",
+            "- Run `k-resdev profile-promotion-record --root . --decision verified --reviewer <reviewer> --profile-review-hash <sha256>` only after a supplied human promotion decision.",
             "- Run `k-resdev budget-ledger-import references/budget-ledger.csv --state-dir state --markdown reports/budget-ledger-import.md` to import a reviewable budget ledger.",
             "- Run `k-resdev budget-ledger-integrity --root . --output reports/budget-ledger.md --json state/budget-ledger-integrity.json` to check ledger proof, approval, duplicate, and evidence-link gaps.",
             "- Run `k-resdev checkpoint-create --root . --stage review-pack --summary \"<summary>\" --status needs_review` to create a hash-backed resume checkpoint.",

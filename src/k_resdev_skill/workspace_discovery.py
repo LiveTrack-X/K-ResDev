@@ -17,6 +17,7 @@ STANDARD_DIRS = (
     "state/bibliography-reviews",
     "state/citation-support",
     "state/checkpoints",
+    "state/profile-promotions",
 )
 STARTER_FILES = (
     "README.k-resdev.md",

@@ -16,6 +16,7 @@ from .approval_coverage import generate_workspace_approval_coverage
 from .bibliography_integrity import generate_workspace_bibliography_integrity
 from .budget_ledger import generate_workspace_budget_ledger
 from .citation_support import generate_workspace_citation_support_integrity
+from .profile_promotion import summarize_profile_promotions
 from .profile_review import generate_profile_review
 from .profile_sources import generate_profile_integrity
 from .project_goals import generate_goals_review
@@ -84,6 +85,8 @@ def generate_workspace_review_pack(
     profile_integrity_json = state / "profile-integrity.json"
     profile_review_md = reports / "profile-review.md"
     profile_review_json = state / "profile-review.json"
+    profile_promotion_md = reports / "profile-promotion-summary.md"
+    profile_promotion_json = state / "profile-promotion-summary.json"
     workspace_trace_md = reports / "workspace-trace.md"
     workspace_trace_json = state / "workspace-trace.json"
     trace_passport_md = reports / "trace-passport.md"
@@ -105,6 +108,7 @@ def generate_workspace_review_pack(
     research_claim_matrix = generate_research_claim_matrix(workspace, output_path=research_claim_md, json_path=research_claim_json)
     profile_integrity = generate_profile_integrity(workspace, output_path=profile_integrity_md, json_path=profile_integrity_json)
     profile_review = generate_profile_review(workspace, output_path=profile_review_md, json_path=profile_review_json)
+    profile_promotion = summarize_profile_promotions(workspace, output_path=profile_promotion_md, json_path=profile_promotion_json)
     weekly_review = generate_weekly_review(
         workspace,
         review_date=weekly_date,
@@ -169,6 +173,8 @@ def generate_workspace_review_pack(
         str(profile_integrity_json),
         str(profile_review_md),
         str(profile_review_json),
+        str(profile_promotion_md),
+        str(profile_promotion_json),
         str(workspace_trace_md),
         str(workspace_trace_json),
         str(trace_passport_md),
@@ -247,6 +253,9 @@ def generate_workspace_review_pack(
         profile_review_status=profile_review.status,
         profile_review_can_promote=profile_review.can_promote,
         profile_review_failed_count=profile_review.failed_count,
+        profile_promotion_status=profile_promotion.status,
+        profile_promotion_record_count=profile_promotion.record_count,
+        latest_profile_promotion_decision=profile_promotion.latest_decision,
         workspace_trace_status=workspace_trace.status,
         workspace_trace_node_count=workspace_trace.node_count,
         workspace_trace_edge_count=workspace_trace.edge_count,
@@ -385,6 +394,9 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
         f"| Profile review status | {_escape(result.profile_review_status or '-')} |",
         f"| Profile review can promote | {result.profile_review_can_promote} |",
         f"| Profile review failed count | {result.profile_review_failed_count} |",
+        f"| Profile promotion status | {_escape(result.profile_promotion_status or '-')} |",
+        f"| Profile promotion record count | {result.profile_promotion_record_count} |",
+        f"| Latest profile promotion decision | {_escape(result.latest_profile_promotion_decision or '-')} |",
         f"| Workspace trace status | {_escape(result.workspace_trace_status or '-')} |",
         f"| Workspace trace nodes | {result.workspace_trace_node_count} |",
         f"| Workspace trace edges | {result.workspace_trace_edge_count} |",
@@ -432,6 +444,7 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
             "- Use `research-claim-matrix.md` to check supplied research claims against evidence, bibliography, and citation-support records.",
             "- Use `profile-integrity.md` to check project/agency profile source records and drift.",
             "- Use `profile-review.md` before promoting any source-backed profile to verified.",
+            "- Use `profile-promotion-summary.md` to inspect supplied human profile-promotion decisions.",
             "- Use `workspace-trace.md` to inspect cross-artifact traceability and impact findings.",
             "- Use `trace-passport.md` to inspect checkpoint freshness before resuming long-running work.",
             "- Run `verify-review-pack state/workspace-review-pack.json` before relying on a saved pack.",
@@ -484,6 +497,8 @@ def _artifact_label(path: str) -> str:
         "profile-integrity.json": "Profile integrity JSON",
         "profile-review.md": "Profile review",
         "profile-review.json": "Profile review JSON",
+        "profile-promotion-summary.md": "Profile promotion summary",
+        "profile-promotion-summary.json": "Profile promotion summary JSON",
         "workspace-trace.md": "Workspace trace",
         "workspace-trace.json": "Workspace trace JSON",
         "trace-passport.md": "Trace passport",

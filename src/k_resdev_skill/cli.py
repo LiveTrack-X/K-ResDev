@@ -47,6 +47,12 @@ from .intake import run_intake
 from .literature import generate_literature_matrix
 from .models import EvidenceItem, PaperRecord, ProjectState, ResearchInsight
 from .plan_mapper import extract_project_state_from_text
+from .profile_promotion import (
+    create_profile_promotion_record,
+    default_profile_promotions_dir,
+    summarize_profile_promotions,
+    write_profile_promotion_record,
+)
 from .profile_sources import (
     create_profile_source_record,
     default_profile_sources_path,
@@ -323,6 +329,24 @@ def main(argv: list[str] | None = None) -> int:
     profile_review_parser.add_argument("--root", default=".")
     profile_review_parser.add_argument("--output", default=None)
     profile_review_parser.add_argument("--json", default=None)
+
+    profile_promotion_record_parser = subparsers.add_parser("profile-promotion-record", help="Record a supplied human profile-promotion decision after profile-review passes.")
+    profile_promotion_record_parser.add_argument("--root", default=".")
+    profile_promotion_record_parser.add_argument("--decision", required=True, choices=["verified", "rejected", "needs_changes", "revoked"])
+    profile_promotion_record_parser.add_argument("--reviewer", required=True)
+    profile_promotion_record_parser.add_argument("--profile-review", default=None)
+    profile_promotion_record_parser.add_argument("--profile-review-hash", required=True)
+    profile_promotion_record_parser.add_argument("--reviewed-at", default=None)
+    profile_promotion_record_parser.add_argument("--note", default=None)
+    profile_promotion_record_parser.add_argument("--risk-flag", action="append", default=[])
+    profile_promotion_record_parser.add_argument("--promotions-dir", default=None)
+    profile_promotion_record_parser.add_argument("--print-only", action="store_true")
+
+    profile_promotion_summary_parser = subparsers.add_parser("profile-promotion-summary", help="Summarize supplied profile-promotion decision records.")
+    profile_promotion_summary_parser.add_argument("--root", default=".")
+    profile_promotion_summary_parser.add_argument("--promotions-dir", default=None)
+    profile_promotion_summary_parser.add_argument("--output", default=None)
+    profile_promotion_summary_parser.add_argument("--json", default=None)
 
     validate_json_parser = subparsers.add_parser("validate-json", help="Validate JSON files against bundled or custom JSON schema.")
     validate_json_parser.add_argument(
@@ -753,6 +777,31 @@ def main(argv: list[str] | None = None) -> int:
         result = generate_profile_review(args.root, output_path=args.output, json_path=args.json)
         print(result.model_dump_json(indent=2))
         return 0 if result.status != "blocked" else 1
+    if args.command == "profile-promotion-record":
+        record = create_profile_promotion_record(
+            args.root,
+            decision=args.decision,
+            reviewer=args.reviewer,
+            profile_review_hash=args.profile_review_hash,
+            profile_review_path=args.profile_review,
+            reviewed_at=args.reviewed_at,
+            notes=args.note,
+            risk_flags=args.risk_flag,
+        )
+        if not args.print_only:
+            promotions_dir = Path(args.promotions_dir) if args.promotions_dir else default_profile_promotions_dir(args.root)
+            write_profile_promotion_record(record, promotions_dir)
+        print(record.model_dump_json(indent=2))
+        return 0
+    if args.command == "profile-promotion-summary":
+        result = summarize_profile_promotions(
+            args.root,
+            promotions_dir=args.promotions_dir,
+            output_path=args.output,
+            json_path=args.json,
+        )
+        print(result.model_dump_json(indent=2))
+        return 0
     if args.command == "validate-json":
         result = validate_json_files(args.json_paths, args.schema)
         print(json.dumps(result, ensure_ascii=False, indent=2))

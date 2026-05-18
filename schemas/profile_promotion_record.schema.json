@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ProfilePromotionRecord",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "promotion_id",
+    "profile_id",
+    "decision",
+    "reviewer",
+    "reviewed_at",
+    "profile_review_path",
+    "profile_review_hash",
+    "profile_review_status",
+    "profile_review_can_promote",
+    "risk_flags"
+  ],
+  "properties": {
+    "promotion_id": {"type": "string"},
+    "profile_id": {"type": "string"},
+    "decision": {"type": "string", "enum": ["verified", "rejected", "needs_changes", "revoked"]},
+    "reviewer": {"type": "string"},
+    "reviewed_at": {"type": "string"},
+    "profile_review_path": {"type": "string"},
+    "profile_review_hash": {"type": "string"},
+    "profile_review_status": {"type": "string"},
+    "profile_review_can_promote": {"type": "boolean"},
+    "notes": {"type": ["string", "null"]},
+    "risk_flags": {"type": "array", "items": {"type": "string"}}
+  }
+}

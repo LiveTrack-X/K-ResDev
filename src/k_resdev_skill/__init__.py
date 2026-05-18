@@ -103,6 +103,8 @@ from .models import (
     PaperRecord,
     ProfileIntegrityFinding,
     ProfileIntegrityResult,
+    ProfilePromotionRecord,
+    ProfilePromotionSummaryResult,
     ProfileReviewChecklistItem,
     ProfileReviewResult,
     ProfileSource,
@@ -161,6 +163,15 @@ from .models import (
     WorkflowStep,
 )
 from .plan_mapper import extract_project_state_from_text
+from .profile_promotion import (
+    create_profile_promotion_record,
+    default_profile_promotions_dir,
+    latest_profile_promotion,
+    load_profile_promotion_records,
+    render_profile_promotion_summary_markdown,
+    summarize_profile_promotions,
+    write_profile_promotion_record,
+)
 from .profile_review import generate_profile_review, load_profile_review, render_profile_review_markdown
 from .profile_sources import (
     create_profile_source_record,
@@ -265,6 +276,7 @@ __all__ = [
     "CitationSupportRecord",
     "DashboardCard",
     "DataProfile",
+    "default_profile_promotions_dir",
     "default_profile_sources_path",
     "EvidenceSourceVerificationItem",
     "EvidenceSourceVerificationResult",
@@ -279,6 +291,8 @@ __all__ = [
     "PaperRecord",
     "ProfileIntegrityFinding",
     "ProfileIntegrityResult",
+    "ProfilePromotionRecord",
+    "ProfilePromotionSummaryResult",
     "ProfileReviewChecklistItem",
     "ProfileReviewResult",
     "ProfileSource",
@@ -346,6 +360,7 @@ __all__ = [
     "create_approval_record",
     "create_bibliography_review_record",
     "create_citation_support_record",
+    "create_profile_promotion_record",
     "create_profile_source_record",
     "create_checkpoint",
     "check_unsupported_claims",
@@ -403,6 +418,7 @@ __all__ = [
     "latest_approval_for_target",
     "latest_bibliography_review",
     "latest_citation_support",
+    "latest_profile_promotion",
     "load_approval_records",
     "load_artifact_authority",
     "load_bibliography_review_records",
@@ -410,6 +426,7 @@ __all__ = [
     "load_evidence_index",
     "load_project_profile",
     "load_project_goals",
+    "load_profile_promotion_records",
     "load_profile_sources",
     "load_profile_review",
     "load_reference_corpus",
@@ -443,6 +460,7 @@ __all__ = [
     "render_evidence_source_verification_markdown",
     "render_goals_review_markdown",
     "render_profile_integrity_markdown",
+    "render_profile_promotion_summary_markdown",
     "render_profile_review_markdown",
     "render_profile_source_summary_markdown",
     "render_reference_corpus_summary",
@@ -460,6 +478,7 @@ __all__ = [
     "render_workspace_trace_markdown",
     "run_workspace_doctor",
     "record_profile_source",
+    "summarize_profile_promotions",
     "summarize_profile_sources",
     "validate_json_file",
     "validate_json_files",
@@ -470,6 +489,7 @@ __all__ = [
     "write_citation_support_record",
     "write_budget_ledger",
     "write_evidence_index",
+    "write_profile_promotion_record",
     "write_profile_sources",
     "write_projection_docx",
     "write_projection_html",
@@ -477,4 +497,4 @@ __all__ = [
     "write_research_claims",
 ]
 
-__version__ = "0.1.0b35"
+__version__ = "0.1.0b36"

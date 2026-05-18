@@ -146,6 +146,7 @@ def test_workspace_review_pack_writes_all_review_artifacts(tmp_path):
     assert json.loads((tmp_path / "state" / "research-claim-matrix.json").read_text(encoding="utf-8"))["status"] == "not_configured"
     assert json.loads((tmp_path / "state" / "profile-integrity.json").read_text(encoding="utf-8"))["status"] == "needs_review"
     assert json.loads((tmp_path / "state" / "profile-review.json").read_text(encoding="utf-8"))["status"] == "needs_review"
+    assert json.loads((tmp_path / "state" / "profile-promotion-summary.json").read_text(encoding="utf-8"))["status"] == "not_recorded"
     assert json.loads((tmp_path / "state" / "workspace-trace.json").read_text(encoding="utf-8"))["node_count"] == result.workspace_trace_node_count
     assert json.loads((tmp_path / "state" / "trace-passport.json").read_text(encoding="utf-8"))["status"] == "not_configured"
     assert verify_workspace_review_pack(tmp_path / "state" / "workspace-review-pack.json").valid is True
@@ -175,6 +176,7 @@ def test_workspace_review_pack_cli(tmp_path, capsys):
     assert (tmp_path / "reports" / "research-claim-matrix.md").exists()
     assert (tmp_path / "reports" / "profile-integrity.md").exists()
     assert (tmp_path / "reports" / "profile-review.md").exists()
+    assert (tmp_path / "reports" / "profile-promotion-summary.md").exists()
     assert (tmp_path / "reports" / "workspace-trace.md").exists()
     assert (tmp_path / "reports" / "trace-passport.md").exists()
 
@@ -221,6 +223,7 @@ def test_operational_markdown_does_not_satisfy_report_draft_check(tmp_path):
         "workspace-discovery.md",
         "checkpoint-resume-plan.md",
         "profile-integrity.md",
+        "profile-promotion-summary.md",
         "profile-review.md",
         "profile-source-summary.md",
         "workspace-trace.md",

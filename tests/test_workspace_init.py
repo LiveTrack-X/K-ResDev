@@ -19,6 +19,7 @@ def test_initialize_workspace_creates_standard_layout(tmp_path):
         "state/bibliography-reviews",
         "state/citation-support",
         "state/checkpoints",
+        "state/profile-promotions",
     ]:
         assert (tmp_path / relative).is_dir()
 
@@ -51,6 +52,7 @@ def test_initialize_workspace_creates_standard_layout(tmp_path):
     assert "research-claim-matrix" in readme
     assert "profile-source-record" in readme
     assert "profile-integrity" in readme
+    assert "profile-promotion-record" in readme
     assert "budget-ledger-import" in readme
     assert "budget-ledger-integrity" in readme
     assert "checkpoint-create" in readme

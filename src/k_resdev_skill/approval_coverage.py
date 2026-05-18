@@ -21,6 +21,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "evidence-bundle-index.md",
     "goals-review.md",
     "profile-integrity.md",
+    "profile-promotion-summary.md",
     "profile-review.md",
     "profile-source-summary.md",
     "reference-corpus-summary.md",

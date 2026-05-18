@@ -490,11 +490,26 @@ Profile review is a guardrail projection only. It can say local metadata is read
 
 ### Task 46: Profile promotion record workflow
 
+Implemented:
+- `ProfilePromotionRecord` and `ProfilePromotionSummaryResult` models
+- `profile-promotion-record` command and public API for supplied human decisions
+- required SHA-256 binding to a passing `state/profile-review.json` artifact before writing a record
+- `profile-promotion-summary` command and Markdown/JSON projection
+- `state/profile-promotions/` workspace support
+- schema/template coverage for promotion records and summaries
+- workspace doctor, next-action, summary, review-pack, and trace integration
+- logic that treats only the latest hash-matching promotion record as current while leaving older stale records visible as mismatch counts
+
+Profile promotion records are supplied human decision metadata only. They do not mutate `state/project-profile.json`, infer official verification, create approvals, or certify agency compliance.
+
+### Task 47: Profile promotion apply proposal
+
 Planned:
-- add a data-only command that records a supplied human profile promotion decision
-- require a passing profile-review artifact hash before writing a promotion record
-- keep project profile mutation opt-in and non-destructive
-- integrate promotion records into trace, doctor, summary, and review pack
+- add a proposal-only command that turns a current verified profile-promotion record into a reviewable profile-status change plan
+- block proposals unless the latest promotion record is `verified` and hash-matches the current `state/profile-review.json`
+- write `reports/profile-promotion-apply-plan.md` and `state/profile-promotion-apply-plan.json`
+- show exact proposed field changes without rewriting `state/project-profile.json`
+- keep any future write/apply operation explicit, opt-in, and non-destructive
 
 ## Safety constraints
 

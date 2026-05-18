@@ -1,12 +1,12 @@
 # K-ResDev Next Planning
 
-This planning note starts after `0.1.0b35`.
+This planning note starts after `0.1.0b36`.
 
 ## Current Diagnosis
 
-K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, budget ledger review, bibliography metadata, reference corpus adapters, read-only workspace discovery, bibliography review, citation support, research claim matrices, profile source records, profile integrity, a narrow source-backed IRIS/Innopolis profile seed, profile promotion review, workspace traceability graph, trace passport checkpoints, artifact authority labels, goals/deadline review, weekly operating reviews, workspace dashboards, thin local workflow router, workspace doctor, next actions, workspace summary, and review packs.
+K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, budget ledger review, bibliography metadata, reference corpus adapters, read-only workspace discovery, bibliography review, citation support, research claim matrices, profile source records, profile integrity, a narrow source-backed IRIS/Innopolis profile seed, profile promotion review, hash-bound profile promotion records, workspace traceability graph, trace passport checkpoints, artifact authority labels, goals/deadline review, weekly operating reviews, workspace dashboards, thin local workflow router, workspace doctor, next actions, workspace summary, and review packs.
 
-The next bottleneck is recording supplied human promotion decisions without letting the tool silently mutate official profile status. K-ResDev can now say whether local metadata is ready for promotion; the next high-value move is a data-only promotion record workflow that binds a passing profile-review artifact hash to a human decision.
+The next bottleneck is controlled application of supplied human promotion decisions. K-ResDev can now record a verified human promotion decision against a passing `profile-review` artifact hash, but project profiles still remain unchanged by default. The next high-value move is a non-destructive apply proposal that shows exactly how `state/project-profile.json` would change before any opt-in mutation.
 
 ## Planning Principles
 
@@ -251,15 +251,30 @@ Safety boundary:
 
 Goal: record supplied human profile promotion decisions without making AI-generated profile checks authoritative.
 
+Status: implemented as a data-only record and summary workflow in `src/k_resdev_skill/profile_promotion.py`, with CLI/API, schema/template, workspace doctor, next-action, summary, review-pack, and trace integration. The latest current record is checked against the current `state/profile-review.json` hash; historical stale records remain visible as mismatch counts without blocking a newer matching verified record.
+
 Expected scope:
 - `profile-promotion-record` command for supplied human decisions;
-- optional `--apply` mode later, but default should only write records;
 - require a passing `state/profile-review.json` hash before accepting a promotion record;
 - record reviewer, reviewed_at, target profile ID, source review hash, decision, and notes;
-- integrate promotion records into profile-review, doctor, next actions, summary, review pack, and trace.
+- integrate promotion records into doctor, next actions, summary, review pack, and trace.
 
 Safety boundary:
 - The tool records supplied decisions only. It must not infer official verification, mutate profile status by default, or certify agency compliance.
+
+### Beta 37 - Profile Promotion Apply Proposal
+
+Goal: make a verified profile-promotion record operationally usable without silent profile mutation.
+
+Expected scope:
+- `profile-promotion-apply-plan` command that reads `state/project-profile.json`, `state/profile-review.json`, and `state/profile-promotions/`;
+- generate `reports/profile-promotion-apply-plan.md` and `state/profile-promotion-apply-plan.json`;
+- show the exact proposed field changes, especially `status: needs_review -> verified`, reviewer metadata, source review hash, and rollback note;
+- block the plan unless the latest promotion record is `verified` and hash-matches the current profile-review artifact;
+- optional `--write` mode may be considered later, but beta.37 should stay proposal-only unless explicitly approved.
+
+Safety boundary:
+- Apply plans are proposed diffs only. They must not rewrite profile files or certify official agency compliance.
 
 ## Deferred Ideas
 
@@ -273,6 +288,6 @@ These should wait until traceability, impact analysis, and verified profile sour
 
 ## Recommended Next Slice
 
-Implement Beta 36 next.
+Implement Beta 37 next.
 
-Beta 36 should make human profile-promotion decisions traceable and hash-bound while preserving the rule that AI checks are projections, not official certification.
+Beta 37 should make profile promotion operationally reviewable by producing a non-destructive apply plan from a current verified promotion record.

@@ -127,8 +127,10 @@ def test_validate_json_file_accepts_workflow_aliases():
 
 def test_validate_json_file_accepts_profile_review_aliases():
     check = validate_json_file("templates/profile-review-check.json", "profile-review-check")
+    promotion = validate_json_file("templates/profile-promotion-record.json", "profile-promotion-record")
 
     assert check["valid"] is True
+    assert promotion["valid"] is True
 
 
 def test_validate_json_cli_returns_nonzero_for_invalid(tmp_path, capsys):

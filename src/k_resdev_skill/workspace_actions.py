@@ -84,6 +84,7 @@ def _actions_for_findings(root: Path, findings: list[WorkspaceDoctorFinding]) ->
         _action_for_profile(root, by_code),
         _action_for_profile_integrity(root, by_code),
         _action_for_profile_review(root, by_code),
+        _action_for_profile_promotion(root, by_code),
         _action_for_approval_coverage(root, by_code),
         _action_for_report_integrity(root, by_code),
         _action_for_artifact_authority(root, by_code),
@@ -275,6 +276,26 @@ def _action_for_profile_review(root: Path, by_code: dict[str, list[WorkspaceDoct
         "Review profile promotion readiness",
         "Source-backed profiles should not be promoted until source hashes, reviewer identity, applicability notes, and risk flags are resolved.",
         f'python -m k_resdev_skill profile-review --root "{root}" --output "{root / "reports" / "profile-review.md"}" --json "{root / "state" / "profile-review.json"}"',
+        by_code,
+        codes,
+    )
+
+
+def _action_for_profile_promotion(root: Path, by_code: dict[str, list[WorkspaceDoctorFinding]]) -> WorkspaceActionItem | None:
+    codes = [
+        "profile_verified_without_promotion_record",
+        "profile_promotion_review_hash_mismatch",
+        "profile_promotion_record_missing",
+    ]
+    if not any(code in by_code for code in codes):
+        return None
+    priority = "high" if any(code in by_code for code in codes[:2]) else "medium"
+    return _action(
+        root,
+        priority,
+        "Record profile promotion decision",
+        "Profile promotion should be a supplied human decision bound to a passing profile-review artifact hash.",
+        f'python -m k_resdev_skill profile-promotion-summary --root "{root}" --output "{root / "reports" / "profile-promotion-summary.md"}" --json "{root / "state" / "profile-promotion-summary.json"}"',
         by_code,
         codes,
     )

@@ -1,0 +1,13 @@
+{
+  "promotion_id": "PPR-2026-ABCD1234",
+  "profile_id": "iris-innopolis-2026-017795",
+  "decision": "verified",
+  "reviewer": "project-owner",
+  "reviewed_at": "2026-05-19T09:00:00Z",
+  "profile_review_path": "state/profile-review.json",
+  "profile_review_hash": "sha256:abcd1234",
+  "profile_review_status": "ready_for_human_promotion",
+  "profile_review_can_promote": true,
+  "notes": "Supplied human profile promotion decision.",
+  "risk_flags": []
+}

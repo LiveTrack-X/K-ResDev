@@ -21,6 +21,7 @@ from .profile_registry import default_agency_templates_root, load_project_profil
 from .report_integrity import generate_workspace_report_integrity
 from .schema_tools import validate_json_file
 from .source_verification import verify_evidence_sources
+from .workspace_trace import generate_workspace_trace
 
 DRAFT_NOTICE = "Draft projection only"
 STANDARD_DIRS = (
@@ -49,6 +50,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "source-verification.md",
     "workspace-review-pack.md",
     "workspace-summary.md",
+    "workspace-trace.md",
 }
 
 
@@ -131,6 +133,7 @@ def run_workspace_doctor(
     _check_report_integrity(workspace, findings)
     _check_bibliography_integrity(workspace, findings)
     _check_citation_support_integrity(workspace, findings)
+    _check_workspace_trace(workspace, findings)
     _check_exports(workspace, findings)
     _check_analysis(workspace, findings)
 
@@ -519,6 +522,31 @@ def _check_citation_support_integrity(workspace: Path, findings: list[WorkspaceD
                 f"{result.medium_count + result.low_count} citation support review finding(s) or warnings were detected.",
                 path,
                 "Review citation-support output before external manuscript or report use.",
+            )
+        )
+
+
+def _check_workspace_trace(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> None:
+    result = generate_workspace_trace(workspace)
+    path = workspace / "state" / "workspace-trace.json"
+    if result.high_count:
+        findings.append(
+            _finding(
+                "workspace_trace_high_findings",
+                "high",
+                f"{result.high_count} high-severity trace impact finding(s) were detected.",
+                path,
+                "Run workspace-trace and resolve changed or missing upstream artifacts before relying on downstream projections.",
+            )
+        )
+    if result.medium_count or result.low_count or result.warnings:
+        findings.append(
+            _finding(
+                "workspace_trace_review_findings",
+                "medium",
+                f"{result.medium_count + result.low_count} workspace trace review finding(s) or warnings were detected.",
+                path,
+                "Review workspace-trace output to understand affected evidence, reports, approvals, bibliography, and citation support.",
             )
         )
 

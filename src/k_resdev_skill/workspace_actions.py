@@ -84,6 +84,7 @@ def _actions_for_findings(root: Path, findings: list[WorkspaceDoctorFinding]) ->
         _action_for_report_integrity(root, by_code),
         _action_for_bibliography_integrity(root, by_code),
         _action_for_citation_support_integrity(root, by_code),
+        _action_for_workspace_trace(root, by_code),
         _action_for_reports(root, by_code),
         _action_for_analysis(root, by_code),
         _action_for_exports(root, by_code),
@@ -269,6 +270,22 @@ def _action_for_citation_support_integrity(root: Path, by_code: dict[str, list[W
         "Review citation support",
         "Cited papers should have supplied human paper-claim support records before external manuscript or report use.",
         f'python -m k_resdev_skill citation-support-integrity --root "{root}" --output "{root / "reports" / "citation-support.md"}" --json "{root / "state" / "citation-support.json"}"',
+        by_code,
+        codes,
+    )
+
+
+def _action_for_workspace_trace(root: Path, by_code: dict[str, list[WorkspaceDoctorFinding]]) -> WorkspaceActionItem | None:
+    codes = ["workspace_trace_high_findings", "workspace_trace_review_findings"]
+    if not any(code in by_code for code in codes):
+        return None
+    priority = "high" if "workspace_trace_high_findings" in by_code else "medium"
+    return _action(
+        root,
+        priority,
+        "Review workspace trace impact",
+        "Trace impact review shows changed, missing, or unresolved upstream artifacts that may affect downstream reports, approvals, bibliography, or citation support.",
+        f'python -m k_resdev_skill workspace-trace --root "{root}" --output "{root / "reports" / "workspace-trace.md"}" --json "{root / "state" / "workspace-trace.json"}"',
         by_code,
         codes,
     )

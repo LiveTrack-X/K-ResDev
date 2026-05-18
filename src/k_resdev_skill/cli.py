@@ -61,6 +61,7 @@ from .workspace import initialize_workspace, run_workspace_doctor
 from .workspace_actions import generate_workspace_action_plan
 from .workspace_review import generate_workspace_review_pack, verify_workspace_review_pack
 from .workspace_summary import generate_workspace_summary
+from .workspace_trace import generate_workspace_trace
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -306,6 +307,11 @@ def main(argv: list[str] | None = None) -> int:
     workspace_summary_parser.add_argument("--output", default=None)
     workspace_summary_parser.add_argument("--json", default=None)
     workspace_summary_parser.add_argument("--max-actions", type=int, default=5)
+
+    workspace_trace_parser = subparsers.add_parser("workspace-trace", help="Generate a local workspace traceability graph and impact report.")
+    workspace_trace_parser.add_argument("--root", default=".")
+    workspace_trace_parser.add_argument("--output", default=None)
+    workspace_trace_parser.add_argument("--json", default=None)
 
     review_pack_parser = subparsers.add_parser(
         "workspace-review-pack",
@@ -577,6 +583,10 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if args.command == "workspace-summary":
         result = generate_workspace_summary(args.root, output_path=args.output, json_path=args.json, max_actions=args.max_actions)
+        print(result.model_dump_json(indent=2))
+        return 0
+    if args.command == "workspace-trace":
+        result = generate_workspace_trace(args.root, output_path=args.output, json_path=args.json)
         print(result.model_dump_json(indent=2))
         return 0
     if args.command == "workspace-review-pack":

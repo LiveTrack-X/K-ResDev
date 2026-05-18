@@ -560,6 +560,10 @@ class WorkspaceSummaryResult(StrictModel):
     report_paths: list[str] = Field(default_factory=list)
     export_paths: list[str] = Field(default_factory=list)
     analysis_manifest_paths: list[str] = Field(default_factory=list)
+    trace_status: str | None = None
+    trace_node_count: int = 0
+    trace_edge_count: int = 0
+    trace_finding_count: int = 0
     top_actions: list[WorkspaceActionItem] = Field(default_factory=list)
     markdown_path: str | None = None
     json_path: str | None = None
@@ -609,6 +613,50 @@ class EvidenceSourceVerificationResult(StrictModel):
     warnings: list[str] = Field(default_factory=list)
 
 
+class WorkspaceTraceNode(StrictModel):
+    node_id: str
+    node_type: str
+    label: str
+    path: str | None = None
+    ref_id: str | None = None
+    status: str | None = None
+    sha256: str | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class WorkspaceTraceEdge(StrictModel):
+    source: str
+    target: str
+    relation: str
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class WorkspaceTraceFinding(StrictModel):
+    code: str
+    severity: str
+    message: str
+    node_id: str | None = None
+    path: str | None = None
+    suggested_action: str | None = None
+
+
+class WorkspaceTraceResult(StrictModel):
+    root: str
+    status: str
+    node_count: int = 0
+    edge_count: int = 0
+    finding_count: int = 0
+    high_count: int = 0
+    medium_count: int = 0
+    low_count: int = 0
+    nodes: list[WorkspaceTraceNode] = Field(default_factory=list)
+    edges: list[WorkspaceTraceEdge] = Field(default_factory=list)
+    findings: list[WorkspaceTraceFinding] = Field(default_factory=list)
+    markdown_path: str | None = None
+    json_path: str | None = None
+    warnings: list[str] = Field(default_factory=list)
+
+
 class WorkspaceReviewPackResult(StrictModel):
     root: str
     status: str
@@ -638,6 +686,11 @@ class WorkspaceReviewPackResult(StrictModel):
     citation_support_citation_count: int = 0
     citation_support_finding_count: int = 0
     citation_support_high_count: int = 0
+    workspace_trace_status: str | None = None
+    workspace_trace_node_count: int = 0
+    workspace_trace_edge_count: int = 0
+    workspace_trace_finding_count: int = 0
+    workspace_trace_high_count: int = 0
     generated_paths: list[str] = Field(default_factory=list)
     artifacts: list[ReviewPackArtifact] = Field(default_factory=list)
     index_path: str

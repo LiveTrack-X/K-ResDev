@@ -311,6 +311,124 @@ Implement:
 
 Bibliography review records are human decision metadata only. They must not be inferred from import, and an accepted bibliography review still does not prove that the cited paper supports a report or manuscript claim.
 
+### Task 31: Citation support records
+
+Implemented:
+- `citation-support-record` for supplied human paper-claim support decisions
+- `citation-support-summary`, `citation-support-status`, and `citation-support-integrity` commands
+- JSON schema and template coverage for citation support records
+- workspace skeleton support for `state/citation-support/`
+- workspace doctor, next-action, and review-pack integration for citation-support findings
+
+Citation support records are human decision metadata only. They must not be inferred from bibliography import or accepted bibliography review records. A support record checks the local claim-support review state; it does not independently prove scientific truth.
+
+### Task 32: Workspace traceability graph
+
+Implemented:
+- `workspace-trace` command and public API
+- `state/workspace-trace.json` and `reports/workspace-trace.md`
+- deterministic graph nodes for source files, evidence items, report artifacts, approvals, bibliography entries, bibliography reviews, citation support records, analysis manifests, and generated review-pack artifacts
+- graph edges such as `source_of`, `cites`, `approves`, `supports_claim`, `derived_from`, and `generated_artifact`
+- impact findings when a source hash changes, an approval target drifts, bibliography metadata changes, or citation support is unresolved
+- integration into doctor, next actions, workspace summary, and workspace review pack
+
+The traceability graph is a local operational projection. It must not certify official compliance, scientific validity, source truth, or approval validity.
+
+### Task 33: Verified profile source pack
+
+Planned after source verification:
+- `ProfileSource` and `VerifiedProfilePack` models
+- `state/profile-sources.json`
+- commands for recording and summarizing profile source verification
+- profile fields for source URL, retrieval date, source hash, reviewer, and review status
+- profile-integrity checks that keep unverified profiles in `needs_review`
+
+This task requires checking current official agency sources before implementation. Do not hardcode IRIS, NTIS, ministry, or agency rules from memory.
+
+### Task 34: Budget evidence ledger
+
+Planned:
+- `BudgetLedgerItem` model
+- CSV/JSON ledger import and Markdown ledger writer
+- duplicate vendor/date/amount and missing proof warnings
+- amount rollups by profile-driven category labels
+- doctor and next-action integration for ledger/evidence mismatch
+
+Budget ledgers are review aids only. They must not infer official cost eligibility or agency compliance.
+
+### Task 35: Research claim matrix
+
+Planned:
+- `ResearchClaim` model
+- claim matrix writer connecting author claims, AI interpretations, experiment evidence, citation support, risk flags, and next checks
+- report/manuscript citation-support coverage by claim rather than citation key alone
+- optional projection into literature-review matrix outputs
+
+Research claims stay `hypothesis`, `candidate`, or `needs_review` unless a supplied human review record accepts them.
+
+### Task 36: External academic workflow ideas SPEC
+
+Implemented as planning documentation:
+- `workflows/external-academic-workflow-ideas-spec.md`
+- concept adaptation map for ARS, ARS-Codex, Claude Code for Academics, and claudeblattman ideas
+- explicit license boundary: borrow concepts only unless license review permits reuse
+- future implementation sequence for trace passport, authority levels, corpus adapters, workspace discovery, goals review, weekly dashboard, and router UX
+
+This SPEC is planning input only. It must not be treated as implemented runtime behavior.
+
+### Task 37: Trace passport and checkpoint ledger
+
+Planned:
+- `TracePassportEntry` and `WorkspaceTracePassport` models
+- checkpoint creation, summary, and resume-plan commands
+- `state/trace-passport.json`, `state/checkpoints/`, and `reports/trace-passport.md`
+- stale checkpoint detection from changed artifact hashes
+- review-pack inclusion after traceability graph support lands
+
+Trace passports are resume aids only. They must not copy raw restricted source bodies or certify compliance, approval, or scientific truth.
+
+### Task 38: Reference corpus adapter bridge
+
+Planned:
+- local folder scan adapter for PDFs and notes
+- Zotero exported JSON adapter without default Web API access
+- Markdown note/frontmatter adapter
+- `state/literature-corpus.json`, `state/reference-rejection-log.json`, and `reports/reference-corpus-summary.md`
+- deterministic rejection reasons for missing metadata, duplicate keys, invalid fields, unsupported files, and copyright-risk text fields
+
+Adapters must never fabricate citation metadata, paper relevance, or claim support.
+
+### Task 39: Workspace discovery, goals, and deadlines
+
+Planned:
+- read-only `workspace-discover` command
+- additive `workspace-setup-plan` output before initialization or migration
+- `ProjectObjective` and `ProjectDeadline` models
+- `state/project-goals.json`, `reports/goals-review.md`, and deadline readiness checks
+- KPI/milestone/evidence/report linkage without official agency schedule claims
+
+Discovery is read-only by default. Goals review is an operating projection only.
+
+### Task 40: Local weekly review and workspace dashboard
+
+Planned:
+- local artifact-only weekly review generator
+- `reports/weekly-review-YYYY-MM-DD.md`, `state/weekly-review-YYYY-MM-DD.json`, and `reports/workspace-dashboard.md`
+- sections for KPI movement, evidence added, open review findings, budget gaps, research insight candidates, deadlines, and human decisions needed
+- no default connector access to Gmail, WhatsApp, Google Docs, Slack, Teams, or cloud drives
+
+Weekly reviews are team operating summaries, not final official reports.
+
+### Task 41: Thin workflow router
+
+Planned:
+- `workflow admin-review`, `workflow research-review`, `workflow integrity-review`, and `workflow weekly`
+- router prints concrete commands and artifact paths before running
+- router uses only stable local deterministic commands by default
+- hidden connector/network actions are out of scope
+
+Router UX is convenience only. The underlying CLI commands and public APIs remain the source of testable behavior.
+
 ## Safety constraints
 
 - Never alter raw files.

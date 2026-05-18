@@ -22,6 +22,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "source-verification.md",
     "workspace-review-pack.md",
     "workspace-summary.md",
+    "workspace-trace.md",
 }
 
 

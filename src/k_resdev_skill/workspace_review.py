@@ -18,6 +18,7 @@ from .source_verification import verify_evidence_sources
 from .workspace import run_workspace_doctor
 from .workspace_actions import generate_workspace_action_plan
 from .workspace_summary import generate_workspace_summary
+from .workspace_trace import generate_workspace_trace
 
 
 def generate_workspace_review_pack(
@@ -50,6 +51,8 @@ def generate_workspace_review_pack(
     bibliography_integrity_json = state / "bibliography-integrity.json"
     citation_support_md = reports / "citation-support.md"
     citation_support_json = state / "citation-support.json"
+    workspace_trace_md = reports / "workspace-trace.md"
+    workspace_trace_json = state / "workspace-trace.json"
     index_md = reports / "workspace-review-pack.md"
     index_json = state / "workspace-review-pack.json"
 
@@ -59,6 +62,7 @@ def generate_workspace_review_pack(
     report_integrity = generate_workspace_report_integrity(workspace, output_path=report_integrity_md, json_path=report_integrity_json)
     bibliography_integrity = generate_workspace_bibliography_integrity(workspace, output_path=bibliography_integrity_md, json_path=bibliography_integrity_json)
     citation_support = generate_workspace_citation_support_integrity(workspace, output_path=citation_support_md, json_path=citation_support_json)
+    workspace_trace = generate_workspace_trace(workspace, output_path=workspace_trace_md, json_path=workspace_trace_json)
     actions = generate_workspace_action_plan(workspace, doctor_result=doctor, output_path=actions_md, json_path=actions_json)
     summary = generate_workspace_summary(
         workspace,
@@ -85,6 +89,8 @@ def generate_workspace_review_pack(
         str(bibliography_integrity_json),
         str(citation_support_md),
         str(citation_support_json),
+        str(workspace_trace_md),
+        str(workspace_trace_json),
         str(index_md),
         str(index_json),
     ]
@@ -117,6 +123,11 @@ def generate_workspace_review_pack(
         citation_support_citation_count=citation_support.citation_count,
         citation_support_finding_count=citation_support.finding_count,
         citation_support_high_count=citation_support.high_count,
+        workspace_trace_status=workspace_trace.status,
+        workspace_trace_node_count=workspace_trace.node_count,
+        workspace_trace_edge_count=workspace_trace.edge_count,
+        workspace_trace_finding_count=workspace_trace.finding_count,
+        workspace_trace_high_count=workspace_trace.high_count,
         generated_paths=generated_paths,
         index_path=str(index_md),
         json_path=str(index_json),
@@ -203,6 +214,11 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
         f"| Citation support citation count | {result.citation_support_citation_count} |",
         f"| Citation support finding count | {result.citation_support_finding_count} |",
         f"| Citation support high count | {result.citation_support_high_count} |",
+        f"| Workspace trace status | {_escape(result.workspace_trace_status or '-')} |",
+        f"| Workspace trace nodes | {result.workspace_trace_node_count} |",
+        f"| Workspace trace edges | {result.workspace_trace_edge_count} |",
+        f"| Workspace trace finding count | {result.workspace_trace_finding_count} |",
+        f"| Workspace trace high count | {result.workspace_trace_high_count} |",
         "",
         "## Generated Artifacts",
         "",
@@ -230,6 +246,7 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
             "- Use `report-integrity.md` to check draft report claims against indexed evidence.",
             "- Use `bibliography-integrity.md` to check local citation keys and bibliography source hashes.",
             "- Use `citation-support.md` to check cited papers against supplied paper-claim support records.",
+            "- Use `workspace-trace.md` to inspect cross-artifact traceability and impact findings.",
             "- Run `verify-review-pack state/workspace-review-pack.json` before relying on a saved pack.",
             "- Keep official reports and scientific claims human-approved.",
             "",
@@ -257,6 +274,8 @@ def _artifact_label(path: str) -> str:
         "bibliography-integrity.json": "Bibliography integrity JSON",
         "citation-support.md": "Citation support",
         "citation-support.json": "Citation support JSON",
+        "workspace-trace.md": "Workspace trace",
+        "workspace-trace.json": "Workspace trace JSON",
         "workspace-review-pack.md": "Review pack index",
         "workspace-review-pack.json": "Review pack JSON",
     }

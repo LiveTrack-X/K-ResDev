@@ -2,7 +2,7 @@
 
 Purpose: 한국형 국책 R&D 환경에서 연구 행정 문서화, 증빙 정합성, 보고서 생성, 논문/데이터 인사이트 보조를 evidence-first 방식으로 지원하는 Codex/Skill 프로젝트입니다.
 
-Current release: `0.1 BETA 22` (`0.1.0b22`).
+Current release: `0.1 BETA 23` (`0.1.0b23`).
 
 Core principle:
 
@@ -42,6 +42,7 @@ This repository does not encode any single ministry/institution form as authorit
 - Bibliography integrity checker for Markdown citation keys, duplicate citation metadata, and bibliography source hash drift.
 - Citation support records for supplied human paper-claim support decisions under `state/citation-support/`.
 - Citation support integrity checker for Markdown citations against supplied paper-claim support records.
+- Workspace traceability graph for local source, evidence, report, approval, bibliography, citation-support, analysis, and review-pack impact review.
 - Data insight candidate reports that keep findings in hypothesis/review state.
 - Experiment comparison table and reproducibility checklist generators.
 - Hypothesis-to-experiment planner for turning `ResearchInsight` records into reviewable validation plans.
@@ -59,7 +60,7 @@ This repository does not encode any single ministry/institution form as authorit
 - Workspace initializer and readiness doctor for standard local workspace setup and pre-reporting checks.
 - Workspace next-action planner that converts doctor findings into deterministic, reviewable commands.
 - Workspace summary report that combines readiness, next actions, evidence counts, approvals, reports, exports, and analysis manifests.
-- Workspace review pack command that refreshes readiness, next actions, workspace summary, source-verification, approval-coverage, report-integrity, bibliography-integrity, and citation-support artifacts together.
+- Workspace review pack command that refreshes readiness, next actions, workspace summary, source-verification, approval-coverage, report-integrity, bibliography-integrity, citation-support, and workspace-trace artifacts together.
 - Review pack artifact hash manifest and verifier for detecting missing or changed generated artifacts.
 - Evidence source verifier that checks indexed source files against saved source hashes.
 - Workspace doctor and review pack integration for local evidence-source presence/hash drift checks.
@@ -68,6 +69,7 @@ This repository does not encode any single ministry/institution form as authorit
 - Workspace doctor and review pack integration for report claim integrity findings.
 - Workspace doctor and review pack integration for bibliography integrity findings.
 - Workspace doctor and review pack integration for citation support findings.
+- Workspace doctor, next-action, summary, and review-pack integration for trace impact findings.
 - `national-rnd-basic` agency template skeleton for annual/interim/final reports, change requests, and performance registration drafts.
 
 ## Local use
@@ -99,6 +101,7 @@ python -m k_resdev_skill citation-support-record --bibliography-id BIB-2026-ABCD
 python -m k_resdev_skill citation-support-summary .\state\citation-support --output .\reports\citation-support-summary.md
 python -m k_resdev_skill citation-support-status .\state\citation-support --bibliography-id BIB-2026-ABCD1234 --claim "Model A underperforms on small-lesion cases."
 python -m k_resdev_skill citation-support-integrity --root . --output .\reports\citation-support.md --json .\state\citation-support.json
+python -m k_resdev_skill workspace-trace --root . --output .\reports\workspace-trace.md --json .\state\workspace-trace.json
 python -m k_resdev_skill data-insights .\inbox\metrics.csv --output .\reports\data-insights.md
 python -m k_resdev_skill run-analysis .\inbox\metrics.csv --output-dir .\reports\analysis --evidence-id EVI-2026-0001
 python -m k_resdev_skill analysis-script .\inbox\metrics.csv --output-dir .\reports\analysis --output .\reports\analysis\metrics-analysis.py

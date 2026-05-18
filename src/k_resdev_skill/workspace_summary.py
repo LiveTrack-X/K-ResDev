@@ -15,6 +15,7 @@ from .models import (
 from .profile_registry import load_project_profile
 from .workspace import OPERATIONAL_MARKDOWN_NAMES, run_workspace_doctor
 from .workspace_actions import generate_workspace_action_plan
+from .workspace_trace import generate_workspace_trace
 
 
 def generate_workspace_summary(
@@ -37,6 +38,7 @@ def generate_workspace_summary(
     reports = _report_paths(workspace / "reports")
     exports = _sorted_paths(workspace / "reports", ["*.docx", "*.html", "*.txt"])
     manifests = _sorted_paths(workspace / "reports" / "analysis", ["*-analysis-run.json"])
+    trace = generate_workspace_trace(workspace)
 
     summary = WorkspaceSummaryResult(
         root=str(workspace),
@@ -55,6 +57,10 @@ def generate_workspace_summary(
         report_paths=reports,
         export_paths=exports,
         analysis_manifest_paths=manifests,
+        trace_status=trace.status,
+        trace_node_count=trace.node_count,
+        trace_edge_count=trace.edge_count,
+        trace_finding_count=trace.finding_count,
         top_actions=actions.actions[:action_limit],
         markdown_path=str(output_path) if output_path else None,
         json_path=str(json_path) if json_path else None,
@@ -88,6 +94,9 @@ def render_workspace_summary_markdown(summary: WorkspaceSummaryResult) -> str:
         f"| Approval count | {summary.approval_count} |",
         f"| Finding count | {summary.finding_count} |",
         f"| Action count | {summary.action_count} |",
+        f"| Trace status | {_escape(summary.trace_status or '-')} |",
+        f"| Trace nodes | {summary.trace_node_count} |",
+        f"| Trace findings | {summary.trace_finding_count} |",
         "",
         "## Evidence",
         "",
@@ -106,6 +115,7 @@ def render_workspace_summary_markdown(summary: WorkspaceSummaryResult) -> str:
         f"| Report Markdown | {len(summary.report_paths)} | {_format_paths(summary.report_paths)} |",
         f"| Projection exports | {len(summary.export_paths)} | {_format_paths(summary.export_paths)} |",
         f"| Analysis manifests | {len(summary.analysis_manifest_paths)} | {_format_paths(summary.analysis_manifest_paths)} |",
+        f"| Workspace trace | {summary.trace_node_count} | status: {_escape(summary.trace_status or '-')}; findings: {summary.trace_finding_count} |",
         "",
         "## Top Actions",
         "",

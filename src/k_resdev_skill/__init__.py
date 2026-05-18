@@ -97,6 +97,10 @@ from .models import (
     WorkspaceReviewPackResult,
     WorkspaceReviewPackVerificationResult,
     WorkspaceSummaryResult,
+    WorkspaceTraceEdge,
+    WorkspaceTraceFinding,
+    WorkspaceTraceNode,
+    WorkspaceTraceResult,
 )
 from .plan_mapper import extract_project_state_from_text
 from .profile_registry import generate_profile_registry, list_project_profiles, load_project_profile
@@ -121,6 +125,7 @@ from .workspace_review import (
     verify_workspace_review_pack,
 )
 from .workspace_summary import generate_workspace_summary, render_workspace_summary_markdown
+from .workspace_trace import generate_workspace_trace, render_workspace_trace_markdown
 
 __all__ = [
     "ApprovalRecord",
@@ -167,6 +172,10 @@ __all__ = [
     "WorkspaceReviewPackResult",
     "WorkspaceReviewPackVerificationResult",
     "WorkspaceSummaryResult",
+    "WorkspaceTraceEdge",
+    "WorkspaceTraceFinding",
+    "WorkspaceTraceNode",
+    "WorkspaceTraceResult",
     "approval_gate_status",
     "bibliography_review_status",
     "budget_evidence_gaps",
@@ -205,6 +214,7 @@ __all__ = [
     "generate_workspace_report_integrity",
     "generate_workspace_review_pack",
     "generate_workspace_summary",
+    "generate_workspace_trace",
     "import_bibliography",
     "initialize_workspace",
     "load_bibliography_index",
@@ -234,6 +244,7 @@ __all__ = [
     "render_report_integrity_markdown",
     "render_workspace_review_pack_markdown",
     "render_workspace_summary_markdown",
+    "render_workspace_trace_markdown",
     "run_workspace_doctor",
     "validate_json_file",
     "validate_json_files",
@@ -248,4 +259,4 @@ __all__ = [
     "write_projection_text",
 ]
 
-__version__ = "0.1.0b22"
+__version__ = "0.1.0b23"

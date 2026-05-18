@@ -32,6 +32,8 @@ def test_workspace_review_pack_writes_all_review_artifacts(tmp_path):
         tmp_path / "state" / "bibliography-integrity.json",
         tmp_path / "reports" / "citation-support.md",
         tmp_path / "state" / "citation-support.json",
+        tmp_path / "reports" / "workspace-trace.md",
+        tmp_path / "state" / "workspace-trace.json",
         tmp_path / "reports" / "workspace-review-pack.md",
         tmp_path / "state" / "workspace-review-pack.json",
     ]
@@ -49,6 +51,7 @@ def test_workspace_review_pack_writes_all_review_artifacts(tmp_path):
     assert result.citation_support_status == "not_configured"
     assert result.citation_support_count == 0
     assert result.citation_support_finding_count == 0
+    assert result.workspace_trace_node_count >= 0
     assert result.artifacts
     assert all(len(artifact.sha256) == 64 for artifact in result.artifacts)
     assert all(path.exists() for path in expected)
@@ -59,6 +62,7 @@ def test_workspace_review_pack_writes_all_review_artifacts(tmp_path):
     assert "Report integrity status" in rendered
     assert "Bibliography integrity status" in rendered
     assert "Citation support status" in rendered
+    assert "Workspace trace status" in rendered
     assert "Hashed artifacts" in rendered
     assert json.loads((tmp_path / "state" / "workspace-review-pack.json").read_text(encoding="utf-8"))["index_path"] == str(
         tmp_path / "reports" / "workspace-review-pack.md"
@@ -69,6 +73,7 @@ def test_workspace_review_pack_writes_all_review_artifacts(tmp_path):
     assert json.loads((tmp_path / "state" / "report-integrity.json").read_text(encoding="utf-8"))["status"] == "no_reports"
     assert json.loads((tmp_path / "state" / "bibliography-integrity.json").read_text(encoding="utf-8"))["status"] == "not_configured"
     assert json.loads((tmp_path / "state" / "citation-support.json").read_text(encoding="utf-8"))["status"] == "not_configured"
+    assert json.loads((tmp_path / "state" / "workspace-trace.json").read_text(encoding="utf-8"))["node_count"] == result.workspace_trace_node_count
     assert verify_workspace_review_pack(tmp_path / "state" / "workspace-review-pack.json").valid is True
 
 
@@ -86,6 +91,7 @@ def test_workspace_review_pack_cli(tmp_path, capsys):
     assert (tmp_path / "reports" / "report-integrity.md").exists()
     assert (tmp_path / "reports" / "bibliography-integrity.md").exists()
     assert (tmp_path / "reports" / "citation-support.md").exists()
+    assert (tmp_path / "reports" / "workspace-trace.md").exists()
 
 
 def test_verify_review_pack_cli_detects_tampering(tmp_path, capsys):
@@ -117,6 +123,7 @@ def test_operational_markdown_does_not_satisfy_report_draft_check(tmp_path):
         "bibliography-integrity.md",
         "citation-support.md",
         "citation-support-summary.md",
+        "workspace-trace.md",
         "workspace-review-pack.md",
     ]:
         (tmp_path / "reports" / name).write_text("# Operational\n", encoding="utf-8")

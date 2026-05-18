@@ -205,6 +205,7 @@ def test_workspace_doctor_flags_source_hash_mismatch(tmp_path):
 
     assert result.status == "blocked"
     assert "source_hash_mismatch" in codes
+    assert "workspace_trace_high_findings" in codes
 
 
 def test_workspace_doctor_flags_missing_hashed_source(tmp_path):

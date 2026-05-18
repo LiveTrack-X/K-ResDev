@@ -1,12 +1,12 @@
 # K-ResDev Next Planning
 
-This planning note starts after `0.1.0b38`.
+This planning note starts after `0.1.0b39`.
 
 ## Current Diagnosis
 
-K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, budget ledger review, bibliography metadata, reference corpus adapters, read-only workspace discovery, bibliography review, citation support, research claim matrices, profile source records, profile integrity, a narrow source-backed IRIS/Innopolis profile seed, profile promotion review, hash-bound profile promotion records, non-destructive profile promotion apply plans, guarded profile promotion apply results/backups, workspace traceability graph, trace passport checkpoints, artifact authority labels, goals/deadline review, weekly operating reviews, workspace dashboards, thin local workflow router, workspace doctor, next actions, workspace summary, and review packs.
+K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, budget ledger review, bibliography metadata, reference corpus adapters, read-only workspace discovery, bibliography review, citation support, research claim matrices, profile source records, profile integrity, a narrow source-backed IRIS/Innopolis profile seed, profile promotion review, hash-bound profile promotion records, non-destructive profile promotion apply plans, guarded profile promotion apply results/backups, non-destructive profile promotion revocation plans, workspace traceability graph, trace passport checkpoints, artifact authority labels, goals/deadline review, weekly operating reviews, workspace dashboards, thin local workflow router, workspace doctor, next actions, workspace summary, and review packs.
 
-The next bottleneck is source/profile lifecycle rollback and revocation. K-ResDev can now promote a profile only through a hash-guarded apply plan with backup and result records, but it does not yet have a first-class command to revoke a profile promotion and restore or supersede the verified state.
+The next bottleneck is guarded profile lifecycle rollback execution. K-ResDev can now review whether an applied profile promotion can be revoked cleanly, but it does not yet have a hash-guarded command that restores `state/project-profile.json` from an approved revoke plan while preserving the promotion/apply/revoke audit trail.
 
 ## Planning Principles
 
@@ -298,6 +298,8 @@ Safety boundary:
 
 Goal: make profile promotion revocation reviewable before a verified profile is restored or superseded.
 
+Status: implemented in `src/k_resdev_skill/profile_promotion_revoke.py` with `profile-promotion-revoke-plan`, `ProfilePromotionRevocationPlanResult`, schema/template coverage, doctor, next-action, workspace-summary, review-pack, operational Markdown filtering, and trace integration.
+
 Expected scope:
 - `profile-promotion-revoke-plan` command that reads `state/profile-promotion-apply-result.json`, `state/profile-backups/`, and current `state/project-profile.json`;
 - generate `reports/profile-promotion-revoke-plan.md` and `state/profile-promotion-revoke-plan.json`;
@@ -308,6 +310,21 @@ Expected scope:
 
 Safety boundary:
 - Revocation plans are local profile-lifecycle controls only. They must not certify official agency status or erase the promotion/audit trail.
+
+### Beta 40 - Guarded Profile Promotion Revoke Command
+
+Goal: optionally execute a reviewed revocation plan with a hash guard and an additional backup of the currently verified profile.
+
+Expected scope:
+- `profile-promotion-revoke` command that requires `--revoke-plan state/profile-promotion-revoke-plan.json` and `--revoke-plan-hash <sha256>`;
+- refuse to run unless the revocation plan status is `ready_to_revoke`, `can_revoke=true`, and the hash matches the supplied plan artifact;
+- write a timestamped pre-revoke backup under `state/profile-backups/` before restoring `state/project-profile.json`;
+- restore only the fields listed in the revocation plan, initially limited to `ProjectProfile` schema fields;
+- write `state/profile-promotion-revoke-result.json` and `reports/profile-promotion-revoke-result.md`;
+- keep apply-result, original backup, revoke-plan, and revoke-result artifacts visible in doctor, next actions, summary, review pack, and trace.
+
+Safety boundary:
+- The revoke command must be explicit and hash-guarded. It must never delete promotion/apply history, infer official agency compliance, or alter raw source files.
 
 ## Deferred Ideas
 
@@ -321,6 +338,6 @@ These should wait until traceability, impact analysis, and verified profile sour
 
 ## Recommended Next Slice
 
-Implement Beta 39 next.
+Implement Beta 40 next.
 
-Beta 39 should make profile promotion revocation and rollback reviewable before any verified profile state is restored or superseded.
+Beta 40 should make profile promotion revocation executable only through a hash-matched revoke plan and a fresh backup of the current verified profile.

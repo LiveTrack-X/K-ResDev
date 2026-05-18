@@ -16,6 +16,7 @@ from .models import (
 from .profile_registry import load_project_profile
 from .profile_promotion import summarize_profile_promotions
 from .profile_promotion_apply import generate_profile_promotion_apply_plan, load_profile_promotion_apply_result
+from .profile_promotion_revoke import load_profile_promotion_revoke_plan
 from .profile_review import generate_profile_review
 from .profile_sources import generate_profile_integrity
 from .budget_ledger import generate_workspace_budget_ledger
@@ -61,6 +62,7 @@ def generate_workspace_summary(
     profile_promotion = summarize_profile_promotions(workspace)
     profile_apply = generate_profile_promotion_apply_plan(workspace)
     profile_apply_result = _load_profile_apply_result(workspace)
+    profile_revoke_plan = _load_profile_revoke_plan(workspace)
     trace = generate_workspace_trace(workspace)
     trace_passport = generate_trace_passport(workspace)
     weekly_review = load_latest_weekly_review(workspace)
@@ -133,6 +135,9 @@ def generate_workspace_summary(
         profile_promotion_apply_result_status=profile_apply_result.status if profile_apply_result else None,
         profile_promotion_applied=profile_apply_result.applied if profile_apply_result else False,
         profile_promotion_apply_backup_path=profile_apply_result.backup_path if profile_apply_result else None,
+        profile_promotion_revoke_status=profile_revoke_plan.status if profile_revoke_plan else None,
+        profile_promotion_revoke_can_revoke=profile_revoke_plan.can_revoke if profile_revoke_plan else False,
+        profile_promotion_revoke_change_count=profile_revoke_plan.change_count if profile_revoke_plan else 0,
         trace_status=trace.status,
         trace_node_count=trace.node_count,
         trace_edge_count=trace.edge_count,
@@ -179,6 +184,8 @@ def render_workspace_summary_markdown(summary: WorkspaceSummaryResult) -> str:
         f"| Profile promotion can apply | {summary.profile_promotion_apply_can_apply} |",
         f"| Profile promotion apply result | {_escape(summary.profile_promotion_apply_result_status or '-')} |",
         f"| Profile promotion applied | {summary.profile_promotion_applied} |",
+        f"| Profile promotion revoke plan | {_escape(summary.profile_promotion_revoke_status or '-')} |",
+        f"| Profile promotion can revoke | {summary.profile_promotion_revoke_can_revoke} |",
         f"| Profile sources | {summary.profile_source_count} |",
         f"| Verified profile sources | {summary.profile_verified_source_count} |",
         f"| Workspace discovery | {_escape(summary.discovery_status or '-')} |",
@@ -245,6 +252,7 @@ def render_workspace_summary_markdown(summary: WorkspaceSummaryResult) -> str:
         f"| Profile promotion | {summary.profile_promotion_record_count} | status: {_escape(summary.profile_promotion_status or '-')}; latest decision: {_escape(summary.latest_profile_promotion_decision or '-')} |",
         f"| Profile promotion apply plan | {summary.profile_promotion_apply_change_count} | status: {_escape(summary.profile_promotion_apply_status or '-')}; can apply: {summary.profile_promotion_apply_can_apply} |",
         f"| Profile promotion apply result | {1 if summary.profile_promotion_applied else 0} | status: {_escape(summary.profile_promotion_apply_result_status or '-')}; backup: {_escape(summary.profile_promotion_apply_backup_path or '-')} |",
+        f"| Profile promotion revoke plan | {summary.profile_promotion_revoke_change_count} | status: {_escape(summary.profile_promotion_revoke_status or '-')}; can revoke: {summary.profile_promotion_revoke_can_revoke} |",
         f"| Workspace trace | {summary.trace_node_count} | status: {_escape(summary.trace_status or '-')}; findings: {summary.trace_finding_count} |",
         f"| Trace passport | {summary.checkpoint_count} | status: {_escape(summary.trace_passport_status or '-')}; latest: {_escape(summary.latest_checkpoint_id or '-')}; findings: {summary.trace_passport_finding_count} |",
         "",
@@ -278,6 +286,16 @@ def _load_profile_apply_result(workspace: Path):
         return None
     try:
         return load_profile_promotion_apply_result(path)
+    except Exception:
+        return None
+
+
+def _load_profile_revoke_plan(workspace: Path):
+    path = workspace / "state" / "profile-promotion-revoke-plan.json"
+    if not path.exists():
+        return None
+    try:
+        return load_profile_promotion_revoke_plan(path)
     except Exception:
         return None
 

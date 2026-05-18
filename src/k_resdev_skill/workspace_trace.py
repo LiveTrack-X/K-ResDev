@@ -23,6 +23,7 @@ from .models import (
     EvidenceItem,
     ProfilePromotionApplyPlanResult,
     ProfilePromotionApplyResult,
+    ProfilePromotionRevocationPlanResult,
     ProfileSource,
     ReferenceCorpusItem,
     ResearchClaim,
@@ -56,6 +57,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "profile-integrity.md",
     "profile-promotion-apply-plan.md",
     "profile-promotion-apply-result.md",
+    "profile-promotion-revoke-plan.md",
     "profile-promotion-summary.md",
     "profile-review.md",
     "profile-source-summary.md",
@@ -94,6 +96,7 @@ def generate_workspace_trace(
     builder.add_profile_promotions()
     builder.add_profile_promotion_apply_plan()
     builder.add_profile_promotion_apply_result()
+    builder.add_profile_promotion_revoke_plan()
     builder.add_bibliography()
     builder.add_reference_corpus()
     builder.add_reports()
@@ -692,6 +695,55 @@ class _TraceBuilder:
                 node_id=node.node_id,
                 path=result.backup_path,
                 suggested_action="Restore the profile backup or review version control rollback options.",
+            )
+
+    def add_profile_promotion_revoke_plan(self) -> None:
+        path = self.workspace / "state" / "profile-promotion-revoke-plan.json"
+        if not path.exists():
+            return
+        try:
+            plan = ProfilePromotionRevocationPlanResult.model_validate_json(path.read_text(encoding="utf-8-sig"))
+        except Exception as exc:
+            self.finding(
+                "trace_profile_promotion_revoke_plan_unreadable",
+                "medium",
+                f"Profile promotion revoke plan could not be read: {exc}",
+                path=path,
+                suggested_action="Regenerate profile-promotion-revoke-plan before relying on rollback trace state.",
+            )
+            return
+        node = self.node(
+            "profile_promotion_revoke_plan",
+            "profile-promotion-revoke-plan",
+            "Profile promotion revocation plan",
+            status=plan.status,
+            path=str(path),
+            metadata={
+                "profile_id": plan.profile_id,
+                "can_revoke": plan.can_revoke,
+                "promotion_id": plan.promotion_id,
+                "change_count": plan.change_count,
+                "backup_path": plan.backup_path,
+                "backup_available": plan.backup_available,
+                "current_matches_applied_profile": plan.current_matches_applied_profile,
+            },
+        )
+        if plan.profile_id:
+            self.edge(node.node_id, _node_id("profile", plan.profile_id), "plans_profile_restore")
+        if plan.promotion_id:
+            self.edge(node.node_id, _node_id("profile_promotion", plan.promotion_id), "plans_revoke_promotion")
+        self.edge(node.node_id, _node_id("profile_promotion_apply_result", "profile-promotion-apply-result"), "reviews_apply_result")
+        if plan.backup_path:
+            self.edge(node.node_id, _node_id("artifact", plan.backup_path), "plans_restore_from_backup")
+        if plan.status not in {"ready_to_revoke", "already_restored"}:
+            severity = "high" if plan.status in {"missing_backup", "backup_unreadable", "backup_mismatch", "current_profile_drift"} else "medium"
+            self.finding(
+                f"trace_profile_promotion_revoke_{plan.status}",
+                severity,
+                f"Profile promotion revoke plan is not ready_to_revoke: {plan.status}.",
+                node_id=node.node_id,
+                path=str(path),
+                suggested_action="Review backup, apply-result, and current profile state before rollback.",
             )
 
     def add_approvals(self) -> None:

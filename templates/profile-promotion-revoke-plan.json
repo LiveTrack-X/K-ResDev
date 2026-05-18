@@ -1,0 +1,42 @@
+{
+  "root": ".",
+  "status": "ready_to_revoke",
+  "can_revoke": true,
+  "profile_id": "iris-innopolis-2026-017795",
+  "profile_path": "state/project-profile.json",
+  "apply_result_path": "state/profile-promotion-apply-result.json",
+  "apply_result_hash": "sha256:abcd1234",
+  "promotion_id": "PPR-2026-ABCD1234",
+  "reviewer": "project-owner",
+  "reason": "Supplied human decision to revoke the verified profile promotion.",
+  "requested_at": "2026-05-19T11:00:00Z",
+  "current_profile_status": "verified",
+  "restore_profile_status": "needs_review",
+  "backup_path": "state/profile-backups/project-profile-20260519T100000Z-abcd1234.json",
+  "backup_hash": "sha256:dcba4321",
+  "backup_available": true,
+  "current_matches_applied_profile": true,
+  "change_count": 2,
+  "changes": [
+    {
+      "field": "status",
+      "current": "verified",
+      "restore_to": "needs_review",
+      "rationale": "Restore `status` to the pre-apply value captured before PPR-2026-ABCD1234."
+    },
+    {
+      "field": "notes",
+      "current": "Profile status promotion proposed from supplied human decision PPR-2026-ABCD1234.",
+      "restore_to": null,
+      "rationale": "Restore `notes` to the pre-apply value captured before PPR-2026-ABCD1234."
+    }
+  ],
+  "restored_profile": {
+    "profile_id": "iris-innopolis-2026-017795",
+    "status": "needs_review"
+  },
+  "rollback_note": "This revocation plan is non-mutating. A later guarded revoke command should hash-check this plan and restore `state/project-profile.json` from the backup.",
+  "markdown_path": "reports/profile-promotion-revoke-plan.md",
+  "json_path": "state/profile-promotion-revoke-plan.json",
+  "warnings": []
+}

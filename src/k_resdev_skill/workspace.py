@@ -24,6 +24,7 @@ from .models import (
 )
 from .profile_promotion import summarize_profile_promotions
 from .profile_promotion_apply import generate_profile_promotion_apply_plan, load_profile_promotion_apply_result
+from .profile_promotion_revoke import load_profile_promotion_revoke_plan
 from .profile_registry import default_agency_templates_root, load_project_profile
 from .profile_review import generate_profile_review
 from .profile_sources import generate_profile_integrity, load_profile_sources
@@ -69,6 +70,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "profile-integrity.md",
     "profile-promotion-apply-plan.md",
     "profile-promotion-apply-result.md",
+    "profile-promotion-revoke-plan.md",
     "profile-promotion-summary.md",
     "profile-review.md",
     "profile-source-summary.md",
@@ -189,6 +191,7 @@ def run_workspace_doctor(
     _check_profile_review(workspace, findings)
     _check_profile_promotion(workspace, findings)
     _check_profile_promotion_apply(workspace, findings)
+    _check_profile_promotion_revoke(workspace, findings)
     _check_reports(workspace, findings)
     _check_report_integrity(workspace, findings)
     _check_artifact_authority(workspace, findings)
@@ -737,6 +740,37 @@ def _check_profile_promotion_apply(workspace: Path, findings: list[WorkspaceDoct
             )
 
 
+def _check_profile_promotion_revoke(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> None:
+    path = workspace / "state" / "profile-promotion-revoke-plan.json"
+    if not path.exists():
+        return
+    try:
+        plan = load_profile_promotion_revoke_plan(path)
+    except Exception as exc:
+        findings.append(
+            _finding(
+                "profile_promotion_revoke_plan_unreadable",
+                "medium",
+                f"Profile promotion revoke plan could not be read: {exc}",
+                path,
+                "Regenerate profile-promotion-revoke-plan before relying on rollback readiness.",
+            )
+        )
+        return
+    if plan.status in {"ready_to_revoke", "already_restored"}:
+        return
+    severity = "high" if plan.status in {"missing_backup", "backup_unreadable", "backup_mismatch", "current_profile_drift"} else "medium"
+    findings.append(
+        _finding(
+            f"profile_promotion_revoke_{plan.status}",
+            severity,
+            f"Profile promotion revoke plan is not ready_to_revoke: {plan.status}.",
+            path,
+            "Review backup, apply result, and current profile drift before any rollback operation.",
+        )
+    )
+
+
 def _check_reports(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> None:
     reports_dir = workspace / "reports"
     reports = [path for path in reports_dir.glob("*.md") if not is_operational_markdown(path)] if reports_dir.exists() else []
@@ -1236,6 +1270,7 @@ def _starter_readme(project_id: str, title: str, profile_id: str) -> str:
             "- Run `k-resdev profile-promotion-record --root . --decision verified --reviewer <reviewer> --profile-review-hash <sha256>` only after a supplied human promotion decision.",
             "- Run `k-resdev profile-promotion-apply-plan --root . --output reports/profile-promotion-apply-plan.md --json state/profile-promotion-apply-plan.json` before changing any profile status.",
             "- Run `k-resdev profile-promotion-apply --root . --apply-plan state/profile-promotion-apply-plan.json --apply-plan-hash <sha256>` only after reviewing the apply plan.",
+            "- Run `k-resdev profile-promotion-revoke-plan --root . --reviewer <reviewer> --reason \"<reason>\" --output reports/profile-promotion-revoke-plan.md --json state/profile-promotion-revoke-plan.json` before rolling back an applied profile promotion.",
             "- Run `k-resdev budget-ledger-import references/budget-ledger.csv --state-dir state --markdown reports/budget-ledger-import.md` to import a reviewable budget ledger.",
             "- Run `k-resdev budget-ledger-integrity --root . --output reports/budget-ledger.md --json state/budget-ledger-integrity.json` to check ledger proof, approval, duplicate, and evidence-link gaps.",
             "- Run `k-resdev checkpoint-create --root . --stage review-pack --summary \"<summary>\" --status needs_review` to create a hash-backed resume checkpoint.",

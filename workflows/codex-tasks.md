@@ -533,13 +533,29 @@ Guarded profile promotion apply results are local mutation records only. They do
 
 ### Task 49: Profile promotion revocation and rollback plan
 
+Implemented:
+- `ProfilePromotionRevocationPlanResult` and `ProfilePromotionRevocationChange` models
+- `profile-promotion-revoke-plan` command and public API
+- supplied reviewer and revocation reason requirement
+- current `state/project-profile.json` comparison against the saved apply result after-profile
+- saved backup presence/hash check under `state/profile-backups/`
+- blocked statuses for missing apply result, missing/unreadable backup, backup mismatch, and current profile drift
+- `reports/profile-promotion-revoke-plan.md` and `state/profile-promotion-revoke-plan.json`
+- schema/template coverage and validation aliases
+- doctor, next-action, workspace-summary, review-pack, operational Markdown filtering, and trace integration
+
+Revocation plans are proposal-only lifecycle controls. They do not restore profile state, certify official agency status, or erase the promotion/apply audit trail.
+
+### Task 50: Guarded profile promotion revoke command
+
 Planned:
-- add a proposal-only revocation plan for previously applied profile promotions
-- require supplied reviewer and revocation reason
-- compare current `state/project-profile.json` to the saved apply result after-profile
-- inspect whether the saved backup under `state/profile-backups/` is still present
-- write `reports/profile-promotion-revoke-plan.md` and `state/profile-promotion-revoke-plan.json`
-- integrate revocation plans into doctor, next-action, summary, review-pack, and trace
+- add `profile-promotion-revoke` command and public API
+- require `--revoke-plan` plus a matching `--revoke-plan-hash`
+- refuse to run unless the revoke plan is `ready_to_revoke` and `can_revoke=true`
+- write a pre-revoke backup of the current profile before restoring
+- restore only supported `ProjectProfile` fields listed in the revoke plan
+- write `reports/profile-promotion-revoke-result.md` and `state/profile-promotion-revoke-result.json`
+- integrate revoke results into doctor, next-action, summary, review-pack, and trace
 
 ## Safety constraints
 

@@ -18,6 +18,7 @@ from .budget_ledger import generate_workspace_budget_ledger
 from .citation_support import generate_workspace_citation_support_integrity
 from .profile_promotion import summarize_profile_promotions
 from .profile_promotion_apply import generate_profile_promotion_apply_plan, load_profile_promotion_apply_result
+from .profile_promotion_revoke import load_profile_promotion_revoke_plan
 from .profile_review import generate_profile_review
 from .profile_sources import generate_profile_integrity
 from .project_goals import generate_goals_review
@@ -92,6 +93,8 @@ def generate_workspace_review_pack(
     profile_apply_json = state / "profile-promotion-apply-plan.json"
     profile_apply_result_md = reports / "profile-promotion-apply-result.md"
     profile_apply_result_json = state / "profile-promotion-apply-result.json"
+    profile_revoke_md = reports / "profile-promotion-revoke-plan.md"
+    profile_revoke_json = state / "profile-promotion-revoke-plan.json"
     workspace_trace_md = reports / "workspace-trace.md"
     workspace_trace_json = state / "workspace-trace.json"
     trace_passport_md = reports / "trace-passport.md"
@@ -116,6 +119,7 @@ def generate_workspace_review_pack(
     profile_promotion = summarize_profile_promotions(workspace, output_path=profile_promotion_md, json_path=profile_promotion_json)
     profile_apply = generate_profile_promotion_apply_plan(workspace, output_path=profile_apply_md, json_path=profile_apply_json)
     profile_apply_result = _load_profile_apply_result(profile_apply_result_json)
+    profile_revoke_plan = _load_profile_revoke_plan(profile_revoke_json)
     weekly_review = generate_weekly_review(
         workspace,
         review_date=weekly_date,
@@ -271,6 +275,9 @@ def generate_workspace_review_pack(
         profile_promotion_apply_result_status=profile_apply_result.status if profile_apply_result else None,
         profile_promotion_applied=profile_apply_result.applied if profile_apply_result else False,
         profile_promotion_apply_backup_path=profile_apply_result.backup_path if profile_apply_result else None,
+        profile_promotion_revoke_status=profile_revoke_plan.status if profile_revoke_plan else None,
+        profile_promotion_revoke_can_revoke=profile_revoke_plan.can_revoke if profile_revoke_plan else False,
+        profile_promotion_revoke_change_count=profile_revoke_plan.change_count if profile_revoke_plan else 0,
         workspace_trace_status=workspace_trace.status,
         workspace_trace_node_count=workspace_trace.node_count,
         workspace_trace_edge_count=workspace_trace.edge_count,
@@ -289,6 +296,10 @@ def generate_workspace_review_pack(
         generated_paths.append(str(profile_apply_result_md))
     if profile_apply_result_json.exists():
         generated_paths.append(str(profile_apply_result_json))
+    if profile_revoke_md.exists():
+        generated_paths.append(str(profile_revoke_md))
+    if profile_revoke_json.exists():
+        generated_paths.append(str(profile_revoke_json))
     result = result.model_copy(
         update={
             "generated_paths": generated_paths,
@@ -427,6 +438,9 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
         f"| Profile promotion apply-result status | {_escape(result.profile_promotion_apply_result_status or '-')} |",
         f"| Profile promotion applied | {result.profile_promotion_applied} |",
         f"| Profile promotion apply backup | {_escape(result.profile_promotion_apply_backup_path or '-')} |",
+        f"| Profile promotion revoke-plan status | {_escape(result.profile_promotion_revoke_status or '-')} |",
+        f"| Profile promotion revoke-plan can revoke | {result.profile_promotion_revoke_can_revoke} |",
+        f"| Profile promotion revoke-plan change count | {result.profile_promotion_revoke_change_count} |",
         f"| Workspace trace status | {_escape(result.workspace_trace_status or '-')} |",
         f"| Workspace trace nodes | {result.workspace_trace_node_count} |",
         f"| Workspace trace edges | {result.workspace_trace_edge_count} |",
@@ -477,6 +491,7 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
             "- Use `profile-promotion-summary.md` to inspect supplied human profile-promotion decisions.",
             "- Use `profile-promotion-apply-plan.md` to review proposed profile field changes before any profile status is changed.",
             "- Use `profile-promotion-apply-result.md` to inspect guarded profile status mutations and backup paths.",
+            "- Use `profile-promotion-revoke-plan.md` to review whether an applied profile promotion can be rolled back cleanly.",
             "- Use `workspace-trace.md` to inspect cross-artifact traceability and impact findings.",
             "- Use `trace-passport.md` to inspect checkpoint freshness before resuming long-running work.",
             "- Run `verify-review-pack state/workspace-review-pack.json` before relying on a saved pack.",
@@ -535,6 +550,8 @@ def _artifact_label(path: str) -> str:
         "profile-promotion-apply-plan.json": "Profile promotion apply plan JSON",
         "profile-promotion-apply-result.md": "Profile promotion apply result",
         "profile-promotion-apply-result.json": "Profile promotion apply result JSON",
+        "profile-promotion-revoke-plan.md": "Profile promotion revocation plan",
+        "profile-promotion-revoke-plan.json": "Profile promotion revocation plan JSON",
         "workspace-trace.md": "Workspace trace",
         "workspace-trace.json": "Workspace trace JSON",
         "trace-passport.md": "Trace passport",
@@ -598,6 +615,15 @@ def _load_profile_apply_result(path: Path):
         return None
     try:
         return load_profile_promotion_apply_result(path)
+    except Exception:
+        return None
+
+
+def _load_profile_revoke_plan(path: Path):
+    if not path.exists():
+        return None
+    try:
+        return load_profile_promotion_revoke_plan(path)
     except Exception:
         return None
 

@@ -43,6 +43,8 @@ SCHEMA_ALIASES = {
     "profile_promotion_apply_plan": "profile_promotion_apply_plan.schema.json",
     "profile-promotion-apply-result": "profile_promotion_apply_result.schema.json",
     "profile_promotion_apply_result": "profile_promotion_apply_result.schema.json",
+    "profile-promotion-revoke-plan": "profile_promotion_revoke_plan.schema.json",
+    "profile_promotion_revoke_plan": "profile_promotion_revoke_plan.schema.json",
     "project-deadline": "project_deadline.schema.json",
     "project_deadline": "project_deadline.schema.json",
     "project-goals": "project_goals.schema.json",

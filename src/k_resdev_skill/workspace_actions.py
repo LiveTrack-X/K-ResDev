@@ -87,6 +87,7 @@ def _actions_for_findings(root: Path, findings: list[WorkspaceDoctorFinding]) ->
         _action_for_profile_promotion(root, by_code),
         _action_for_profile_promotion_apply(root, by_code),
         _action_for_profile_promotion_apply_result(root, by_code),
+        _action_for_profile_promotion_revoke(root, by_code),
         _action_for_approval_coverage(root, by_code),
         _action_for_report_integrity(root, by_code),
         _action_for_artifact_authority(root, by_code),
@@ -338,6 +339,35 @@ def _action_for_profile_promotion_apply_result(root: Path, by_code: dict[str, li
         "Apply or review profile promotion plan",
         "Profile status changes should go through the guarded apply command with a current apply-plan hash and backup.",
         f'python -m k_resdev_skill profile-promotion-apply --root "{root}" --apply-plan "{plan_path}" --apply-plan-hash "{plan_hash}" --output "{root / "reports" / "profile-promotion-apply-result.md"}" --json "{root / "state" / "profile-promotion-apply-result.json"}"',
+        by_code,
+        codes,
+    )
+
+
+def _action_for_profile_promotion_revoke(root: Path, by_code: dict[str, list[WorkspaceDoctorFinding]]) -> WorkspaceActionItem | None:
+    codes = [
+        "profile_promotion_revoke_plan_unreadable",
+        "profile_promotion_revoke_missing_backup",
+        "profile_promotion_revoke_backup_unreadable",
+        "profile_promotion_revoke_backup_mismatch",
+        "profile_promotion_revoke_current_profile_drift",
+        "profile_promotion_revoke_missing_apply_result",
+        "profile_promotion_revoke_apply_result_unreadable",
+        "profile_promotion_revoke_apply_result_profile_invalid",
+        "profile_promotion_revoke_apply_result_not_applied",
+        "profile_promotion_revoke_missing_profile",
+        "profile_promotion_revoke_profile_unreadable",
+        "profile_promotion_revoke_blocked",
+    ]
+    if not any(code in by_code for code in codes):
+        return None
+    priority = "high" if any(code in by_code for code in codes[1:5]) else "medium"
+    return _action(
+        root,
+        priority,
+        "Review profile promotion revocation plan",
+        "A saved revocation plan is blocked or stale; inspect backup, apply-result, and current profile state before any rollback.",
+        f'python -m k_resdev_skill profile-promotion-revoke-plan --root "{root}" --reviewer "<reviewer>" --reason "<reason>" --output "{root / "reports" / "profile-promotion-revoke-plan.md"}" --json "{root / "state" / "profile-promotion-revoke-plan.json"}"',
         by_code,
         codes,
     )

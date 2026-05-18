@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ProfilePromotionRevocationPlanResult",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "root",
+    "status",
+    "can_revoke",
+    "reviewer",
+    "reason",
+    "requested_at",
+    "backup_available",
+    "current_matches_applied_profile",
+    "change_count",
+    "changes",
+    "restored_profile",
+    "warnings"
+  ],
+  "properties": {
+    "root": {"type": "string"},
+    "status": {"type": "string"},
+    "can_revoke": {"type": "boolean"},
+    "profile_id": {"type": ["string", "null"]},
+    "profile_path": {"type": ["string", "null"]},
+    "apply_result_path": {"type": ["string", "null"]},
+    "apply_result_hash": {"type": ["string", "null"]},
+    "promotion_id": {"type": ["string", "null"]},
+    "reviewer": {"type": "string"},
+    "reason": {"type": "string"},
+    "requested_at": {"type": "string"},
+    "current_profile_status": {"type": ["string", "null"]},
+    "restore_profile_status": {"type": ["string", "null"]},
+    "backup_path": {"type": ["string", "null"]},
+    "backup_hash": {"type": ["string", "null"]},
+    "backup_available": {"type": "boolean"},
+    "current_matches_applied_profile": {"type": "boolean"},
+    "change_count": {"type": "integer", "minimum": 0},
+    "changes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["field", "rationale"],
+        "properties": {
+          "field": {"type": "string"},
+          "current": {},
+          "restore_to": {},
+          "rationale": {"type": "string"}
+        }
+      }
+    },
+    "restored_profile": {"type": "object"},
+    "rollback_note": {"type": ["string", "null"]},
+    "markdown_path": {"type": ["string", "null"]},
+    "json_path": {"type": ["string", "null"]},
+    "warnings": {"type": "array", "items": {"type": "string"}}
+  }
+}

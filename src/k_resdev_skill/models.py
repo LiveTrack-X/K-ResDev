@@ -1136,6 +1136,9 @@ class WorkspaceSummaryResult(StrictModel):
     profile_promotion_apply_result_status: str | None = None
     profile_promotion_applied: bool = False
     profile_promotion_apply_backup_path: str | None = None
+    profile_promotion_revoke_status: str | None = None
+    profile_promotion_revoke_can_revoke: bool = False
+    profile_promotion_revoke_change_count: int = 0
     trace_status: str | None = None
     trace_node_count: int = 0
     trace_edge_count: int = 0
@@ -1395,6 +1398,9 @@ class WorkspaceReviewPackResult(StrictModel):
     profile_promotion_apply_result_status: str | None = None
     profile_promotion_applied: bool = False
     profile_promotion_apply_backup_path: str | None = None
+    profile_promotion_revoke_status: str | None = None
+    profile_promotion_revoke_can_revoke: bool = False
+    profile_promotion_revoke_change_count: int = 0
     workspace_trace_status: str | None = None
     workspace_trace_node_count: int = 0
     workspace_trace_edge_count: int = 0
@@ -1660,6 +1666,54 @@ class ProfilePromotionApplyResult(StrictModel):
     @field_validator("root", "status", "apply_plan_path", "apply_plan_hash", "applied_at")
     @classmethod
     def _profile_apply_result_field_must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
+class ProfilePromotionRevocationChange(StrictModel):
+    field: str
+    current: Any = None
+    restore_to: Any = None
+    rationale: str
+
+    @field_validator("field", "rationale")
+    @classmethod
+    def _profile_revoke_change_field_must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
+class ProfilePromotionRevocationPlanResult(StrictModel):
+    root: str
+    status: str
+    can_revoke: bool = False
+    profile_id: str | None = None
+    profile_path: str | None = None
+    apply_result_path: str | None = None
+    apply_result_hash: str | None = None
+    promotion_id: str | None = None
+    reviewer: str
+    reason: str
+    requested_at: str
+    current_profile_status: str | None = None
+    restore_profile_status: str | None = None
+    backup_path: str | None = None
+    backup_hash: str | None = None
+    backup_available: bool = False
+    current_matches_applied_profile: bool = False
+    change_count: int = 0
+    changes: list[ProfilePromotionRevocationChange] = Field(default_factory=list)
+    restored_profile: dict[str, Any] = Field(default_factory=dict)
+    rollback_note: str | None = None
+    markdown_path: str | None = None
+    json_path: str | None = None
+    warnings: list[str] = Field(default_factory=list)
+
+    @field_validator("root", "status", "reviewer", "reason", "requested_at")
+    @classmethod
+    def _profile_revoke_plan_field_must_not_be_blank(cls, value: str) -> str:
         if not value or not value.strip():
             raise ValueError("value must not be blank")
         return value.strip()

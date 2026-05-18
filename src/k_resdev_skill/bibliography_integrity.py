@@ -32,6 +32,7 @@ BIBLIOGRAPHY_OPERATIONAL_NAMES = {
     "profile-integrity.md",
     "profile-promotion-apply-plan.md",
     "profile-promotion-apply-result.md",
+    "profile-lifecycle-ledger.md",
     "profile-promotion-revoke-plan.md",
     "profile-promotion-revoke-result.md",
     "profile-promotion-summary.md",

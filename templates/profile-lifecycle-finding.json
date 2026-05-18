@@ -1,0 +1,7 @@
+{
+  "code": "profile_lifecycle_apply_backup_missing",
+  "severity": "medium",
+  "message": "Profile promotion apply result refers to a missing profile backup.",
+  "path": "state/profile-backups/project-profile-20260519T100000Z-abcd1234.json",
+  "suggested_action": "Restore the apply backup artifact or review version control before relying on rollback instructions."
+}

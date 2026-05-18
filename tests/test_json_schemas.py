@@ -146,6 +146,25 @@ def test_profile_promotion_revoke_result_template_matches_json_schema():
     jsonschema.validate(sample, schema)
 
 
+def test_profile_lifecycle_templates_match_json_schemas():
+    with open("schemas/profile_lifecycle_entry.schema.json", encoding="utf-8") as handle:
+        entry_schema = json.load(handle)
+    with open("schemas/profile_lifecycle_finding.schema.json", encoding="utf-8") as handle:
+        finding_schema = json.load(handle)
+    with open("schemas/profile_lifecycle_ledger.schema.json", encoding="utf-8") as handle:
+        ledger_schema = json.load(handle)
+    with open("templates/profile-lifecycle-entry.json", encoding="utf-8") as handle:
+        entry = json.load(handle)
+    with open("templates/profile-lifecycle-finding.json", encoding="utf-8") as handle:
+        finding = json.load(handle)
+    with open("templates/profile-lifecycle-ledger.json", encoding="utf-8") as handle:
+        ledger = json.load(handle)
+
+    jsonschema.validate(entry, entry_schema)
+    jsonschema.validate(finding, finding_schema)
+    jsonschema.validate(ledger, ledger_schema)
+
+
 def test_budget_ledger_item_template_matches_json_schema():
     with open("schemas/budget_ledger_item.schema.json", encoding="utf-8") as handle:
         schema = json.load(handle)

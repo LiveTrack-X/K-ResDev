@@ -25,6 +25,7 @@ from .models import (
 from .profile_promotion import summarize_profile_promotions
 from .profile_promotion_apply import generate_profile_promotion_apply_plan, load_profile_promotion_apply_result
 from .profile_promotion_revoke import load_profile_promotion_revoke_plan, load_profile_promotion_revoke_result
+from .profile_lifecycle import generate_profile_lifecycle_ledger
 from .profile_registry import default_agency_templates_root, load_project_profile
 from .profile_review import generate_profile_review
 from .profile_sources import generate_profile_integrity, load_profile_sources
@@ -70,6 +71,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "profile-integrity.md",
     "profile-promotion-apply-plan.md",
     "profile-promotion-apply-result.md",
+    "profile-lifecycle-ledger.md",
     "profile-promotion-revoke-plan.md",
     "profile-promotion-revoke-result.md",
     "profile-promotion-summary.md",
@@ -194,6 +196,7 @@ def run_workspace_doctor(
     _check_profile_promotion_apply(workspace, findings)
     _check_profile_promotion_revoke(workspace, findings)
     _check_profile_promotion_revoke_result(workspace, findings)
+    _check_profile_lifecycle(workspace, findings)
     _check_reports(workspace, findings)
     _check_report_integrity(workspace, findings)
     _check_artifact_authority(workspace, findings)
@@ -730,7 +733,19 @@ def _check_profile_promotion_apply(workspace: Path, findings: list[WorkspaceDoct
                     "Restore the backup artifact or review version control before relying on rollback instructions.",
                 )
             )
-        if profile is not None and result.after_profile and profile.model_dump() != result.after_profile:
+        revoke_result_path = workspace / "state" / "profile-promotion-revoke-result.json"
+        revoke_result = None
+        if revoke_result_path.exists():
+            try:
+                revoke_result = load_profile_promotion_revoke_result(revoke_result_path)
+            except Exception:
+                revoke_result = None
+        if (
+            profile is not None
+            and result.after_profile
+            and profile.model_dump() != result.after_profile
+            and not (revoke_result is not None and revoke_result.after_profile and profile.model_dump() == revoke_result.after_profile)
+        ):
             findings.append(
                 _finding(
                     "profile_promotion_apply_result_drift",
@@ -843,6 +858,33 @@ def _check_profile_promotion_revoke_result(workspace: Path, findings: list[Works
                 "Current project profile no longer matches the saved profile promotion revoke result.",
                 profile_path,
                 "Inspect profile changes before relying on reverted profile status.",
+            )
+        )
+
+
+def _check_profile_lifecycle(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> None:
+    result = generate_profile_lifecycle_ledger(workspace)
+    if result.status == "not_configured":
+        return
+    path = workspace / "state" / "profile-lifecycle-ledger.json"
+    if result.high_count:
+        findings.append(
+            _finding(
+                "profile_lifecycle_high_findings",
+                "high",
+                f"{result.high_count} high-severity profile lifecycle finding(s) were detected.",
+                path,
+                "Run profile-lifecycle-ledger and resolve profile lifecycle drift before relying on profile status.",
+            )
+        )
+    if result.medium_count or result.low_count or result.warnings:
+        findings.append(
+            _finding(
+                "profile_lifecycle_review_findings",
+                "medium" if result.medium_count else "low",
+                f"{result.medium_count + result.low_count} profile lifecycle review finding(s) or warnings were detected.",
+                path,
+                "Review profile-lifecycle-ledger before relying on review/promotion/apply/revoke history.",
             )
         )
 
@@ -1348,6 +1390,7 @@ def _starter_readme(project_id: str, title: str, profile_id: str) -> str:
             "- Run `k-resdev profile-promotion-apply --root . --apply-plan state/profile-promotion-apply-plan.json --apply-plan-hash <sha256>` only after reviewing the apply plan.",
             "- Run `k-resdev profile-promotion-revoke-plan --root . --reviewer <reviewer> --reason \"<reason>\" --output reports/profile-promotion-revoke-plan.md --json state/profile-promotion-revoke-plan.json` before rolling back an applied profile promotion.",
             "- Run `k-resdev profile-promotion-revoke --root . --revoke-plan state/profile-promotion-revoke-plan.json --revoke-plan-hash <sha256>` only after reviewing the revoke plan.",
+            "- Run `k-resdev profile-lifecycle-ledger --root . --output reports/profile-lifecycle-ledger.md --json state/profile-lifecycle-ledger.json` to review profile review/promotion/apply/revoke history from one ledger.",
             "- Run `k-resdev budget-ledger-import references/budget-ledger.csv --state-dir state --markdown reports/budget-ledger-import.md` to import a reviewable budget ledger.",
             "- Run `k-resdev budget-ledger-integrity --root . --output reports/budget-ledger.md --json state/budget-ledger-integrity.json` to check ledger proof, approval, duplicate, and evidence-link gaps.",
             "- Run `k-resdev checkpoint-create --root . --stage review-pack --summary \"<summary>\" --status needs_review` to create a hash-backed resume checkpoint.",

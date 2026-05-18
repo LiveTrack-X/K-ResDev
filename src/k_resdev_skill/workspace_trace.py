@@ -34,6 +34,7 @@ from .models import (
     WorkspaceTraceResult,
 )
 from .profile_promotion import load_profile_promotion_records
+from .profile_lifecycle import load_profile_lifecycle_ledger
 from .profile_review import load_profile_review
 from .profile_sources import load_profile_sources
 from .project_goals import generate_goals_review
@@ -58,6 +59,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "profile-integrity.md",
     "profile-promotion-apply-plan.md",
     "profile-promotion-apply-result.md",
+    "profile-lifecycle-ledger.md",
     "profile-promotion-revoke-plan.md",
     "profile-promotion-revoke-result.md",
     "profile-promotion-summary.md",
@@ -100,6 +102,7 @@ def generate_workspace_trace(
     builder.add_profile_promotion_apply_result()
     builder.add_profile_promotion_revoke_plan()
     builder.add_profile_promotion_revoke_result()
+    builder.add_profile_lifecycle_ledger()
     builder.add_bibliography()
     builder.add_reference_corpus()
     builder.add_reports()
@@ -808,6 +811,62 @@ class _TraceBuilder:
                     path=result.restore_backup_path,
                     suggested_action="Restore the original profile backup or review version control rollback options.",
                 )
+
+    def add_profile_lifecycle_ledger(self) -> None:
+        path = self.workspace / "state" / "profile-lifecycle-ledger.json"
+        if not path.exists():
+            return
+        try:
+            ledger = load_profile_lifecycle_ledger(path)
+        except Exception as exc:
+            self.finding(
+                "trace_profile_lifecycle_ledger_unreadable",
+                "medium",
+                f"Profile lifecycle ledger could not be read: {exc}",
+                path=path,
+                suggested_action="Regenerate profile-lifecycle-ledger before relying on profile lifecycle trace state.",
+            )
+            return
+        node = self.node(
+            "profile_lifecycle_ledger",
+            "profile-lifecycle-ledger",
+            "Profile lifecycle ledger",
+            status=ledger.status,
+            path=str(path),
+            sha256=_sha256_file(path),
+            metadata={
+                "profile_id": ledger.profile_id,
+                "current_profile_status": ledger.current_profile_status,
+                "entry_count": ledger.entry_count,
+                "finding_count": ledger.finding_count,
+                "high_count": ledger.high_count,
+            },
+        )
+        if ledger.profile_id:
+            self.edge(node.node_id, _node_id("profile", ledger.profile_id), "summarizes_profile")
+        for entry in ledger.entries:
+            if entry.entry_type == "profile_review":
+                self.edge(node.node_id, _node_id("profile_review", "profile-review"), "summarizes")
+            elif entry.entry_type == "profile_promotion" and entry.promotion_id:
+                self.edge(node.node_id, _node_id("profile_promotion", entry.promotion_id), "summarizes")
+            elif entry.entry_type == "profile_promotion_apply_plan":
+                self.edge(node.node_id, _node_id("profile_promotion_apply_plan", "profile-promotion-apply-plan"), "summarizes")
+            elif entry.entry_type == "profile_promotion_apply_result":
+                self.edge(node.node_id, _node_id("profile_promotion_apply_result", "profile-promotion-apply-result"), "summarizes")
+            elif entry.entry_type == "profile_promotion_revoke_plan":
+                self.edge(node.node_id, _node_id("profile_promotion_revoke_plan", "profile-promotion-revoke-plan"), "summarizes")
+            elif entry.entry_type == "profile_promotion_revoke_result":
+                self.edge(node.node_id, _node_id("profile_promotion_revoke_result", "profile-promotion-revoke-result"), "summarizes")
+        for finding in ledger.findings:
+            severity = "high" if finding.severity == "high" else "medium" if finding.severity == "medium" else "low"
+            self.finding(
+                "trace_profile_lifecycle_finding",
+                severity,
+                finding.message,
+                node_id=node.node_id,
+                path=finding.path or str(path),
+                suggested_action=finding.suggested_action or "Review profile-lifecycle-ledger before relying on profile status.",
+            )
 
     def add_approvals(self) -> None:
         approvals_dir = self.workspace / "state" / "approvals"

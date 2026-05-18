@@ -1,0 +1,18 @@
+{
+  "entry_id": "PLC-2026ABCD1234",
+  "entry_type": "profile_promotion_apply_result",
+  "status": "applied",
+  "artifact_path": "state/profile-promotion-apply-result.json",
+  "artifact_hash": "sha256:abcd1234",
+  "occurred_at": "2026-05-19T10:00:00Z",
+  "profile_id": "iris-innopolis-2026-017795",
+  "promotion_id": "PPR-2026-ABCD1234",
+  "reviewer": "project-owner",
+  "decision": null,
+  "backup_path": "state/profile-backups/project-profile-20260519T100000Z-abcd1234.json",
+  "related_paths": [
+    "state/profile-promotion-apply-plan.json"
+  ],
+  "notes": "applied=true; fields=status,notes",
+  "warnings": []
+}

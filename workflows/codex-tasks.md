@@ -564,12 +564,29 @@ Guarded profile promotion revoke results are local mutation records only. They d
 
 ### Task 51: Profile lifecycle ledger
 
+Implemented:
+- `ProfileLifecycleLedgerEntry`, `ProfileLifecycleLedgerFinding`, and `ProfileLifecycleLedgerResult` models
+- `profile-lifecycle-ledger` command and public API
+- chronological ledger combining current profile status, profile-review, profile-promotion records, apply-plan/result, and revoke-plan/result artifacts
+- `reports/profile-lifecycle-ledger.md` and `state/profile-lifecycle-ledger.json`
+- missing backup, ready revoke plan without result, verified-without-apply-result, and unexplained profile drift findings
+- schema/template coverage and validation aliases
+- doctor, next-action, workspace-summary, review-pack, operational Markdown filtering, and trace integration
+- apply-result drift handling that recognizes a later guarded revoke result as the current profile explanation
+
+Profile lifecycle ledgers are operating projections only. They do not certify official agency compliance, alter profile state, or erase promotion/apply/revoke history.
+
+### Task 52: Profile source pack review queue
+
 Planned:
-- add `profile-lifecycle-ledger` command and public API
-- combine profile-review, profile-promotion, apply-plan/result, revoke-plan/result, and current profile status into a chronological timeline
-- write `reports/profile-lifecycle-ledger.md` and `state/profile-lifecycle-ledger.json`
-- flag orphaned lifecycle artifacts, missing backups, ready revoke plans without revoke results, profile drift, and superseded transitions
-- integrate the ledger into doctor, next-action, summary, review-pack, and trace
+- add `profile-source-queue` command and public API
+- scan `templates/agencies/` and workspace `state/profile-sources.json`
+- group source-pack review gaps by profile ID
+- flag missing source URL/file, retrieved date, source hash, reviewer, unresolved risk flags, stale source hashes, and non-verified source statuses
+- write `reports/profile-source-queue.md` and `state/profile-source-queue.json`
+- integrate queue counts into doctor, next-action, summary, review-pack, and trace
+
+Profile source queues must remain local operating projections. Do not add new official agency packs without current official source verification.
 
 ## Safety constraints
 

@@ -1,12 +1,12 @@
 # K-ResDev Next Planning
 
-This planning note starts after `0.1.0b40`.
+This planning note starts after `0.1.0b41`.
 
 ## Current Diagnosis
 
-K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, budget ledger review, bibliography metadata, reference corpus adapters, read-only workspace discovery, bibliography review, citation support, research claim matrices, profile source records, profile integrity, a narrow source-backed IRIS/Innopolis profile seed, profile promotion review, hash-bound profile promotion records, non-destructive profile promotion apply plans, guarded profile promotion apply results/backups, non-destructive profile promotion revocation plans, guarded profile promotion revocation results/backups, workspace traceability graph, trace passport checkpoints, artifact authority labels, goals/deadline review, weekly operating reviews, workspace dashboards, thin local workflow router, workspace doctor, next actions, workspace summary, and review packs.
+K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, budget ledger review, bibliography metadata, reference corpus adapters, read-only workspace discovery, bibliography review, citation support, research claim matrices, profile source records, profile integrity, a narrow source-backed IRIS/Innopolis profile seed, profile promotion review, hash-bound profile promotion records, non-destructive profile promotion apply plans, guarded profile promotion apply results/backups, non-destructive profile promotion revocation plans, guarded profile promotion revocation results/backups, a profile lifecycle ledger, workspace traceability graph, trace passport checkpoints, artifact authority labels, goals/deadline review, weekly operating reviews, workspace dashboards, thin local workflow router, workspace doctor, next actions, workspace summary, and review packs.
 
-The next bottleneck is profile lifecycle readability. K-ResDev can now create review, promotion, apply, revoke-plan, and revoke-result artifacts, but an operator still has to inspect several files to understand the full profile state history and detect orphaned or superseded transitions.
+The next bottleneck is deciding how much agency/profile specificity to add without crossing the safety boundary. K-ResDev can now show the full local profile lifecycle from one ledger, so the next useful slice should improve profile source-pack intake/review queues while still keeping official rules pluggable and source-verified.
 
 ## Planning Principles
 
@@ -332,6 +332,8 @@ Safety boundary:
 
 Goal: make profile lifecycle state readable as one chronological operating ledger.
 
+Status: implemented in `src/k_resdev_skill/profile_lifecycle.py` with CLI/API, schema/template coverage, doctor, next-action, workspace-summary, review-pack, operational Markdown filtering, and trace integration. The ledger also avoids false apply-drift alarms when a later guarded revoke result explains the current profile state.
+
 Expected scope:
 - `profile-lifecycle-ledger` command that reads profile-review, profile-promotion records, apply plans/results, revoke plans/results, and current `state/project-profile.json`;
 - write `reports/profile-lifecycle-ledger.md` and `state/profile-lifecycle-ledger.json`;
@@ -341,6 +343,22 @@ Expected scope:
 
 Safety boundary:
 - The ledger is an operating projection only. It must not certify agency compliance, alter profile state, or collapse human review decisions into AI-generated facts.
+
+### Beta 42 - Profile Source Pack Review Queue
+
+Goal: make verified-agency-profile work easier to stage without hardcoding time-sensitive official rules.
+
+Expected scope:
+- `profile-source-queue` command that scans `templates/agencies/` and workspace `state/profile-sources.json`;
+- surface profiles with missing source URL/file, missing retrieved date, missing source hash, missing reviewer, unresolved risk flags, stale local source hash, or `needs_review`/`rejected` source records;
+- write `reports/profile-source-queue.md` and `state/profile-source-queue.json`;
+- group findings by profile ID and proposed next action;
+- integrate queue counts into doctor, next actions, workspace-summary, review-pack, and trace;
+- do not add new official agency packs unless current official sources have been checked and recorded.
+
+Safety boundary:
+- This queue is an operating projection only. It must not certify current law, ministry guidance, or agency forms.
+- Any specific agency/profile pack still requires current official source verification before promotion.
 
 ## Deferred Ideas
 
@@ -354,6 +372,6 @@ These should wait until traceability, impact analysis, and verified profile sour
 
 ## Recommended Next Slice
 
-Implement Beta 41 next.
+Implement Beta 42 next.
 
-Beta 41 should make the full profile lifecycle auditable from one local ledger before adding more agency-specific profile packs.
+Beta 42 should make the source-pack review queue explicit before adding more agency-specific profile packs.

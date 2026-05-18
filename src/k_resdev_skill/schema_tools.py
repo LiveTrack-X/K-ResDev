@@ -47,6 +47,12 @@ SCHEMA_ALIASES = {
     "profile_promotion_revoke_plan": "profile_promotion_revoke_plan.schema.json",
     "profile-promotion-revoke-result": "profile_promotion_revoke_result.schema.json",
     "profile_promotion_revoke_result": "profile_promotion_revoke_result.schema.json",
+    "profile-lifecycle-ledger": "profile_lifecycle_ledger.schema.json",
+    "profile_lifecycle_ledger": "profile_lifecycle_ledger.schema.json",
+    "profile-lifecycle-entry": "profile_lifecycle_entry.schema.json",
+    "profile_lifecycle_entry": "profile_lifecycle_entry.schema.json",
+    "profile-lifecycle-finding": "profile_lifecycle_finding.schema.json",
+    "profile_lifecycle_finding": "profile_lifecycle_finding.schema.json",
     "project-deadline": "project_deadline.schema.json",
     "project_deadline": "project_deadline.schema.json",
     "project-goals": "project_goals.schema.json",
@@ -147,6 +153,8 @@ def _validation_targets(document: Any, schema_payload: dict[str, Any]) -> list[t
         "DashboardCard",
         "EvidenceItem",
         "ProfileSource",
+        "ProfileLifecycleLedgerEntry",
+        "ProfileLifecycleLedgerFinding",
         "ProjectDeadline",
         "ProjectObjective",
         "ReferenceCorpusItem",
@@ -171,6 +179,10 @@ def _validation_targets(document: Any, schema_payload: dict[str, Any]) -> list[t
             return [(f"$.objectives[{index}]", item) for index, item in enumerate(document["objectives"])]
         if title == "ProjectDeadline" and isinstance(document, dict) and isinstance(document.get("deadlines"), list):
             return [(f"$.deadlines[{index}]", item) for index, item in enumerate(document["deadlines"])]
+        if title == "ProfileLifecycleLedgerEntry" and isinstance(document, dict) and isinstance(document.get("entries"), list):
+            return [(f"$.entries[{index}]", item) for index, item in enumerate(document["entries"])]
+        if title == "ProfileLifecycleLedgerFinding" and isinstance(document, dict) and isinstance(document.get("findings"), list):
+            return [(f"$.findings[{index}]", item) for index, item in enumerate(document["findings"])]
         if isinstance(document, dict) and isinstance(document.get("items"), list):
             return [(f"$.items[{index}]", item) for index, item in enumerate(document["items"])]
         if title == "DashboardCard" and isinstance(document, dict) and isinstance(document.get("cards"), list):

@@ -17,6 +17,7 @@ from .profile_registry import load_project_profile
 from .profile_promotion import summarize_profile_promotions
 from .profile_promotion_apply import generate_profile_promotion_apply_plan, load_profile_promotion_apply_result
 from .profile_promotion_revoke import load_profile_promotion_revoke_plan, load_profile_promotion_revoke_result
+from .profile_lifecycle import generate_profile_lifecycle_ledger
 from .profile_review import generate_profile_review
 from .profile_sources import generate_profile_integrity
 from .budget_ledger import generate_workspace_budget_ledger
@@ -64,6 +65,7 @@ def generate_workspace_summary(
     profile_apply_result = _load_profile_apply_result(workspace)
     profile_revoke_plan = _load_profile_revoke_plan(workspace)
     profile_revoke_result = _load_profile_revoke_result(workspace)
+    profile_lifecycle = generate_profile_lifecycle_ledger(workspace)
     trace = generate_workspace_trace(workspace)
     trace_passport = generate_trace_passport(workspace)
     weekly_review = load_latest_weekly_review(workspace)
@@ -142,6 +144,10 @@ def generate_workspace_summary(
         profile_promotion_revoke_result_status=profile_revoke_result.status if profile_revoke_result else None,
         profile_promotion_revoked=profile_revoke_result.revoked if profile_revoke_result else False,
         profile_promotion_revoke_backup_path=profile_revoke_result.pre_revoke_backup_path if profile_revoke_result else None,
+        profile_lifecycle_status=profile_lifecycle.status,
+        profile_lifecycle_entry_count=profile_lifecycle.entry_count,
+        profile_lifecycle_finding_count=profile_lifecycle.finding_count,
+        profile_lifecycle_high_count=profile_lifecycle.high_count,
         trace_status=trace.status,
         trace_node_count=trace.node_count,
         trace_edge_count=trace.edge_count,
@@ -192,6 +198,9 @@ def render_workspace_summary_markdown(summary: WorkspaceSummaryResult) -> str:
         f"| Profile promotion can revoke | {summary.profile_promotion_revoke_can_revoke} |",
         f"| Profile promotion revoke result | {_escape(summary.profile_promotion_revoke_result_status or '-')} |",
         f"| Profile promotion revoked | {summary.profile_promotion_revoked} |",
+        f"| Profile lifecycle ledger | {_escape(summary.profile_lifecycle_status or '-')} |",
+        f"| Profile lifecycle entries | {summary.profile_lifecycle_entry_count} |",
+        f"| Profile lifecycle findings | {summary.profile_lifecycle_finding_count} |",
         f"| Profile sources | {summary.profile_source_count} |",
         f"| Verified profile sources | {summary.profile_verified_source_count} |",
         f"| Workspace discovery | {_escape(summary.discovery_status or '-')} |",
@@ -260,6 +269,7 @@ def render_workspace_summary_markdown(summary: WorkspaceSummaryResult) -> str:
         f"| Profile promotion apply result | {1 if summary.profile_promotion_applied else 0} | status: {_escape(summary.profile_promotion_apply_result_status or '-')}; backup: {_escape(summary.profile_promotion_apply_backup_path or '-')} |",
         f"| Profile promotion revoke plan | {summary.profile_promotion_revoke_change_count} | status: {_escape(summary.profile_promotion_revoke_status or '-')}; can revoke: {summary.profile_promotion_revoke_can_revoke} |",
         f"| Profile promotion revoke result | {1 if summary.profile_promotion_revoked else 0} | status: {_escape(summary.profile_promotion_revoke_result_status or '-')}; pre-backup: {_escape(summary.profile_promotion_revoke_backup_path or '-')} |",
+        f"| Profile lifecycle ledger | {summary.profile_lifecycle_entry_count} | status: {_escape(summary.profile_lifecycle_status or '-')}; findings: {summary.profile_lifecycle_finding_count}; high: {summary.profile_lifecycle_high_count} |",
         f"| Workspace trace | {summary.trace_node_count} | status: {_escape(summary.trace_status or '-')}; findings: {summary.trace_finding_count} |",
         f"| Trace passport | {summary.checkpoint_count} | status: {_escape(summary.trace_passport_status or '-')}; latest: {_escape(summary.latest_checkpoint_id or '-')}; findings: {summary.trace_passport_finding_count} |",
         "",

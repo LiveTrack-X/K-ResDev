@@ -103,6 +103,9 @@ from .models import (
     PaperRecord,
     ProfileIntegrityFinding,
     ProfileIntegrityResult,
+    ProfileLifecycleLedgerEntry,
+    ProfileLifecycleLedgerFinding,
+    ProfileLifecycleLedgerResult,
     ProfilePromotionApplyChange,
     ProfilePromotionApplyPlanResult,
     ProfilePromotionApplyResult,
@@ -193,6 +196,7 @@ from .profile_promotion_revoke import (
     render_profile_promotion_revoke_result_markdown,
     revoke_profile_promotion_plan,
 )
+from .profile_lifecycle import generate_profile_lifecycle_ledger, load_profile_lifecycle_ledger, render_profile_lifecycle_ledger_markdown
 from .profile_review import generate_profile_review, load_profile_review, render_profile_review_markdown
 from .profile_sources import (
     create_profile_source_record,
@@ -312,6 +316,9 @@ __all__ = [
     "PaperRecord",
     "ProfileIntegrityFinding",
     "ProfileIntegrityResult",
+    "ProfileLifecycleLedgerEntry",
+    "ProfileLifecycleLedgerFinding",
+    "ProfileLifecycleLedgerResult",
     "ProfilePromotionApplyChange",
     "ProfilePromotionApplyPlanResult",
     "ProfilePromotionApplyResult",
@@ -418,6 +425,7 @@ __all__ = [
     "generate_literature_matrix",
     "generate_paper_card_markdown",
     "generate_profile_integrity",
+    "generate_profile_lifecycle_ledger",
     "generate_profile_promotion_apply_plan",
     "generate_profile_promotion_revoke_plan",
     "generate_profile_review",
@@ -462,6 +470,7 @@ __all__ = [
     "load_profile_promotion_apply_result",
     "load_profile_promotion_revoke_plan",
     "load_profile_promotion_revoke_result",
+    "load_profile_lifecycle_ledger",
     "load_reference_corpus",
     "load_reference_rejections",
     "load_research_claims",
@@ -493,6 +502,7 @@ __all__ = [
     "render_evidence_source_verification_markdown",
     "render_goals_review_markdown",
     "render_profile_integrity_markdown",
+    "render_profile_lifecycle_ledger_markdown",
     "render_profile_promotion_apply_plan_markdown",
     "render_profile_promotion_apply_result_markdown",
     "render_profile_promotion_revoke_plan_markdown",
@@ -535,4 +545,4 @@ __all__ = [
     "write_research_claims",
 ]
 
-__version__ = "0.1.0b40"
+__version__ = "0.1.0b41"

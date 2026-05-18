@@ -19,6 +19,7 @@ from .citation_support import generate_workspace_citation_support_integrity
 from .profile_promotion import summarize_profile_promotions
 from .profile_promotion_apply import generate_profile_promotion_apply_plan, load_profile_promotion_apply_result
 from .profile_promotion_revoke import load_profile_promotion_revoke_plan, load_profile_promotion_revoke_result
+from .profile_lifecycle import generate_profile_lifecycle_ledger
 from .profile_review import generate_profile_review
 from .profile_sources import generate_profile_integrity
 from .project_goals import generate_goals_review
@@ -97,6 +98,8 @@ def generate_workspace_review_pack(
     profile_revoke_json = state / "profile-promotion-revoke-plan.json"
     profile_revoke_result_md = reports / "profile-promotion-revoke-result.md"
     profile_revoke_result_json = state / "profile-promotion-revoke-result.json"
+    profile_lifecycle_md = reports / "profile-lifecycle-ledger.md"
+    profile_lifecycle_json = state / "profile-lifecycle-ledger.json"
     workspace_trace_md = reports / "workspace-trace.md"
     workspace_trace_json = state / "workspace-trace.json"
     trace_passport_md = reports / "trace-passport.md"
@@ -123,6 +126,7 @@ def generate_workspace_review_pack(
     profile_apply_result = _load_profile_apply_result(profile_apply_result_json)
     profile_revoke_plan = _load_profile_revoke_plan(profile_revoke_json)
     profile_revoke_result = _load_profile_revoke_result(profile_revoke_result_json)
+    profile_lifecycle = generate_profile_lifecycle_ledger(workspace, output_path=profile_lifecycle_md, json_path=profile_lifecycle_json)
     weekly_review = generate_weekly_review(
         workspace,
         review_date=weekly_date,
@@ -191,6 +195,8 @@ def generate_workspace_review_pack(
         str(profile_promotion_json),
         str(profile_apply_md),
         str(profile_apply_json),
+        str(profile_lifecycle_md),
+        str(profile_lifecycle_json),
         str(workspace_trace_md),
         str(workspace_trace_json),
         str(trace_passport_md),
@@ -284,6 +290,10 @@ def generate_workspace_review_pack(
         profile_promotion_revoke_result_status=profile_revoke_result.status if profile_revoke_result else None,
         profile_promotion_revoked=profile_revoke_result.revoked if profile_revoke_result else False,
         profile_promotion_revoke_backup_path=profile_revoke_result.pre_revoke_backup_path if profile_revoke_result else None,
+        profile_lifecycle_status=profile_lifecycle.status,
+        profile_lifecycle_entry_count=profile_lifecycle.entry_count,
+        profile_lifecycle_finding_count=profile_lifecycle.finding_count,
+        profile_lifecycle_high_count=profile_lifecycle.high_count,
         workspace_trace_status=workspace_trace.status,
         workspace_trace_node_count=workspace_trace.node_count,
         workspace_trace_edge_count=workspace_trace.edge_count,
@@ -454,6 +464,10 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
         f"| Profile promotion revoke-result status | {_escape(result.profile_promotion_revoke_result_status or '-')} |",
         f"| Profile promotion revoked | {result.profile_promotion_revoked} |",
         f"| Profile promotion revoke backup | {_escape(result.profile_promotion_revoke_backup_path or '-')} |",
+        f"| Profile lifecycle status | {_escape(result.profile_lifecycle_status or '-')} |",
+        f"| Profile lifecycle entries | {result.profile_lifecycle_entry_count} |",
+        f"| Profile lifecycle finding count | {result.profile_lifecycle_finding_count} |",
+        f"| Profile lifecycle high count | {result.profile_lifecycle_high_count} |",
         f"| Workspace trace status | {_escape(result.workspace_trace_status or '-')} |",
         f"| Workspace trace nodes | {result.workspace_trace_node_count} |",
         f"| Workspace trace edges | {result.workspace_trace_edge_count} |",
@@ -506,6 +520,7 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
             "- Use `profile-promotion-apply-result.md` to inspect guarded profile status mutations and backup paths.",
             "- Use `profile-promotion-revoke-plan.md` to review whether an applied profile promotion can be rolled back cleanly.",
             "- Use `profile-promotion-revoke-result.md` to inspect guarded profile rollback mutations and pre-revoke backup paths.",
+            "- Use `profile-lifecycle-ledger.md` to inspect profile review/promotion/apply/revoke history from one chronological ledger.",
             "- Use `workspace-trace.md` to inspect cross-artifact traceability and impact findings.",
             "- Use `trace-passport.md` to inspect checkpoint freshness before resuming long-running work.",
             "- Run `verify-review-pack state/workspace-review-pack.json` before relying on a saved pack.",
@@ -568,6 +583,8 @@ def _artifact_label(path: str) -> str:
         "profile-promotion-revoke-plan.json": "Profile promotion revocation plan JSON",
         "profile-promotion-revoke-result.md": "Profile promotion revocation result",
         "profile-promotion-revoke-result.json": "Profile promotion revocation result JSON",
+        "profile-lifecycle-ledger.md": "Profile lifecycle ledger",
+        "profile-lifecycle-ledger.json": "Profile lifecycle ledger JSON",
         "workspace-trace.md": "Workspace trace",
         "workspace-trace.json": "Workspace trace JSON",
         "trace-passport.md": "Trace passport",

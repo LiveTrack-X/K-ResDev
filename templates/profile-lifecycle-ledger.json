@@ -1,0 +1,52 @@
+{
+  "root": ".",
+  "status": "ready",
+  "profile_id": "iris-innopolis-2026-017795",
+  "current_profile_status": "needs_review",
+  "entry_count": 2,
+  "finding_count": 0,
+  "high_count": 0,
+  "medium_count": 0,
+  "low_count": 0,
+  "entries": [
+    {
+      "entry_id": "PLC-2026ABCD1234",
+      "entry_type": "current_profile",
+      "status": "needs_review",
+      "artifact_path": "state/project-profile.json",
+      "artifact_hash": "sha256:abcd1234",
+      "occurred_at": null,
+      "profile_id": "iris-innopolis-2026-017795",
+      "promotion_id": null,
+      "reviewer": null,
+      "decision": null,
+      "backup_path": null,
+      "related_paths": [],
+      "notes": "Local profile seed; official status still needs review.",
+      "warnings": []
+    },
+    {
+      "entry_id": "PLC-2026DCBA4321",
+      "entry_type": "profile_promotion_revoke_result",
+      "status": "revoked",
+      "artifact_path": "state/profile-promotion-revoke-result.json",
+      "artifact_hash": "sha256:dcba4321",
+      "occurred_at": "2026-05-19T12:00:00Z",
+      "profile_id": "iris-innopolis-2026-017795",
+      "promotion_id": "PPR-2026-ABCD1234",
+      "reviewer": "project-owner",
+      "decision": null,
+      "backup_path": "state/profile-backups/project-profile-pre-revoke-20260519T120000Z-dcba4321.json",
+      "related_paths": [
+        "state/profile-promotion-revoke-plan.json",
+        "state/profile-promotion-apply-result.json"
+      ],
+      "notes": "revoked=true; fields=status,notes",
+      "warnings": []
+    }
+  ],
+  "findings": [],
+  "markdown_path": "reports/profile-lifecycle-ledger.md",
+  "json_path": "state/profile-lifecycle-ledger.json",
+  "warnings": []
+}

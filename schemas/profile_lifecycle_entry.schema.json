@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ProfileLifecycleLedgerEntry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["entry_id", "entry_type", "status", "related_paths", "warnings"],
+  "properties": {
+    "entry_id": {"type": "string"},
+    "entry_type": {"type": "string"},
+    "status": {"type": "string"},
+    "artifact_path": {"type": ["string", "null"]},
+    "artifact_hash": {"type": ["string", "null"]},
+    "occurred_at": {"type": ["string", "null"]},
+    "profile_id": {"type": ["string", "null"]},
+    "promotion_id": {"type": ["string", "null"]},
+    "reviewer": {"type": ["string", "null"]},
+    "decision": {"type": ["string", "null"]},
+    "backup_path": {"type": ["string", "null"]},
+    "related_paths": {"type": "array", "items": {"type": "string"}},
+    "notes": {"type": ["string", "null"]},
+    "warnings": {"type": "array", "items": {"type": "string"}}
+  }
+}

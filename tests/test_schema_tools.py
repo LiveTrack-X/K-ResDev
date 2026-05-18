@@ -132,6 +132,9 @@ def test_validate_json_file_accepts_profile_review_aliases():
     apply_result = validate_json_file("templates/profile-promotion-apply-result.json", "profile-promotion-apply-result")
     revoke_plan = validate_json_file("templates/profile-promotion-revoke-plan.json", "profile-promotion-revoke-plan")
     revoke_result = validate_json_file("templates/profile-promotion-revoke-result.json", "profile-promotion-revoke-result")
+    lifecycle_entry = validate_json_file("templates/profile-lifecycle-entry.json", "profile-lifecycle-entry")
+    lifecycle_finding = validate_json_file("templates/profile-lifecycle-finding.json", "profile-lifecycle-finding")
+    lifecycle_ledger = validate_json_file("templates/profile-lifecycle-ledger.json", "profile-lifecycle-ledger")
 
     assert check["valid"] is True
     assert promotion["valid"] is True
@@ -139,6 +142,9 @@ def test_validate_json_file_accepts_profile_review_aliases():
     assert apply_result["valid"] is True
     assert revoke_plan["valid"] is True
     assert revoke_result["valid"] is True
+    assert lifecycle_entry["valid"] is True
+    assert lifecycle_finding["valid"] is True
+    assert lifecycle_ledger["valid"] is True
 
 
 def test_validate_json_cli_returns_nonzero_for_invalid(tmp_path, capsys):

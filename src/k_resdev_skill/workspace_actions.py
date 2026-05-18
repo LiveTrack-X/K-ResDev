@@ -89,6 +89,7 @@ def _actions_for_findings(root: Path, findings: list[WorkspaceDoctorFinding]) ->
         _action_for_profile_promotion_apply_result(root, by_code),
         _action_for_profile_promotion_revoke(root, by_code),
         _action_for_profile_promotion_revoke_result(root, by_code),
+        _action_for_profile_lifecycle(root, by_code),
         _action_for_approval_coverage(root, by_code),
         _action_for_report_integrity(root, by_code),
         _action_for_artifact_authority(root, by_code),
@@ -393,6 +394,22 @@ def _action_for_profile_promotion_revoke_result(root: Path, by_code: dict[str, l
         "Apply or review profile promotion revocation plan",
         "Profile rollback should go through the guarded revoke command with a current revoke-plan hash and pre-revoke backup.",
         f'python -m k_resdev_skill profile-promotion-revoke --root "{root}" --revoke-plan "{plan_path}" --revoke-plan-hash "{plan_hash}" --output "{root / "reports" / "profile-promotion-revoke-result.md"}" --json "{root / "state" / "profile-promotion-revoke-result.json"}"',
+        by_code,
+        codes,
+    )
+
+
+def _action_for_profile_lifecycle(root: Path, by_code: dict[str, list[WorkspaceDoctorFinding]]) -> WorkspaceActionItem | None:
+    codes = ["profile_lifecycle_high_findings", "profile_lifecycle_review_findings"]
+    if not any(code in by_code for code in codes):
+        return None
+    priority = "high" if "profile_lifecycle_high_findings" in by_code else "medium"
+    return _action(
+        root,
+        priority,
+        "Review profile lifecycle ledger",
+        "Profile review, promotion, apply, and revoke artifacts should line up before relying on current profile status.",
+        f'python -m k_resdev_skill profile-lifecycle-ledger --root "{root}" --output "{root / "reports" / "profile-lifecycle-ledger.md"}" --json "{root / "state" / "profile-lifecycle-ledger.json"}"',
         by_code,
         codes,
     )

@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ProfileLifecycleLedgerResult",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "root",
+    "status",
+    "entry_count",
+    "finding_count",
+    "high_count",
+    "medium_count",
+    "low_count",
+    "entries",
+    "findings",
+    "warnings"
+  ],
+  "properties": {
+    "root": {"type": "string"},
+    "status": {"type": "string"},
+    "profile_id": {"type": ["string", "null"]},
+    "current_profile_status": {"type": ["string", "null"]},
+    "entry_count": {"type": "integer", "minimum": 0},
+    "finding_count": {"type": "integer", "minimum": 0},
+    "high_count": {"type": "integer", "minimum": 0},
+    "medium_count": {"type": "integer", "minimum": 0},
+    "low_count": {"type": "integer", "minimum": 0},
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["entry_id", "entry_type", "status", "related_paths", "warnings"],
+        "properties": {
+          "entry_id": {"type": "string"},
+          "entry_type": {"type": "string"},
+          "status": {"type": "string"},
+          "artifact_path": {"type": ["string", "null"]},
+          "artifact_hash": {"type": ["string", "null"]},
+          "occurred_at": {"type": ["string", "null"]},
+          "profile_id": {"type": ["string", "null"]},
+          "promotion_id": {"type": ["string", "null"]},
+          "reviewer": {"type": ["string", "null"]},
+          "decision": {"type": ["string", "null"]},
+          "backup_path": {"type": ["string", "null"]},
+          "related_paths": {"type": "array", "items": {"type": "string"}},
+          "notes": {"type": ["string", "null"]},
+          "warnings": {"type": "array", "items": {"type": "string"}}
+        }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code", "severity", "message"],
+        "properties": {
+          "code": {"type": "string"},
+          "severity": {"type": "string", "enum": ["high", "medium", "low"]},
+          "message": {"type": "string"},
+          "path": {"type": ["string", "null"]},
+          "suggested_action": {"type": ["string", "null"]}
+        }
+      }
+    },
+    "markdown_path": {"type": ["string", "null"]},
+    "json_path": {"type": ["string", "null"]},
+    "warnings": {"type": "array", "items": {"type": "string"}}
+  }
+}

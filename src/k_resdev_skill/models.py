@@ -1142,6 +1142,10 @@ class WorkspaceSummaryResult(StrictModel):
     profile_promotion_revoke_result_status: str | None = None
     profile_promotion_revoked: bool = False
     profile_promotion_revoke_backup_path: str | None = None
+    profile_lifecycle_status: str | None = None
+    profile_lifecycle_entry_count: int = 0
+    profile_lifecycle_finding_count: int = 0
+    profile_lifecycle_high_count: int = 0
     trace_status: str | None = None
     trace_node_count: int = 0
     trace_edge_count: int = 0
@@ -1407,6 +1411,10 @@ class WorkspaceReviewPackResult(StrictModel):
     profile_promotion_revoke_result_status: str | None = None
     profile_promotion_revoked: bool = False
     profile_promotion_revoke_backup_path: str | None = None
+    profile_lifecycle_status: str | None = None
+    profile_lifecycle_entry_count: int = 0
+    profile_lifecycle_finding_count: int = 0
+    profile_lifecycle_high_count: int = 0
     workspace_trace_status: str | None = None
     workspace_trace_node_count: int = 0
     workspace_trace_edge_count: int = 0
@@ -1756,6 +1764,62 @@ class ProfilePromotionRevocationResult(StrictModel):
         if not value or not value.strip():
             raise ValueError("value must not be blank")
         return value.strip()
+
+
+class ProfileLifecycleLedgerEntry(StrictModel):
+    entry_id: str
+    entry_type: str
+    status: str
+    artifact_path: str | None = None
+    artifact_hash: str | None = None
+    occurred_at: str | None = None
+    profile_id: str | None = None
+    promotion_id: str | None = None
+    reviewer: str | None = None
+    decision: str | None = None
+    backup_path: str | None = None
+    related_paths: list[str] = Field(default_factory=list)
+    notes: str | None = None
+    warnings: list[str] = Field(default_factory=list)
+
+    @field_validator("entry_id", "entry_type", "status")
+    @classmethod
+    def _profile_lifecycle_entry_field_must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
+class ProfileLifecycleLedgerFinding(StrictModel):
+    code: str
+    severity: str
+    message: str
+    path: str | None = None
+    suggested_action: str | None = None
+
+    @field_validator("code", "severity", "message")
+    @classmethod
+    def _profile_lifecycle_finding_field_must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
+class ProfileLifecycleLedgerResult(StrictModel):
+    root: str
+    status: str
+    profile_id: str | None = None
+    current_profile_status: str | None = None
+    entry_count: int = 0
+    finding_count: int = 0
+    high_count: int = 0
+    medium_count: int = 0
+    low_count: int = 0
+    entries: list[ProfileLifecycleLedgerEntry] = Field(default_factory=list)
+    findings: list[ProfileLifecycleLedgerFinding] = Field(default_factory=list)
+    markdown_path: str | None = None
+    json_path: str | None = None
+    warnings: list[str] = Field(default_factory=list)
 
 
 class PaperRecord(StrictModel):

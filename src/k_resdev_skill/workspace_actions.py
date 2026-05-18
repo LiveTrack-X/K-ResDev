@@ -83,6 +83,7 @@ def _actions_for_findings(root: Path, findings: list[WorkspaceDoctorFinding]) ->
         _action_for_budget_ledger(root, by_code),
         _action_for_profile(root, by_code),
         _action_for_profile_integrity(root, by_code),
+        _action_for_profile_review(root, by_code),
         _action_for_approval_coverage(root, by_code),
         _action_for_report_integrity(root, by_code),
         _action_for_artifact_authority(root, by_code),
@@ -258,6 +259,22 @@ def _action_for_profile_integrity(root: Path, by_code: dict[str, list[WorkspaceD
         "Review profile source integrity",
         "Agency/project profiles should stay needs_review until official-source records are hash-backed and human-reviewed.",
         f'python -m k_resdev_skill profile-integrity --root "{root}" --output "{root / "reports" / "profile-integrity.md"}" --json "{root / "state" / "profile-integrity.json"}"',
+        by_code,
+        codes,
+    )
+
+
+def _action_for_profile_review(root: Path, by_code: dict[str, list[WorkspaceDoctorFinding]]) -> WorkspaceActionItem | None:
+    codes = ["profile_review_blocked", "profile_review_incomplete"]
+    if not any(code in by_code for code in codes):
+        return None
+    priority = "high" if "profile_review_blocked" in by_code else "medium"
+    return _action(
+        root,
+        priority,
+        "Review profile promotion readiness",
+        "Source-backed profiles should not be promoted until source hashes, reviewer identity, applicability notes, and risk flags are resolved.",
+        f'python -m k_resdev_skill profile-review --root "{root}" --output "{root / "reports" / "profile-review.md"}" --json "{root / "state" / "profile-review.json"}"',
         by_code,
         codes,
     )

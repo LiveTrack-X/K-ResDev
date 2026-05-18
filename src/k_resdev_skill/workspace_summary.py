@@ -14,6 +14,7 @@ from .models import (
     WorkspaceSummaryResult,
 )
 from .profile_registry import load_project_profile
+from .profile_review import generate_profile_review
 from .profile_sources import generate_profile_integrity
 from .budget_ledger import generate_workspace_budget_ledger
 from .project_goals import generate_goals_review
@@ -54,6 +55,7 @@ def generate_workspace_summary(
     reference_corpus = build_reference_corpus(workspace)
     research_claim_matrix = generate_research_claim_matrix(workspace)
     profile_integrity = generate_profile_integrity(workspace)
+    profile_review = generate_profile_review(workspace)
     trace = generate_workspace_trace(workspace)
     trace_passport = generate_trace_passport(workspace)
     weekly_review = load_latest_weekly_review(workspace)
@@ -114,6 +116,9 @@ def generate_workspace_summary(
         profile_source_count=profile_integrity.source_count,
         profile_verified_source_count=profile_integrity.verified_source_count,
         profile_integrity_finding_count=profile_integrity.finding_count,
+        profile_review_status=profile_review.status,
+        profile_review_can_promote=profile_review.can_promote,
+        profile_review_failed_count=profile_review.failed_count,
         trace_status=trace.status,
         trace_node_count=trace.node_count,
         trace_edge_count=trace.edge_count,
@@ -152,6 +157,8 @@ def render_workspace_summary_markdown(summary: WorkspaceSummaryResult) -> str:
         f"| Profile | {_escape(summary.profile_id or 'missing')} |",
         f"| Profile status | {_escape(summary.profile_status or 'missing')} |",
         f"| Profile integrity | {_escape(summary.profile_integrity_status or '-')} |",
+        f"| Profile review | {_escape(summary.profile_review_status or '-')} |",
+        f"| Profile can promote | {summary.profile_review_can_promote} |",
         f"| Profile sources | {summary.profile_source_count} |",
         f"| Verified profile sources | {summary.profile_verified_source_count} |",
         f"| Workspace discovery | {_escape(summary.discovery_status or '-')} |",
@@ -214,6 +221,7 @@ def render_workspace_summary_markdown(summary: WorkspaceSummaryResult) -> str:
         f"| Reference corpus | {summary.reference_corpus_count} | status: {_escape(summary.reference_corpus_status or '-')}; rejections: {summary.reference_rejection_count}; high: {summary.reference_corpus_high_count} |",
         f"| Research claim matrix | {summary.research_claim_count} | status: {_escape(summary.research_claim_matrix_status or '-')}; findings: {summary.research_claim_matrix_finding_count} |",
         f"| Profile integrity | {summary.profile_integrity_finding_count} | status: {_escape(summary.profile_integrity_status or '-')}; verified sources: {summary.profile_verified_source_count} |",
+        f"| Profile review | {summary.profile_review_failed_count} | status: {_escape(summary.profile_review_status or '-')}; can promote: {summary.profile_review_can_promote} |",
         f"| Workspace trace | {summary.trace_node_count} | status: {_escape(summary.trace_status or '-')}; findings: {summary.trace_finding_count} |",
         f"| Trace passport | {summary.checkpoint_count} | status: {_escape(summary.trace_passport_status or '-')}; latest: {_escape(summary.latest_checkpoint_id or '-')}; findings: {summary.trace_passport_finding_count} |",
         "",

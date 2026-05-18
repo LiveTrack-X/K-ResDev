@@ -56,6 +56,7 @@ from .profile_sources import (
     utc_now_iso,
 )
 from .profile_registry import generate_profile_registry, list_project_profiles, load_project_profile
+from .profile_review import generate_profile_review
 from .project_goals import generate_goals_review, initialize_project_goals
 from .projection_export import export_projection
 from .reference_corpus import build_reference_corpus
@@ -317,6 +318,11 @@ def main(argv: list[str] | None = None) -> int:
     profile_integrity_parser.add_argument("--root", default=".")
     profile_integrity_parser.add_argument("--output", default=None)
     profile_integrity_parser.add_argument("--json", default=None)
+
+    profile_review_parser = subparsers.add_parser("profile-review", help="Review whether a profile has enough source and human-review metadata for promotion.")
+    profile_review_parser.add_argument("--root", default=".")
+    profile_review_parser.add_argument("--output", default=None)
+    profile_review_parser.add_argument("--json", default=None)
 
     validate_json_parser = subparsers.add_parser("validate-json", help="Validate JSON files against bundled or custom JSON schema.")
     validate_json_parser.add_argument(
@@ -743,6 +749,10 @@ def main(argv: list[str] | None = None) -> int:
         result = generate_profile_integrity(args.root, output_path=args.output, json_path=args.json)
         print(result.model_dump_json(indent=2))
         return 0
+    if args.command == "profile-review":
+        result = generate_profile_review(args.root, output_path=args.output, json_path=args.json)
+        print(result.model_dump_json(indent=2))
+        return 0 if result.status != "blocked" else 1
     if args.command == "validate-json":
         result = validate_json_files(args.json_paths, args.schema)
         print(json.dumps(result, ensure_ascii=False, indent=2))

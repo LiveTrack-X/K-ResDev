@@ -31,6 +31,7 @@ CITATION_SUPPORT_OPERATIONAL_NAMES = {
     "goals-review.md",
     "next-actions.md",
     "profile-integrity.md",
+    "profile-review.md",
     "profile-source-summary.md",
     "readiness.md",
     "reference-corpus-summary.md",

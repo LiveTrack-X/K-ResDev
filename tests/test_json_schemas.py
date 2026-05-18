@@ -92,6 +92,15 @@ def test_profile_source_template_matches_json_schema():
     jsonschema.validate(sample, schema)
 
 
+def test_profile_review_check_template_matches_json_schema():
+    with open("schemas/profile_review_check.schema.json", encoding="utf-8") as handle:
+        schema = json.load(handle)
+    with open("templates/profile-review-check.json", encoding="utf-8") as handle:
+        sample = json.load(handle)
+
+    jsonschema.validate(sample, schema)
+
+
 def test_budget_ledger_item_template_matches_json_schema():
     with open("schemas/budget_ledger_item.schema.json", encoding="utf-8") as handle:
         schema = json.load(handle)

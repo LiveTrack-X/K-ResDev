@@ -1124,6 +1124,9 @@ class WorkspaceSummaryResult(StrictModel):
     profile_source_count: int = 0
     profile_verified_source_count: int = 0
     profile_integrity_finding_count: int = 0
+    profile_review_status: str | None = None
+    profile_review_can_promote: bool = False
+    profile_review_failed_count: int = 0
     trace_status: str | None = None
     trace_node_count: int = 0
     trace_edge_count: int = 0
@@ -1371,6 +1374,9 @@ class WorkspaceReviewPackResult(StrictModel):
     profile_verified_source_count: int = 0
     profile_integrity_finding_count: int = 0
     profile_integrity_high_count: int = 0
+    profile_review_status: str | None = None
+    profile_review_can_promote: bool = False
+    profile_review_failed_count: int = 0
     workspace_trace_status: str | None = None
     workspace_trace_node_count: int = 0
     workspace_trace_edge_count: int = 0
@@ -1495,6 +1501,42 @@ class ProfileIntegrityResult(StrictModel):
     low_count: int = 0
     findings: list[ProfileIntegrityFinding] = Field(default_factory=list)
     profile_pack: VerifiedProfilePack | None = None
+    markdown_path: str | None = None
+    json_path: str | None = None
+    warnings: list[str] = Field(default_factory=list)
+
+
+class ProfileReviewChecklistItem(StrictModel):
+    check_id: str
+    title: str
+    status: str
+    severity: str
+    message: str
+    source_id: str | None = None
+    path: str | None = None
+    suggested_action: str | None = None
+
+    @field_validator("check_id", "title", "status", "severity", "message")
+    @classmethod
+    def _profile_review_field_must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
+class ProfileReviewResult(StrictModel):
+    root: str
+    profile_id: str | None = None
+    profile_status: str | None = None
+    status: str
+    can_promote: bool = False
+    checklist_count: int = 0
+    passed_count: int = 0
+    failed_count: int = 0
+    warning_count: int = 0
+    source_count: int = 0
+    verified_source_count: int = 0
+    checklist: list[ProfileReviewChecklistItem] = Field(default_factory=list)
     markdown_path: str | None = None
     json_path: str | None = None
     warnings: list[str] = Field(default_factory=list)

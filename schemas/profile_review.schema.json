@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ProfileReviewResult",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["root", "status", "can_promote", "checklist"],
+  "properties": {
+    "root": {"type": "string"},
+    "profile_id": {"type": ["string", "null"]},
+    "profile_status": {"type": ["string", "null"]},
+    "status": {"type": "string"},
+    "can_promote": {"type": "boolean"},
+    "checklist_count": {"type": "integer", "minimum": 0},
+    "passed_count": {"type": "integer", "minimum": 0},
+    "failed_count": {"type": "integer", "minimum": 0},
+    "warning_count": {"type": "integer", "minimum": 0},
+    "source_count": {"type": "integer", "minimum": 0},
+    "verified_source_count": {"type": "integer", "minimum": 0},
+    "checklist": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["check_id", "title", "status", "severity", "message"],
+        "properties": {
+          "check_id": {"type": "string"},
+          "title": {"type": "string"},
+          "status": {"type": "string", "enum": ["pass", "fail", "warn"]},
+          "severity": {"type": "string", "enum": ["high", "medium", "low"]},
+          "message": {"type": "string"},
+          "source_id": {"type": ["string", "null"]},
+          "path": {"type": ["string", "null"]},
+          "suggested_action": {"type": ["string", "null"]}
+        }
+      }
+    },
+    "markdown_path": {"type": ["string", "null"]},
+    "json_path": {"type": ["string", "null"]},
+    "warnings": {"type": "array", "items": {"type": "string"}}
+  }
+}

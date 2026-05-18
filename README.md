@@ -2,7 +2,7 @@
 
 Purpose: 한국형 국책 R&D 환경에서 연구 행정 문서화, 증빙 정합성, 보고서 생성, 논문/데이터 인사이트 보조를 evidence-first 방식으로 지원하는 Codex/Skill 프로젝트입니다.
 
-Current release: `0.1 BETA 34` (`0.1.0b34`).
+Current release: `0.1 BETA 35` (`0.1.0b35`).
 
 Core principle:
 
@@ -69,6 +69,7 @@ This repository does not encode any single ministry/institution form as authorit
 - Local weekly operating review and workspace dashboard generated from local K-ResDev artifacts.
 - Thin local workflow router for Admin, Research, Integrity, and Weekly review command plans.
 - Narrow IRIS/Innopolis 2026 source-backed profile seed that installs hash-backed profile source notes while keeping official-use status as `needs_review`.
+- Profile promotion review workflow that checks source hashes, reviewer identity, applicability notes, and unresolved risk flags before any profile can be treated as ready for human-controlled promotion.
 - Workspace next-action planner that converts doctor findings into deterministic, reviewable commands.
 - Workspace summary report that combines readiness, next actions, evidence counts, approvals, reports, exports, and analysis manifests.
 - Workspace review pack command that refreshes discovery, readiness, next actions, workspace summary, artifact-authority, goals-review, weekly-review, workspace-dashboard, budget-ledger, profile-integrity, source-verification, approval-coverage, report-integrity, bibliography-integrity, reference-corpus, citation-support, research-claim-matrix, and workspace-trace artifacts together.
@@ -140,6 +141,7 @@ python -m k_resdev_skill research-claim-matrix --root . --output .\reports\resea
 python -m k_resdev_skill profile-source-record --profile-id national-rnd-basic --title "Official source snapshot" --source-url https://example.org/official-source --retrieved-at 2026-05-18 --review-status needs_review
 python -m k_resdev_skill profile-source-summary --root . --output .\reports\profile-source-summary.md --json .\state\profile-source-summary.json
 python -m k_resdev_skill profile-integrity --root . --output .\reports\profile-integrity.md --json .\state\profile-integrity.json
+python -m k_resdev_skill profile-review --root . --output .\reports\profile-review.md --json .\state\profile-review.json
 python -m k_resdev_skill workspace-trace --root . --output .\reports\workspace-trace.md --json .\state\workspace-trace.json
 python -m k_resdev_skill budget-ledger-import .\references\budget-ledger.csv --state-dir .\state --markdown .\reports\budget-ledger-import.md
 python -m k_resdev_skill budget-ledger-integrity --root . --output .\reports\budget-ledger.md --json .\state\budget-ledger-integrity.json

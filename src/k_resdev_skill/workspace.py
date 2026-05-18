@@ -23,6 +23,7 @@ from .models import (
     WorkspaceInitResult,
 )
 from .profile_registry import default_agency_templates_root, load_project_profile
+from .profile_review import generate_profile_review
 from .profile_sources import generate_profile_integrity, load_profile_sources
 from .project_goals import generate_goals_review
 from .reference_corpus import build_reference_corpus
@@ -62,6 +63,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "goals-review.md",
     "next-actions.md",
     "profile-integrity.md",
+    "profile-review.md",
     "profile-source-summary.md",
     "readiness.md",
     "reference-corpus-summary.md",
@@ -177,6 +179,7 @@ def run_workspace_doctor(
     _check_budget_ledger(workspace, findings)
     _check_profile(workspace, findings)
     _check_profile_integrity(workspace, findings)
+    _check_profile_review(workspace, findings)
     _check_reports(workspace, findings)
     _check_report_integrity(workspace, findings)
     _check_artifact_authority(workspace, findings)
@@ -565,6 +568,31 @@ def _check_profile_integrity(workspace: Path, findings: list[WorkspaceDoctorFind
                 f"{result.medium_count + result.low_count} profile source review finding(s) or warnings were detected.",
                 path,
                 "Review profile-integrity output before treating any agency/profile template as verified.",
+            )
+        )
+
+
+def _check_profile_review(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> None:
+    result = generate_profile_review(workspace)
+    path = workspace / "state" / "profile-review.json"
+    if result.status == "blocked":
+        findings.append(
+            _finding(
+                "profile_review_blocked",
+                "high",
+                f"{result.failed_count} profile promotion review check(s) failed, including at least one high-severity check.",
+                path,
+                "Run profile-review and resolve high-severity profile promotion blockers.",
+            )
+        )
+    elif not result.can_promote:
+        findings.append(
+            _finding(
+                "profile_review_incomplete",
+                "medium",
+                f"{result.failed_count} profile promotion review check(s) still require human/source metadata.",
+                path,
+                "Run profile-review before marking any profile as verified.",
             )
         )
 
@@ -1064,6 +1092,7 @@ def _starter_readme(project_id: str, title: str, profile_id: str) -> str:
             "- Run `k-resdev research-claim-matrix --root . --output reports/research-claim-matrix.md --json state/research-claim-matrix.json` to check claims against evidence, bibliography, and citation support.",
             "- Run `k-resdev profile-source-record --profile-id <profile-id> --title \"<official source title>\" --source-url <url> --review-status needs_review` to record official-source metadata for profile review.",
             "- Run `k-resdev profile-integrity --root . --output reports/profile-integrity.md --json state/profile-integrity.json` to check profile source records.",
+            "- Run `k-resdev profile-review --root . --output reports/profile-review.md --json state/profile-review.json` before promoting any profile to verified.",
             "- Run `k-resdev budget-ledger-import references/budget-ledger.csv --state-dir state --markdown reports/budget-ledger-import.md` to import a reviewable budget ledger.",
             "- Run `k-resdev budget-ledger-integrity --root . --output reports/budget-ledger.md --json state/budget-ledger-integrity.json` to check ledger proof, approval, duplicate, and evidence-link gaps.",
             "- Run `k-resdev checkpoint-create --root . --stage review-pack --summary \"<summary>\" --status needs_review` to create a hash-backed resume checkpoint.",

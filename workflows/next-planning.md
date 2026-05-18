@@ -1,12 +1,12 @@
 # K-ResDev Next Planning
 
-This planning note starts after `0.1.0b34`.
+This planning note starts after `0.1.0b35`.
 
 ## Current Diagnosis
 
-K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, budget ledger review, bibliography metadata, reference corpus adapters, read-only workspace discovery, bibliography review, citation support, research claim matrices, profile source records, profile integrity, a narrow source-backed IRIS/Innopolis profile seed, workspace traceability graph, trace passport checkpoints, artifact authority labels, goals/deadline review, weekly operating reviews, workspace dashboards, thin local workflow router, workspace doctor, next actions, workspace summary, and review packs.
+K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, budget ledger review, bibliography metadata, reference corpus adapters, read-only workspace discovery, bibliography review, citation support, research claim matrices, profile source records, profile integrity, a narrow source-backed IRIS/Innopolis profile seed, profile promotion review, workspace traceability graph, trace passport checkpoints, artifact authority labels, goals/deadline review, weekly operating reviews, workspace dashboards, thin local workflow router, workspace doctor, next actions, workspace summary, and review packs.
 
-The next bottleneck is profile promotion governance. K-ResDev now has one official-source-backed profile seed, but it intentionally remains `needs_review`. The next high-value move is to add a deterministic review workflow that prevents profile promotion unless source hashes, human reviewer identity, and applicability notes are all supplied.
+The next bottleneck is recording supplied human promotion decisions without letting the tool silently mutate official profile status. K-ResDev can now say whether local metadata is ready for promotion; the next high-value move is a data-only promotion record workflow that binds a passing profile-review artifact hash to a human decision.
 
 ## Planning Principles
 
@@ -235,6 +235,8 @@ Safety boundary:
 
 Goal: add a review workflow that can explain what is still missing before a source-backed profile may be promoted.
 
+Status: implemented as a local first pass in `src/k_resdev_skill/profile_review.py`, with CLI/API, schema/template, doctor, next-action, workspace-summary, review-pack, operational Markdown filtering, and trace integration.
+
 Expected scope:
 - `profile-review` command over `state/project-profile.json` and `state/profile-sources.json`;
 - promotion checklist for source freshness, hash match, reviewer identity, applicability notes, and unresolved risk flags;
@@ -244,6 +246,20 @@ Expected scope:
 
 Safety boundary:
 - Promotion checks are guardrails only. They do not certify legal compliance or official submission readiness.
+
+### Beta 36 - Profile Promotion Record Workflow
+
+Goal: record supplied human profile promotion decisions without making AI-generated profile checks authoritative.
+
+Expected scope:
+- `profile-promotion-record` command for supplied human decisions;
+- optional `--apply` mode later, but default should only write records;
+- require a passing `state/profile-review.json` hash before accepting a promotion record;
+- record reviewer, reviewed_at, target profile ID, source review hash, decision, and notes;
+- integrate promotion records into profile-review, doctor, next actions, summary, review pack, and trace.
+
+Safety boundary:
+- The tool records supplied decisions only. It must not infer official verification, mutate profile status by default, or certify agency compliance.
 
 ## Deferred Ideas
 
@@ -257,6 +273,6 @@ These should wait until traceability, impact analysis, and verified profile sour
 
 ## Recommended Next Slice
 
-Implement Beta 35 next.
+Implement Beta 36 next.
 
-Beta 35 should make profile promotion reviewable before any profile moves from `needs_review` to `verified`. It should require current source records, hash checks, and supplied human review metadata while keeping all official rules in profile data rather than Python logic.
+Beta 36 should make human profile-promotion decisions traceable and hash-bound while preserving the rule that AI checks are projections, not official certification.

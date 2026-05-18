@@ -478,11 +478,23 @@ This task does not certify the profile as an official IRIS, NTIS, MSIT, or Innop
 
 ### Task 45: Verified profile review workflow
 
+Implemented:
+- `ProfileReviewChecklistItem` and `ProfileReviewResult` models
+- `profile-review` command and public API
+- `reports/profile-review.md` and `state/profile-review.json`
+- promotion-readiness checks for source records, local source file/hash freshness, reviewer identity, retrieved date, applicability notes, verified review status, and unresolved risk flags
+- doctor, next-action, workspace-summary, review-pack, artifact filtering, schema/template, and trace integration
+- no automatic profile mutation or official approval creation
+
+Profile review is a guardrail projection only. It can say local metadata is ready for human-controlled promotion, but it does not certify official compliance.
+
+### Task 46: Profile promotion record workflow
+
 Planned:
-- add a review command that compares a profile seed, source records, and supplied human verification records
-- emit a promotion checklist before any profile can move from `needs_review` to `verified`
-- require source hash freshness and explicit reviewer identity before promotion
-- keep promotion as data-only profile metadata, not Python hardcoding
+- add a data-only command that records a supplied human profile promotion decision
+- require a passing profile-review artifact hash before writing a promotion record
+- keep project profile mutation opt-in and non-destructive
+- integrate promotion records into trace, doctor, summary, and review pack
 
 ## Safety constraints
 

@@ -29,6 +29,7 @@ from .models import (
     WorkspaceTraceNode,
     WorkspaceTraceResult,
 )
+from .profile_review import load_profile_review
 from .profile_sources import load_profile_sources
 from .project_goals import generate_goals_review
 from .reference_corpus import build_reference_corpus
@@ -50,6 +51,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "goals-review.md",
     "next-actions.md",
     "profile-integrity.md",
+    "profile-review.md",
     "profile-source-summary.md",
     "readiness.md",
     "reference-corpus-summary.md",
@@ -82,6 +84,7 @@ def generate_workspace_trace(
     builder.add_project_goals()
     builder.add_budget_ledger()
     builder.add_profile_sources()
+    builder.add_profile_review()
     builder.add_bibliography()
     builder.add_reference_corpus()
     builder.add_reports()
@@ -503,6 +506,50 @@ class _TraceBuilder:
                     path=source.source_file,
                     suggested_action="Record verified_by and a hash-backed local source/reference artifact.",
                 )
+
+    def add_profile_review(self) -> None:
+        path = self.workspace / "state" / "profile-review.json"
+        if not path.exists():
+            return
+        try:
+            review = load_profile_review(path)
+        except Exception as exc:
+            self.finding(
+                "trace_profile_review_unreadable",
+                "medium",
+                f"Profile review could not be read: {exc}",
+                path=path,
+                suggested_action="Regenerate profile-review before relying on profile promotion trace state.",
+            )
+            return
+        node = self.node(
+            "profile_review",
+            "profile-review",
+            "Profile review",
+            status=review.status,
+            path=str(path),
+            metadata={
+                "profile_id": review.profile_id,
+                "can_promote": review.can_promote,
+                "failed_count": review.failed_count,
+                "source_count": review.source_count,
+            },
+        )
+        if review.profile_id:
+            self.edge(node.node_id, _node_id("profile", review.profile_id), "reviews_profile")
+        for item in review.checklist:
+            if item.source_id:
+                self.edge(node.node_id, _node_id("profile_source", item.source_id), "reviews_source")
+        if not review.can_promote:
+            severity = "high" if review.status == "blocked" else "medium"
+            self.finding(
+                "trace_profile_review_incomplete",
+                severity,
+                f"Profile review status is `{review.status}` with {review.failed_count} failed check(s).",
+                node_id=node.node_id,
+                path=str(path),
+                suggested_action="Run profile-review and resolve promotion blockers before marking any profile verified.",
+            )
 
     def add_approvals(self) -> None:
         approvals_dir = self.workspace / "state" / "approvals"

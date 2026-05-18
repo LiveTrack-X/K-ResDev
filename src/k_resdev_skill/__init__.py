@@ -103,6 +103,8 @@ from .models import (
     PaperRecord,
     ProfileIntegrityFinding,
     ProfileIntegrityResult,
+    ProfileReviewChecklistItem,
+    ProfileReviewResult,
     ProfileSource,
     ProjectDeadline,
     ProjectGoalsFile,
@@ -159,6 +161,7 @@ from .models import (
     WorkflowStep,
 )
 from .plan_mapper import extract_project_state_from_text
+from .profile_review import generate_profile_review, load_profile_review, render_profile_review_markdown
 from .profile_sources import (
     create_profile_source_record,
     default_profile_sources_path,
@@ -276,6 +279,8 @@ __all__ = [
     "PaperRecord",
     "ProfileIntegrityFinding",
     "ProfileIntegrityResult",
+    "ProfileReviewChecklistItem",
+    "ProfileReviewResult",
     "ProfileSource",
     "ProjectDeadline",
     "ProjectGoalsFile",
@@ -370,6 +375,7 @@ __all__ = [
     "generate_literature_matrix",
     "generate_paper_card_markdown",
     "generate_profile_integrity",
+    "generate_profile_review",
     "generate_profile_registry",
     "generate_reproducibility_checklist",
     "generate_research_claim_matrix",
@@ -405,6 +411,7 @@ __all__ = [
     "load_project_profile",
     "load_project_goals",
     "load_profile_sources",
+    "load_profile_review",
     "load_reference_corpus",
     "load_reference_rejections",
     "load_research_claims",
@@ -436,6 +443,7 @@ __all__ = [
     "render_evidence_source_verification_markdown",
     "render_goals_review_markdown",
     "render_profile_integrity_markdown",
+    "render_profile_review_markdown",
     "render_profile_source_summary_markdown",
     "render_reference_corpus_summary",
     "render_report_integrity_markdown",
@@ -469,4 +477,4 @@ __all__ = [
     "write_research_claims",
 ]
 
-__version__ = "0.1.0b34"
+__version__ = "0.1.0b35"

@@ -1,0 +1,10 @@
+{
+  "check_id": "profile-source-verified",
+  "title": "Source is human-verified",
+  "status": "fail",
+  "severity": "medium",
+  "message": "Profile source remains needs_review.",
+  "source_id": "PRS-2026-0001",
+  "path": "state/profile-sources/source-note.md",
+  "suggested_action": "Record supplied human verification before profile promotion."
+}

@@ -125,6 +125,12 @@ def test_validate_json_file_accepts_workflow_aliases():
     assert plan["valid"] is True
 
 
+def test_validate_json_file_accepts_profile_review_aliases():
+    check = validate_json_file("templates/profile-review-check.json", "profile-review-check")
+
+    assert check["valid"] is True
+
+
 def test_validate_json_cli_returns_nonzero_for_invalid(tmp_path, capsys):
     path = tmp_path / "bad-approval.json"
     path.write_text(json.dumps({"approval_id": "APR-2026-BAD"}), encoding="utf-8")

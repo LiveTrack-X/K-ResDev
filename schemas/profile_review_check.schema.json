@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ProfileReviewChecklistItem",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["check_id", "title", "status", "severity", "message"],
+  "properties": {
+    "check_id": {"type": "string"},
+    "title": {"type": "string"},
+    "status": {"type": "string", "enum": ["pass", "fail", "warn"]},
+    "severity": {"type": "string", "enum": ["high", "medium", "low"]},
+    "message": {"type": "string"},
+    "source_id": {"type": ["string", "null"]},
+    "path": {"type": ["string", "null"]},
+    "suggested_action": {"type": ["string", "null"]}
+  }
+}

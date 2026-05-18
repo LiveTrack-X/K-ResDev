@@ -20,6 +20,7 @@ from .models import (
 )
 from .profile_registry import default_agency_templates_root, load_project_profile
 from .profile_sources import generate_profile_integrity
+from .research_claims import generate_research_claim_matrix
 from .report_integrity import generate_workspace_report_integrity
 from .schema_tools import validate_json_file
 from .source_verification import verify_evidence_sources
@@ -51,6 +52,8 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "profile-integrity.md",
     "profile-source-summary.md",
     "readiness.md",
+    "research-claim-matrix.md",
+    "research-claims.md",
     "report-integrity.md",
     "source-verification.md",
     "workspace-review-pack.md",
@@ -146,6 +149,7 @@ def run_workspace_doctor(
     _check_report_integrity(workspace, findings)
     _check_bibliography_integrity(workspace, findings)
     _check_citation_support_integrity(workspace, findings)
+    _check_research_claim_matrix(workspace, findings)
     _check_workspace_trace(workspace, findings)
     _check_exports(workspace, findings)
     _check_analysis(workspace, findings)
@@ -591,6 +595,33 @@ def _check_citation_support_integrity(workspace: Path, findings: list[WorkspaceD
         )
 
 
+def _check_research_claim_matrix(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> None:
+    result = generate_research_claim_matrix(workspace)
+    if result.status == "not_configured":
+        return
+    path = workspace / "state" / "research-claims.json"
+    if result.high_count:
+        findings.append(
+            _finding(
+                "research_claim_matrix_high_findings",
+                "high",
+                f"{result.high_count} high-severity research claim matrix finding(s) were detected.",
+                path,
+                "Run research-claim-matrix and resolve invalid evidence, citation, or support links before external manuscript/report use.",
+            )
+        )
+    if result.medium_count or result.low_count or result.warnings:
+        findings.append(
+            _finding(
+                "research_claim_matrix_review_findings",
+                "medium",
+                f"{result.medium_count + result.low_count} research claim matrix review finding(s) or warnings were detected.",
+                path,
+                "Review research-claim-matrix output and keep unresolved claims as hypothesis/candidate items.",
+            )
+        )
+
+
 def _check_workspace_trace(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> None:
     result = generate_workspace_trace(workspace)
     path = workspace / "state" / "workspace-trace.json"
@@ -713,13 +744,15 @@ def _starter_readme(project_id: str, title: str, profile_id: str) -> str:
             "- Run `k-resdev bib-integrity --root . --output reports/bibliography-integrity.md --json state/bibliography-integrity.json` to check citation keys and bibliography source hashes.",
             "- Run `k-resdev citation-support-record --bibliography-id <BIB-ID> --citation-key <key> --claim \"<claim>\" --decision needs_review --reviewer <reviewer> --support-dir state/citation-support` to record paper-claim support decisions.",
             "- Run `k-resdev citation-support-integrity --root . --output reports/citation-support.md --json state/citation-support.json` to check cited papers against supplied support records.",
+            "- Run `k-resdev research-claim-import references/research-claims.csv --state-dir state --markdown reports/research-claims.md` to import supplied research claim records.",
+            "- Run `k-resdev research-claim-matrix --root . --output reports/research-claim-matrix.md --json state/research-claim-matrix.json` to check claims against evidence, bibliography, and citation support.",
             "- Run `k-resdev profile-source-record --profile-id <profile-id> --title \"<official source title>\" --source-url <url> --review-status needs_review` to record official-source metadata for profile review.",
             "- Run `k-resdev profile-integrity --root . --output reports/profile-integrity.md --json state/profile-integrity.json` to check profile source records.",
             "- Run `k-resdev budget-ledger-import references/budget-ledger.csv --state-dir state --markdown reports/budget-ledger-import.md` to import a reviewable budget ledger.",
             "- Run `k-resdev budget-ledger-integrity --root . --output reports/budget-ledger.md --json state/budget-ledger-integrity.json` to check ledger proof, approval, duplicate, and evidence-link gaps.",
             "- Run `k-resdev doctor --root . --output reports/readiness.md --json state/readiness.json` before reporting.",
             "- Run `k-resdev workspace-summary --root . --output reports/workspace-summary.md --json state/workspace-summary.json` for a one-page status handoff.",
-            "- Run `k-resdev workspace-review-pack --root .` to refresh readiness, next actions, summary, source-verification, budget-ledger, approval-coverage, report-integrity, bibliography-integrity, and citation-support artifacts together.",
+            "- Run `k-resdev workspace-review-pack --root .` to refresh readiness, next actions, summary, source-verification, budget-ledger, approval-coverage, report-integrity, bibliography-integrity, citation-support, research-claim-matrix, and trace artifacts together.",
             "- Run `k-resdev verify-review-pack state/workspace-review-pack.json` to check saved review-pack artifact hashes.",
             "- Run `k-resdev verify-evidence-sources state/evidence-index.json --root . --output reports/source-verification.md --json state/source-verification.json` to check indexed source hashes.",
             "- Run `k-resdev approval-coverage --root . --output reports/approval-coverage.md --json state/approval-coverage.json` to check report approval coverage.",

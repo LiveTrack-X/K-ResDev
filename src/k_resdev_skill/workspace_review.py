@@ -15,6 +15,7 @@ from .bibliography_integrity import generate_workspace_bibliography_integrity
 from .budget_ledger import generate_workspace_budget_ledger
 from .citation_support import generate_workspace_citation_support_integrity
 from .profile_sources import generate_profile_integrity
+from .research_claims import generate_research_claim_matrix
 from .report_integrity import generate_workspace_report_integrity
 from .source_verification import verify_evidence_sources
 from .workspace import run_workspace_doctor
@@ -29,7 +30,7 @@ def generate_workspace_review_pack(
     state_dir: str | Path | None = None,
     max_actions: int = 5,
 ) -> WorkspaceReviewPackResult:
-    """Generate a bundled local review pack for readiness, traceability, budget, profile, source, approval, report, bibliography, and citation-support checks."""
+    """Generate a bundled local review pack for readiness, traceability, budget, profile, source, approval, report, bibliography, citation-support, and research-claim checks."""
 
     workspace = Path(root)
     reports = Path(reports_dir) if reports_dir is not None else workspace / "reports"
@@ -55,6 +56,8 @@ def generate_workspace_review_pack(
     bibliography_integrity_json = state / "bibliography-integrity.json"
     citation_support_md = reports / "citation-support.md"
     citation_support_json = state / "citation-support.json"
+    research_claim_md = reports / "research-claim-matrix.md"
+    research_claim_json = state / "research-claim-matrix.json"
     profile_integrity_md = reports / "profile-integrity.md"
     profile_integrity_json = state / "profile-integrity.json"
     workspace_trace_md = reports / "workspace-trace.md"
@@ -69,6 +72,7 @@ def generate_workspace_review_pack(
     budget_ledger = generate_workspace_budget_ledger(workspace, output_path=budget_ledger_md, json_path=budget_ledger_json)
     bibliography_integrity = generate_workspace_bibliography_integrity(workspace, output_path=bibliography_integrity_md, json_path=bibliography_integrity_json)
     citation_support = generate_workspace_citation_support_integrity(workspace, output_path=citation_support_md, json_path=citation_support_json)
+    research_claim_matrix = generate_research_claim_matrix(workspace, output_path=research_claim_md, json_path=research_claim_json)
     profile_integrity = generate_profile_integrity(workspace, output_path=profile_integrity_md, json_path=profile_integrity_json)
     workspace_trace = generate_workspace_trace(workspace, output_path=workspace_trace_md, json_path=workspace_trace_json)
     actions = generate_workspace_action_plan(workspace, doctor_result=doctor, output_path=actions_md, json_path=actions_json)
@@ -99,6 +103,8 @@ def generate_workspace_review_pack(
         str(bibliography_integrity_json),
         str(citation_support_md),
         str(citation_support_json),
+        str(research_claim_md),
+        str(research_claim_json),
         str(profile_integrity_md),
         str(profile_integrity_json),
         str(workspace_trace_md),
@@ -139,6 +145,10 @@ def generate_workspace_review_pack(
         citation_support_citation_count=citation_support.citation_count,
         citation_support_finding_count=citation_support.finding_count,
         citation_support_high_count=citation_support.high_count,
+        research_claim_matrix_status=research_claim_matrix.status,
+        research_claim_count=research_claim_matrix.claim_count,
+        research_claim_matrix_finding_count=research_claim_matrix.finding_count,
+        research_claim_matrix_high_count=research_claim_matrix.high_count,
         profile_integrity_status=profile_integrity.status,
         profile_source_count=profile_integrity.source_count,
         profile_verified_source_count=profile_integrity.verified_source_count,
@@ -203,7 +213,7 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
     lines = [
         "# K-ResDev Workspace Review Pack",
         "",
-        "> Review pack projection only. It bundles local readiness, next-action, summary, source-verification, budget-ledger, approval-coverage, report-integrity, bibliography-integrity, citation-support, profile-integrity, and trace artifacts; it does not certify official agency compliance.",
+        "> Review pack projection only. It bundles local readiness, next-action, summary, source-verification, budget-ledger, approval-coverage, report-integrity, bibliography-integrity, citation-support, research-claim-matrix, profile-integrity, and trace artifacts; it does not certify official agency compliance.",
         "",
         "| Field | Value |",
         "|---|---|",
@@ -239,6 +249,10 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
         f"| Citation support citation count | {result.citation_support_citation_count} |",
         f"| Citation support finding count | {result.citation_support_finding_count} |",
         f"| Citation support high count | {result.citation_support_high_count} |",
+        f"| Research claim matrix status | {_escape(result.research_claim_matrix_status or '-')} |",
+        f"| Research claim count | {result.research_claim_count} |",
+        f"| Research claim matrix finding count | {result.research_claim_matrix_finding_count} |",
+        f"| Research claim matrix high count | {result.research_claim_matrix_high_count} |",
         f"| Profile integrity status | {_escape(result.profile_integrity_status or '-')} |",
         f"| Profile source count | {result.profile_source_count} |",
         f"| Profile verified source count | {result.profile_verified_source_count} |",
@@ -277,6 +291,7 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
             "- Use `budget-ledger.md` to check budget ledger proof, approval, duplicate, and evidence-link gaps.",
             "- Use `bibliography-integrity.md` to check local citation keys and bibliography source hashes.",
             "- Use `citation-support.md` to check cited papers against supplied paper-claim support records.",
+            "- Use `research-claim-matrix.md` to check supplied research claims against evidence, bibliography, and citation-support records.",
             "- Use `profile-integrity.md` to check project/agency profile source records and drift.",
             "- Use `workspace-trace.md` to inspect cross-artifact traceability and impact findings.",
             "- Run `verify-review-pack state/workspace-review-pack.json` before relying on a saved pack.",
@@ -308,6 +323,8 @@ def _artifact_label(path: str) -> str:
         "bibliography-integrity.json": "Bibliography integrity JSON",
         "citation-support.md": "Citation support",
         "citation-support.json": "Citation support JSON",
+        "research-claim-matrix.md": "Research claim matrix",
+        "research-claim-matrix.json": "Research claim matrix JSON",
         "profile-integrity.md": "Profile integrity",
         "profile-integrity.json": "Profile integrity JSON",
         "workspace-trace.md": "Workspace trace",

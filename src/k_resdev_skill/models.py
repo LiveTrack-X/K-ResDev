@@ -97,6 +97,15 @@ class CitationSupportDecision(str, Enum):
     SUPERSEDED = "superseded"
 
 
+class ResearchClaimStatus(str, Enum):
+    HYPOTHESIS = "hypothesis"
+    CANDIDATE = "candidate"
+    NEEDS_REVIEW = "needs_review"
+    ACCEPTED = "accepted"
+    REJECTED = "rejected"
+    SUPERSEDED = "superseded"
+
+
 class ApprovalTargetType(str, Enum):
     REPORT = "report"
     EVIDENCE = "evidence"
@@ -448,6 +457,67 @@ class CitationSupportRecord(StrictModel):
         return value.strip()
 
 
+class ResearchClaim(StrictModel):
+    claim_id: str
+    claim: str
+    claim_type: str = "research"
+    evidence_ids: list[str] = Field(default_factory=list)
+    citation_keys: list[str] = Field(default_factory=list)
+    bibliography_ids: list[str] = Field(default_factory=list)
+    support_ids: list[str] = Field(default_factory=list)
+    insight_ids: list[str] = Field(default_factory=list)
+    status: ResearchClaimStatus = ResearchClaimStatus.NEEDS_REVIEW
+    confidence: Confidence = Confidence.UNKNOWN
+    risk_flags: list[str] = Field(default_factory=list)
+    next_checks: list[str] = Field(default_factory=list)
+    notes: str | None = None
+
+    @field_validator("claim_id", "claim", "claim_type")
+    @classmethod
+    def _must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
+class ResearchClaimImportResult(StrictModel):
+    source_file: str
+    source_hash: str
+    source_format: str
+    claim_count: int = 0
+    claims_json_path: str
+    claims_markdown_path: str
+    warnings: list[str] = Field(default_factory=list)
+
+
+class ResearchClaimMatrixFinding(StrictModel):
+    code: str
+    severity: str
+    message: str
+    claim_id: str | None = None
+    evidence_id: str | None = None
+    citation_key: str | None = None
+    bibliography_id: str | None = None
+    support_id: str | None = None
+    path: str | None = None
+    suggested_action: str | None = None
+
+
+class WorkspaceResearchClaimMatrixResult(StrictModel):
+    root: str
+    status: str
+    claim_count: int = 0
+    finding_count: int = 0
+    high_count: int = 0
+    medium_count: int = 0
+    low_count: int = 0
+    claims: list[ResearchClaim] = Field(default_factory=list)
+    findings: list[ResearchClaimMatrixFinding] = Field(default_factory=list)
+    markdown_path: str | None = None
+    json_path: str | None = None
+    warnings: list[str] = Field(default_factory=list)
+
+
 class BibliographyIntegrityFinding(StrictModel):
     code: str
     severity: str
@@ -626,6 +696,9 @@ class WorkspaceSummaryResult(StrictModel):
     budget_ledger_count: int = 0
     budget_ledger_finding_count: int = 0
     budget_total_by_currency: dict[str, float] = Field(default_factory=dict)
+    research_claim_matrix_status: str | None = None
+    research_claim_count: int = 0
+    research_claim_matrix_finding_count: int = 0
     profile_integrity_status: str | None = None
     profile_source_count: int = 0
     profile_verified_source_count: int = 0
@@ -756,6 +829,10 @@ class WorkspaceReviewPackResult(StrictModel):
     citation_support_citation_count: int = 0
     citation_support_finding_count: int = 0
     citation_support_high_count: int = 0
+    research_claim_matrix_status: str | None = None
+    research_claim_count: int = 0
+    research_claim_matrix_finding_count: int = 0
+    research_claim_matrix_high_count: int = 0
     budget_ledger_status: str | None = None
     budget_ledger_count: int = 0
     budget_ledger_finding_count: int = 0

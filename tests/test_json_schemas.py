@@ -82,3 +82,12 @@ def test_budget_ledger_item_template_matches_json_schema():
         sample = json.load(handle)
 
     jsonschema.validate(sample, schema)
+
+
+def test_research_claim_template_matches_json_schema():
+    with open("schemas/research_claim.schema.json", encoding="utf-8") as handle:
+        schema = json.load(handle)
+    with open("templates/research-claim.json", encoding="utf-8") as handle:
+        sample = json.load(handle)
+
+    jsonschema.validate(sample, schema)

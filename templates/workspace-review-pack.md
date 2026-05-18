@@ -1,6 +1,6 @@
 # K-ResDev Workspace Review Pack
 
-> Review pack projection only. It bundles local readiness, next-action, summary, source-verification, budget-ledger, approval-coverage, report-integrity, bibliography-integrity, citation-support, profile-integrity, and trace artifacts; it does not certify official agency compliance.
+> Review pack projection only. It bundles local readiness, next-action, summary, source-verification, budget-ledger, approval-coverage, report-integrity, bibliography-integrity, citation-support, research-claim-matrix, profile-integrity, and trace artifacts; it does not certify official agency compliance.
 
 | Field | Value |
 |---|---|
@@ -36,6 +36,10 @@
 | Citation support citation count | `{{citation_support_citation_count}}` |
 | Citation support finding count | `{{citation_support_finding_count}}` |
 | Citation support high count | `{{citation_support_high_count}}` |
+| Research claim matrix status | `{{research_claim_matrix_status}}` |
+| Research claim count | `{{research_claim_count}}` |
+| Research claim matrix finding count | `{{research_claim_matrix_finding_count}}` |
+| Research claim matrix high count | `{{research_claim_matrix_high_count}}` |
 | Profile integrity status | `{{profile_integrity_status}}` |
 | Profile source count | `{{profile_source_count}}` |
 | Profile verified source count | `{{profile_verified_source_count}}` |
@@ -57,6 +61,7 @@
 | Budget ledger integrity | `reports/budget-ledger.md` |
 | Bibliography integrity | `reports/bibliography-integrity.md` |
 | Citation support | `reports/citation-support.md` |
+| Research claim matrix | `reports/research-claim-matrix.md` |
 | Profile integrity | `reports/profile-integrity.md` |
 | Workspace trace | `reports/workspace-trace.md` |
 | Review pack index | `reports/workspace-review-pack.md` |

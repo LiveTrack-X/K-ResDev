@@ -86,6 +86,7 @@ def _actions_for_findings(root: Path, findings: list[WorkspaceDoctorFinding]) ->
         _action_for_report_integrity(root, by_code),
         _action_for_bibliography_integrity(root, by_code),
         _action_for_citation_support_integrity(root, by_code),
+        _action_for_research_claim_matrix(root, by_code),
         _action_for_workspace_trace(root, by_code),
         _action_for_reports(root, by_code),
         _action_for_analysis(root, by_code),
@@ -304,6 +305,22 @@ def _action_for_citation_support_integrity(root: Path, by_code: dict[str, list[W
         "Review citation support",
         "Cited papers should have supplied human paper-claim support records before external manuscript or report use.",
         f'python -m k_resdev_skill citation-support-integrity --root "{root}" --output "{root / "reports" / "citation-support.md"}" --json "{root / "state" / "citation-support.json"}"',
+        by_code,
+        codes,
+    )
+
+
+def _action_for_research_claim_matrix(root: Path, by_code: dict[str, list[WorkspaceDoctorFinding]]) -> WorkspaceActionItem | None:
+    codes = ["research_claim_matrix_high_findings", "research_claim_matrix_review_findings"]
+    if not any(code in by_code for code in codes):
+        return None
+    priority = "high" if "research_claim_matrix_high_findings" in by_code else "medium"
+    return _action(
+        root,
+        priority,
+        "Review research claim matrix",
+        "Research claims should resolve to reviewed local evidence, bibliography metadata, and supplied citation-support decisions before external manuscript or report use.",
+        f'python -m k_resdev_skill research-claim-matrix --root "{root}" --output "{root / "reports" / "research-claim-matrix.md"}" --json "{root / "state" / "research-claim-matrix.json"}"',
         by_code,
         codes,
     )

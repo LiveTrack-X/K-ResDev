@@ -96,7 +96,11 @@ from .models import (
     ReportDraftPaths,
     ReviewPackArtifact,
     ReviewPackVerificationItem,
+    ResearchClaim,
+    ResearchClaimImportResult,
+    ResearchClaimMatrixFinding,
     ResearchInsight,
+    ResearchClaimStatus,
     SourceRecord,
     WorkspaceActionItem,
     WorkspaceActionPlan,
@@ -110,6 +114,7 @@ from .models import (
     WorkspaceInitResult,
     WorkspaceReportIntegrityItem,
     WorkspaceReportIntegrityResult,
+    WorkspaceResearchClaimMatrixResult,
     WorkspaceReviewPackResult,
     WorkspaceReviewPackVerificationResult,
     WorkspaceSummaryResult,
@@ -134,6 +139,15 @@ from .profile_sources import (
 from .profile_registry import generate_profile_registry, list_project_profiles, load_project_profile
 from .projection_export import export_projection, write_projection_docx, write_projection_html, write_projection_text
 from .report_integrity import generate_workspace_report_integrity, render_report_integrity_markdown
+from .research_claims import (
+    generate_research_claim_matrix,
+    import_research_claims,
+    load_research_claims,
+    parse_research_claim_file,
+    render_research_claim_matrix_markdown,
+    render_research_claims_markdown,
+    write_research_claims,
+)
 from .research_assistant import (
     generate_data_insight_candidates,
     generate_data_insight_report,
@@ -191,7 +205,11 @@ __all__ = [
     "ReportDraftPaths",
     "ReviewPackArtifact",
     "ReviewPackVerificationItem",
+    "ResearchClaim",
+    "ResearchClaimImportResult",
+    "ResearchClaimMatrixFinding",
     "ResearchInsight",
+    "ResearchClaimStatus",
     "SourceRecord",
     "WorkspaceActionItem",
     "WorkspaceActionPlan",
@@ -205,6 +223,7 @@ __all__ = [
     "WorkspaceInitResult",
     "WorkspaceReportIntegrityItem",
     "WorkspaceReportIntegrityResult",
+    "WorkspaceResearchClaimMatrixResult",
     "WorkspaceReviewPackResult",
     "WorkspaceReviewPackVerificationResult",
     "WorkspaceSummaryResult",
@@ -247,6 +266,7 @@ __all__ = [
     "generate_profile_integrity",
     "generate_profile_registry",
     "generate_reproducibility_checklist",
+    "generate_research_claim_matrix",
     "generate_workspace_action_plan",
     "generate_workspace_approval_coverage",
     "generate_workspace_bibliography_integrity",
@@ -257,6 +277,7 @@ __all__ = [
     "generate_workspace_trace",
     "import_bibliography",
     "import_budget_ledger",
+    "import_research_claims",
     "initialize_workspace",
     "load_bibliography_index",
     "load_budget_ledger",
@@ -270,11 +291,13 @@ __all__ = [
     "load_evidence_index",
     "load_project_profile",
     "load_profile_sources",
+    "load_research_claims",
     "profile_data_file",
     "paper_records_from_bibliography",
     "parse_budget_ledger_file",
     "paper_card_from_text",
     "parse_bibliography_file",
+    "parse_research_claim_file",
     "render_bibliography_index",
     "render_budget_ledger_integrity_markdown",
     "render_budget_ledger_markdown",
@@ -290,6 +313,8 @@ __all__ = [
     "render_profile_integrity_markdown",
     "render_profile_source_summary_markdown",
     "render_report_integrity_markdown",
+    "render_research_claim_matrix_markdown",
+    "render_research_claims_markdown",
     "render_workspace_review_pack_markdown",
     "render_workspace_summary_markdown",
     "render_workspace_trace_markdown",
@@ -309,6 +334,7 @@ __all__ = [
     "write_projection_docx",
     "write_projection_html",
     "write_projection_text",
+    "write_research_claims",
 ]
 
-__version__ = "0.1.0b25"
+__version__ = "0.1.0b26"

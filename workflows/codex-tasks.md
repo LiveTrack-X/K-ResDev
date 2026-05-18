@@ -360,11 +360,12 @@ Budget ledgers are review aids only. They must not infer official cost eligibili
 
 ### Task 35: Research claim matrix
 
-Planned:
+Implemented:
 - `ResearchClaim` model
-- claim matrix writer connecting author claims, AI interpretations, experiment evidence, citation support, risk flags, and next checks
+- JSON/CSV research claim import into `state/research-claims.json`
+- claim summary and matrix writers connecting supplied claims, experiment evidence, citation support, risk flags, and next checks
 - report/manuscript citation-support coverage by claim rather than citation key alone
-- optional projection into literature-review matrix outputs
+- schema, template, CLI, workspace doctor, next-action, summary, review-pack, and trace integration
 
 Research claims stay `hypothesis`, `candidate`, or `needs_review` unless a supplied human review record accepts them.
 

@@ -1,0 +1,19 @@
+{
+  "claim_id": "RCL-2026-NEEDSREVIEW",
+  "claim": "claim_needs_review",
+  "claim_type": "research",
+  "evidence_ids": [],
+  "citation_keys": [],
+  "bibliography_ids": [],
+  "support_ids": [],
+  "insight_ids": [],
+  "status": "needs_review",
+  "confidence": "unknown",
+  "risk_flags": [
+    "claim_needs_review"
+  ],
+  "next_checks": [
+    "Link evidence IDs, bibliography metadata, and citation-support records before external use."
+  ],
+  "notes": "Research claims are candidates until human-reviewed."
+}

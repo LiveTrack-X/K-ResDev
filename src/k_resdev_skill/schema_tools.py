@@ -26,6 +26,8 @@ SCHEMA_ALIASES = {
     "project-state": "project_state.schema.json",
     "research-insight": "research_insight.schema.json",
     "research_insight": "research_insight.schema.json",
+    "research-claim": "research_claim.schema.json",
+    "research_claim": "research_claim.schema.json",
 }
 
 
@@ -81,6 +83,7 @@ def _validation_targets(document: Any, schema_payload: dict[str, Any]) -> list[t
         "CitationSupportRecord",
         "EvidenceItem",
         "ProfileSource",
+        "ResearchClaim",
         "ResearchInsight",
     }:
         if isinstance(document, list):

@@ -56,6 +56,7 @@ from .profile_sources import (
 from .profile_registry import generate_profile_registry, list_project_profiles, load_project_profile
 from .projection_export import export_projection
 from .report_integrity import generate_workspace_report_integrity
+from .research_claims import generate_research_claim_matrix, import_research_claims, load_research_claims, render_research_claims_markdown
 from .research_assistant import (
     generate_data_insight_report,
     generate_experiment_comparison_table,
@@ -198,6 +199,20 @@ def main(argv: list[str] | None = None) -> int:
     citation_support_integrity_parser.add_argument("--root", default=".")
     citation_support_integrity_parser.add_argument("--output", default=None)
     citation_support_integrity_parser.add_argument("--json", default=None)
+
+    research_claim_import_parser = subparsers.add_parser("research-claim-import", help="Import supplied research claims into state/research-claims.json.")
+    research_claim_import_parser.add_argument("claim_file")
+    research_claim_import_parser.add_argument("--state-dir", default="state")
+    research_claim_import_parser.add_argument("--markdown", default=None)
+
+    research_claim_summary_parser = subparsers.add_parser("research-claim-summary", help="Render a Markdown summary for research claim records.")
+    research_claim_summary_parser.add_argument("claims_json")
+    research_claim_summary_parser.add_argument("--output", default=None)
+
+    research_claim_matrix_parser = subparsers.add_parser("research-claim-matrix", help="Check research claims against evidence, bibliography, and citation support.")
+    research_claim_matrix_parser.add_argument("--root", default=".")
+    research_claim_matrix_parser.add_argument("--output", default=None)
+    research_claim_matrix_parser.add_argument("--json", default=None)
 
     paper_parser = subparsers.add_parser("paper-card", help="Create a conservative paper card from text.")
     paper_parser.add_argument("paper_text")
@@ -505,6 +520,23 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if args.command == "citation-support-integrity":
         result = generate_workspace_citation_support_integrity(args.root, output_path=args.output, json_path=args.json)
+        print(result.model_dump_json(indent=2))
+        return 0
+    if args.command == "research-claim-import":
+        result = import_research_claims(args.claim_file, state_dir=args.state_dir, markdown_path=args.markdown)
+        print(result.model_dump_json(indent=2))
+        return 0
+    if args.command == "research-claim-summary":
+        claims = load_research_claims(args.claims_json)
+        rendered = render_research_claims_markdown(claims, source_file=args.claims_json)
+        if args.output:
+            target = Path(args.output)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(rendered, encoding="utf-8")
+        print(rendered)
+        return 0
+    if args.command == "research-claim-matrix":
+        result = generate_research_claim_matrix(args.root, output_path=args.output, json_path=args.json)
         print(result.model_dump_json(indent=2))
         return 0
     if args.command == "paper-card":

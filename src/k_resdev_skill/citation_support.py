@@ -30,6 +30,8 @@ CITATION_SUPPORT_OPERATIONAL_NAMES = {
     "profile-integrity.md",
     "profile-source-summary.md",
     "readiness.md",
+    "research-claim-matrix.md",
+    "research-claims.md",
     "report-integrity.md",
     "source-verification.md",
     "workspace-review-pack.md",

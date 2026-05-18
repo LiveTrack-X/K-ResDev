@@ -23,7 +23,7 @@ P0 intake hardening now includes DOCX/XLSX/HWPX/PDF text extraction, optional HW
 5. Reproducibility checklist.
 6. Hypothesis-to-experiment planner.
 
-Status: paper card extraction, BibTeX/RIS/CSL JSON bibliography intake, bibliography review records, citation support records, bibliography integrity checks, citation-support integrity checks, literature matrix, data insight candidate report, experiment comparison table, reproducibility checklist, and hypothesis-to-experiment planning are implemented. Generated experiment plans remain validation drafts and require human approval before execution.
+Status: paper card extraction, BibTeX/RIS/CSL JSON bibliography intake, bibliography review records, citation support records, bibliography integrity checks, citation-support integrity checks, research claim import/matrix checks, literature matrix, data insight candidate report, experiment comparison table, reproducibility checklist, and hypothesis-to-experiment planning are implemented. Generated experiment plans and research claims remain validation drafts unless human-reviewed.
 
 ## P2 - Korean R&D specialization
 
@@ -43,7 +43,7 @@ Status: `national-rnd-basic` is present as a generic needs-review template skele
 4. Report export to Markdown/DOCX/HWP-compatible intermediate format.
 5. Human approval workflow.
 
-Status: JSON schema validation, evidence bundle indexes, human approval records/gates, reproducible CSV/XLSX analysis runs, Markdown projection export to DOCX/HTML/TXT, workspace initialization, readiness doctor checks, doctor-derived next-action plans, one-page workspace summaries, bundled workspace review packs, review-pack artifact hash verification, evidence source hash verification, source-integrity findings inside doctor/review-pack flows, report approval coverage checks, approval target hash binding, workspace report-integrity checks, cited evidence review-status checks, budget-ledger import/integrity checks, bibliography index/review/citation-support schema validation, and bibliography/citation-support doctor/review-pack checks are implemented as a first pass.
+Status: JSON schema validation, evidence bundle indexes, human approval records/gates, reproducible CSV/XLSX analysis runs, Markdown projection export to DOCX/HTML/TXT, workspace initialization, readiness doctor checks, doctor-derived next-action plans, one-page workspace summaries, bundled workspace review packs, review-pack artifact hash verification, evidence source hash verification, source-integrity findings inside doctor/review-pack flows, report approval coverage checks, approval target hash binding, workspace report-integrity checks, cited evidence review-status checks, budget-ledger import/integrity checks, bibliography index/review/citation-support/research-claim schema validation, and bibliography/citation-support/research-claim doctor/review-pack checks are implemented as a first pass.
 
 ## P4 - Operational continuity
 
@@ -53,7 +53,7 @@ Status: JSON schema validation, evidence bundle indexes, human approval records/
 4. Budget evidence ledger with category rollups and proof completeness checks.
 5. Research claim matrix connecting paper claims, experiment evidence, citation support, and insight candidates.
 
-Status: workspace traceability graph and impact review are implemented as a local first pass. Generic profile source records and budget ledgers now plug into the same doctor/review-pack/trace layer. Verified agency-specific packs and research claim matrices should continue to plug into that trace layer instead of becoming separate disconnected checklists.
+Status: workspace traceability graph and impact review are implemented as a local first pass. Generic profile source records, budget ledgers, and research claim matrices now plug into the same doctor/review-pack/trace layer. Verified agency-specific packs should continue to plug into that trace layer instead of becoming separate disconnected checklists.
 
 ## P5 - Research operations workflow layer
 

@@ -15,6 +15,7 @@ from .models import (
 from .profile_registry import load_project_profile
 from .profile_sources import generate_profile_integrity
 from .budget_ledger import generate_workspace_budget_ledger
+from .research_claims import generate_research_claim_matrix
 from .workspace import OPERATIONAL_MARKDOWN_NAMES, run_workspace_doctor
 from .workspace_actions import generate_workspace_action_plan
 from .workspace_trace import generate_workspace_trace
@@ -41,6 +42,7 @@ def generate_workspace_summary(
     exports = _sorted_paths(workspace / "reports", ["*.docx", "*.html", "*.txt"])
     manifests = _sorted_paths(workspace / "reports" / "analysis", ["*-analysis-run.json"])
     budget_ledger = generate_workspace_budget_ledger(workspace)
+    research_claim_matrix = generate_research_claim_matrix(workspace)
     profile_integrity = generate_profile_integrity(workspace)
     trace = generate_workspace_trace(workspace)
 
@@ -65,6 +67,9 @@ def generate_workspace_summary(
         budget_ledger_count=budget_ledger.ledger_count,
         budget_ledger_finding_count=budget_ledger.finding_count,
         budget_total_by_currency=budget_ledger.total_by_currency,
+        research_claim_matrix_status=research_claim_matrix.status,
+        research_claim_count=research_claim_matrix.claim_count,
+        research_claim_matrix_finding_count=research_claim_matrix.finding_count,
         profile_integrity_status=profile_integrity.status,
         profile_source_count=profile_integrity.source_count,
         profile_verified_source_count=profile_integrity.verified_source_count,
@@ -107,6 +112,8 @@ def render_workspace_summary_markdown(summary: WorkspaceSummaryResult) -> str:
         f"| Verified profile sources | {summary.profile_verified_source_count} |",
         f"| Budget ledger | {_escape(summary.budget_ledger_status or '-')} |",
         f"| Budget ledger rows | {summary.budget_ledger_count} |",
+        f"| Research claim matrix | {_escape(summary.research_claim_matrix_status or '-')} |",
+        f"| Research claims | {summary.research_claim_count} |",
         f"| Evidence count | {summary.evidence_count} |",
         f"| Approval count | {summary.approval_count} |",
         f"| Finding count | {summary.finding_count} |",
@@ -133,6 +140,7 @@ def render_workspace_summary_markdown(summary: WorkspaceSummaryResult) -> str:
         f"| Projection exports | {len(summary.export_paths)} | {_format_paths(summary.export_paths)} |",
         f"| Analysis manifests | {len(summary.analysis_manifest_paths)} | {_format_paths(summary.analysis_manifest_paths)} |",
         f"| Budget ledger | {summary.budget_ledger_count} | status: {_escape(summary.budget_ledger_status or '-')}; findings: {summary.budget_ledger_finding_count}; totals: {_format_float_counts(summary.budget_total_by_currency)} |",
+        f"| Research claim matrix | {summary.research_claim_count} | status: {_escape(summary.research_claim_matrix_status or '-')}; findings: {summary.research_claim_matrix_finding_count} |",
         f"| Profile integrity | {summary.profile_integrity_finding_count} | status: {_escape(summary.profile_integrity_status or '-')}; verified sources: {summary.profile_verified_source_count} |",
         f"| Workspace trace | {summary.trace_node_count} | status: {_escape(summary.trace_status or '-')}; findings: {summary.trace_finding_count} |",
         "",

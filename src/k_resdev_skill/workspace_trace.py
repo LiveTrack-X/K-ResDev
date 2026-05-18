@@ -21,12 +21,14 @@ from .models import (
     CitationSupportRecord,
     EvidenceItem,
     ProfileSource,
+    ResearchClaim,
     WorkspaceTraceEdge,
     WorkspaceTraceFinding,
     WorkspaceTraceNode,
     WorkspaceTraceResult,
 )
 from .profile_sources import load_profile_sources
+from .research_claims import generate_research_claim_matrix, load_research_claims
 
 OPERATIONAL_MARKDOWN_NAMES = {
     "agency-profiles.md",
@@ -42,6 +44,8 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "profile-integrity.md",
     "profile-source-summary.md",
     "readiness.md",
+    "research-claim-matrix.md",
+    "research-claims.md",
     "report-integrity.md",
     "source-verification.md",
     "workspace-review-pack.md",
@@ -69,6 +73,7 @@ def generate_workspace_trace(
     builder.add_approvals()
     builder.add_bibliography_reviews()
     builder.add_citation_support()
+    builder.add_research_claims()
     builder.add_analysis_manifests()
     builder.add_review_pack()
 
@@ -172,6 +177,7 @@ class _TraceBuilder:
         self.budget_ledger_by_id: dict[str, BudgetLedgerItem] = {}
         self.bibliography_by_id: dict[str, BibliographyEntry] = {}
         self.bibliography_by_key: dict[str, BibliographyEntry] = {}
+        self.citation_support_by_id: dict[str, CitationSupportRecord] = {}
         self.profile_sources_by_id: dict[str, ProfileSource] = {}
 
     def add_evidence(self) -> None:
@@ -501,6 +507,7 @@ class _TraceBuilder:
                 )
                 records = []
             for record in records:
+                self.citation_support_by_id[record.support_id] = record
                 self._add_citation_support_record(record)
         integrity = generate_workspace_citation_support_integrity(self.workspace)
         if integrity.status == "not_configured":
@@ -522,6 +529,45 @@ class _TraceBuilder:
                 warning,
                 path=support_dir,
                 suggested_action="Review citation-support integrity output.",
+            )
+
+    def add_research_claims(self) -> None:
+        claim_path = self.workspace / "state" / "research-claims.json"
+        if not claim_path.exists():
+            return
+        try:
+            claims = load_research_claims(claim_path)
+        except Exception as exc:
+            self.finding(
+                "trace_research_claims_unreadable",
+                "high",
+                f"Research claims could not be read: {exc}",
+                path=claim_path,
+                suggested_action="Fix state/research-claims.json or re-import supplied research claims.",
+            )
+            return
+        for claim in claims:
+            self._add_research_claim(claim, claim_path)
+        matrix = generate_research_claim_matrix(self.workspace)
+        if matrix.status == "not_configured":
+            return
+        for finding in matrix.findings:
+            severity = "high" if finding.severity == "high" else "medium" if finding.severity == "medium" else "low"
+            self.finding(
+                "trace_research_claim_matrix_finding",
+                severity,
+                finding.message,
+                node_id=_node_id("research_claim", finding.claim_id) if finding.claim_id else None,
+                path=finding.path,
+                suggested_action=finding.suggested_action or "Review research-claim matrix before external manuscript/report use.",
+            )
+        for warning in matrix.warnings:
+            self.finding(
+                "trace_research_claim_warning",
+                "medium",
+                warning,
+                path=claim_path,
+                suggested_action="Review research-claim matrix output.",
             )
 
     def add_analysis_manifests(self) -> None:
@@ -626,6 +672,57 @@ class _TraceBuilder:
                 f"Citation support `{record.support_id}` has decision `{record.decision}`.",
                 node_id=node.node_id,
                 suggested_action="Remove or revise downstream claims that depend on this citation support.",
+            )
+
+    def _add_research_claim(self, claim: ResearchClaim, claim_path: Path) -> None:
+        node = self.node(
+            "research_claim",
+            claim.claim_id,
+            claim.claim_id,
+            ref_id=claim.claim_id,
+            status=str(claim.status),
+            path=str(claim_path),
+            metadata={
+                "claim": claim.claim,
+                "claim_type": claim.claim_type,
+                "confidence": str(claim.confidence),
+                "risk_flags": claim.risk_flags,
+                "next_checks": claim.next_checks,
+            },
+        )
+        for evidence_id in claim.evidence_ids:
+            self.edge(node.node_id, _node_id("evidence", evidence_id), "references_evidence")
+        for bibliography_id in claim.bibliography_ids:
+            self.edge(node.node_id, _node_id("bibliography", bibliography_id), "cites_paper")
+        for citation_key in claim.citation_keys:
+            bib = self.bibliography_by_key.get(citation_key)
+            if bib is None:
+                self.node("bibliography", citation_key, citation_key, ref_id=citation_key, status="missing", metadata={"citation_key": citation_key})
+                target = _node_id("bibliography", citation_key)
+            else:
+                target = _node_id("bibliography", bib.bibliography_id)
+            self.edge(node.node_id, target, "cites_paper", {"citation_key": citation_key})
+        for support_id in claim.support_ids:
+            self.edge(node.node_id, _node_id("citation_support", support_id), "uses_citation_support")
+        for insight_id in claim.insight_ids:
+            self.edge(node.node_id, _node_id("research_insight", insight_id), "relates_insight")
+        if str(claim.status) in {"hypothesis", "candidate", "needs_review"}:
+            self.finding(
+                "trace_research_claim_unresolved",
+                "medium",
+                f"Research claim `{claim.claim_id}` is `{claim.status}`.",
+                node_id=node.node_id,
+                path=claim_path,
+                suggested_action="Keep unresolved research claims marked as hypothesis/candidate or record supplied human acceptance.",
+            )
+        if str(claim.status) in {"rejected", "superseded"}:
+            self.finding(
+                "trace_research_claim_invalid_status",
+                "high",
+                f"Research claim `{claim.claim_id}` has status `{claim.status}`.",
+                node_id=node.node_id,
+                path=claim_path,
+                suggested_action="Remove downstream use of rejected or superseded research claims.",
             )
 
     def _approval_target_node(self, record: ApprovalRecord) -> str:

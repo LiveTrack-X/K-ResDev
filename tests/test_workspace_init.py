@@ -38,6 +38,8 @@ def test_initialize_workspace_creates_standard_layout(tmp_path):
     assert "bib-integrity" in readme
     assert "citation-support-record" in readme
     assert "citation-support-integrity" in readme
+    assert "research-claim-import" in readme
+    assert "research-claim-matrix" in readme
     assert "profile-source-record" in readme
     assert "profile-integrity" in readme
     assert "budget-ledger-import" in readme

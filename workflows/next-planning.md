@@ -1,12 +1,12 @@
 # K-ResDev Next Planning
 
-This planning note starts after `0.1.0b25`.
+This planning note starts after `0.1.0b26`.
 
 ## Current Diagnosis
 
-K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, budget ledger review, bibliography metadata, bibliography review, citation support, profile source records, profile integrity, workspace traceability graph, workspace doctor, next actions, workspace summary, and review packs.
+K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, budget ledger review, bibliography metadata, bibliography review, citation support, research claim matrices, profile source records, profile integrity, workspace traceability graph, workspace doctor, next actions, workspace summary, and review packs.
 
-The next bottleneck is still operational continuity, but the first traceability, profile-source, and budget-ledger layers now exist. A real R&D workspace next needs a research claim matrix, compact checkpoints, explicit artifact authority levels, and eventually verified agency profile packs based on current official sources.
+The next bottleneck is still operational continuity, but the first traceability, profile-source, budget-ledger, and research-claim layers now exist. A real R&D workspace next needs compact checkpoints, explicit artifact authority levels, and eventually verified agency profile packs based on current official sources.
 
 ## Planning Principles
 
@@ -104,6 +104,8 @@ Safety boundary:
 
 Goal: connect paper claims, citation support decisions, experiment evidence, and insight candidates into a single reviewable research matrix.
 
+Status: implemented as a local first pass in `src/k_resdev_skill/research_claims.py`, with CLI/API, schema/template, doctor, next-action, summary, review-pack, and trace integration.
+
 Expected scope:
 - `ResearchClaim` model.
 - claim matrix writer for author claim, AI interpretation, supporting evidence, citation support, risk flags, and next checks.
@@ -176,6 +178,6 @@ These should wait until traceability, impact analysis, and verified profile sour
 
 ## Recommended Next Slice
 
-Implement Beta 26 next.
+Implement Beta 27 next.
 
-Beta 26 should add a research claim matrix that connects report/manuscript claims, evidence IDs, citation-support records, experiment evidence, risk flags, and next checks. Claims should remain `hypothesis`, `candidate`, or `needs_review` unless supplied human review records accept them.
+Beta 27 should add a trace passport and checkpoint ledger so long-running K-ResDev workspaces can create compact, hash-backed resume points without copying raw restricted source bodies. Checkpoints should remain operational aids only and must not certify compliance, approval, or scientific truth.

@@ -12,6 +12,8 @@
 | Profile integrity | `{{profile_integrity_status}}` |
 | Profile sources | `{{profile_source_count}}` |
 | Verified profile sources | `{{profile_verified_source_count}}` |
+| Budget ledger | `{{budget_ledger_status}}` |
+| Budget ledger rows | `{{budget_ledger_count}}` |
 | Evidence count | `{{evidence_count}}` |
 | Approval count | `{{approval_count}}` |
 | Action count | `{{action_count}}` |
@@ -33,6 +35,7 @@
 | Report Markdown | `{{report_count}}` | `{{report_paths}}` |
 | Projection exports | `{{export_count}}` | `{{export_paths}}` |
 | Analysis manifests | `{{analysis_manifest_count}}` | `{{analysis_manifest_paths}}` |
+| Budget ledger | `{{budget_ledger_count}}` | `{{budget_total_by_currency}}` |
 | Profile integrity | `{{profile_integrity_finding_count}}` | `{{profile_integrity_status}}` |
 | Workspace trace | `{{trace_node_count}}` | `{{trace_status}}` |
 

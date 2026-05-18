@@ -8,6 +8,7 @@ from .approval import load_approval_records
 from .approval_coverage import generate_workspace_approval_coverage
 from .bibliography_integrity import generate_workspace_bibliography_integrity
 from .budget import budget_evidence_gaps
+from .budget_ledger import generate_workspace_budget_ledger
 from .citation_support import generate_workspace_citation_support_integrity
 from .evidence_index import load_evidence_index
 from .models import (
@@ -41,6 +42,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "approval-coverage.md",
     "approval-summary.md",
     "bibliography-integrity.md",
+    "budget-ledger.md",
     "budget-checklist.md",
     "citation-support.md",
     "citation-support-summary.md",
@@ -137,6 +139,7 @@ def run_workspace_doctor(
     evidence_count = _check_evidence(workspace, findings)
     approval_count = _check_approvals(workspace, findings)
     _check_approval_coverage(workspace, findings)
+    _check_budget_ledger(workspace, findings)
     _check_profile(workspace, findings)
     _check_profile_integrity(workspace, findings)
     _check_reports(workspace, findings)
@@ -416,6 +419,33 @@ def _check_approval_coverage(workspace: Path, findings: list[WorkspaceDoctorFind
         )
 
 
+def _check_budget_ledger(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> None:
+    result = generate_workspace_budget_ledger(workspace)
+    path = workspace / "state" / "budget-ledger.json"
+    if result.status == "not_configured":
+        return
+    if result.high_count:
+        findings.append(
+            _finding(
+                "budget_ledger_high_findings",
+                "high",
+                f"{result.high_count} high-severity budget ledger finding(s) were detected.",
+                path,
+                "Run budget-ledger-integrity and resolve ledger/evidence mismatches before settlement or audit use.",
+            )
+        )
+    if result.medium_count or result.low_count or result.warnings:
+        findings.append(
+            _finding(
+                "budget_ledger_review_findings",
+                "medium",
+                f"{result.medium_count + result.low_count} budget ledger review finding(s) or warnings were detected.",
+                path,
+                "Review budget-ledger-integrity output before settlement or audit use.",
+            )
+        )
+
+
 def _check_profile(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> None:
     profile_path = workspace / "state" / "project-profile.json"
     if not profile_path.exists():
@@ -685,9 +715,11 @@ def _starter_readme(project_id: str, title: str, profile_id: str) -> str:
             "- Run `k-resdev citation-support-integrity --root . --output reports/citation-support.md --json state/citation-support.json` to check cited papers against supplied support records.",
             "- Run `k-resdev profile-source-record --profile-id <profile-id> --title \"<official source title>\" --source-url <url> --review-status needs_review` to record official-source metadata for profile review.",
             "- Run `k-resdev profile-integrity --root . --output reports/profile-integrity.md --json state/profile-integrity.json` to check profile source records.",
+            "- Run `k-resdev budget-ledger-import references/budget-ledger.csv --state-dir state --markdown reports/budget-ledger-import.md` to import a reviewable budget ledger.",
+            "- Run `k-resdev budget-ledger-integrity --root . --output reports/budget-ledger.md --json state/budget-ledger-integrity.json` to check ledger proof, approval, duplicate, and evidence-link gaps.",
             "- Run `k-resdev doctor --root . --output reports/readiness.md --json state/readiness.json` before reporting.",
             "- Run `k-resdev workspace-summary --root . --output reports/workspace-summary.md --json state/workspace-summary.json` for a one-page status handoff.",
-            "- Run `k-resdev workspace-review-pack --root .` to refresh readiness, next actions, summary, source-verification, approval-coverage, report-integrity, bibliography-integrity, and citation-support artifacts together.",
+            "- Run `k-resdev workspace-review-pack --root .` to refresh readiness, next actions, summary, source-verification, budget-ledger, approval-coverage, report-integrity, bibliography-integrity, and citation-support artifacts together.",
             "- Run `k-resdev verify-review-pack state/workspace-review-pack.json` to check saved review-pack artifact hashes.",
             "- Run `k-resdev verify-evidence-sources state/evidence-index.json --root . --output reports/source-verification.md --json state/source-verification.json` to check indexed source hashes.",
             "- Run `k-resdev approval-coverage --root . --output reports/approval-coverage.md --json state/approval-coverage.json` to check report approval coverage.",

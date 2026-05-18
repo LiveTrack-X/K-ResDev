@@ -25,6 +25,7 @@ from .bibliography_review import (
     write_bibliography_review_record,
 )
 from .budget import generate_budget_evidence_checklist
+from .budget_ledger import generate_workspace_budget_ledger, import_budget_ledger
 from .claim_checker import check_unsupported_claims
 from .citation_support import (
     citation_support_status,
@@ -239,6 +240,16 @@ def main(argv: list[str] | None = None) -> int:
     budget_parser.add_argument("evidence_index_json")
     budget_parser.add_argument("--output", default=None)
 
+    budget_ledger_import_parser = subparsers.add_parser("budget-ledger-import", help="Import a CSV/JSON budget evidence ledger.")
+    budget_ledger_import_parser.add_argument("ledger_file")
+    budget_ledger_import_parser.add_argument("--state-dir", default="state")
+    budget_ledger_import_parser.add_argument("--markdown", default=None)
+
+    budget_ledger_parser = subparsers.add_parser("budget-ledger-integrity", help="Check budget ledger metadata and evidence links.")
+    budget_ledger_parser.add_argument("--root", default=".")
+    budget_ledger_parser.add_argument("--output", default=None)
+    budget_ledger_parser.add_argument("--json", default=None)
+
     profiles_parser = subparsers.add_parser("profiles", help="List agency profile templates.")
     profiles_parser.add_argument("--templates-root", default=None)
     profiles_parser.add_argument("--markdown", action="store_true")
@@ -280,7 +291,7 @@ def main(argv: list[str] | None = None) -> int:
     validate_json_parser = subparsers.add_parser("validate-json", help="Validate JSON files against bundled or custom JSON schema.")
     validate_json_parser.add_argument(
         "schema",
-        help="Schema alias such as evidence, research-insight, project-profile, profile-source, approval, or a schema path.",
+        help="Schema alias such as evidence, research-insight, project-profile, profile-source, budget-ledger, approval, or a schema path.",
     )
     validate_json_parser.add_argument("json_paths", nargs="+")
 
@@ -551,6 +562,14 @@ def main(argv: list[str] | None = None) -> int:
         evidence = load_evidence_index(args.evidence_index_json)
         rendered = generate_budget_evidence_checklist(evidence, args.output)
         print(rendered)
+        return 0
+    if args.command == "budget-ledger-import":
+        result = import_budget_ledger(args.ledger_file, state_dir=args.state_dir, markdown_path=args.markdown)
+        print(result.model_dump_json(indent=2))
+        return 0
+    if args.command == "budget-ledger-integrity":
+        result = generate_workspace_budget_ledger(args.root, output_path=args.output, json_path=args.json)
+        print(result.model_dump_json(indent=2))
         return 0
     if args.command == "profiles":
         if args.markdown or args.output:

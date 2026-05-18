@@ -64,3 +64,21 @@ def test_citation_support_record_template_matches_json_schema():
         sample = json.load(handle)
 
     jsonschema.validate(sample, schema)
+
+
+def test_profile_source_template_matches_json_schema():
+    with open("schemas/profile_source.schema.json", encoding="utf-8") as handle:
+        schema = json.load(handle)
+    with open("templates/profile-source.json", encoding="utf-8") as handle:
+        sample = json.load(handle)
+
+    jsonschema.validate(sample, schema)
+
+
+def test_budget_ledger_item_template_matches_json_schema():
+    with open("schemas/budget_ledger_item.schema.json", encoding="utf-8") as handle:
+        schema = json.load(handle)
+    with open("templates/budget-ledger-item.json", encoding="utf-8") as handle:
+        sample = json.load(handle)
+
+    jsonschema.validate(sample, schema)

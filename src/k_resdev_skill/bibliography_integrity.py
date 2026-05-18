@@ -20,6 +20,7 @@ BIBLIOGRAPHY_OPERATIONAL_NAMES = {
     "approval-summary.md",
     "bibliography-integrity.md",
     "bibliography-review-summary.md",
+    "budget-ledger.md",
     "budget-checklist.md",
     "citation-support.md",
     "citation-support-summary.md",

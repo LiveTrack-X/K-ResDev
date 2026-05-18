@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BudgetLedgerItem",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["ledger_id", "currency", "evidence_ids", "review_status", "risk_flags"],
+  "properties": {
+    "ledger_id": {"type": "string"},
+    "date": {"type": ["string", "null"]},
+    "vendor": {"type": ["string", "null"]},
+    "amount": {"type": ["number", "null"], "minimum": 0},
+    "currency": {"type": "string"},
+    "category": {"type": ["string", "null"]},
+    "proof_type": {"type": ["string", "null"]},
+    "approval_reference": {"type": ["string", "null"]},
+    "evidence_ids": {"type": "array", "items": {"type": "string"}},
+    "invoice_id": {"type": ["string", "null"]},
+    "source_file": {"type": ["string", "null"]},
+    "source_hash": {"type": ["string", "null"]},
+    "review_status": {
+      "type": "string",
+      "enum": ["needs_review", "accepted", "rejected", "superseded"]
+    },
+    "notes": {"type": ["string", "null"]},
+    "risk_flags": {"type": "array", "items": {"type": "string"}}
+  }
+}

@@ -348,12 +348,13 @@ This task implements the generic source-recording and integrity shell only. It d
 
 ### Task 34: Budget evidence ledger
 
-Planned:
+Implemented:
 - `BudgetLedgerItem` model
 - CSV/JSON ledger import and Markdown ledger writer
 - duplicate vendor/date/amount and missing proof warnings
 - amount rollups by profile-driven category labels
 - doctor and next-action integration for ledger/evidence mismatch
+- review-pack, workspace-summary, trace, schema, and template integration
 
 Budget ledgers are review aids only. They must not infer official cost eligibility or agency compliance.
 

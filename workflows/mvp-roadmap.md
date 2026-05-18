@@ -43,7 +43,7 @@ Status: `national-rnd-basic` is present as a generic needs-review template skele
 4. Report export to Markdown/DOCX/HWP-compatible intermediate format.
 5. Human approval workflow.
 
-Status: JSON schema validation, evidence bundle indexes, human approval records/gates, reproducible CSV/XLSX analysis runs, Markdown projection export to DOCX/HTML/TXT, workspace initialization, readiness doctor checks, doctor-derived next-action plans, one-page workspace summaries, bundled workspace review packs, review-pack artifact hash verification, evidence source hash verification, source-integrity findings inside doctor/review-pack flows, report approval coverage checks, approval target hash binding, workspace report-integrity checks, cited evidence review-status checks, bibliography index/review/citation-support schema validation, and bibliography/citation-support doctor/review-pack checks are implemented as a first pass.
+Status: JSON schema validation, evidence bundle indexes, human approval records/gates, reproducible CSV/XLSX analysis runs, Markdown projection export to DOCX/HTML/TXT, workspace initialization, readiness doctor checks, doctor-derived next-action plans, one-page workspace summaries, bundled workspace review packs, review-pack artifact hash verification, evidence source hash verification, source-integrity findings inside doctor/review-pack flows, report approval coverage checks, approval target hash binding, workspace report-integrity checks, cited evidence review-status checks, budget-ledger import/integrity checks, bibliography index/review/citation-support schema validation, and bibliography/citation-support doctor/review-pack checks are implemented as a first pass.
 
 ## P4 - Operational continuity
 
@@ -53,7 +53,7 @@ Status: JSON schema validation, evidence bundle indexes, human approval records/
 4. Budget evidence ledger with category rollups and proof completeness checks.
 5. Research claim matrix connecting paper claims, experiment evidence, citation support, and insight candidates.
 
-Status: workspace traceability graph and impact review are implemented as a local first pass. Generic profile source records now plug into the same doctor/review-pack/trace layer. Verified agency-specific packs, budget ledgers, and research claim matrices should continue to plug into that trace layer instead of becoming separate disconnected checklists.
+Status: workspace traceability graph and impact review are implemented as a local first pass. Generic profile source records and budget ledgers now plug into the same doctor/review-pack/trace layer. Verified agency-specific packs and research claim matrices should continue to plug into that trace layer instead of becoming separate disconnected checklists.
 
 ## P5 - Research operations workflow layer
 

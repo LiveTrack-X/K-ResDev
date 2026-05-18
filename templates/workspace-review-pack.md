@@ -1,6 +1,6 @@
 # K-ResDev Workspace Review Pack
 
-> Review pack projection only. It bundles local readiness, next-action, summary, source-verification, approval-coverage, report-integrity, bibliography-integrity, citation-support, profile-integrity, and trace artifacts; it does not certify official agency compliance.
+> Review pack projection only. It bundles local readiness, next-action, summary, source-verification, budget-ledger, approval-coverage, report-integrity, bibliography-integrity, citation-support, profile-integrity, and trace artifacts; it does not certify official agency compliance.
 
 | Field | Value |
 |---|---|
@@ -21,6 +21,10 @@
 | Report integrity status | `{{report_integrity_status}}` |
 | Report integrity finding count | `{{report_integrity_finding_count}}` |
 | Report integrity high count | `{{report_integrity_high_count}}` |
+| Budget ledger status | `{{budget_ledger_status}}` |
+| Budget ledger count | `{{budget_ledger_count}}` |
+| Budget ledger finding count | `{{budget_ledger_finding_count}}` |
+| Budget ledger high count | `{{budget_ledger_high_count}}` |
 | Bibliography integrity status | `{{bibliography_integrity_status}}` |
 | Bibliography entry count | `{{bibliography_entry_count}}` |
 | Bibliography review count | `{{bibliography_review_count}}` |
@@ -50,6 +54,7 @@
 | Evidence source verification | `reports/source-verification.md` |
 | Approval coverage | `reports/approval-coverage.md` |
 | Report integrity | `reports/report-integrity.md` |
+| Budget ledger integrity | `reports/budget-ledger.md` |
 | Bibliography integrity | `reports/bibliography-integrity.md` |
 | Citation support | `reports/citation-support.md` |
 | Profile integrity | `reports/profile-integrity.md` |

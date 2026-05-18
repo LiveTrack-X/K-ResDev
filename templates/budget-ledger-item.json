@@ -1,0 +1,19 @@
+{
+  "ledger_id": "BUD-NEEDS-REVIEW",
+  "date": null,
+  "vendor": null,
+  "amount": null,
+  "currency": "KRW",
+  "category": null,
+  "proof_type": null,
+  "approval_reference": null,
+  "evidence_ids": [],
+  "invoice_id": null,
+  "source_file": null,
+  "source_hash": null,
+  "review_status": "needs_review",
+  "notes": "Generic ledger item only. It does not certify official cost eligibility.",
+  "risk_flags": [
+    "needs_review"
+  ]
+}

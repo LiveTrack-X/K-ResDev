@@ -2,7 +2,7 @@
 
 Purpose: 한국형 국책 R&D 환경에서 연구 행정 문서화, 증빙 정합성, 보고서 생성, 논문/데이터 인사이트 보조를 evidence-first 방식으로 지원하는 Codex/Skill 프로젝트입니다.
 
-Current release: `0.1 BETA 24` (`0.1.0b24`).
+Current release: `0.1 BETA 25` (`0.1.0b25`).
 
 Core principle:
 
@@ -49,6 +49,7 @@ This repository does not encode any single ministry/institution form as authorit
 - Experiment comparison table and reproducibility checklist generators.
 - Hypothesis-to-experiment planner for turning `ResearchInsight` records into reviewable validation plans.
 - Generic budget evidence completeness checklist that avoids hardcoding unverified agency rules.
+- Budget evidence ledger import and integrity checks for generic amount/proof/approval/evidence-link review without inferring official eligibility.
 - Agency profile registry/validator for `templates/agencies/` skeletons.
 - Human approval record workflow for supplied reviewer decisions, approval summaries, and approval gates.
 - Evidence bundle index generator for audit/review packages without copying or altering raw files.
@@ -62,13 +63,14 @@ This repository does not encode any single ministry/institution form as authorit
 - Workspace initializer and readiness doctor for standard local workspace setup and pre-reporting checks.
 - Workspace next-action planner that converts doctor findings into deterministic, reviewable commands.
 - Workspace summary report that combines readiness, next actions, evidence counts, approvals, reports, exports, and analysis manifests.
-- Workspace review pack command that refreshes readiness, next actions, workspace summary, profile-integrity, source-verification, approval-coverage, report-integrity, bibliography-integrity, citation-support, and workspace-trace artifacts together.
+- Workspace review pack command that refreshes readiness, next actions, workspace summary, budget-ledger, profile-integrity, source-verification, approval-coverage, report-integrity, bibliography-integrity, citation-support, and workspace-trace artifacts together.
 - Review pack artifact hash manifest and verifier for detecting missing or changed generated artifacts.
 - Evidence source verifier that checks indexed source files against saved source hashes.
 - Workspace doctor and review pack integration for local evidence-source presence/hash drift checks.
 - Next-action routing for source-integrity findings.
 - Workspace doctor and review pack integration for report approval coverage.
 - Workspace doctor and review pack integration for report claim integrity findings.
+- Workspace doctor, next-action, summary, review-pack, and trace integration for budget ledger findings.
 - Workspace doctor and review pack integration for bibliography integrity findings.
 - Workspace doctor and review pack integration for citation support findings.
 - Workspace doctor, next-action, summary, and review-pack integration for profile source integrity findings.
@@ -108,6 +110,8 @@ python -m k_resdev_skill profile-source-record --profile-id national-rnd-basic -
 python -m k_resdev_skill profile-source-summary --root . --output .\reports\profile-source-summary.md --json .\state\profile-source-summary.json
 python -m k_resdev_skill profile-integrity --root . --output .\reports\profile-integrity.md --json .\state\profile-integrity.json
 python -m k_resdev_skill workspace-trace --root . --output .\reports\workspace-trace.md --json .\state\workspace-trace.json
+python -m k_resdev_skill budget-ledger-import .\references\budget-ledger.csv --state-dir .\state --markdown .\reports\budget-ledger-import.md
+python -m k_resdev_skill budget-ledger-integrity --root . --output .\reports\budget-ledger.md --json .\state\budget-ledger-integrity.json
 python -m k_resdev_skill data-insights .\inbox\metrics.csv --output .\reports\data-insights.md
 python -m k_resdev_skill run-analysis .\inbox\metrics.csv --output-dir .\reports\analysis --evidence-id EVI-2026-0001
 python -m k_resdev_skill analysis-script .\inbox\metrics.csv --output-dir .\reports\analysis --output .\reports\analysis\metrics-analysis.py
@@ -118,6 +122,7 @@ python -m k_resdev_skill budget-check .\state\evidence-index.json --output .\rep
 python -m k_resdev_skill profiles --markdown --output .\reports\agency-profiles.md
 python -m k_resdev_skill validate-profile .\templates\agencies\national-rnd-basic\project-profile.json
 python -m k_resdev_skill validate-json profile-source .\state\profile-sources.json
+python -m k_resdev_skill validate-json budget-ledger .\state\budget-ledger.json
 python -m k_resdev_skill validate-json evidence .\state\evidence-index.json
 python -m k_resdev_skill validate-json bibliography-review .\templates\bibliography-review-record.json
 python -m k_resdev_skill approval-record --target-type report --target-id monthly-2026-05 --target-path .\reports\monthly-report-2026-05.md --decision needs_changes --reviewer reviewer-name --approvals-dir .\state\approvals

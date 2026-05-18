@@ -10,12 +10,14 @@ from .approval import load_approval_records
 from .bibliography import load_bibliography_index
 from .bibliography_integrity import extract_markdown_citation_keys
 from .bibliography_review import load_bibliography_review_records
+from .budget_ledger import generate_workspace_budget_ledger, load_budget_ledger
 from .citation_support import generate_workspace_citation_support_integrity, load_citation_support_records
 from .evidence_index import load_evidence_index
 from .models import (
     ApprovalRecord,
     BibliographyEntry,
     BibliographyReviewRecord,
+    BudgetLedgerItem,
     CitationSupportRecord,
     EvidenceItem,
     ProfileSource,
@@ -31,6 +33,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "approval-coverage.md",
     "approval-summary.md",
     "bibliography-integrity.md",
+    "budget-ledger.md",
     "budget-checklist.md",
     "citation-support.md",
     "citation-support-summary.md",
@@ -59,6 +62,7 @@ def generate_workspace_trace(
     workspace = Path(root)
     builder = _TraceBuilder(workspace)
     builder.add_evidence()
+    builder.add_budget_ledger()
     builder.add_profile_sources()
     builder.add_bibliography()
     builder.add_reports()
@@ -165,6 +169,7 @@ class _TraceBuilder:
         self.findings: list[WorkspaceTraceFinding] = []
         self.warnings: list[str] = []
         self.evidence_by_id: dict[str, EvidenceItem] = {}
+        self.budget_ledger_by_id: dict[str, BudgetLedgerItem] = {}
         self.bibliography_by_id: dict[str, BibliographyEntry] = {}
         self.bibliography_by_key: dict[str, BibliographyEntry] = {}
         self.profile_sources_by_id: dict[str, ProfileSource] = {}
@@ -270,6 +275,61 @@ class _TraceBuilder:
                     self.node("bibliography", citation_key, citation_key, ref_id=citation_key, status="missing", metadata={"citation_key": citation_key})
                 target = _node_id("bibliography", bib.bibliography_id if bib else citation_key)
                 self.edge(node.node_id, target, "cites_paper", {"citation_key": citation_key})
+
+    def add_budget_ledger(self) -> None:
+        path = self.workspace / "state" / "budget-ledger.json"
+        if not path.exists():
+            return
+        try:
+            items = load_budget_ledger(path)
+        except Exception as exc:
+            self.finding(
+                "trace_budget_ledger_unreadable",
+                "high",
+                f"Budget ledger could not be read: {exc}",
+                path=path,
+                suggested_action="Fix state/budget-ledger.json or re-import the budget ledger.",
+            )
+            return
+        for item in items:
+            self.budget_ledger_by_id[item.ledger_id] = item
+            node = self.node(
+                "budget_ledger",
+                item.ledger_id,
+                item.ledger_id,
+                ref_id=item.ledger_id,
+                status=item.review_status,
+                path=item.source_file,
+                metadata={
+                    "date": item.date,
+                    "vendor": item.vendor,
+                    "amount": item.amount,
+                    "currency": item.currency,
+                    "category": item.category,
+                    "proof_type": item.proof_type,
+                    "approval_reference": item.approval_reference,
+                    "risk_flags": item.risk_flags,
+                },
+            )
+            if item.source_file:
+                source_node = self.source_node(item.source_file, item.source_hash)
+                self.edge(source_node.node_id, node.node_id, "source_of")
+                self._source_hash_findings(source_node, item.source_hash, "budget_ledger")
+            for evidence_id in item.evidence_ids:
+                self.edge(node.node_id, _node_id("evidence", evidence_id), "references_evidence")
+        integrity = generate_workspace_budget_ledger(self.workspace)
+        if integrity.status == "not_configured":
+            return
+        for finding in integrity.findings:
+            severity = "high" if finding.severity == "high" else "medium" if finding.severity == "medium" else "low"
+            self.finding(
+                "trace_budget_ledger_integrity_finding",
+                severity,
+                finding.message,
+                node_id=_node_id("budget_ledger", finding.ledger_id) if finding.ledger_id else None,
+                path=finding.path,
+                suggested_action=finding.suggested_action or "Review budget ledger integrity before settlement or audit use.",
+            )
 
     def add_profile_sources(self) -> None:
         path = self.workspace / "state" / "profile-sources.json"

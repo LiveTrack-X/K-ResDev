@@ -305,6 +305,68 @@ class ProjectionExportResult(StrictModel):
     warnings: list[str] = Field(default_factory=list)
 
 
+class BudgetLedgerItem(StrictModel):
+    ledger_id: str
+    date: str | None = None
+    vendor: str | None = None
+    amount: float | None = Field(default=None, ge=0)
+    currency: str = "KRW"
+    category: str | None = None
+    proof_type: str | None = None
+    approval_reference: str | None = None
+    evidence_ids: list[str] = Field(default_factory=list)
+    invoice_id: str | None = None
+    source_file: str | None = None
+    source_hash: str | None = None
+    review_status: str = "needs_review"
+    notes: str | None = None
+    risk_flags: list[str] = Field(default_factory=list)
+
+    @field_validator("ledger_id")
+    @classmethod
+    def _must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
+class BudgetLedgerImportResult(StrictModel):
+    source_file: str
+    source_hash: str
+    source_format: str
+    item_count: int = 0
+    ledger_json_path: str
+    ledger_markdown_path: str
+    warnings: list[str] = Field(default_factory=list)
+
+
+class BudgetLedgerFinding(StrictModel):
+    code: str
+    severity: str
+    message: str
+    ledger_id: str | None = None
+    path: str | None = None
+    suggested_action: str | None = None
+
+
+class WorkspaceBudgetLedgerResult(StrictModel):
+    root: str
+    status: str
+    ledger_count: int = 0
+    linked_evidence_count: int = 0
+    finding_count: int = 0
+    high_count: int = 0
+    medium_count: int = 0
+    low_count: int = 0
+    total_by_currency: dict[str, float] = Field(default_factory=dict)
+    amount_by_category: dict[str, float] = Field(default_factory=dict)
+    items: list[BudgetLedgerItem] = Field(default_factory=list)
+    findings: list[BudgetLedgerFinding] = Field(default_factory=list)
+    markdown_path: str | None = None
+    json_path: str | None = None
+    warnings: list[str] = Field(default_factory=list)
+
+
 class BibliographyEntry(StrictModel):
     bibliography_id: str
     paper_id: str
@@ -560,6 +622,10 @@ class WorkspaceSummaryResult(StrictModel):
     report_paths: list[str] = Field(default_factory=list)
     export_paths: list[str] = Field(default_factory=list)
     analysis_manifest_paths: list[str] = Field(default_factory=list)
+    budget_ledger_status: str | None = None
+    budget_ledger_count: int = 0
+    budget_ledger_finding_count: int = 0
+    budget_total_by_currency: dict[str, float] = Field(default_factory=dict)
     profile_integrity_status: str | None = None
     profile_source_count: int = 0
     profile_verified_source_count: int = 0
@@ -690,6 +756,10 @@ class WorkspaceReviewPackResult(StrictModel):
     citation_support_citation_count: int = 0
     citation_support_finding_count: int = 0
     citation_support_high_count: int = 0
+    budget_ledger_status: str | None = None
+    budget_ledger_count: int = 0
+    budget_ledger_finding_count: int = 0
+    budget_ledger_high_count: int = 0
     profile_integrity_status: str | None = None
     profile_source_count: int = 0
     profile_verified_source_count: int = 0

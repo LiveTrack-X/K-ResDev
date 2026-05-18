@@ -1,12 +1,12 @@
 # K-ResDev Next Planning
 
-This planning note starts after `0.1.0b24`.
+This planning note starts after `0.1.0b25`.
 
 ## Current Diagnosis
 
-K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, bibliography metadata, bibliography review, citation support, profile source records, profile integrity, workspace traceability graph, workspace doctor, next actions, workspace summary, and review packs.
+K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, budget ledger review, bibliography metadata, bibliography review, citation support, profile source records, profile integrity, workspace traceability graph, workspace doctor, next actions, workspace summary, and review packs.
 
-The next bottleneck is still operational continuity, but the first traceability and profile-source layers now exist. A real R&D workspace next needs a budget evidence ledger, compact checkpoints, explicit artifact authority levels, and eventually verified agency profile packs based on current official sources.
+The next bottleneck is still operational continuity, but the first traceability, profile-source, and budget-ledger layers now exist. A real R&D workspace next needs a research claim matrix, compact checkpoints, explicit artifact authority levels, and eventually verified agency profile packs based on current official sources.
 
 ## Planning Principles
 
@@ -86,12 +86,15 @@ Safety boundary:
 
 Goal: move budget evidence from generic completeness checks into a reviewable ledger.
 
+Status: implemented as a generic CSV/JSON ledger import and integrity layer. It does not infer official cost eligibility.
+
 Expected scope:
 - `BudgetLedgerItem` model for date, vendor, amount, currency, category, proof type, approval reference, evidence IDs, and review status.
 - CSV/JSON import and Markdown ledger writer.
 - duplicate invoice/vendor/date/amount warnings.
 - amount rollups by category without agency-specific rule claims.
 - doctor findings for missing proof type, missing approval reference, and ledger/evidence mismatch.
+- Integration into workspace doctor, next actions, summary, review pack, and trace.
 
 Safety boundary:
 - Do not infer official eligibility.
@@ -173,6 +176,6 @@ These should wait until traceability, impact analysis, and verified profile sour
 
 ## Recommended Next Slice
 
-Implement Beta 25 next.
+Implement Beta 26 next.
 
-Beta 25 should add a generic budget evidence ledger without inferring official cost eligibility. Amount rollups, duplicate detection, and proof/approval gaps can be implemented locally while keeping budget categories profile-driven and needs-review until verified against official guidance.
+Beta 26 should add a research claim matrix that connects report/manuscript claims, evidence IDs, citation-support records, experiment evidence, risk flags, and next checks. Claims should remain `hypothesis`, `candidate`, or `needs_review` unless supplied human review records accept them.

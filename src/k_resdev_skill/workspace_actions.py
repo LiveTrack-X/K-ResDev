@@ -79,6 +79,7 @@ def _actions_for_findings(root: Path, findings: list[WorkspaceDoctorFinding]) ->
         _action_for_source_integrity(root, by_code),
         _action_for_review_evidence(root, by_code),
         _action_for_budget_gaps(root, by_code),
+        _action_for_budget_ledger(root, by_code),
         _action_for_profile(root, by_code),
         _action_for_profile_integrity(root, by_code),
         _action_for_approval_coverage(root, by_code),
@@ -189,6 +190,22 @@ def _action_for_budget_gaps(root: Path, by_code: dict[str, list[WorkspaceDoctorF
         f'python -m k_resdev_skill budget-check "{root / "state" / "evidence-index.json"}" --output "{root / "reports" / "budget-checklist.md"}"',
         by_code,
         ["budget_metadata_gap"],
+    )
+
+
+def _action_for_budget_ledger(root: Path, by_code: dict[str, list[WorkspaceDoctorFinding]]) -> WorkspaceActionItem | None:
+    codes = ["budget_ledger_high_findings", "budget_ledger_review_findings"]
+    if not any(code in by_code for code in codes):
+        return None
+    priority = "high" if "budget_ledger_high_findings" in by_code else "medium"
+    return _action(
+        root,
+        priority,
+        "Review budget ledger integrity",
+        "Budget ledger rows should have proof metadata, approval references, and valid budget evidence links before settlement or audit use.",
+        f'python -m k_resdev_skill budget-ledger-integrity --root "{root}" --output "{root / "reports" / "budget-ledger.md"}" --json "{root / "state" / "budget-ledger-integrity.json"}"',
+        by_code,
+        codes,
     )
 
 

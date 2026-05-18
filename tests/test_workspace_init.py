@@ -40,6 +40,8 @@ def test_initialize_workspace_creates_standard_layout(tmp_path):
     assert "citation-support-integrity" in readme
     assert "profile-source-record" in readme
     assert "profile-integrity" in readme
+    assert "budget-ledger-import" in readme
+    assert "budget-ledger-integrity" in readme
     assert "workspace-summary" in readme
     assert "workspace-review-pack" in readme
     assert "verify-review-pack" in readme

@@ -591,15 +591,29 @@ Profile source queues must remain local operating projections. Do not add new of
 
 ### Task 53: Profile source queue fix plan
 
-Planned:
-- add `profile-source-fix-plan` command and public API
-- read `state/profile-source-queue.json`
-- group queue items by profile ID and severity
-- propose reviewable next commands or manual review steps without executing them
-- write `reports/profile-source-fix-plan.md` and `state/profile-source-fix-plan.json`
-- integrate plan counts into doctor, next-action, summary, review-pack, and trace
+Implemented:
+- `ProfileSourceFixPlanAction` and `ProfileSourceFixPlanResult` models
+- `profile-source-fix-plan` command and public API
+- read-only conversion from `state/profile-source-queue.json` into queue-hash-bound remediation actions
+- profile/source grouped manual steps and local command suggestions for `profile-source-record`, `profile-source-summary`, `profile-integrity`, `profile-source-queue`, `profile-review`, and `validate-json`
+- explicit `requires_human_review` and `requires_official_source_check` flags
+- `reports/profile-source-fix-plan.md` and `state/profile-source-fix-plan.json`
+- schema/template coverage and validation aliases
+- doctor, next-action, workspace-summary, review-pack, operational Markdown filtering, and trace integration
 
 Profile source fix plans must not fetch official sources, mutate profile packs, or mark sources verified.
+
+### Task 54: Profile source fix review records
+
+Planned:
+- add supplied human review records for individual profile-source fix-plan actions
+- bind each review record to `state/profile-source-fix-plan.json` SHA-256 and `action_id`
+- support decisions such as `resolved`, `accepted_risk`, `deferred`, and `rejected`
+- write records under `state/profile-source-fix-reviews/`
+- summarize unresolved fix actions with `profile-source-fix-summary`
+- integrate review counts into doctor, next-action, summary, review-pack, and trace
+
+Profile source fix review records should document supplied human decisions only. They must not mutate source records or upgrade any source/profile to verified by themselves.
 
 ## Safety constraints
 

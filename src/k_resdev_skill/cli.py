@@ -66,6 +66,7 @@ from .profile_sources import (
 )
 from .profile_registry import generate_profile_registry, list_project_profiles, load_project_profile
 from .profile_review import generate_profile_review
+from .profile_source_fix_plan import generate_profile_source_fix_plan
 from .profile_source_queue import generate_profile_source_queue
 from .project_goals import generate_goals_review, initialize_project_goals
 from .projection_export import export_projection
@@ -330,6 +331,12 @@ def main(argv: list[str] | None = None) -> int:
     profile_source_queue_parser.add_argument("--output", default=None)
     profile_source_queue_parser.add_argument("--json", default=None)
 
+    profile_source_fix_plan_parser = subparsers.add_parser("profile-source-fix-plan", help="Plan local remediation commands for profile source queue items.")
+    profile_source_fix_plan_parser.add_argument("--root", default=".")
+    profile_source_fix_plan_parser.add_argument("--queue", default=None)
+    profile_source_fix_plan_parser.add_argument("--output", default=None)
+    profile_source_fix_plan_parser.add_argument("--json", default=None)
+
     profile_integrity_parser = subparsers.add_parser("profile-integrity", help="Check project profile source records and review status.")
     profile_integrity_parser.add_argument("--root", default=".")
     profile_integrity_parser.add_argument("--output", default=None)
@@ -398,7 +405,7 @@ def main(argv: list[str] | None = None) -> int:
     validate_json_parser = subparsers.add_parser("validate-json", help="Validate JSON files against bundled or custom JSON schema.")
     validate_json_parser.add_argument(
         "schema",
-        help="Schema alias such as evidence, research-insight, project-profile, profile-source, budget-ledger, approval, or a schema path.",
+        help="Schema alias such as evidence, research-insight, project-profile, profile-source, profile-source-fix-plan, budget-ledger, approval, or a schema path.",
     )
     validate_json_parser.add_argument("json_paths", nargs="+")
 
@@ -820,6 +827,10 @@ def main(argv: list[str] | None = None) -> int:
         result = generate_profile_source_queue(args.root, templates_root=args.templates_root, output_path=args.output, json_path=args.json)
         print(result.model_dump_json(indent=2))
         return 0 if result.status != "blocked" else 1
+    if args.command == "profile-source-fix-plan":
+        result = generate_profile_source_fix_plan(args.root, queue_path=args.queue, output_path=args.output, json_path=args.json)
+        print(result.model_dump_json(indent=2))
+        return 0 if result.status not in {"blocked", "missing_queue", "unreadable_queue"} else 1
     if args.command == "profile-integrity":
         result = generate_profile_integrity(args.root, output_path=args.output, json_path=args.json)
         print(result.model_dump_json(indent=2))

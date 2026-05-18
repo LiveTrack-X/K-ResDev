@@ -21,6 +21,7 @@ from .profile_promotion_apply import generate_profile_promotion_apply_plan, load
 from .profile_promotion_revoke import load_profile_promotion_revoke_plan, load_profile_promotion_revoke_result
 from .profile_lifecycle import generate_profile_lifecycle_ledger
 from .profile_review import generate_profile_review
+from .profile_source_fix_plan import generate_profile_source_fix_plan
 from .profile_source_queue import generate_profile_source_queue
 from .profile_sources import generate_profile_integrity
 from .project_goals import generate_goals_review
@@ -43,7 +44,7 @@ def generate_workspace_review_pack(
     state_dir: str | Path | None = None,
     max_actions: int = 5,
 ) -> WorkspaceReviewPackResult:
-    """Generate a bundled local review pack for discovery, authority, goals, weekly/dashboard, readiness, traceability, checkpoint, budget, profile source queue/integrity, source, approval, report, bibliography, reference corpus, citation-support, and research-claim checks."""
+    """Generate a bundled local review pack for discovery, authority, goals, weekly/dashboard, readiness, traceability, checkpoint, budget, profile source queue/fix-plan/integrity, source, approval, report, bibliography, reference corpus, citation-support, and research-claim checks."""
 
     workspace = Path(root)
     reports = Path(reports_dir) if reports_dir is not None else workspace / "reports"
@@ -89,6 +90,8 @@ def generate_workspace_review_pack(
     profile_integrity_json = state / "profile-integrity.json"
     profile_source_queue_md = reports / "profile-source-queue.md"
     profile_source_queue_json = state / "profile-source-queue.json"
+    profile_source_fix_plan_md = reports / "profile-source-fix-plan.md"
+    profile_source_fix_plan_json = state / "profile-source-fix-plan.json"
     profile_review_md = reports / "profile-review.md"
     profile_review_json = state / "profile-review.json"
     profile_promotion_md = reports / "profile-promotion-summary.md"
@@ -124,6 +127,7 @@ def generate_workspace_review_pack(
     research_claim_matrix = generate_research_claim_matrix(workspace, output_path=research_claim_md, json_path=research_claim_json)
     profile_integrity = generate_profile_integrity(workspace, output_path=profile_integrity_md, json_path=profile_integrity_json)
     profile_source_queue = generate_profile_source_queue(workspace, output_path=profile_source_queue_md, json_path=profile_source_queue_json)
+    profile_source_fix_plan = generate_profile_source_fix_plan(workspace, output_path=profile_source_fix_plan_md, json_path=profile_source_fix_plan_json)
     profile_review = generate_profile_review(workspace, output_path=profile_review_md, json_path=profile_review_json)
     profile_promotion = summarize_profile_promotions(workspace, output_path=profile_promotion_md, json_path=profile_promotion_json)
     profile_apply = generate_profile_promotion_apply_plan(workspace, output_path=profile_apply_md, json_path=profile_apply_json)
@@ -195,6 +199,8 @@ def generate_workspace_review_pack(
         str(profile_integrity_json),
         str(profile_source_queue_md),
         str(profile_source_queue_json),
+        str(profile_source_fix_plan_md),
+        str(profile_source_fix_plan_json),
         str(profile_review_md),
         str(profile_review_json),
         str(profile_promotion_md),
@@ -281,6 +287,11 @@ def generate_workspace_review_pack(
         profile_source_queue_status=profile_source_queue.status,
         profile_source_queue_item_count=profile_source_queue.queue_item_count,
         profile_source_queue_high_count=profile_source_queue.high_count,
+        profile_source_fix_plan_status=profile_source_fix_plan.status,
+        profile_source_fix_plan_action_count=profile_source_fix_plan.action_count,
+        profile_source_fix_plan_manual_count=profile_source_fix_plan.manual_count,
+        profile_source_fix_plan_official_check_count=profile_source_fix_plan.official_source_check_count,
+        profile_source_fix_plan_high_count=profile_source_fix_plan.high_count,
         profile_review_status=profile_review.status,
         profile_review_can_promote=profile_review.can_promote,
         profile_review_failed_count=profile_review.failed_count,
@@ -384,7 +395,7 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
     lines = [
         "# K-ResDev Workspace Review Pack",
         "",
-        "> Review pack projection only. It bundles local discovery, authority, goals, weekly-review, dashboard, readiness, next-action, summary, source-verification, budget-ledger, approval-coverage, report-integrity, bibliography-integrity, reference-corpus, citation-support, research-claim-matrix, trace-passport, profile-source-queue, profile-integrity, and trace artifacts; it does not certify official agency compliance.",
+            "> Review pack projection only. It bundles local discovery, authority, goals, weekly-review, dashboard, readiness, next-action, summary, source-verification, budget-ledger, approval-coverage, report-integrity, bibliography-integrity, reference-corpus, citation-support, research-claim-matrix, trace-passport, profile-source-queue, profile-source-fix-plan, profile-integrity, and trace artifacts; it does not certify official agency compliance.",
         "",
         "| Field | Value |",
         "|---|---|",
@@ -458,6 +469,11 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
         f"| Profile source queue status | {_escape(result.profile_source_queue_status or '-')} |",
         f"| Profile source queue items | {result.profile_source_queue_item_count} |",
         f"| Profile source queue high count | {result.profile_source_queue_high_count} |",
+        f"| Profile source fix-plan status | {_escape(result.profile_source_fix_plan_status or '-')} |",
+        f"| Profile source fix-plan actions | {result.profile_source_fix_plan_action_count} |",
+        f"| Profile source fix-plan manual actions | {result.profile_source_fix_plan_manual_count} |",
+        f"| Profile source fix-plan official-source checks | {result.profile_source_fix_plan_official_check_count} |",
+        f"| Profile source fix-plan high count | {result.profile_source_fix_plan_high_count} |",
         f"| Profile review status | {_escape(result.profile_review_status or '-')} |",
         f"| Profile review can promote | {result.profile_review_can_promote} |",
         f"| Profile review failed count | {result.profile_review_failed_count} |",
@@ -527,6 +543,7 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
             "- Use `research-claim-matrix.md` to check supplied research claims against evidence, bibliography, and citation-support records.",
             "- Use `profile-integrity.md` to check project/agency profile source records and drift.",
             "- Use `profile-source-queue.md` to review profile source-pack gaps before promotion or new agency pack work.",
+            "- Use `profile-source-fix-plan.md` to translate queue gaps into reviewable local commands and manual official-source checks.",
             "- Use `profile-review.md` before promoting any source-backed profile to verified.",
             "- Use `profile-promotion-summary.md` to inspect supplied human profile-promotion decisions.",
             "- Use `profile-promotion-apply-plan.md` to review proposed profile field changes before any profile status is changed.",
@@ -586,6 +603,8 @@ def _artifact_label(path: str) -> str:
         "profile-integrity.json": "Profile integrity JSON",
         "profile-source-queue.md": "Profile source queue",
         "profile-source-queue.json": "Profile source queue JSON",
+        "profile-source-fix-plan.md": "Profile source fix plan",
+        "profile-source-fix-plan.json": "Profile source fix plan JSON",
         "profile-review.md": "Profile review",
         "profile-review.json": "Profile review JSON",
         "profile-promotion-summary.md": "Profile promotion summary",

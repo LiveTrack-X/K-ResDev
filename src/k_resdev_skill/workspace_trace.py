@@ -36,6 +36,7 @@ from .models import (
 from .profile_promotion import load_profile_promotion_records
 from .profile_lifecycle import load_profile_lifecycle_ledger
 from .profile_review import load_profile_review
+from .profile_source_fix_plan import load_profile_source_fix_plan
 from .profile_source_queue import load_profile_source_queue
 from .profile_sources import load_profile_sources
 from .project_goals import generate_goals_review
@@ -65,6 +66,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "profile-promotion-revoke-result.md",
     "profile-promotion-summary.md",
     "profile-review.md",
+    "profile-source-fix-plan.md",
     "profile-source-queue.md",
     "profile-source-summary.md",
     "readiness.md",
@@ -99,6 +101,7 @@ def generate_workspace_trace(
     builder.add_budget_ledger()
     builder.add_profile_sources()
     builder.add_profile_source_queue()
+    builder.add_profile_source_fix_plan()
     builder.add_profile_review()
     builder.add_profile_promotions()
     builder.add_profile_promotion_apply_plan()
@@ -570,6 +573,53 @@ class _TraceBuilder:
                 path=item.source_file or item.source_record_path or item.profile_path,
                 suggested_action=item.suggested_action or "Review profile-source-queue before profile promotion.",
             )
+
+    def add_profile_source_fix_plan(self) -> None:
+        path = self.workspace / "state" / "profile-source-fix-plan.json"
+        if not path.exists():
+            return
+        try:
+            plan = load_profile_source_fix_plan(path)
+        except Exception as exc:
+            self.finding(
+                "trace_profile_source_fix_plan_unreadable",
+                "medium",
+                f"Profile source fix plan could not be read: {exc}",
+                path=path,
+                suggested_action="Regenerate profile-source-fix-plan before relying on source remediation trace state.",
+            )
+            return
+        node = self.node(
+            "profile_source_fix_plan",
+            "profile-source-fix-plan",
+            "Profile source fix plan",
+            status=plan.status,
+            path=str(path),
+            sha256=_sha256_file(path),
+            metadata={
+                "queue_hash": plan.queue_hash,
+                "queue_status": plan.queue_status,
+                "action_count": plan.action_count,
+                "manual_count": plan.manual_count,
+                "official_source_check_count": plan.official_source_check_count,
+                "high_count": plan.high_count,
+            },
+        )
+        self.edge(node.node_id, _node_id("profile_source_queue", "profile-source-queue"), "plans_queue_remediation")
+        for action in plan.actions:
+            if action.profile_id:
+                self.edge(node.node_id, _node_id("profile", action.profile_id), "plans_profile_source_fix")
+            if action.source_id:
+                self.edge(node.node_id, _node_id("profile_source", action.source_id), "plans_source_fix")
+            if action.severity in {"high", "medium"}:
+                self.finding(
+                    "trace_profile_source_fix_plan_action",
+                    action.severity,
+                    action.rationale,
+                    node_id=node.node_id,
+                    path=action.source_file or action.source_record_path,
+                    suggested_action=action.manual_step or action.command or "Review profile-source-fix-plan.",
+                )
 
     def add_profile_review(self) -> None:
         path = self.workspace / "state" / "profile-review.json"

@@ -1127,6 +1127,11 @@ class WorkspaceSummaryResult(StrictModel):
     profile_source_queue_status: str | None = None
     profile_source_queue_item_count: int = 0
     profile_source_queue_high_count: int = 0
+    profile_source_fix_plan_status: str | None = None
+    profile_source_fix_plan_action_count: int = 0
+    profile_source_fix_plan_manual_count: int = 0
+    profile_source_fix_plan_official_check_count: int = 0
+    profile_source_fix_plan_high_count: int = 0
     profile_review_status: str | None = None
     profile_review_can_promote: bool = False
     profile_review_failed_count: int = 0
@@ -1399,6 +1404,11 @@ class WorkspaceReviewPackResult(StrictModel):
     profile_source_queue_status: str | None = None
     profile_source_queue_item_count: int = 0
     profile_source_queue_high_count: int = 0
+    profile_source_fix_plan_status: str | None = None
+    profile_source_fix_plan_action_count: int = 0
+    profile_source_fix_plan_manual_count: int = 0
+    profile_source_fix_plan_official_check_count: int = 0
+    profile_source_fix_plan_high_count: int = 0
     profile_review_status: str | None = None
     profile_review_can_promote: bool = False
     profile_review_failed_count: int = 0
@@ -1589,6 +1599,55 @@ class ProfileSourceQueueResult(StrictModel):
     medium_count: int = 0
     low_count: int = 0
     items: list[ProfileSourceQueueItem] = Field(default_factory=list)
+    markdown_path: str | None = None
+    json_path: str | None = None
+    warnings: list[str] = Field(default_factory=list)
+
+
+class ProfileSourceFixPlanAction(StrictModel):
+    action_id: str
+    queue_id: str | None = None
+    scope: str | None = None
+    profile_id: str | None = None
+    source_id: str | None = None
+    issue_code: str
+    severity: str
+    action_type: str
+    title: str
+    rationale: str
+    manual_step: str | None = None
+    command: str | None = None
+    followup_commands: list[str] = Field(default_factory=list)
+    source_record_path: str | None = None
+    source_file: str | None = None
+    requires_human_review: bool = True
+    requires_official_source_check: bool = False
+
+    @field_validator("action_id", "issue_code", "severity", "action_type", "title", "rationale")
+    @classmethod
+    def _profile_source_fix_plan_action_field_must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
+class ProfileSourceFixPlanResult(StrictModel):
+    root: str
+    status: str
+    queue_path: str
+    queue_hash: str | None = None
+    queue_status: str | None = None
+    queue_item_count: int = 0
+    profile_count: int = 0
+    action_count: int = 0
+    command_count: int = 0
+    manual_count: int = 0
+    human_review_count: int = 0
+    official_source_check_count: int = 0
+    high_count: int = 0
+    medium_count: int = 0
+    low_count: int = 0
+    actions: list[ProfileSourceFixPlanAction] = Field(default_factory=list)
     markdown_path: str | None = None
     json_path: str | None = None
     warnings: list[str] = Field(default_factory=list)

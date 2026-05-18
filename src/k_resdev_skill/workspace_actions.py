@@ -83,6 +83,7 @@ def _actions_for_findings(root: Path, findings: list[WorkspaceDoctorFinding]) ->
         _action_for_budget_ledger(root, by_code),
         _action_for_profile(root, by_code),
         _action_for_profile_source_queue(root, by_code),
+        _action_for_profile_source_fix_plan(root, by_code),
         _action_for_profile_integrity(root, by_code),
         _action_for_profile_review(root, by_code),
         _action_for_profile_promotion(root, by_code),
@@ -282,6 +283,26 @@ def _action_for_profile_source_queue(root: Path, by_code: dict[str, list[Workspa
         "Review profile source pack queue",
         "Profile source packs should have URL/file locators, retrieval dates, hashes, reviewers, and resolved risk flags before promotion.",
         f'python -m k_resdev_skill profile-source-queue --root "{root}" --output "{root / "reports" / "profile-source-queue.md"}" --json "{root / "state" / "profile-source-queue.json"}"',
+        by_code,
+        codes,
+    )
+
+
+def _action_for_profile_source_fix_plan(root: Path, by_code: dict[str, list[WorkspaceDoctorFinding]]) -> WorkspaceActionItem | None:
+    codes = [
+        "profile_source_fix_plan_missing",
+        "profile_source_fix_plan_high_actions",
+        "profile_source_fix_plan_review_actions",
+    ]
+    if not any(code in by_code for code in codes):
+        return None
+    priority = "high" if "profile_source_fix_plan_high_actions" in by_code else "medium"
+    return _action(
+        root,
+        priority,
+        "Plan profile source queue fixes",
+        "Profile-source queue findings should be translated into explicit local commands and manual official-source checks before metadata changes.",
+        f'python -m k_resdev_skill profile-source-fix-plan --root "{root}" --output "{root / "reports" / "profile-source-fix-plan.md"}" --json "{root / "state" / "profile-source-fix-plan.json"}"',
         by_code,
         codes,
     )

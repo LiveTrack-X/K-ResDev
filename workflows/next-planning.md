@@ -1,12 +1,12 @@
 # K-ResDev Next Planning
 
-This planning note starts after `0.1.0b42`.
+This planning note starts after `0.1.0b43`.
 
 ## Current Diagnosis
 
-K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, budget ledger review, bibliography metadata, reference corpus adapters, read-only workspace discovery, bibliography review, citation support, research claim matrices, profile source records, profile source-pack review queues, profile integrity, a narrow source-backed IRIS/Innopolis profile seed, profile promotion review, hash-bound profile promotion records, non-destructive profile promotion apply plans, guarded profile promotion apply results/backups, non-destructive profile promotion revocation plans, guarded profile promotion revocation results/backups, a profile lifecycle ledger, workspace traceability graph, trace passport checkpoints, artifact authority labels, goals/deadline review, weekly operating reviews, workspace dashboards, thin local workflow router, workspace doctor, next actions, workspace summary, and review packs.
+K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, budget ledger review, bibliography metadata, reference corpus adapters, read-only workspace discovery, bibliography review, citation support, research claim matrices, profile source records, profile source-pack review queues, profile source fix plans, profile integrity, a narrow source-backed IRIS/Innopolis profile seed, profile promotion review, hash-bound profile promotion records, non-destructive profile promotion apply plans, guarded profile promotion apply results/backups, non-destructive profile promotion revocation plans, guarded profile promotion revocation results/backups, a profile lifecycle ledger, workspace traceability graph, trace passport checkpoints, artifact authority labels, goals/deadline review, weekly operating reviews, workspace dashboards, thin local workflow router, workspace doctor, next actions, workspace summary, and review packs.
 
-The next bottleneck is turning profile-source queue gaps into a safer, reviewable remediation plan without automatically fetching official sources or rewriting profile packs. Operators can now see source-pack gaps, but they still need a command-oriented fix plan that keeps source verification human-controlled.
+The next bottleneck is preserving a supplied human review trail for profile-source fix actions. Operators can now see source-pack gaps and generate a local remediation plan, but there is not yet a durable way to record which fix-plan actions were resolved, deferred, rejected, or accepted as known risk without mutating source records or promoting profiles.
 
 ## Planning Principles
 
@@ -366,6 +366,8 @@ Safety boundary:
 
 Goal: turn profile source queue items into a reviewable local remediation plan.
 
+Status: implemented in `src/k_resdev_skill/profile_source_fix_plan.py` with CLI/API, schema/template coverage, doctor, next-action, workspace-summary, review-pack, operational Markdown filtering, and trace integration.
+
 Expected scope:
 - `profile-source-fix-plan` command that reads `state/profile-source-queue.json`;
 - produce proposed next commands for each queue item without executing them;
@@ -379,6 +381,23 @@ Safety boundary:
 - The fix plan must never fetch official sources, mutate profile packs, or mark sources verified by itself.
 - Any official source update still requires explicit human/source verification.
 
+### Beta 44 - Profile Source Fix Review Records
+
+Goal: record supplied human decisions about profile-source fix-plan actions without mutating profile/source state.
+
+Expected scope:
+- `profile-source-fix-record` command for a supplied reviewer decision on one `action_id`;
+- bind records to `state/profile-source-fix-plan.json` SHA-256 and the selected action;
+- support decisions such as `resolved`, `accepted_risk`, `deferred`, and `rejected`;
+- write review records under `state/profile-source-fix-reviews/`;
+- `profile-source-fix-summary` command that compares the current fix plan against review records;
+- flag stale plan hashes, missing action IDs, unresolved high/medium actions, and accepted-risk actions;
+- integrate summary counts into doctor, next actions, workspace-summary, review-pack, and trace.
+
+Safety boundary:
+- Fix review records are supplied human decision records only.
+- They must not edit `state/profile-sources.json`, fetch official documents, or promote source/profile status.
+
 ## Deferred Ideas
 
 - Direct official HWP/HWPX form generation.
@@ -391,6 +410,6 @@ These should wait until traceability, impact analysis, and verified profile sour
 
 ## Recommended Next Slice
 
-Implement Beta 43 next.
+Implement Beta 44 next.
 
-Beta 43 should make profile-source remediation command-oriented while keeping official-source verification manual and explicit.
+Beta 44 should make profile-source remediation auditable by recording supplied human resolution decisions while keeping source/profile mutation separate and guarded.

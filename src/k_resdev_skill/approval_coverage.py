@@ -28,6 +28,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "profile-promotion-revoke-result.md",
     "profile-promotion-summary.md",
     "profile-review.md",
+    "profile-source-fix-plan.md",
     "profile-source-queue.md",
     "profile-source-summary.md",
     "reference-corpus-summary.md",

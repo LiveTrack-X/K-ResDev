@@ -1,0 +1,43 @@
+{
+  "root": ".",
+  "status": "needs_review",
+  "queue_path": "state/profile-source-queue.json",
+  "queue_hash": "sha256:example",
+  "queue_status": "needs_review",
+  "queue_item_count": 1,
+  "profile_count": 1,
+  "action_count": 1,
+  "command_count": 1,
+  "manual_count": 1,
+  "human_review_count": 1,
+  "official_source_check_count": 1,
+  "high_count": 0,
+  "medium_count": 1,
+  "low_count": 0,
+  "actions": [
+    {
+      "action_id": "PSF-EXAMPLE0001",
+      "queue_id": "PSQ-EXAMPLE0001",
+      "scope": "workspace",
+      "profile_id": "national-rnd-basic",
+      "source_id": "PRS-EXAMPLE0001",
+      "issue_code": "profile_source_hash_missing",
+      "severity": "medium",
+      "action_type": "manual_then_command",
+      "title": "Add or document source hash",
+      "rationale": "Profile source `PRS-EXAMPLE0001` has no source hash.",
+      "manual_step": "Hash a local official-source copy or source note if available; otherwise keep the record needs_review and explain the gap.",
+      "command": "python -m k_resdev_skill profile-source-record --root . --profile-id national-rnd-basic --title \"Official source title\" --source-url https://example.org --retrieved-at 2026-05-19 --review-status needs_review --source-id PRS-EXAMPLE0001",
+      "followup_commands": [
+        "python -m k_resdev_skill profile-integrity --root . --output reports/profile-integrity.md --json state/profile-integrity.json"
+      ],
+      "source_record_path": "state/profile-sources.json",
+      "source_file": null,
+      "requires_human_review": true,
+      "requires_official_source_check": true
+    }
+  ],
+  "markdown_path": "reports/profile-source-fix-plan.md",
+  "json_path": "state/profile-source-fix-plan.json",
+  "warnings": []
+}

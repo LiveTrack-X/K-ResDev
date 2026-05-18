@@ -106,6 +106,20 @@ def test_profile_source_queue_templates_match_json_schemas():
     jsonschema.validate(queue, queue_schema)
 
 
+def test_profile_source_fix_plan_templates_match_json_schemas():
+    with open("schemas/profile_source_fix_plan_action.schema.json", encoding="utf-8") as handle:
+        action_schema = json.load(handle)
+    with open("schemas/profile_source_fix_plan.schema.json", encoding="utf-8") as handle:
+        plan_schema = json.load(handle)
+    with open("templates/profile-source-fix-plan-action.json", encoding="utf-8") as handle:
+        action = json.load(handle)
+    with open("templates/profile-source-fix-plan.json", encoding="utf-8") as handle:
+        plan = json.load(handle)
+
+    jsonschema.validate(action, action_schema)
+    jsonschema.validate(plan, plan_schema)
+
+
 def test_profile_review_check_template_matches_json_schema():
     with open("schemas/profile_review_check.schema.json", encoding="utf-8") as handle:
         schema = json.load(handle)

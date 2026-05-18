@@ -1,12 +1,12 @@
 # K-ResDev Next Planning
 
-This planning note starts after `0.1.0b31`.
+This planning note starts after `0.1.0b32`.
 
 ## Current Diagnosis
 
-K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, budget ledger review, bibliography metadata, reference corpus adapters, read-only workspace discovery, bibliography review, citation support, research claim matrices, profile source records, profile integrity, workspace traceability graph, trace passport checkpoints, artifact authority labels, goals/deadline review, workspace doctor, next actions, workspace summary, and review packs.
+K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, budget ledger review, bibliography metadata, reference corpus adapters, read-only workspace discovery, bibliography review, citation support, research claim matrices, profile source records, profile integrity, workspace traceability graph, trace passport checkpoints, artifact authority labels, goals/deadline review, weekly operating reviews, workspace dashboards, workspace doctor, next actions, workspace summary, and review packs.
 
-The next bottleneck is turning the existing operating artifacts into a local weekly review/dashboard. A real R&D workspace now has evidence, claims, authority, goals, deadlines, approvals, and trace data, but the user still needs one routine view for what moved, what is due soon, and what human decisions are waiting.
+The next bottleneck is command ergonomics. A real R&D workspace now has many useful deterministic commands, but the user still has to remember which command sequence fits an admin review, research review, integrity review, or weekly review.
 
 ## Planning Principles
 
@@ -193,6 +193,8 @@ Safety boundary:
 
 Goal: generate a local R&D weekly review/dashboard from K-ResDev artifacts.
 
+Status: implemented as a local first pass in `src/k_resdev_skill/weekly_review.py`, with `weekly-review`, `workspace-dashboard`, schema/template, doctor, next-action, summary, review-pack, and trace integration.
+
 Expected scope:
 - `weekly-review` and `workspace-dashboard` commands.
 - local artifact-only inputs by default; no Gmail, WhatsApp, Google Docs, Slack, or Teams connector actions.
@@ -223,6 +225,6 @@ These should wait until traceability, impact analysis, and verified profile sour
 
 ## Recommended Next Slice
 
-Implement Beta 32 next.
+Implement Beta 33 next.
 
-Beta 32 should add a local weekly review and workspace dashboard generated from existing K-ResDev artifacts. It should use local files only by default and keep all status language as operating projection, not official report readiness or agency schedule certification.
+Beta 33 should add a thin workflow router that maps common review intentions to the existing deterministic commands. It should print concrete commands and output paths before running, stay local by default, and avoid hiding connector or network actions behind convenience aliases.

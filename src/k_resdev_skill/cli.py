@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+from datetime import date
 from pathlib import Path
 
 from . import __version__
@@ -77,6 +78,7 @@ from .workspace_discovery import discover_workspace
 from .workspace_review import generate_workspace_review_pack, verify_workspace_review_pack
 from .workspace_summary import generate_workspace_summary
 from .workspace_trace import generate_workspace_trace
+from .weekly_review import generate_weekly_review, generate_workspace_dashboard
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -413,6 +415,18 @@ def main(argv: list[str] | None = None) -> int:
     workspace_summary_parser.add_argument("--json", default=None)
     workspace_summary_parser.add_argument("--max-actions", type=int, default=5)
 
+    weekly_review_parser = subparsers.add_parser("weekly-review", help="Generate a dated local weekly operating review.")
+    weekly_review_parser.add_argument("--root", default=".")
+    weekly_review_parser.add_argument("--date", default=None)
+    weekly_review_parser.add_argument("--output", default=None)
+    weekly_review_parser.add_argument("--json", default=None)
+    weekly_review_parser.add_argument("--max-actions", type=int, default=5)
+
+    workspace_dashboard_parser = subparsers.add_parser("workspace-dashboard", help="Generate a compact local workspace dashboard.")
+    workspace_dashboard_parser.add_argument("--root", default=".")
+    workspace_dashboard_parser.add_argument("--output", default=None)
+    workspace_dashboard_parser.add_argument("--json", default=None)
+
     workspace_trace_parser = subparsers.add_parser("workspace-trace", help="Generate a local workspace traceability graph and impact report.")
     workspace_trace_parser.add_argument("--root", default=".")
     workspace_trace_parser.add_argument("--output", default=None)
@@ -441,7 +455,7 @@ def main(argv: list[str] | None = None) -> int:
 
     review_pack_parser = subparsers.add_parser(
         "workspace-review-pack",
-        help="Generate readiness, next-action, summary, goals, profile, source, approval, report, bibliography, reference-corpus, citation-support, trace-passport, and trace artifacts in one local review pack.",
+        help="Generate readiness, next-action, summary, goals, weekly, dashboard, profile, source, approval, report, bibliography, reference-corpus, citation-support, trace-passport, and trace artifacts in one local review pack.",
     )
     review_pack_parser.add_argument("--root", default=".")
     review_pack_parser.add_argument("--reports-dir", default=None)
@@ -796,6 +810,23 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if args.command == "workspace-summary":
         result = generate_workspace_summary(args.root, output_path=args.output, json_path=args.json, max_actions=args.max_actions)
+        print(result.model_dump_json(indent=2))
+        return 0
+    if args.command == "weekly-review":
+        root = Path(args.root)
+        review_date = args.date or date.today().isoformat()
+        output = args.output or root / "reports" / f"weekly-review-{review_date}.md"
+        json_output = args.json or root / "state" / f"weekly-review-{review_date}.json"
+        result = generate_weekly_review(args.root, review_date=review_date, output_path=output, json_path=json_output, max_actions=args.max_actions)
+        print(result.model_dump_json(indent=2))
+        return 0
+    if args.command == "workspace-dashboard":
+        root = Path(args.root)
+        result = generate_workspace_dashboard(
+            args.root,
+            output_path=args.output or root / "reports" / "workspace-dashboard.md",
+            json_path=args.json or root / "state" / "workspace-dashboard.json",
+        )
         print(result.model_dump_json(indent=2))
         return 0
     if args.command == "workspace-trace":

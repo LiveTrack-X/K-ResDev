@@ -20,7 +20,8 @@ from .project_goals import generate_goals_review
 from .reference_corpus import build_reference_corpus
 from .research_claims import generate_research_claim_matrix
 from .trace_passport import generate_trace_passport
-from .workspace import OPERATIONAL_MARKDOWN_NAMES, run_workspace_doctor
+from .weekly_review import load_latest_weekly_review, load_saved_workspace_dashboard
+from .workspace import is_operational_markdown, run_workspace_doctor
 from .workspace_actions import generate_workspace_action_plan
 from .workspace_discovery import discover_workspace
 from .workspace_trace import generate_workspace_trace
@@ -55,6 +56,8 @@ def generate_workspace_summary(
     profile_integrity = generate_profile_integrity(workspace)
     trace = generate_workspace_trace(workspace)
     trace_passport = generate_trace_passport(workspace)
+    weekly_review = load_latest_weekly_review(workspace)
+    dashboard = load_saved_workspace_dashboard(workspace)
 
     summary = WorkspaceSummaryResult(
         root=str(workspace),
@@ -95,6 +98,11 @@ def generate_workspace_summary(
         goals_due_soon_count=goals_review.due_soon_count,
         goals_overdue_count=goals_review.overdue_count,
         goals_at_risk_deadline_count=goals_review.at_risk_deadline_count,
+        weekly_review_status=weekly_review.status if weekly_review else None,
+        weekly_review_item_count=weekly_review.item_count if weekly_review else 0,
+        weekly_review_high_count=sum(1 for item in weekly_review.items if item.severity == "high") if weekly_review else 0,
+        dashboard_status=dashboard.status if dashboard else None,
+        dashboard_card_count=dashboard.card_count if dashboard else 0,
         reference_corpus_status=reference_corpus.status,
         reference_corpus_count=reference_corpus.item_count,
         reference_rejection_count=reference_corpus.rejection_count,
@@ -158,6 +166,10 @@ def render_workspace_summary_markdown(summary: WorkspaceSummaryResult) -> str:
         f"| Deadlines | {summary.deadline_count} |",
         f"| Due soon deadlines | {summary.goals_due_soon_count} |",
         f"| Overdue deadlines | {summary.goals_overdue_count} |",
+        f"| Weekly review | {_escape(summary.weekly_review_status or '-')} |",
+        f"| Weekly review items | {summary.weekly_review_item_count} |",
+        f"| Workspace dashboard | {_escape(summary.dashboard_status or '-')} |",
+        f"| Dashboard cards | {summary.dashboard_card_count} |",
         f"| Budget ledger | {_escape(summary.budget_ledger_status or '-')} |",
         f"| Budget ledger rows | {summary.budget_ledger_count} |",
         f"| Reference corpus | {_escape(summary.reference_corpus_status or '-')} |",
@@ -196,6 +208,8 @@ def render_workspace_summary_markdown(summary: WorkspaceSummaryResult) -> str:
         f"| Workspace discovery | {summary.discovery_scanned_count} | status: {_escape(summary.discovery_status or '-')}; missing dirs: {summary.discovery_missing_standard_dir_count}; loose candidates: {summary.discovery_loose_candidate_count}; proposals: {summary.discovery_setup_proposal_count} |",
         f"| Artifact authority | {summary.artifact_authority_count} | status: {_escape(summary.artifact_authority_status or '-')}; findings: {summary.artifact_authority_finding_count}; high: {summary.artifact_authority_high_count}; levels: {_format_counts(summary.artifact_authority_level_counts)} |",
         f"| Goals review | {summary.objective_count} | status: {_escape(summary.goals_review_status or '-')}; deadlines: {summary.deadline_count}; due soon: {summary.goals_due_soon_count}; overdue: {summary.goals_overdue_count}; at risk: {summary.goals_at_risk_deadline_count}; findings: {summary.goals_review_finding_count}; high: {summary.goals_review_high_count} |",
+        f"| Weekly review | {summary.weekly_review_item_count} | status: {_escape(summary.weekly_review_status or '-')}; high items: {summary.weekly_review_high_count} |",
+        f"| Workspace dashboard | {summary.dashboard_card_count} | status: {_escape(summary.dashboard_status or '-')} |",
         f"| Budget ledger | {summary.budget_ledger_count} | status: {_escape(summary.budget_ledger_status or '-')}; findings: {summary.budget_ledger_finding_count}; totals: {_format_float_counts(summary.budget_total_by_currency)} |",
         f"| Reference corpus | {summary.reference_corpus_count} | status: {_escape(summary.reference_corpus_status or '-')}; rejections: {summary.reference_rejection_count}; high: {summary.reference_corpus_high_count} |",
         f"| Research claim matrix | {summary.research_claim_count} | status: {_escape(summary.research_claim_matrix_status or '-')}; findings: {summary.research_claim_matrix_finding_count} |",
@@ -259,7 +273,7 @@ def _sorted_paths(root: Path, patterns: list[str]) -> list[str]:
 def _report_paths(root: Path) -> list[str]:
     if not root.exists():
         return []
-    paths = [path for path in root.glob("*.md") if path.name not in OPERATIONAL_MARKDOWN_NAMES]
+    paths = [path for path in root.glob("*.md") if not is_operational_markdown(path)]
     return [str(path) for path in sorted(paths, key=lambda item: item.as_posix())]
 
 

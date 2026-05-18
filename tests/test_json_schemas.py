@@ -181,3 +181,21 @@ def test_project_deadline_template_matches_json_schema():
         sample = json.load(handle)
 
     jsonschema.validate(sample, schema)
+
+
+def test_weekly_review_item_template_matches_json_schema():
+    with open("schemas/weekly_review_item.schema.json", encoding="utf-8") as handle:
+        schema = json.load(handle)
+    with open("templates/weekly-review-item.json", encoding="utf-8") as handle:
+        sample = json.load(handle)
+
+    jsonschema.validate(sample, schema)
+
+
+def test_dashboard_card_template_matches_json_schema():
+    with open("schemas/dashboard_card.schema.json", encoding="utf-8") as handle:
+        schema = json.load(handle)
+    with open("templates/dashboard-card.json", encoding="utf-8") as handle:
+        sample = json.load(handle)
+
+    jsonschema.validate(sample, schema)

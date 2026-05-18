@@ -59,10 +59,12 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "source-verification.md",
     "trace-passport.md",
     "workspace-discovery.md",
+    "workspace-dashboard.md",
     "workspace-review-pack.md",
     "workspace-summary.md",
     "workspace-trace.md",
 }
+OPERATIONAL_MARKDOWN_PREFIXES = ("weekly-review-",)
 
 EVIDENCE_ID_RE = re.compile(r"\bEVI-[A-Za-z0-9][A-Za-z0-9_.:-]*\b")
 
@@ -89,6 +91,7 @@ def generate_workspace_trace(
     builder.add_research_claims()
     builder.add_analysis_manifests()
     builder.add_review_pack()
+    builder.add_weekly_dashboard()
     builder.add_trace_passport()
 
     findings = _dedupe_findings(builder.findings)
@@ -786,6 +789,78 @@ class _TraceBuilder:
                     suggested_action="Regenerate or verify the workspace review pack.",
                 )
 
+    def add_weekly_dashboard(self) -> None:
+        state_dir = self.workspace / "state"
+        if not state_dir.exists():
+            return
+        for path in sorted(state_dir.glob("weekly-review-*.json"), key=lambda item: item.name):
+            try:
+                payload = json.loads(path.read_text(encoding="utf-8-sig"))
+            except Exception as exc:
+                self.finding(
+                    "trace_weekly_review_unreadable",
+                    "medium",
+                    f"Weekly review could not be read: {exc}",
+                    path=path,
+                    suggested_action="Regenerate the weekly review.",
+                )
+                continue
+            node = self.node(
+                "weekly_review",
+                str(path),
+                path.name,
+                status=_text(payload.get("status")),
+                path=str(path),
+                sha256=_sha256_file(path),
+                metadata={
+                    "review_date": payload.get("review_date"),
+                    "item_count": payload.get("item_count"),
+                    "high_finding_count": payload.get("high_finding_count"),
+                },
+            )
+            for item in payload.get("items") or []:
+                if not isinstance(item, dict):
+                    continue
+                for evidence_id in item.get("evidence_ids") or []:
+                    self.edge(node.node_id, _node_id("evidence", str(evidence_id)), "references_evidence")
+                for artifact_path in item.get("artifact_paths") or []:
+                    artifact_node = self.node("generated_artifact", str(artifact_path), Path(str(artifact_path)).name, path=str(artifact_path))
+                    self.edge(node.node_id, artifact_node.node_id, "references_artifact")
+        dashboard_path = state_dir / "workspace-dashboard.json"
+        if not dashboard_path.exists():
+            return
+        try:
+            payload = json.loads(dashboard_path.read_text(encoding="utf-8-sig"))
+        except Exception as exc:
+            self.finding(
+                "trace_workspace_dashboard_unreadable",
+                "medium",
+                f"Workspace dashboard could not be read: {exc}",
+                path=dashboard_path,
+                suggested_action="Regenerate the workspace dashboard.",
+            )
+            return
+        node = self.node(
+            "workspace_dashboard",
+            str(dashboard_path),
+            dashboard_path.name,
+            status=_text(payload.get("status")),
+            path=str(dashboard_path),
+            sha256=_sha256_file(dashboard_path),
+            metadata={
+                "generated_at": payload.get("generated_at"),
+                "card_count": payload.get("card_count"),
+                "finding_count": payload.get("finding_count"),
+                "action_count": payload.get("action_count"),
+            },
+        )
+        for card in payload.get("cards") or []:
+            if not isinstance(card, dict):
+                continue
+            for artifact_path in card.get("artifact_paths") or []:
+                artifact_node = self.node("generated_artifact", str(artifact_path), Path(str(artifact_path)).name, path=str(artifact_path))
+                self.edge(node.node_id, artifact_node.node_id, "summarizes_artifact")
+
     def add_trace_passport(self) -> None:
         checkpoints_dir = self.workspace / "state" / "checkpoints"
         if not checkpoints_dir.exists():
@@ -1067,7 +1142,7 @@ class _TraceBuilder:
         reports = self.workspace / "reports"
         if not reports.exists():
             return []
-        return sorted(path for path in reports.glob("*.md") if path.name not in OPERATIONAL_MARKDOWN_NAMES)
+        return sorted(path for path in reports.glob("*.md") if not _is_operational_markdown(path))
 
     def _resolve_path(self, path: str) -> Path:
         target = Path(path)
@@ -1097,6 +1172,11 @@ def _normalize_hash(value: str | None) -> str | None:
         return None
     text = str(value)
     return text if text.startswith("sha256:") else f"sha256:{text}"
+
+
+def _is_operational_markdown(path: str | Path) -> bool:
+    name = Path(path).name
+    return name in OPERATIONAL_MARKDOWN_NAMES or any(name.startswith(prefix) for prefix in OPERATIONAL_MARKDOWN_PREFIXES)
 
 
 def _read_text(path: Path) -> str:

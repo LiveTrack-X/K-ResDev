@@ -227,6 +227,25 @@ def test_workspace_action_plan_maps_missing_trace_passport_to_create_command(tmp
     assert "checkpoint-create" in (action.command or "")
 
 
+def test_workspace_action_plan_maps_weekly_review_and_dashboard_findings(tmp_path):
+    doctor_result = WorkspaceDoctorResult(
+        root=str(tmp_path),
+        status="ready_with_notes",
+        findings=[
+            WorkspaceDoctorFinding(code="weekly_review_missing", severity="low", message="weekly missing"),
+            WorkspaceDoctorFinding(code="workspace_dashboard_missing", severity="low", message="dashboard missing"),
+        ],
+    )
+
+    plan = generate_workspace_action_plan(tmp_path, doctor_result=doctor_result)
+    titles = {item.title for item in plan.actions}
+
+    assert "Refresh the weekly operating review" in titles
+    assert "Refresh the workspace dashboard" in titles
+    assert any("weekly-review" in (item.command or "") for item in plan.actions)
+    assert any("workspace-dashboard" in (item.command or "") for item in plan.actions)
+
+
 def test_next_actions_cli_writes_outputs(tmp_path, capsys):
     initialize_workspace(tmp_path, "PRJ-2026-0001", "Demo Project")
     output = tmp_path / "reports" / "next-actions.md"

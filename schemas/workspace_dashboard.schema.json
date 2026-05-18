@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "WorkspaceDashboardResult",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["root", "generated_at", "status"],
+  "properties": {
+    "root": { "type": "string", "minLength": 1 },
+    "generated_at": { "type": "string", "minLength": 1 },
+    "status": { "type": "string", "minLength": 1 },
+    "evidence_count": { "type": "integer", "minimum": 0 },
+    "report_count": { "type": "integer", "minimum": 0 },
+    "approval_count": { "type": "integer", "minimum": 0 },
+    "finding_count": { "type": "integer", "minimum": 0 },
+    "high_finding_count": { "type": "integer", "minimum": 0 },
+    "action_count": { "type": "integer", "minimum": 0 },
+    "high_action_count": { "type": "integer", "minimum": 0 },
+    "objective_count": { "type": "integer", "minimum": 0 },
+    "deadline_count": { "type": "integer", "minimum": 0 },
+    "due_soon_count": { "type": "integer", "minimum": 0 },
+    "overdue_count": { "type": "integer", "minimum": 0 },
+    "budget_ledger_status": { "type": ["string", "null"] },
+    "artifact_authority_status": { "type": ["string", "null"] },
+    "reference_corpus_status": { "type": ["string", "null"] },
+    "research_claim_matrix_status": { "type": ["string", "null"] },
+    "trace_status": { "type": ["string", "null"] },
+    "checkpoint_count": { "type": "integer", "minimum": 0 },
+    "card_count": { "type": "integer", "minimum": 0 },
+    "cards": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["card_id", "title", "status", "severity"],
+        "properties": {
+          "card_id": { "type": "string", "minLength": 1 },
+          "title": { "type": "string", "minLength": 1 },
+          "status": { "type": "string", "minLength": 1 },
+          "value": { "type": ["string", "integer", "number", "null"] },
+          "severity": { "type": "string", "minLength": 1 },
+          "detail": { "type": ["string", "null"] },
+          "artifact_paths": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "markdown_path": { "type": ["string", "null"] },
+    "json_path": { "type": ["string", "null"] },
+    "warnings": { "type": "array", "items": { "type": "string" } }
+  }
+}

@@ -36,10 +36,12 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "source-verification.md",
     "trace-passport.md",
     "workspace-discovery.md",
+    "workspace-dashboard.md",
     "workspace-review-pack.md",
     "workspace-summary.md",
     "workspace-trace.md",
 }
+OPERATIONAL_MARKDOWN_PREFIXES = ("weekly-review-",)
 
 
 def generate_workspace_report_integrity(
@@ -204,7 +206,12 @@ def _report_drafts(workspace: Path) -> list[Path]:
     reports_dir = workspace / "reports"
     if not reports_dir.exists():
         return []
-    return [path for path in sorted(reports_dir.glob("*.md")) if path.name not in OPERATIONAL_MARKDOWN_NAMES]
+    return [path for path in sorted(reports_dir.glob("*.md")) if not _is_operational_markdown(path)]
+
+
+def _is_operational_markdown(path: str | Path) -> bool:
+    name = Path(path).name
+    return name in OPERATIONAL_MARKDOWN_NAMES or any(name.startswith(prefix) for prefix in OPERATIONAL_MARKDOWN_PREFIXES)
 
 
 def _evidence_status_findings(text: str, evidence: list[EvidenceItem]) -> list[CheckFinding]:

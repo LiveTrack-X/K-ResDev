@@ -93,6 +93,8 @@ def _actions_for_findings(root: Path, findings: list[WorkspaceDoctorFinding]) ->
         _action_for_research_claim_matrix(root, by_code),
         _action_for_workspace_trace(root, by_code),
         _action_for_trace_passport(root, by_code),
+        _action_for_weekly_review(root, by_code),
+        _action_for_workspace_dashboard(root, by_code),
         _action_for_reports(root, by_code),
         _action_for_analysis(root, by_code),
         _action_for_exports(root, by_code),
@@ -442,6 +444,38 @@ def _action_for_trace_passport(root: Path, by_code: dict[str, list[WorkspaceDoct
         "Review trace passport checkpoints",
         "Checkpoint artifacts may be stale, missing, or still waiting for review.",
         f'python -m k_resdev_skill checkpoint-summary --root "{root}" --output "{root / "reports" / "trace-passport.md"}" --json "{root / "state" / "trace-passport.json"}"',
+        by_code,
+        codes,
+    )
+
+
+def _action_for_weekly_review(root: Path, by_code: dict[str, list[WorkspaceDoctorFinding]]) -> WorkspaceActionItem | None:
+    codes = ["weekly_review_missing", "weekly_review_stale", "weekly_review_unreadable"]
+    if not any(code in by_code for code in codes):
+        return None
+    priority = "medium" if "weekly_review_unreadable" in by_code else "low"
+    return _action(
+        root,
+        priority,
+        "Refresh the weekly operating review",
+        "A dated weekly review gives the team a compact local status slice without turning it into an official report.",
+        f'python -m k_resdev_skill weekly-review --root "{root}"',
+        by_code,
+        codes,
+    )
+
+
+def _action_for_workspace_dashboard(root: Path, by_code: dict[str, list[WorkspaceDoctorFinding]]) -> WorkspaceActionItem | None:
+    codes = ["workspace_dashboard_missing", "workspace_dashboard_unreadable"]
+    if not any(code in by_code for code in codes):
+        return None
+    priority = "medium" if "workspace_dashboard_unreadable" in by_code else "low"
+    return _action(
+        root,
+        priority,
+        "Refresh the workspace dashboard",
+        "The dashboard summarizes readiness, evidence, approvals, goals, budget, research, and trace state from local artifacts.",
+        f'python -m k_resdev_skill workspace-dashboard --root "{root}"',
         by_code,
         codes,
     )

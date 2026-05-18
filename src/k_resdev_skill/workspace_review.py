@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from datetime import date
 from pathlib import Path
 
 from .artifact_authority import generate_artifact_authority
@@ -27,6 +28,7 @@ from .workspace_actions import generate_workspace_action_plan
 from .workspace_discovery import discover_workspace
 from .workspace_summary import generate_workspace_summary
 from .workspace_trace import generate_workspace_trace
+from .weekly_review import generate_weekly_review, generate_workspace_dashboard
 
 
 def generate_workspace_review_pack(
@@ -35,7 +37,7 @@ def generate_workspace_review_pack(
     state_dir: str | Path | None = None,
     max_actions: int = 5,
 ) -> WorkspaceReviewPackResult:
-    """Generate a bundled local review pack for discovery, authority, goals, readiness, traceability, checkpoint, budget, profile, source, approval, report, bibliography, reference corpus, citation-support, and research-claim checks."""
+    """Generate a bundled local review pack for discovery, authority, goals, weekly/dashboard, readiness, traceability, checkpoint, budget, profile, source, approval, report, bibliography, reference corpus, citation-support, and research-claim checks."""
 
     workspace = Path(root)
     reports = Path(reports_dir) if reports_dir is not None else workspace / "reports"
@@ -57,6 +59,11 @@ def generate_workspace_review_pack(
     authority_json = state / "artifact-authority.json"
     goals_md = reports / "goals-review.md"
     goals_json = state / "goals-review.json"
+    weekly_date = date.today().isoformat()
+    weekly_md = reports / f"weekly-review-{weekly_date}.md"
+    weekly_json = state / f"weekly-review-{weekly_date}.json"
+    dashboard_md = reports / "workspace-dashboard.md"
+    dashboard_json = state / "workspace-dashboard.json"
     approval_md = reports / "approval-coverage.md"
     approval_json = state / "approval-coverage.json"
     report_integrity_md = reports / "report-integrity.md"
@@ -82,7 +89,7 @@ def generate_workspace_review_pack(
     index_json = state / "workspace-review-pack.json"
 
     discovery = discover_workspace(workspace, output_path=discovery_md, json_path=discovery_json)
-    doctor = run_workspace_doctor(workspace, readiness_md, readiness_json)
+    doctor = run_workspace_doctor(workspace)
     source_verification = verify_evidence_sources(state / "evidence-index.json", root=workspace, output_path=source_md, json_path=source_json)
     artifact_authority = generate_artifact_authority(workspace, output_path=authority_md, json_path=authority_json)
     goals_review = generate_goals_review(workspace, output_path=goals_md, json_path=goals_json)
@@ -94,8 +101,23 @@ def generate_workspace_review_pack(
     citation_support = generate_workspace_citation_support_integrity(workspace, output_path=citation_support_md, json_path=citation_support_json)
     research_claim_matrix = generate_research_claim_matrix(workspace, output_path=research_claim_md, json_path=research_claim_json)
     profile_integrity = generate_profile_integrity(workspace, output_path=profile_integrity_md, json_path=profile_integrity_json)
+    weekly_review = generate_weekly_review(
+        workspace,
+        review_date=weekly_date,
+        output_path=weekly_md,
+        json_path=weekly_json,
+        max_actions=max_actions,
+        doctor_result=doctor,
+    )
+    dashboard = generate_workspace_dashboard(
+        workspace,
+        output_path=dashboard_md,
+        json_path=dashboard_json,
+        doctor_result=doctor,
+    )
     workspace_trace = generate_workspace_trace(workspace, output_path=workspace_trace_md, json_path=workspace_trace_json)
     trace_passport = generate_trace_passport(workspace, output_path=trace_passport_md, json_path=trace_passport_json)
+    doctor = run_workspace_doctor(workspace, readiness_md, readiness_json)
     actions = generate_workspace_action_plan(workspace, doctor_result=doctor, output_path=actions_md, json_path=actions_json)
     summary = generate_workspace_summary(
         workspace,
@@ -120,6 +142,10 @@ def generate_workspace_review_pack(
         str(authority_json),
         str(goals_md),
         str(goals_json),
+        str(weekly_md),
+        str(weekly_json),
+        str(dashboard_md),
+        str(dashboard_json),
         str(approval_md),
         str(approval_json),
         str(report_integrity_md),
@@ -166,6 +192,11 @@ def generate_workspace_review_pack(
         goals_due_soon_count=goals_review.due_soon_count,
         goals_overdue_count=goals_review.overdue_count,
         goals_at_risk_deadline_count=goals_review.at_risk_deadline_count,
+        weekly_review_status=weekly_review.status,
+        weekly_review_item_count=weekly_review.item_count,
+        weekly_review_high_count=sum(1 for item in weekly_review.items if item.severity == "high"),
+        dashboard_status=dashboard.status,
+        dashboard_card_count=dashboard.card_count,
         approval_coverage_status=approval_coverage.status,
         approval_missing_count=approval_coverage.missing_count,
         approval_not_approved_count=approval_coverage.not_approved_count,
@@ -271,7 +302,7 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
     lines = [
         "# K-ResDev Workspace Review Pack",
         "",
-        "> Review pack projection only. It bundles local discovery, authority, goals, readiness, next-action, summary, source-verification, budget-ledger, approval-coverage, report-integrity, bibliography-integrity, reference-corpus, citation-support, research-claim-matrix, trace-passport, profile-integrity, and trace artifacts; it does not certify official agency compliance.",
+        "> Review pack projection only. It bundles local discovery, authority, goals, weekly-review, dashboard, readiness, next-action, summary, source-verification, budget-ledger, approval-coverage, report-integrity, bibliography-integrity, reference-corpus, citation-support, research-claim-matrix, trace-passport, profile-integrity, and trace artifacts; it does not certify official agency compliance.",
         "",
         "| Field | Value |",
         "|---|---|",
@@ -296,6 +327,11 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
         f"| Due soon deadlines | {result.goals_due_soon_count} |",
         f"| Overdue deadlines | {result.goals_overdue_count} |",
         f"| At-risk deadlines | {result.goals_at_risk_deadline_count} |",
+        f"| Weekly review status | {_escape(result.weekly_review_status or '-')} |",
+        f"| Weekly review item count | {result.weekly_review_item_count} |",
+        f"| Weekly review high count | {result.weekly_review_high_count} |",
+        f"| Workspace dashboard status | {_escape(result.dashboard_status or '-')} |",
+        f"| Workspace dashboard card count | {result.dashboard_card_count} |",
         f"| Approval coverage status | {_escape(result.approval_coverage_status or '-')} |",
         f"| Approval missing count | {result.approval_missing_count} |",
         f"| Approval not approved count | {result.approval_not_approved_count} |",
@@ -373,6 +409,8 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
             "- Use `source-verification.md` to check local source presence and hash drift.",
             "- Use `artifact-authority.md` to check whether artifacts are raw sources, extracted candidates, accepted evidence, drafts, reviewed projections, or approved projections.",
             "- Use `goals-review.md` to check local objectives, deadlines, evidence links, report drafts, and approval readiness.",
+            "- Use the dated `weekly-review-YYYY-MM-DD.md` artifact for a compact weekly operating slice.",
+            "- Use `workspace-dashboard.md` for a compact dashboard across evidence, approvals, goals, budget, research, and trace state.",
             "- Use `approval-coverage.md` to check report artifacts against supplied human decisions.",
             "- Use `report-integrity.md` to check draft report claims against indexed evidence.",
             "- Use `budget-ledger.md` to check budget ledger proof, approval, duplicate, and evidence-link gaps.",
@@ -393,6 +431,10 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
 
 def _artifact_label(path: str) -> str:
     name = Path(path).name
+    if name.startswith("weekly-review-") and name.endswith(".md"):
+        return "Weekly review"
+    if name.startswith("weekly-review-") and name.endswith(".json"):
+        return "Weekly review JSON"
     labels = {
         "readiness.md": "Readiness report",
         "readiness.json": "Readiness JSON",
@@ -408,6 +450,8 @@ def _artifact_label(path: str) -> str:
         "artifact-authority.json": "Artifact authority JSON",
         "goals-review.md": "Goals review",
         "goals-review.json": "Goals review JSON",
+        "workspace-dashboard.md": "Workspace dashboard",
+        "workspace-dashboard.json": "Workspace dashboard JSON",
         "approval-coverage.md": "Approval coverage",
         "approval-coverage.json": "Approval coverage JSON",
         "report-integrity.md": "Report integrity",

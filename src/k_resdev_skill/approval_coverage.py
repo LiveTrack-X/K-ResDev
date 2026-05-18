@@ -31,10 +31,12 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "source-verification.md",
     "trace-passport.md",
     "workspace-discovery.md",
+    "workspace-dashboard.md",
     "workspace-review-pack.md",
     "workspace-summary.md",
     "workspace-trace.md",
 }
+OPERATIONAL_MARKDOWN_PREFIXES = ("weekly-review-",)
 
 
 def generate_workspace_approval_coverage(
@@ -142,10 +144,15 @@ def _report_artifacts(workspace: Path) -> list[tuple[Path, str]]:
     if not reports_dir.exists():
         return []
     artifacts: list[tuple[Path, str]] = []
-    artifacts.extend((path, "report_draft") for path in sorted(reports_dir.glob("*.md")) if path.name not in OPERATIONAL_MARKDOWN_NAMES)
+    artifacts.extend((path, "report_draft") for path in sorted(reports_dir.glob("*.md")) if not _is_operational_markdown(path))
     for pattern in ("*.docx", "*.html", "*.txt"):
         artifacts.extend((path, "projection_export") for path in sorted(reports_dir.glob(pattern)))
     return artifacts
+
+
+def _is_operational_markdown(path: str | Path) -> bool:
+    name = Path(path).name
+    return name in OPERATIONAL_MARKDOWN_NAMES or any(name.startswith(prefix) for prefix in OPERATIONAL_MARKDOWN_PREFIXES)
 
 
 def _coverage_item(

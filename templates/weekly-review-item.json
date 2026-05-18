@@ -1,0 +1,12 @@
+{
+  "item_id": "WRV-EXAMPLE01",
+  "category": "readiness",
+  "title": "Evidence needs review",
+  "severity": "medium",
+  "status": "needs_review",
+  "message": "Example weekly operating item.",
+  "evidence_ids": ["EVI-2026-EXAMPLE"],
+  "artifact_paths": ["state/evidence-index.json"],
+  "due_date": null,
+  "suggested_action": "Review evidence before external use."
+}

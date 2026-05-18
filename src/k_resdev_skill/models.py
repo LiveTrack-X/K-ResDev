@@ -855,6 +855,93 @@ class WorkspaceGoalsReviewResult(StrictModel):
     warnings: list[str] = Field(default_factory=list)
 
 
+class WeeklyReviewItem(StrictModel):
+    item_id: str
+    category: str
+    title: str
+    severity: str = "medium"
+    status: str = "needs_review"
+    message: str | None = None
+    evidence_ids: list[str] = Field(default_factory=list)
+    artifact_paths: list[str] = Field(default_factory=list)
+    due_date: date | None = None
+    suggested_action: str | None = None
+
+    @field_validator("item_id", "category", "title", "severity", "status")
+    @classmethod
+    def _weekly_review_field_must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
+class WorkspaceWeeklyReviewResult(StrictModel):
+    root: str
+    review_date: date
+    status: str
+    evidence_count: int = 0
+    report_count: int = 0
+    approval_count: int = 0
+    action_count: int = 0
+    high_action_count: int = 0
+    objective_count: int = 0
+    deadline_count: int = 0
+    due_soon_count: int = 0
+    overdue_count: int = 0
+    open_finding_count: int = 0
+    high_finding_count: int = 0
+    item_count: int = 0
+    items: list[WeeklyReviewItem] = Field(default_factory=list)
+    markdown_path: str | None = None
+    json_path: str | None = None
+    warnings: list[str] = Field(default_factory=list)
+
+
+class DashboardCard(StrictModel):
+    card_id: str
+    title: str
+    status: str
+    value: str | int | float | None = None
+    severity: str = "medium"
+    detail: str | None = None
+    artifact_paths: list[str] = Field(default_factory=list)
+
+    @field_validator("card_id", "title", "status", "severity")
+    @classmethod
+    def _dashboard_card_field_must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
+class WorkspaceDashboardResult(StrictModel):
+    root: str
+    generated_at: str
+    status: str
+    evidence_count: int = 0
+    report_count: int = 0
+    approval_count: int = 0
+    finding_count: int = 0
+    high_finding_count: int = 0
+    action_count: int = 0
+    high_action_count: int = 0
+    objective_count: int = 0
+    deadline_count: int = 0
+    due_soon_count: int = 0
+    overdue_count: int = 0
+    budget_ledger_status: str | None = None
+    artifact_authority_status: str | None = None
+    reference_corpus_status: str | None = None
+    research_claim_matrix_status: str | None = None
+    trace_status: str | None = None
+    checkpoint_count: int = 0
+    card_count: int = 0
+    cards: list[DashboardCard] = Field(default_factory=list)
+    markdown_path: str | None = None
+    json_path: str | None = None
+    warnings: list[str] = Field(default_factory=list)
+
+
 class WorkspaceDoctorFinding(StrictModel):
     code: str
     severity: str
@@ -990,6 +1077,11 @@ class WorkspaceSummaryResult(StrictModel):
     goals_due_soon_count: int = 0
     goals_overdue_count: int = 0
     goals_at_risk_deadline_count: int = 0
+    weekly_review_status: str | None = None
+    weekly_review_item_count: int = 0
+    weekly_review_high_count: int = 0
+    dashboard_status: str | None = None
+    dashboard_card_count: int = 0
     reference_corpus_status: str | None = None
     reference_corpus_count: int = 0
     reference_rejection_count: int = 0
@@ -1215,6 +1307,11 @@ class WorkspaceReviewPackResult(StrictModel):
     goals_due_soon_count: int = 0
     goals_overdue_count: int = 0
     goals_at_risk_deadline_count: int = 0
+    weekly_review_status: str | None = None
+    weekly_review_item_count: int = 0
+    weekly_review_high_count: int = 0
+    dashboard_status: str | None = None
+    dashboard_card_count: int = 0
     bibliography_integrity_status: str | None = None
     bibliography_entry_count: int = 0
     bibliography_review_count: int = 0

@@ -109,6 +109,14 @@ def test_validate_json_file_accepts_project_goals_aliases():
     assert deadline["valid"] is True
 
 
+def test_validate_json_file_accepts_weekly_review_and_dashboard_aliases():
+    weekly_item = validate_json_file("templates/weekly-review-item.json", "weekly-review-item")
+    dashboard_card = validate_json_file("templates/dashboard-card.json", "dashboard-card")
+
+    assert weekly_item["valid"] is True
+    assert dashboard_card["valid"] is True
+
+
 def test_validate_json_cli_returns_nonzero_for_invalid(tmp_path, capsys):
     path = tmp_path / "bad-approval.json"
     path.write_text(json.dumps({"approval_id": "APR-2026-BAD"}), encoding="utf-8")

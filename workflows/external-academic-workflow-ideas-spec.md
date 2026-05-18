@@ -399,7 +399,7 @@ Recommended order after the traceability graph, research-claim matrix, trace-pas
 
 1. Artifact authority levels are implemented as Task 40.
 2. Goals/deadline operating file and goals review are implemented as Task 41.
-3. Implement local weekly review and dashboard.
+3. Local weekly review and dashboard are implemented as Task 42.
 4. Add thin workflow router only after the concrete commands are stable.
 
 ## Open Questions
@@ -408,7 +408,7 @@ Recommended order after the traceability graph, research-claim matrix, trace-pas
 2. Should `workspace-review-pack` stay checkpoint-neutral, or should a separate opt-in flag create a checkpoint?
 3. Should artifact authority levels be represented as trace-node metadata only, or also as a standalone schema for generated artifacts?
 4. Should Zotero support stay exported-file only for 0.x, or later add an optional Web API connector behind an explicit flag?
-5. Should weekly review stay Markdown-only, or should DOCX/HTML export be added after the projection exporter?
+5. Resolved for beta.32 first pass: weekly review stays Markdown plus JSON by default; DOCX/HTML export can use the existing projection exporter later when a reviewed draft is needed.
 
 ## Traceability To Planned Tasks
 

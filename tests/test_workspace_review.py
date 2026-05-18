@@ -30,6 +30,8 @@ def test_workspace_review_pack_writes_all_review_artifacts(tmp_path):
         tmp_path / "state" / "artifact-authority.json",
         tmp_path / "reports" / "goals-review.md",
         tmp_path / "state" / "goals-review.json",
+        tmp_path / "reports" / "workspace-dashboard.md",
+        tmp_path / "state" / "workspace-dashboard.json",
         tmp_path / "reports" / "approval-coverage.md",
         tmp_path / "state" / "approval-coverage.json",
         tmp_path / "reports" / "report-integrity.md",
@@ -76,6 +78,11 @@ def test_workspace_review_pack_writes_all_review_artifacts(tmp_path):
     assert result.deadline_count == 0
     assert result.goals_review_finding_count >= 1
     assert result.goals_review_high_count == 0
+    assert result.weekly_review_status == "blocked"
+    assert result.weekly_review_item_count > 0
+    assert result.weekly_review_high_count >= 1
+    assert result.dashboard_status == "blocked"
+    assert result.dashboard_card_count > 0
     assert result.budget_ledger_status == "not_configured"
     assert result.budget_ledger_count == 0
     assert result.budget_ledger_finding_count == 0
@@ -109,6 +116,8 @@ def test_workspace_review_pack_writes_all_review_artifacts(tmp_path):
     assert "Workspace discovery status" in rendered
     assert "Artifact authority status" in rendered
     assert "Goals review status" in rendered
+    assert "Weekly review status" in rendered
+    assert "Workspace dashboard status" in rendered
     assert "Budget ledger status" in rendered
     assert "Bibliography integrity status" in rendered
     assert "Reference corpus status" in rendered
@@ -126,6 +135,8 @@ def test_workspace_review_pack_writes_all_review_artifacts(tmp_path):
     assert json.loads((tmp_path / "state" / "approval-coverage.json").read_text(encoding="utf-8"))["status"] == "no_artifacts"
     assert json.loads((tmp_path / "state" / "artifact-authority.json").read_text(encoding="utf-8"))["status"] in {"ready", "ready_with_notes"}
     assert json.loads((tmp_path / "state" / "goals-review.json").read_text(encoding="utf-8"))["status"] == "needs_review"
+    assert json.loads(next((tmp_path / "state").glob("weekly-review-*.json")).read_text(encoding="utf-8"))["item_count"] > 0
+    assert json.loads((tmp_path / "state" / "workspace-dashboard.json").read_text(encoding="utf-8"))["card_count"] > 0
     assert json.loads((tmp_path / "state" / "report-integrity.json").read_text(encoding="utf-8"))["status"] == "no_reports"
     assert json.loads((tmp_path / "state" / "workspace-discovery.json").read_text(encoding="utf-8"))["status"] == "ready_with_notes"
     assert json.loads((tmp_path / "state" / "budget-ledger-integrity.json").read_text(encoding="utf-8"))["status"] == "not_configured"
@@ -152,6 +163,8 @@ def test_workspace_review_pack_cli(tmp_path, capsys):
     assert (tmp_path / "reports" / "workspace-discovery.md").exists()
     assert (tmp_path / "reports" / "artifact-authority.md").exists()
     assert (tmp_path / "reports" / "goals-review.md").exists()
+    assert any(path.name.startswith("weekly-review-") for path in (tmp_path / "reports").glob("*.md"))
+    assert (tmp_path / "reports" / "workspace-dashboard.md").exists()
     assert (tmp_path / "reports" / "approval-coverage.md").exists()
     assert (tmp_path / "reports" / "report-integrity.md").exists()
     assert (tmp_path / "reports" / "budget-ledger.md").exists()
@@ -191,6 +204,8 @@ def test_operational_markdown_does_not_satisfy_report_draft_check(tmp_path):
         "approval-coverage.md",
         "artifact-authority.md",
         "goals-review.md",
+        "weekly-review-2026-05-19.md",
+        "workspace-dashboard.md",
         "report-integrity.md",
         "budget-ledger.md",
         "bibliography-integrity.md",

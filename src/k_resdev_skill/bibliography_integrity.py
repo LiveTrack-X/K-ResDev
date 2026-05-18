@@ -39,10 +39,12 @@ BIBLIOGRAPHY_OPERATIONAL_NAMES = {
     "source-verification.md",
     "trace-passport.md",
     "workspace-discovery.md",
+    "workspace-dashboard.md",
     "workspace-review-pack.md",
     "workspace-summary.md",
     "workspace-trace.md",
 }
+BIBLIOGRAPHY_OPERATIONAL_PREFIXES = ("weekly-review-",)
 
 
 def generate_workspace_bibliography_integrity(
@@ -350,12 +352,17 @@ def _citations_by_report(workspace: Path) -> dict[Path, set[str]]:
     if not reports.exists():
         return result
     for path in sorted(reports.glob("*.md"), key=lambda item: item.as_posix()):
-        if path.name in BIBLIOGRAPHY_OPERATIONAL_NAMES:
+        if _is_operational_markdown(path):
             continue
         keys = extract_markdown_citation_keys(path.read_text(encoding="utf-8", errors="replace"))
         if keys:
             result[path] = keys
     return result
+
+
+def _is_operational_markdown(path: str | Path) -> bool:
+    name = Path(path).name
+    return name in BIBLIOGRAPHY_OPERATIONAL_NAMES or any(name.startswith(prefix) for prefix in BIBLIOGRAPHY_OPERATIONAL_PREFIXES)
 
 
 def extract_markdown_citation_keys(text: str) -> set[str]:

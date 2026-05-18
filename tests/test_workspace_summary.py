@@ -6,6 +6,7 @@ from k_resdev_skill.evidence_index import write_evidence_index
 from k_resdev_skill.models import EvidenceItem
 from k_resdev_skill.workspace import initialize_workspace
 from k_resdev_skill.workspace_summary import generate_workspace_summary, render_workspace_summary_markdown
+from k_resdev_skill.weekly_review import generate_weekly_review, generate_workspace_dashboard
 
 
 def test_workspace_summary_combines_operational_counts(tmp_path):
@@ -42,6 +43,8 @@ def test_workspace_summary_combines_operational_counts(tmp_path):
     (tmp_path / "reports" / "monthly-report.md").write_text("# Monthly Report\n", encoding="utf-8")
     (tmp_path / "reports" / "monthly-report.html").write_text("Draft projection only\n", encoding="utf-8")
     (tmp_path / "reports" / "analysis" / "metrics-analysis-run.json").write_text("{}\n", encoding="utf-8")
+    generate_weekly_review(tmp_path, review_date="2026-05-19", output_path=tmp_path / "reports" / "weekly-review-2026-05-19.md", json_path=tmp_path / "state" / "weekly-review-2026-05-19.json")
+    generate_workspace_dashboard(tmp_path, output_path=tmp_path / "reports" / "workspace-dashboard.md", json_path=tmp_path / "state" / "workspace-dashboard.json")
 
     output = tmp_path / "reports" / "workspace-summary.md"
     json_output = tmp_path / "state" / "workspace-summary.json"
@@ -56,6 +59,10 @@ def test_workspace_summary_combines_operational_counts(tmp_path):
     assert summary.objective_count == 0
     assert summary.deadline_count == 0
     assert summary.goals_review_finding_count >= 1
+    assert summary.weekly_review_status is not None
+    assert summary.weekly_review_item_count > 0
+    assert summary.dashboard_status is not None
+    assert summary.dashboard_card_count > 0
     assert summary.budget_ledger_status == "needs_review"
     assert summary.budget_ledger_finding_count >= 1
     assert summary.evidence_by_type["budget_evidence"] == 1

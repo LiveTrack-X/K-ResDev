@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import zipfile
+from datetime import date
 from pathlib import Path
 
 from .artifact_authority import generate_artifact_authority
@@ -69,10 +70,12 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "source-verification.md",
     "trace-passport.md",
     "workspace-discovery.md",
+    "workspace-dashboard.md",
     "workspace-review-pack.md",
     "workspace-summary.md",
     "workspace-trace.md",
 }
+OPERATIONAL_MARKDOWN_PREFIXES = ("weekly-review-",)
 
 
 def initialize_workspace(
@@ -182,6 +185,7 @@ def run_workspace_doctor(
     _check_research_claim_matrix(workspace, findings)
     _check_workspace_trace(workspace, findings)
     _check_trace_passport(workspace, findings)
+    _check_weekly_dashboard(workspace, findings)
     _check_exports(workspace, findings)
     _check_analysis(workspace, findings)
 
@@ -565,7 +569,7 @@ def _check_profile_integrity(workspace: Path, findings: list[WorkspaceDoctorFind
 
 def _check_reports(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> None:
     reports_dir = workspace / "reports"
-    reports = [path for path in reports_dir.glob("*.md") if path.name not in OPERATIONAL_MARKDOWN_NAMES] if reports_dir.exists() else []
+    reports = [path for path in reports_dir.glob("*.md") if not is_operational_markdown(path)] if reports_dir.exists() else []
     if not reports:
         findings.append(_finding("report_missing", "low", "No report Markdown drafts found.", reports_dir, "Generate a draft report when evidence is ready."))
 
@@ -839,6 +843,72 @@ def _check_trace_passport(workspace: Path, findings: list[WorkspaceDoctorFinding
         )
 
 
+def _check_weekly_dashboard(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> None:
+    state_dir = workspace / "state"
+    weekly_paths = sorted(state_dir.glob("weekly-review-*.json")) if state_dir.exists() else []
+    dashboard_path = state_dir / "workspace-dashboard.json"
+    if not weekly_paths:
+        findings.append(
+            _finding(
+                "weekly_review_missing",
+                "low",
+                "No saved weekly operating review found.",
+                state_dir,
+                "Run weekly-review to create a dated local operating review.",
+            )
+        )
+    else:
+        latest = weekly_paths[-1]
+        try:
+            payload = json.loads(latest.read_text(encoding="utf-8-sig"))
+            raw_date = str(payload.get("review_date") or "").strip()
+            if raw_date:
+                review_date = date.fromisoformat(raw_date)
+                if (date.today() - review_date).days > 7:
+                    findings.append(
+                        _finding(
+                            "weekly_review_stale",
+                            "low",
+                            f"Latest weekly operating review is older than 7 days: {raw_date}.",
+                            latest,
+                            "Run weekly-review to refresh the local operating review.",
+                        )
+                    )
+        except Exception as exc:
+            findings.append(
+                _finding(
+                    "weekly_review_unreadable",
+                    "medium",
+                    f"Latest weekly operating review could not be read: {exc}",
+                    latest,
+                    "Regenerate the weekly review JSON.",
+                )
+            )
+    if not dashboard_path.exists():
+        findings.append(
+            _finding(
+                "workspace_dashboard_missing",
+                "low",
+                "No saved workspace dashboard found.",
+                dashboard_path,
+                "Run workspace-dashboard to create a compact local status dashboard.",
+            )
+        )
+    else:
+        try:
+            json.loads(dashboard_path.read_text(encoding="utf-8-sig"))
+        except Exception as exc:
+            findings.append(
+                _finding(
+                    "workspace_dashboard_unreadable",
+                    "medium",
+                    f"Workspace dashboard JSON could not be read: {exc}",
+                    dashboard_path,
+                    "Regenerate the workspace dashboard JSON.",
+                )
+            )
+
+
 def _check_exports(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> None:
     reports_dir = workspace / "reports"
     if not reports_dir.exists():
@@ -933,6 +1003,8 @@ def _starter_readme(project_id: str, title: str, profile_id: str) -> str:
             "- Run `k-resdev discover-workspace --root . --output reports/workspace-discovery.md --json state/workspace-discovery.json` to inspect folder layout before setup or migration.",
             "- Run `k-resdev artifact-authority --root . --output reports/artifact-authority.md --json state/artifact-authority.json` to review local artifact authority levels before external use.",
             "- Run `k-resdev goals-review --root . --output reports/goals-review.md --json state/goals-review.json` to review local objectives, deadlines, evidence, report, and approval readiness.",
+            "- Run `k-resdev weekly-review --root .` to create a dated local operating review.",
+            "- Run `k-resdev workspace-dashboard --root .` to create a compact local status dashboard.",
             "- Run `k-resdev intake --inbox inbox --state-dir state --evidence-dir evidence` to build evidence metadata.",
             "- Run `k-resdev bib-import references/library.bib --state-dir state --literature-matrix reports/literature-review-matrix.md` to build bibliography metadata.",
             "- Run `k-resdev reference-corpus --root . --output reports/reference-corpus-summary.md --json state/literature-corpus.json --rejections state/reference-rejection-log.json` to scan local PDFs, Zotero JSON exports, and Markdown notes into a reviewable corpus.",
@@ -951,7 +1023,7 @@ def _starter_readme(project_id: str, title: str, profile_id: str) -> str:
             "- Run `k-resdev checkpoint-resume-plan --root . --output reports/checkpoint-resume-plan.md --json state/checkpoint-resume-plan.json` before resuming from a saved checkpoint.",
             "- Run `k-resdev doctor --root . --output reports/readiness.md --json state/readiness.json` before reporting.",
             "- Run `k-resdev workspace-summary --root . --output reports/workspace-summary.md --json state/workspace-summary.json` for a one-page status handoff.",
-            "- Run `k-resdev workspace-review-pack --root .` to refresh discovery, readiness, next actions, summary, source-verification, artifact-authority, goals-review, budget-ledger, approval-coverage, report-integrity, bibliography-integrity, reference-corpus, citation-support, research-claim-matrix, trace-passport, and trace artifacts together.",
+            "- Run `k-resdev workspace-review-pack --root .` to refresh discovery, readiness, next actions, summary, source-verification, artifact-authority, goals-review, weekly-review, workspace-dashboard, budget-ledger, approval-coverage, report-integrity, bibliography-integrity, reference-corpus, citation-support, research-claim-matrix, trace-passport, and trace artifacts together.",
             "- Run `k-resdev verify-review-pack state/workspace-review-pack.json` to check saved review-pack artifact hashes.",
             "- Run `k-resdev verify-evidence-sources state/evidence-index.json --root . --output reports/source-verification.md --json state/source-verification.json` to check indexed source hashes.",
             "- Run `k-resdev approval-coverage --root . --output reports/approval-coverage.md --json state/approval-coverage.json` to check report approval coverage.",
@@ -985,6 +1057,11 @@ def _finding(
         path=str(path) if path is not None else None,
         suggested_action=suggested_action,
     )
+
+
+def is_operational_markdown(path: str | Path) -> bool:
+    name = Path(path).name
+    return name in OPERATIONAL_MARKDOWN_NAMES or any(name.startswith(prefix) for prefix in OPERATIONAL_MARKDOWN_PREFIXES)
 
 
 def _unique(values: list[str]) -> list[str]:

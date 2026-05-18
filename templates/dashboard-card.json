@@ -1,0 +1,9 @@
+{
+  "card_id": "readiness",
+  "title": "Readiness",
+  "status": "needs_review",
+  "value": 3,
+  "severity": "medium",
+  "detail": "Example dashboard card.",
+  "artifact_paths": ["reports/readiness.md", "state/readiness.json"]
+}

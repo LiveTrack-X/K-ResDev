@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "WeeklyReviewItem",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["item_id", "category", "title", "severity", "status"],
+  "properties": {
+    "item_id": { "type": "string", "minLength": 1 },
+    "category": { "type": "string", "minLength": 1 },
+    "title": { "type": "string", "minLength": 1 },
+    "severity": { "type": "string", "minLength": 1 },
+    "status": { "type": "string", "minLength": 1 },
+    "message": { "type": ["string", "null"] },
+    "evidence_ids": { "type": "array", "items": { "type": "string" } },
+    "artifact_paths": { "type": "array", "items": { "type": "string" } },
+    "due_date": { "type": ["string", "null"], "format": "date" },
+    "suggested_action": { "type": ["string", "null"] }
+  }
+}

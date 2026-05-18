@@ -46,10 +46,12 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "source-verification.md",
     "trace-passport.md",
     "workspace-discovery.md",
+    "workspace-dashboard.md",
     "workspace-review-pack.md",
     "workspace-summary.md",
     "workspace-trace.md",
 }
+OPERATIONAL_MARKDOWN_PREFIXES = ("weekly-review-",)
 EVIDENCE_ID_RE = re.compile(r"\bEVI-[A-Za-z0-9][A-Za-z0-9_.:-]*\b")
 HIGH_AUTHORITY_NAME_RE = re.compile(
     "(approved|final|submission|submitted|official|\uCD5C\uC885|\uC81C\uCD9C|\uC2B9\uC778)",
@@ -285,7 +287,17 @@ def authority_for_trace_node(node_type: str, status: str | None = None, path: st
         return authority_for_evidence_status(status)
     if node_type in {"report"}:
         return "draft_projection"
-    if node_type in {"generated_artifact", "review_pack", "checkpoint", "analysis_manifest", "project_goals", "project_objective", "project_deadline"}:
+    if node_type in {
+        "generated_artifact",
+        "review_pack",
+        "checkpoint",
+        "analysis_manifest",
+        "project_goals",
+        "project_objective",
+        "project_deadline",
+        "weekly_review",
+        "workspace_dashboard",
+    }:
         return "operating_summary"
     if node_type in {"reference", "bibliography", "research_claim"}:
         if str(status) in {"accepted", "supports", "verified"}:
@@ -399,13 +411,14 @@ def _operating_artifact_paths(workspace: Path) -> list[Path]:
     paths: list[Path] = []
     reports = workspace / "reports"
     if reports.exists():
-        paths.extend(path for path in reports.glob("*.md") if path.name in OPERATIONAL_MARKDOWN_NAMES)
+        paths.extend(path for path in reports.glob("*.md") if _is_operational_markdown(path))
     state = workspace / "state"
     if state.exists():
         for name in (
             "readiness.json",
             "next-actions.json",
             "workspace-summary.json",
+            "workspace-dashboard.json",
             "workspace-review-pack.json",
             "workspace-discovery.json",
             "workspace-trace.json",
@@ -415,7 +428,13 @@ def _operating_artifact_paths(workspace: Path) -> list[Path]:
             target = state / name
             if target.exists():
                 paths.append(target)
+        paths.extend(state.glob("weekly-review-*.json"))
     return sorted(paths, key=lambda item: item.as_posix())
+
+
+def _is_operational_markdown(path: str | Path) -> bool:
+    name = Path(path).name
+    return name in OPERATIONAL_MARKDOWN_NAMES or any(name.startswith(prefix) for prefix in OPERATIONAL_MARKDOWN_PREFIXES)
 
 
 def _finding(

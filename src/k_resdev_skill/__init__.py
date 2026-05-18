@@ -88,6 +88,7 @@ from .models import (
     CitationSupportDecision,
     CitationSupportFinding,
     CitationSupportRecord,
+    DashboardCard,
     DataProfile,
     EvidenceSourceVerificationItem,
     EvidenceSourceVerificationResult,
@@ -126,6 +127,7 @@ from .models import (
     TracePassportStatus,
     WorkspaceDiscoveryItem,
     WorkspaceDiscoveryResult,
+    WorkspaceDashboardResult,
     WorkspaceSetupProposal,
     WorkspaceActionItem,
     WorkspaceActionPlan,
@@ -150,7 +152,9 @@ from .models import (
     WorkspaceTraceFinding,
     WorkspaceTraceNode,
     WorkspaceTraceResult,
+    WorkspaceWeeklyReviewResult,
     VerifiedProfilePack,
+    WeeklyReviewItem,
 )
 from .plan_mapper import extract_project_state_from_text
 from .profile_sources import (
@@ -217,6 +221,16 @@ from .workspace_review import (
 )
 from .workspace_summary import generate_workspace_summary, render_workspace_summary_markdown
 from .workspace_trace import generate_workspace_trace, render_workspace_trace_markdown
+from .weekly_review import (
+    generate_weekly_review,
+    generate_workspace_dashboard,
+    load_latest_weekly_review,
+    load_saved_workspace_dashboard,
+    load_weekly_review,
+    load_workspace_dashboard,
+    render_weekly_review_markdown,
+    render_workspace_dashboard_markdown,
+)
 
 __all__ = [
     "ApprovalRecord",
@@ -238,6 +252,7 @@ __all__ = [
     "CitationSupportDecision",
     "CitationSupportFinding",
     "CitationSupportRecord",
+    "DashboardCard",
     "DataProfile",
     "default_profile_sources_path",
     "EvidenceSourceVerificationItem",
@@ -277,6 +292,7 @@ __all__ = [
     "TracePassportStatus",
     "WorkspaceDiscoveryItem",
     "WorkspaceDiscoveryResult",
+    "WorkspaceDashboardResult",
     "WorkspaceSetupProposal",
     "WorkspaceActionItem",
     "WorkspaceActionPlan",
@@ -301,7 +317,9 @@ __all__ = [
     "WorkspaceTraceFinding",
     "WorkspaceTraceNode",
     "WorkspaceTraceResult",
+    "WorkspaceWeeklyReviewResult",
     "VerifiedProfilePack",
+    "WeeklyReviewItem",
     "approval_gate_status",
     "authority_for_evidence_status",
     "authority_for_trace_node",
@@ -353,6 +371,8 @@ __all__ = [
     "generate_workspace_report_integrity",
     "generate_workspace_review_pack",
     "generate_workspace_summary",
+    "generate_weekly_review",
+    "generate_workspace_dashboard",
     "generate_workspace_trace",
     "import_bibliography",
     "import_budget_ledger",
@@ -377,6 +397,10 @@ __all__ = [
     "load_reference_rejections",
     "load_research_claims",
     "load_workspace_discovery",
+    "load_latest_weekly_review",
+    "load_saved_workspace_dashboard",
+    "load_weekly_review",
+    "load_workspace_dashboard",
     "load_checkpoint_entries",
     "profile_data_file",
     "paper_records_from_bibliography",
@@ -409,6 +433,8 @@ __all__ = [
     "render_workspace_discovery_markdown",
     "render_workspace_review_pack_markdown",
     "render_workspace_summary_markdown",
+    "render_weekly_review_markdown",
+    "render_workspace_dashboard_markdown",
     "render_workspace_trace_markdown",
     "run_workspace_doctor",
     "record_profile_source",
@@ -429,4 +455,4 @@ __all__ = [
     "write_research_claims",
 ]
 
-__version__ = "0.1.0b31"
+__version__ = "0.1.0b32"

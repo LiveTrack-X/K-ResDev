@@ -53,6 +53,14 @@ SCHEMA_ALIASES = {
     "checkpoint": "trace_passport_entry.schema.json",
     "trace-passport-entry": "trace_passport_entry.schema.json",
     "trace_passport_entry": "trace_passport_entry.schema.json",
+    "weekly-review": "weekly_review.schema.json",
+    "weekly_review": "weekly_review.schema.json",
+    "weekly-review-item": "weekly_review_item.schema.json",
+    "weekly_review_item": "weekly_review_item.schema.json",
+    "workspace-dashboard": "workspace_dashboard.schema.json",
+    "workspace_dashboard": "workspace_dashboard.schema.json",
+    "dashboard-card": "dashboard_card.schema.json",
+    "dashboard_card": "dashboard_card.schema.json",
     "workspace-discovery": "workspace_discovery.schema.json",
     "workspace_discovery": "workspace_discovery.schema.json",
     "workspace-discovery-item": "workspace_discovery_item.schema.json",
@@ -114,6 +122,7 @@ def _validation_targets(document: Any, schema_payload: dict[str, Any]) -> list[t
         "BibliographyReviewRecord",
         "BudgetLedgerItem",
         "CitationSupportRecord",
+        "DashboardCard",
         "EvidenceItem",
         "ProfileSource",
         "ProjectDeadline",
@@ -124,6 +133,7 @@ def _validation_targets(document: Any, schema_payload: dict[str, Any]) -> list[t
         "ResearchInsight",
         "TracePassportEntry",
         "WorkspaceDiscoveryItem",
+        "WeeklyReviewItem",
         "WorkspaceSetupProposal",
     }:
         if isinstance(document, list):
@@ -140,6 +150,8 @@ def _validation_targets(document: Any, schema_payload: dict[str, Any]) -> list[t
             return [(f"$.deadlines[{index}]", item) for index, item in enumerate(document["deadlines"])]
         if isinstance(document, dict) and isinstance(document.get("items"), list):
             return [(f"$.items[{index}]", item) for index, item in enumerate(document["items"])]
+        if title == "DashboardCard" and isinstance(document, dict) and isinstance(document.get("cards"), list):
+            return [(f"$.cards[{index}]", item) for index, item in enumerate(document["cards"])]
     return [("$", document)]
 
 

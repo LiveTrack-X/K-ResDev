@@ -440,10 +440,12 @@ Goals review is an operating projection only.
 
 ### Task 42: Local weekly review and workspace dashboard
 
-Planned:
-- local artifact-only weekly review generator
-- `reports/weekly-review-YYYY-MM-DD.md`, `state/weekly-review-YYYY-MM-DD.json`, and `reports/workspace-dashboard.md`
-- sections for KPI movement, evidence added, open review findings, budget gaps, research insight candidates, deadlines, and human decisions needed
+Implemented:
+- `WeeklyReviewItem`, `WorkspaceWeeklyReviewResult`, `DashboardCard`, and `WorkspaceDashboardResult` models
+- `weekly-review` command writing `reports/weekly-review-YYYY-MM-DD.md` and `state/weekly-review-YYYY-MM-DD.json`
+- `workspace-dashboard` command writing `reports/workspace-dashboard.md` and `state/workspace-dashboard.json`
+- local artifact-only summary of readiness findings, next actions, goals/deadlines, evidence review state, approvals, budget, research, references, trace, and checkpoints
+- workspace doctor, next-action, summary, review-pack, schema, template, and trace integration
 - no default connector access to Gmail, WhatsApp, Google Docs, Slack, Teams, or cloud drives
 
 Weekly reviews are team operating summaries, not final official reports.

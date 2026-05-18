@@ -1,0 +1,27 @@
+{
+  "root": ".",
+  "status": "applied",
+  "applied": true,
+  "profile_id": "iris-innopolis-2026-017795",
+  "profile_path": "state/project-profile.json",
+  "backup_path": "state/profile-backups/project-profile-20260519T090000Z-abcd1234.json",
+  "apply_plan_path": "state/profile-promotion-apply-plan.json",
+  "apply_plan_hash": "sha256:abcd1234",
+  "promotion_id": "PPR-2026-ABCD1234",
+  "reviewer": "project-owner",
+  "reviewed_at": "2026-05-19T09:00:00Z",
+  "applied_at": "2026-05-19T09:00:00Z",
+  "applied_fields": ["status", "notes"],
+  "before_profile": {
+    "profile_id": "iris-innopolis-2026-017795",
+    "status": "needs_review"
+  },
+  "after_profile": {
+    "profile_id": "iris-innopolis-2026-017795",
+    "status": "verified"
+  },
+  "rollback_note": "Restore state/project-profile.json from the backup path or from version control.",
+  "markdown_path": "reports/profile-promotion-apply-result.md",
+  "json_path": "state/profile-promotion-apply-result.json",
+  "warnings": []
+}

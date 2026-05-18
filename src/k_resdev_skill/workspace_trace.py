@@ -22,6 +22,7 @@ from .models import (
     CitationSupportRecord,
     EvidenceItem,
     ProfilePromotionApplyPlanResult,
+    ProfilePromotionApplyResult,
     ProfileSource,
     ReferenceCorpusItem,
     ResearchClaim,
@@ -54,6 +55,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "next-actions.md",
     "profile-integrity.md",
     "profile-promotion-apply-plan.md",
+    "profile-promotion-apply-result.md",
     "profile-promotion-summary.md",
     "profile-review.md",
     "profile-source-summary.md",
@@ -91,6 +93,7 @@ def generate_workspace_trace(
     builder.add_profile_review()
     builder.add_profile_promotions()
     builder.add_profile_promotion_apply_plan()
+    builder.add_profile_promotion_apply_result()
     builder.add_bibliography()
     builder.add_reference_corpus()
     builder.add_reports()
@@ -644,6 +647,51 @@ class _TraceBuilder:
                 node_id=node.node_id,
                 path=str(path),
                 suggested_action="Review the apply plan before any profile status change.",
+            )
+
+    def add_profile_promotion_apply_result(self) -> None:
+        path = self.workspace / "state" / "profile-promotion-apply-result.json"
+        if not path.exists():
+            return
+        try:
+            result = ProfilePromotionApplyResult.model_validate_json(path.read_text(encoding="utf-8-sig"))
+        except Exception as exc:
+            self.finding(
+                "trace_profile_promotion_apply_result_unreadable",
+                "medium",
+                f"Profile promotion apply result could not be read: {exc}",
+                path=path,
+                suggested_action="Fix state/profile-promotion-apply-result.json before relying on profile promotion trace state.",
+            )
+            return
+        node = self.node(
+            "profile_promotion_apply_result",
+            "profile-promotion-apply-result",
+            "Profile promotion apply result",
+            status=result.status,
+            path=str(path),
+            metadata={
+                "profile_id": result.profile_id,
+                "applied": result.applied,
+                "promotion_id": result.promotion_id,
+                "applied_fields": result.applied_fields,
+                "backup_path": result.backup_path,
+                "applied_at": result.applied_at,
+            },
+        )
+        if result.profile_id:
+            self.edge(node.node_id, _node_id("profile", result.profile_id), "applied_to_profile")
+        if result.promotion_id:
+            self.edge(node.node_id, _node_id("profile_promotion", result.promotion_id), "applies_promotion")
+        self.edge(node.node_id, _node_id("profile_promotion_apply_plan", "profile-promotion-apply-plan"), "applies_plan")
+        if result.backup_path and not Path(result.backup_path).exists():
+            self.finding(
+                "trace_profile_promotion_apply_backup_missing",
+                "medium",
+                "Profile promotion apply result backup path is missing.",
+                node_id=node.node_id,
+                path=result.backup_path,
+                suggested_action="Restore the profile backup or review version control rollback options.",
             )
 
     def add_approvals(self) -> None:

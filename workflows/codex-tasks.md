@@ -518,12 +518,28 @@ Profile promotion apply plans are proposed diffs only. They do not rewrite profi
 
 ### Task 48: Guarded profile promotion apply command
 
+Implemented:
+- `ProfilePromotionApplyResult` model
+- `profile-promotion-apply` command and public API
+- required current apply-plan artifact and matching SHA-256 hash
+- backup copy of `state/project-profile.json` under `state/profile-backups/` before any mutation
+- application limited to existing `ProjectProfile` fields listed in the apply plan
+- before-value guard that rejects stale apply plans when the current profile no longer matches the plan
+- `reports/profile-promotion-apply-result.md` and `state/profile-promotion-apply-result.json`
+- schema/template coverage and validation aliases
+- doctor, next-action, workspace-summary, review-pack, operational Markdown filtering, and trace integration
+
+Guarded profile promotion apply results are local mutation records only. They do not certify official agency compliance and they preserve the backup/result trail instead of erasing previous states.
+
+### Task 49: Profile promotion revocation and rollback plan
+
 Planned:
-- add an explicit apply command that requires a current apply-plan artifact and matching SHA-256 hash
-- write a backup copy of `state/project-profile.json` before any mutation
-- apply only existing `ProjectProfile` fields listed in the apply plan
-- write an apply result Markdown/JSON artifact with backup path, applied fields, reviewer metadata, and rollback instructions
-- integrate apply results into doctor, next-action, summary, review-pack, and trace
+- add a proposal-only revocation plan for previously applied profile promotions
+- require supplied reviewer and revocation reason
+- compare current `state/project-profile.json` to the saved apply result after-profile
+- inspect whether the saved backup under `state/profile-backups/` is still present
+- write `reports/profile-promotion-revoke-plan.md` and `state/profile-promotion-revoke-plan.json`
+- integrate revocation plans into doctor, next-action, summary, review-pack, and trace
 
 ## Safety constraints
 

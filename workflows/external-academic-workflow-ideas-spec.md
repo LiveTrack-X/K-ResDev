@@ -405,6 +405,7 @@ Recommended order after the traceability graph, research-claim matrix, trace-pas
 6. Profile promotion review is implemented as Task 45.
 7. Profile promotion record workflow is implemented as Task 46.
 8. Profile promotion apply-plan workflow is implemented as Task 47.
+9. Guarded profile promotion apply command is implemented as Task 48.
 
 ## Open Questions
 
@@ -433,3 +434,4 @@ Recommended order after the traceability graph, research-claim matrix, trace-pas
 | Profile promotion review | Task 45 |
 | Profile promotion records | Task 46 |
 | Profile promotion apply plans | Task 47 |
+| Guarded profile promotion apply results | Task 48 |

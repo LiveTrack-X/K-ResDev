@@ -127,6 +127,7 @@ def test_workspace_review_pack_writes_all_review_artifacts(tmp_path):
     assert "Research claim matrix status" in rendered
     assert "Profile integrity status" in rendered
     assert "Profile promotion apply-plan status" in rendered
+    assert "Profile promotion apply-result status" in rendered
     assert "Workspace trace status" in rendered
     assert "Trace passport status" in rendered
     assert "Hashed artifacts" in rendered
@@ -229,6 +230,7 @@ def test_operational_markdown_does_not_satisfy_report_draft_check(tmp_path):
         "checkpoint-resume-plan.md",
         "profile-integrity.md",
         "profile-promotion-apply-plan.md",
+        "profile-promotion-apply-result.md",
         "profile-promotion-summary.md",
         "profile-review.md",
         "profile-source-summary.md",

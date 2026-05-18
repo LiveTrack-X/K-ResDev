@@ -23,7 +23,7 @@ from .models import (
     WorkspaceInitResult,
 )
 from .profile_promotion import summarize_profile_promotions
-from .profile_promotion_apply import generate_profile_promotion_apply_plan
+from .profile_promotion_apply import generate_profile_promotion_apply_plan, load_profile_promotion_apply_result
 from .profile_registry import default_agency_templates_root, load_project_profile
 from .profile_review import generate_profile_review
 from .profile_sources import generate_profile_integrity, load_profile_sources
@@ -49,6 +49,7 @@ STANDARD_DIRS = (
     "state/bibliography-reviews",
     "state/citation-support",
     "state/checkpoints",
+    "state/profile-backups",
     "state/profile-promotions",
 )
 OPERATIONAL_MARKDOWN_NAMES = {
@@ -67,6 +68,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "next-actions.md",
     "profile-integrity.md",
     "profile-promotion-apply-plan.md",
+    "profile-promotion-apply-result.md",
     "profile-promotion-summary.md",
     "profile-review.md",
     "profile-source-summary.md",
@@ -660,6 +662,24 @@ def _check_profile_promotion_apply(workspace: Path, findings: list[WorkspaceDoct
                 "Run profile-promotion-apply-plan before changing state/project-profile.json.",
             )
         )
+    result_path = workspace / "state" / "profile-promotion-apply-result.json"
+    profile_path = workspace / "state" / "project-profile.json"
+    profile: ProjectProfile | None = None
+    if profile_path.exists():
+        try:
+            profile = load_project_profile(profile_path)
+        except Exception:
+            profile = None
+    if plan.status == "ready_to_apply" and path.exists() and not result_path.exists():
+        findings.append(
+            _finding(
+                "profile_promotion_apply_pending",
+                "medium",
+                "A profile promotion apply plan is ready, but the guarded apply command has not been run.",
+                result_path,
+                "Run profile-promotion-apply with the apply-plan hash, or leave the profile in needs_review.",
+            )
+        )
     if plan.current_profile_status == "verified" and plan.promotion_id and not path.exists():
         findings.append(
             _finding(
@@ -670,6 +690,51 @@ def _check_profile_promotion_apply(workspace: Path, findings: list[WorkspaceDoct
                 "Generate profile-promotion-apply-plan to preserve the promotion decision trail.",
             )
         )
+    if profile is not None and profile.status == "verified" and not result_path.exists():
+        findings.append(
+            _finding(
+                "profile_verified_without_apply_result",
+                "high",
+                "The project profile is marked verified, but no guarded profile promotion apply result was found.",
+                result_path,
+                "Restore the profile to needs_review or record/apply the promotion through the guarded workflow.",
+            )
+        )
+    if result_path.exists():
+        try:
+            result = load_profile_promotion_apply_result(result_path)
+        except Exception as exc:
+            findings.append(
+                _finding(
+                    "profile_promotion_apply_result_unreadable",
+                    "medium",
+                    f"Profile promotion apply result could not be read: {exc}",
+                    result_path,
+                    "Fix state/profile-promotion-apply-result.json before relying on profile status.",
+                )
+            )
+            return
+        backup = Path(result.backup_path) if result.backup_path else None
+        if backup is not None and not backup.exists():
+            findings.append(
+                _finding(
+                    "profile_promotion_apply_backup_missing",
+                    "medium",
+                    "Profile promotion apply result refers to a missing backup file.",
+                    backup,
+                    "Restore the backup artifact or review version control before relying on rollback instructions.",
+                )
+            )
+        if profile is not None and result.after_profile and profile.model_dump() != result.after_profile:
+            findings.append(
+                _finding(
+                    "profile_promotion_apply_result_drift",
+                    "high",
+                    "Current project profile no longer matches the saved profile promotion apply result.",
+                    profile_path,
+                    "Regenerate profile promotion review/plan or inspect profile changes before relying on verified status.",
+                )
+            )
 
 
 def _check_reports(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> None:
@@ -1170,6 +1235,7 @@ def _starter_readme(project_id: str, title: str, profile_id: str) -> str:
             "- Run `k-resdev profile-review --root . --output reports/profile-review.md --json state/profile-review.json` before promoting any profile to verified.",
             "- Run `k-resdev profile-promotion-record --root . --decision verified --reviewer <reviewer> --profile-review-hash <sha256>` only after a supplied human promotion decision.",
             "- Run `k-resdev profile-promotion-apply-plan --root . --output reports/profile-promotion-apply-plan.md --json state/profile-promotion-apply-plan.json` before changing any profile status.",
+            "- Run `k-resdev profile-promotion-apply --root . --apply-plan state/profile-promotion-apply-plan.json --apply-plan-hash <sha256>` only after reviewing the apply plan.",
             "- Run `k-resdev budget-ledger-import references/budget-ledger.csv --state-dir state --markdown reports/budget-ledger-import.md` to import a reviewable budget ledger.",
             "- Run `k-resdev budget-ledger-integrity --root . --output reports/budget-ledger.md --json state/budget-ledger-integrity.json` to check ledger proof, approval, duplicate, and evidence-link gaps.",
             "- Run `k-resdev checkpoint-create --root . --stage review-pack --summary \"<summary>\" --status needs_review` to create a hash-backed resume checkpoint.",

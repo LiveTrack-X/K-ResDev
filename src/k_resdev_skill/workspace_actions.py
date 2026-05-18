@@ -86,6 +86,7 @@ def _actions_for_findings(root: Path, findings: list[WorkspaceDoctorFinding]) ->
         _action_for_profile_review(root, by_code),
         _action_for_profile_promotion(root, by_code),
         _action_for_profile_promotion_apply(root, by_code),
+        _action_for_profile_promotion_apply_result(root, by_code),
         _action_for_approval_coverage(root, by_code),
         _action_for_report_integrity(root, by_code),
         _action_for_artifact_authority(root, by_code),
@@ -313,6 +314,30 @@ def _action_for_profile_promotion_apply(root: Path, by_code: dict[str, list[Work
         "Generate profile promotion apply plan",
         "Profile status changes should be reviewed as a non-destructive plan before state/project-profile.json is changed.",
         f'python -m k_resdev_skill profile-promotion-apply-plan --root "{root}" --output "{root / "reports" / "profile-promotion-apply-plan.md"}" --json "{root / "state" / "profile-promotion-apply-plan.json"}"',
+        by_code,
+        codes,
+    )
+
+
+def _action_for_profile_promotion_apply_result(root: Path, by_code: dict[str, list[WorkspaceDoctorFinding]]) -> WorkspaceActionItem | None:
+    codes = [
+        "profile_promotion_apply_pending",
+        "profile_verified_without_apply_result",
+        "profile_promotion_apply_result_unreadable",
+        "profile_promotion_apply_backup_missing",
+        "profile_promotion_apply_result_drift",
+    ]
+    if not any(code in by_code for code in codes):
+        return None
+    plan_path = root / "state" / "profile-promotion-apply-plan.json"
+    plan_hash = _sha256_file(plan_path) if plan_path.exists() else "<sha256>"
+    priority = "high" if any(code in by_code for code in codes[1:]) else "medium"
+    return _action(
+        root,
+        priority,
+        "Apply or review profile promotion plan",
+        "Profile status changes should go through the guarded apply command with a current apply-plan hash and backup.",
+        f'python -m k_resdev_skill profile-promotion-apply --root "{root}" --apply-plan "{plan_path}" --apply-plan-hash "{plan_hash}" --output "{root / "reports" / "profile-promotion-apply-result.md"}" --json "{root / "state" / "profile-promotion-apply-result.json"}"',
         by_code,
         codes,
     )
@@ -615,6 +640,14 @@ def _action(
 
 def _priority_rank(priority: str) -> int:
     return {"high": 0, "medium": 1, "low": 2}.get(priority, 3)
+
+
+def _sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
 def _escape(value: str) -> str:

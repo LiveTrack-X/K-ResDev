@@ -105,6 +105,7 @@ from .models import (
     ProfileIntegrityResult,
     ProfilePromotionApplyChange,
     ProfilePromotionApplyPlanResult,
+    ProfilePromotionApplyResult,
     ProfilePromotionRecord,
     ProfilePromotionSummaryResult,
     ProfileReviewChecklistItem,
@@ -174,7 +175,13 @@ from .profile_promotion import (
     summarize_profile_promotions,
     write_profile_promotion_record,
 )
-from .profile_promotion_apply import generate_profile_promotion_apply_plan, render_profile_promotion_apply_plan_markdown
+from .profile_promotion_apply import (
+    apply_profile_promotion_plan,
+    generate_profile_promotion_apply_plan,
+    load_profile_promotion_apply_result,
+    render_profile_promotion_apply_plan_markdown,
+    render_profile_promotion_apply_result_markdown,
+)
 from .profile_review import generate_profile_review, load_profile_review, render_profile_review_markdown
 from .profile_sources import (
     create_profile_source_record,
@@ -296,6 +303,7 @@ __all__ = [
     "ProfileIntegrityResult",
     "ProfilePromotionApplyChange",
     "ProfilePromotionApplyPlanResult",
+    "ProfilePromotionApplyResult",
     "ProfilePromotionRecord",
     "ProfilePromotionSummaryResult",
     "ProfileReviewChecklistItem",
@@ -356,6 +364,7 @@ __all__ = [
     "WorkflowStep",
     "WORKFLOW_NAMES",
     "approval_gate_status",
+    "apply_profile_promotion_plan",
     "authority_for_evidence_status",
     "authority_for_trace_node",
     "bibliography_review_status",
@@ -435,6 +444,7 @@ __all__ = [
     "load_profile_promotion_records",
     "load_profile_sources",
     "load_profile_review",
+    "load_profile_promotion_apply_result",
     "load_reference_corpus",
     "load_reference_rejections",
     "load_research_claims",
@@ -467,6 +477,7 @@ __all__ = [
     "render_goals_review_markdown",
     "render_profile_integrity_markdown",
     "render_profile_promotion_apply_plan_markdown",
+    "render_profile_promotion_apply_result_markdown",
     "render_profile_promotion_summary_markdown",
     "render_profile_review_markdown",
     "render_profile_source_summary_markdown",
@@ -504,4 +515,4 @@ __all__ = [
     "write_research_claims",
 ]
 
-__version__ = "0.1.0b37"
+__version__ = "0.1.0b38"

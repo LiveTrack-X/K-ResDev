@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ProfilePromotionApplyResult",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "root",
+    "status",
+    "applied",
+    "apply_plan_path",
+    "apply_plan_hash",
+    "applied_at",
+    "applied_fields",
+    "before_profile",
+    "after_profile",
+    "warnings"
+  ],
+  "properties": {
+    "root": {"type": "string"},
+    "status": {"type": "string"},
+    "applied": {"type": "boolean"},
+    "profile_id": {"type": ["string", "null"]},
+    "profile_path": {"type": ["string", "null"]},
+    "backup_path": {"type": ["string", "null"]},
+    "apply_plan_path": {"type": "string"},
+    "apply_plan_hash": {"type": "string"},
+    "promotion_id": {"type": ["string", "null"]},
+    "reviewer": {"type": ["string", "null"]},
+    "reviewed_at": {"type": ["string", "null"]},
+    "applied_at": {"type": "string"},
+    "applied_fields": {"type": "array", "items": {"type": "string"}},
+    "before_profile": {"type": "object"},
+    "after_profile": {"type": "object"},
+    "rollback_note": {"type": ["string", "null"]},
+    "markdown_path": {"type": ["string", "null"]},
+    "json_path": {"type": ["string", "null"]},
+    "warnings": {"type": "array", "items": {"type": "string"}}
+  }
+}

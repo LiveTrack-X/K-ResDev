@@ -1,12 +1,12 @@
 # K-ResDev Next Planning
 
-This planning note starts after `0.1.0b37`.
+This planning note starts after `0.1.0b38`.
 
 ## Current Diagnosis
 
-K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, budget ledger review, bibliography metadata, reference corpus adapters, read-only workspace discovery, bibliography review, citation support, research claim matrices, profile source records, profile integrity, a narrow source-backed IRIS/Innopolis profile seed, profile promotion review, hash-bound profile promotion records, non-destructive profile promotion apply plans, workspace traceability graph, trace passport checkpoints, artifact authority labels, goals/deadline review, weekly operating reviews, workspace dashboards, thin local workflow router, workspace doctor, next actions, workspace summary, and review packs.
+K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, budget ledger review, bibliography metadata, reference corpus adapters, read-only workspace discovery, bibliography review, citation support, research claim matrices, profile source records, profile integrity, a narrow source-backed IRIS/Innopolis profile seed, profile promotion review, hash-bound profile promotion records, non-destructive profile promotion apply plans, guarded profile promotion apply results/backups, workspace traceability graph, trace passport checkpoints, artifact authority labels, goals/deadline review, weekly operating reviews, workspace dashboards, thin local workflow router, workspace doctor, next actions, workspace summary, and review packs.
 
-The next bottleneck is controlled, reversible profile-status mutation. K-ResDev can now record a verified human promotion decision and generate a non-destructive apply plan, but it still intentionally does not rewrite `state/project-profile.json`. The next high-value move is a guarded apply command that only runs from a current apply-plan hash and writes a backup before changing any profile status.
+The next bottleneck is source/profile lifecycle rollback and revocation. K-ResDev can now promote a profile only through a hash-guarded apply plan with backup and result records, but it does not yet have a first-class command to revoke a profile promotion and restore or supersede the verified state.
 
 ## Planning Principles
 
@@ -281,6 +281,8 @@ Safety boundary:
 
 Goal: optionally apply a human-reviewed profile-promotion plan with a backup and hash guard.
 
+Status: implemented in `src/k_resdev_skill/profile_promotion_apply.py` with `profile-promotion-apply`, `ProfilePromotionApplyResult`, schema/template coverage, doctor, next-action, workspace-summary, review-pack, operational Markdown filtering, and trace integration.
+
 Expected scope:
 - `profile-promotion-apply` command that requires `--apply-plan state/profile-promotion-apply-plan.json` and `--apply-plan-hash <sha256>`;
 - refuse to run unless the apply plan status is `ready_to_apply`, `can_apply=true`, and the hash matches the supplied apply-plan artifact;
@@ -291,6 +293,21 @@ Expected scope:
 
 Safety boundary:
 - The apply command must be explicit and hash-guarded. It must never infer official agency compliance or change raw source files.
+
+### Beta 39 - Profile Promotion Revocation and Rollback Plan
+
+Goal: make profile promotion revocation reviewable before a verified profile is restored or superseded.
+
+Expected scope:
+- `profile-promotion-revoke-plan` command that reads `state/profile-promotion-apply-result.json`, `state/profile-backups/`, and current `state/project-profile.json`;
+- generate `reports/profile-promotion-revoke-plan.md` and `state/profile-promotion-revoke-plan.json`;
+- require a supplied revocation reason and reviewer;
+- show whether rollback can restore the backup cleanly or whether current profile drift requires manual review;
+- optionally add a later guarded `profile-promotion-revoke` command, but beta.39 should stay proposal-first unless the rollback rules are trivial and fully tested;
+- integrate revocation plans into doctor, next actions, summary, review pack, and trace.
+
+Safety boundary:
+- Revocation plans are local profile-lifecycle controls only. They must not certify official agency status or erase the promotion/audit trail.
 
 ## Deferred Ideas
 
@@ -304,6 +321,6 @@ These should wait until traceability, impact analysis, and verified profile sour
 
 ## Recommended Next Slice
 
-Implement Beta 38 next.
+Implement Beta 39 next.
 
-Beta 38 should make profile promotion application possible only through a current, hash-matched, human-reviewed apply plan with a backup and audit trail.
+Beta 39 should make profile promotion revocation and rollback reviewable before any verified profile state is restored or superseded.

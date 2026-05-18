@@ -17,6 +17,7 @@ STANDARD_DIRS = (
     "state/bibliography-reviews",
     "state/citation-support",
     "state/checkpoints",
+    "state/profile-backups",
     "state/profile-promotions",
 )
 STARTER_FILES = (

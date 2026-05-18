@@ -22,6 +22,7 @@ STARTER_FILES = (
     "README.k-resdev.md",
     "state/project-state.json",
     "state/project-profile.json",
+    "state/project-goals.json",
     "state/profile-sources.json",
 )
 SKIP_DIR_NAMES = {
@@ -282,6 +283,8 @@ def _role(workspace: Path, path: Path) -> tuple[str, str, list[str]]:
         return "project_state", "high", notes
     if normalized == "state/project-profile.json":
         return "project_profile", "high", notes
+    if normalized == "state/project-goals.json":
+        return "project_goals", "high", notes
     if normalized == "state/profile-sources.json":
         return "profile_sources", "high", notes
     if normalized == "state/evidence-index.json":

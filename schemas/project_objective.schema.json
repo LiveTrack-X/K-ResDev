@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ProjectObjective",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["objective_id", "title", "status", "linked_kpis", "linked_milestones", "linked_evidence_ids", "linked_report_paths", "review_status", "risk_flags"],
+  "properties": {
+    "objective_id": { "type": "string", "minLength": 1 },
+    "title": { "type": "string", "minLength": 1 },
+    "weight": { "type": ["number", "null"] },
+    "status": { "type": "string", "minLength": 1 },
+    "linked_kpis": { "type": "array", "items": { "type": "string" } },
+    "linked_milestones": { "type": "array", "items": { "type": "string" } },
+    "linked_evidence_ids": { "type": "array", "items": { "type": "string" } },
+    "linked_report_paths": { "type": "array", "items": { "type": "string" } },
+    "review_status": { "type": "string", "minLength": 1 },
+    "notes": { "type": ["string", "null"] },
+    "risk_flags": { "type": "array", "items": { "type": "string" } }
+  }
+}

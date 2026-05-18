@@ -95,6 +95,7 @@ from .models import (
     ExtractedDocument,
     ExtractedSegment,
     FileClassification,
+    GoalsReviewFinding,
     IntakeResult,
     KPI,
     Milestone,
@@ -102,6 +103,9 @@ from .models import (
     ProfileIntegrityFinding,
     ProfileIntegrityResult,
     ProfileSource,
+    ProjectDeadline,
+    ProjectGoalsFile,
+    ProjectObjective,
     ProjectState,
     ProjectProfile,
     ProjectionExportResult,
@@ -133,6 +137,7 @@ from .models import (
     WorkspaceCitationSupportResult,
     WorkspaceDoctorFinding,
     WorkspaceDoctorResult,
+    WorkspaceGoalsReviewResult,
     WorkspaceInitResult,
     WorkspaceReportIntegrityItem,
     WorkspaceReportIntegrityResult,
@@ -160,6 +165,12 @@ from .profile_sources import (
     write_profile_sources,
 )
 from .profile_registry import generate_profile_registry, list_project_profiles, load_project_profile
+from .project_goals import (
+    generate_goals_review,
+    initialize_project_goals,
+    load_project_goals,
+    render_goals_review_markdown,
+)
 from .projection_export import export_projection, write_projection_docx, write_projection_html, write_projection_text
 from .reference_corpus import (
     build_reference_corpus,
@@ -235,6 +246,7 @@ __all__ = [
     "ExtractedDocument",
     "ExtractedSegment",
     "FileClassification",
+    "GoalsReviewFinding",
     "IntakeResult",
     "KPI",
     "Milestone",
@@ -242,6 +254,9 @@ __all__ = [
     "ProfileIntegrityFinding",
     "ProfileIntegrityResult",
     "ProfileSource",
+    "ProjectDeadline",
+    "ProjectGoalsFile",
+    "ProjectObjective",
     "ProjectState",
     "ProjectProfile",
     "ProjectionExportResult",
@@ -273,6 +288,7 @@ __all__ = [
     "WorkspaceCitationSupportResult",
     "WorkspaceDoctorFinding",
     "WorkspaceDoctorResult",
+    "WorkspaceGoalsReviewResult",
     "WorkspaceInitResult",
     "WorkspaceReportIntegrityItem",
     "WorkspaceReportIntegrityResult",
@@ -321,6 +337,7 @@ __all__ = [
     "generate_experiment_plan_bundle",
     "generate_experiment_comparison_table",
     "generate_evidence_bundle_index",
+    "generate_goals_review",
     "generate_literature_matrix",
     "generate_paper_card_markdown",
     "generate_profile_integrity",
@@ -340,6 +357,7 @@ __all__ = [
     "import_bibliography",
     "import_budget_ledger",
     "import_research_claims",
+    "initialize_project_goals",
     "initialize_workspace",
     "load_bibliography_index",
     "load_budget_ledger",
@@ -353,6 +371,7 @@ __all__ = [
     "load_citation_support_records",
     "load_evidence_index",
     "load_project_profile",
+    "load_project_goals",
     "load_profile_sources",
     "load_reference_corpus",
     "load_reference_rejections",
@@ -378,6 +397,7 @@ __all__ = [
     "render_approval_coverage_markdown",
     "render_artifact_authority_markdown",
     "render_evidence_source_verification_markdown",
+    "render_goals_review_markdown",
     "render_profile_integrity_markdown",
     "render_profile_source_summary_markdown",
     "render_reference_corpus_summary",
@@ -409,4 +429,4 @@ __all__ = [
     "write_research_claims",
 ]
 
-__version__ = "0.1.0b30"
+__version__ = "0.1.0b31"

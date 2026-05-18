@@ -398,13 +398,13 @@ Safety rule:
 Recommended order after the traceability graph, research-claim matrix, trace-passport, corpus-adapter, and workspace-discovery first passes:
 
 1. Artifact authority levels are implemented as Task 40.
-2. Implement goals/deadline operating file and goals review.
+2. Goals/deadline operating file and goals review are implemented as Task 41.
 3. Implement local weekly review and dashboard.
 4. Add thin workflow router only after the concrete commands are stable.
 
 ## Open Questions
 
-1. Should `project-goals.json` be a new file, or should it extend `project-state.json`?
+1. Resolved for beta.31: `project-goals.json` is a separate operating file so local goals/deadlines can evolve without rewriting `project-state.json`.
 2. Should `workspace-review-pack` stay checkpoint-neutral, or should a separate opt-in flag create a checkpoint?
 3. Should artifact authority levels be represented as trace-node metadata only, or also as a standalone schema for generated artifacts?
 4. Should Zotero support stay exported-file only for 0.x, or later add an optional Web API connector behind an explicit flag?

@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ProjectDeadline",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["deadline_id", "due_date", "title", "deliverable_type", "linked_objective_ids", "linked_kpis", "linked_milestones", "linked_evidence_ids", "linked_report_paths", "approval_required", "status", "review_status", "risk_flags"],
+  "properties": {
+    "deadline_id": { "type": "string", "minLength": 1 },
+    "due_date": { "type": "string", "format": "date" },
+    "title": { "type": "string", "minLength": 1 },
+    "deliverable_type": { "type": "string", "minLength": 1 },
+    "linked_objective_ids": { "type": "array", "items": { "type": "string" } },
+    "linked_kpis": { "type": "array", "items": { "type": "string" } },
+    "linked_milestones": { "type": "array", "items": { "type": "string" } },
+    "linked_evidence_ids": { "type": "array", "items": { "type": "string" } },
+    "linked_report_paths": { "type": "array", "items": { "type": "string" } },
+    "approval_required": { "type": "boolean" },
+    "status": { "type": "string", "minLength": 1 },
+    "review_status": { "type": "string", "minLength": 1 },
+    "notes": { "type": ["string", "null"] },
+    "risk_flags": { "type": "array", "items": { "type": "string" } }
+  }
+}

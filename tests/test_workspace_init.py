@@ -24,6 +24,7 @@ def test_initialize_workspace_creates_standard_layout(tmp_path):
     state = json.loads((tmp_path / "state" / "project-state.json").read_text(encoding="utf-8"))
     profile = json.loads((tmp_path / "state" / "project-profile.json").read_text(encoding="utf-8"))
     profile_sources = json.loads((tmp_path / "state" / "profile-sources.json").read_text(encoding="utf-8"))
+    project_goals = json.loads((tmp_path / "state" / "project-goals.json").read_text(encoding="utf-8"))
     readme = (tmp_path / "README.k-resdev.md").read_text(encoding="utf-8")
 
     assert state["project_id"] == "PRJ-2026-0001"
@@ -32,10 +33,13 @@ def test_initialize_workspace_creates_standard_layout(tmp_path):
     assert profile["profile_id"] == "national-rnd-basic"
     assert profile["status"] == "needs_review"
     assert profile_sources == []
+    assert project_goals["project_id"] == "PRJ-2026-0001"
+    assert project_goals["status"] == "needs_review"
     assert "profile_needs_review" in result.warnings
     assert "Evidence is source of truth" in readme
     assert "discover-workspace" in readme
     assert "artifact-authority" in readme
+    assert "goals-review" in readme
     assert "bib-import" in readme
     assert "reference-corpus" in readme
     assert "bib-review-record" in readme
@@ -91,3 +95,4 @@ def test_init_workspace_cli(tmp_path, capsys):
     assert payload["project_id"] == "PRJ-2026-0001"
     assert (tmp_path / "state" / "project-profile.json").exists()
     assert (tmp_path / "state" / "profile-sources.json").exists()
+    assert (tmp_path / "state" / "project-goals.json").exists()

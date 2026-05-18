@@ -16,6 +16,7 @@ from .models import (
 from .profile_registry import load_project_profile
 from .profile_sources import generate_profile_integrity
 from .budget_ledger import generate_workspace_budget_ledger
+from .project_goals import generate_goals_review
 from .reference_corpus import build_reference_corpus
 from .research_claims import generate_research_claim_matrix
 from .trace_passport import generate_trace_passport
@@ -48,6 +49,7 @@ def generate_workspace_summary(
     budget_ledger = generate_workspace_budget_ledger(workspace)
     discovery = discover_workspace(workspace)
     artifact_authority = generate_artifact_authority(workspace)
+    goals_review = generate_goals_review(workspace)
     reference_corpus = build_reference_corpus(workspace)
     research_claim_matrix = generate_research_claim_matrix(workspace)
     profile_integrity = generate_profile_integrity(workspace)
@@ -85,6 +87,14 @@ def generate_workspace_summary(
         artifact_authority_finding_count=artifact_authority.finding_count,
         artifact_authority_high_count=artifact_authority.high_count,
         artifact_authority_level_counts=artifact_authority.authority_level_counts,
+        goals_review_status=goals_review.status,
+        objective_count=goals_review.objective_count,
+        deadline_count=goals_review.deadline_count,
+        goals_review_finding_count=goals_review.finding_count,
+        goals_review_high_count=goals_review.high_count,
+        goals_due_soon_count=goals_review.due_soon_count,
+        goals_overdue_count=goals_review.overdue_count,
+        goals_at_risk_deadline_count=goals_review.at_risk_deadline_count,
         reference_corpus_status=reference_corpus.status,
         reference_corpus_count=reference_corpus.item_count,
         reference_rejection_count=reference_corpus.rejection_count,
@@ -143,6 +153,11 @@ def render_workspace_summary_markdown(summary: WorkspaceSummaryResult) -> str:
         f"| Artifact authority | {_escape(summary.artifact_authority_status or '-')} |",
         f"| Authority artifacts | {summary.artifact_authority_count} |",
         f"| Authority findings | {summary.artifact_authority_finding_count} |",
+        f"| Goals review | {_escape(summary.goals_review_status or '-')} |",
+        f"| Objectives | {summary.objective_count} |",
+        f"| Deadlines | {summary.deadline_count} |",
+        f"| Due soon deadlines | {summary.goals_due_soon_count} |",
+        f"| Overdue deadlines | {summary.goals_overdue_count} |",
         f"| Budget ledger | {_escape(summary.budget_ledger_status or '-')} |",
         f"| Budget ledger rows | {summary.budget_ledger_count} |",
         f"| Reference corpus | {_escape(summary.reference_corpus_status or '-')} |",
@@ -180,6 +195,7 @@ def render_workspace_summary_markdown(summary: WorkspaceSummaryResult) -> str:
         f"| Analysis manifests | {len(summary.analysis_manifest_paths)} | {_format_paths(summary.analysis_manifest_paths)} |",
         f"| Workspace discovery | {summary.discovery_scanned_count} | status: {_escape(summary.discovery_status or '-')}; missing dirs: {summary.discovery_missing_standard_dir_count}; loose candidates: {summary.discovery_loose_candidate_count}; proposals: {summary.discovery_setup_proposal_count} |",
         f"| Artifact authority | {summary.artifact_authority_count} | status: {_escape(summary.artifact_authority_status or '-')}; findings: {summary.artifact_authority_finding_count}; high: {summary.artifact_authority_high_count}; levels: {_format_counts(summary.artifact_authority_level_counts)} |",
+        f"| Goals review | {summary.objective_count} | status: {_escape(summary.goals_review_status or '-')}; deadlines: {summary.deadline_count}; due soon: {summary.goals_due_soon_count}; overdue: {summary.goals_overdue_count}; at risk: {summary.goals_at_risk_deadline_count}; findings: {summary.goals_review_finding_count}; high: {summary.goals_review_high_count} |",
         f"| Budget ledger | {summary.budget_ledger_count} | status: {_escape(summary.budget_ledger_status or '-')}; findings: {summary.budget_ledger_finding_count}; totals: {_format_float_counts(summary.budget_total_by_currency)} |",
         f"| Reference corpus | {summary.reference_corpus_count} | status: {_escape(summary.reference_corpus_status or '-')}; rejections: {summary.reference_rejection_count}; high: {summary.reference_corpus_high_count} |",
         f"| Research claim matrix | {summary.research_claim_count} | status: {_escape(summary.research_claim_matrix_status or '-')}; findings: {summary.research_claim_matrix_finding_count} |",

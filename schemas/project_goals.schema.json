@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ProjectGoalsFile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["status", "objectives", "deadlines", "warnings"],
+  "properties": {
+    "project_id": { "type": ["string", "null"] },
+    "title": { "type": ["string", "null"] },
+    "status": { "type": "string", "minLength": 1 },
+    "objectives": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/projectObjective" }
+    },
+    "deadlines": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/projectDeadline" }
+    },
+    "notes": { "type": ["string", "null"] },
+    "warnings": { "type": "array", "items": { "type": "string" } }
+  },
+  "$defs": {
+    "projectObjective": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["objective_id", "title", "status", "linked_kpis", "linked_milestones", "linked_evidence_ids", "linked_report_paths", "review_status", "risk_flags"],
+      "properties": {
+        "objective_id": { "type": "string", "minLength": 1 },
+        "title": { "type": "string", "minLength": 1 },
+        "weight": { "type": ["number", "null"] },
+        "status": { "type": "string", "minLength": 1 },
+        "linked_kpis": { "type": "array", "items": { "type": "string" } },
+        "linked_milestones": { "type": "array", "items": { "type": "string" } },
+        "linked_evidence_ids": { "type": "array", "items": { "type": "string" } },
+        "linked_report_paths": { "type": "array", "items": { "type": "string" } },
+        "review_status": { "type": "string", "minLength": 1 },
+        "notes": { "type": ["string", "null"] },
+        "risk_flags": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "projectDeadline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["deadline_id", "due_date", "title", "deliverable_type", "linked_objective_ids", "linked_kpis", "linked_milestones", "linked_evidence_ids", "linked_report_paths", "approval_required", "status", "review_status", "risk_flags"],
+      "properties": {
+        "deadline_id": { "type": "string", "minLength": 1 },
+        "due_date": { "type": "string", "format": "date" },
+        "title": { "type": "string", "minLength": 1 },
+        "deliverable_type": { "type": "string", "minLength": 1 },
+        "linked_objective_ids": { "type": "array", "items": { "type": "string" } },
+        "linked_kpis": { "type": "array", "items": { "type": "string" } },
+        "linked_milestones": { "type": "array", "items": { "type": "string" } },
+        "linked_evidence_ids": { "type": "array", "items": { "type": "string" } },
+        "linked_report_paths": { "type": "array", "items": { "type": "string" } },
+        "approval_required": { "type": "boolean" },
+        "status": { "type": "string", "minLength": 1 },
+        "review_status": { "type": "string", "minLength": 1 },
+        "notes": { "type": ["string", "null"] },
+        "risk_flags": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

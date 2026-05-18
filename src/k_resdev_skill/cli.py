@@ -55,6 +55,7 @@ from .profile_sources import (
     utc_now_iso,
 )
 from .profile_registry import generate_profile_registry, list_project_profiles, load_project_profile
+from .project_goals import generate_goals_review, initialize_project_goals
 from .projection_export import export_projection
 from .reference_corpus import build_reference_corpus
 from .report_integrity import generate_workspace_report_integrity
@@ -376,6 +377,21 @@ def main(argv: list[str] | None = None) -> int:
     authority_parser.add_argument("--output", default=None)
     authority_parser.add_argument("--json", default=None)
 
+    goals_init_parser = subparsers.add_parser("goals-init", help="Create a local project goals/deadlines operating file.")
+    goals_init_parser.add_argument("--root", default=".")
+    goals_init_parser.add_argument("--output", default=None)
+    goals_init_parser.add_argument("--force", action="store_true")
+
+    goals_review_parser = subparsers.add_parser("goals-review", help="Review local objectives, deadlines, evidence, reports, and approvals.")
+    goals_review_parser.add_argument("--root", default=".")
+    goals_review_parser.add_argument("--output", default=None)
+    goals_review_parser.add_argument("--json", default=None)
+
+    deadline_check_parser = subparsers.add_parser("deadline-check", help="Check local deadline readiness from state/project-goals.json.")
+    deadline_check_parser.add_argument("--root", default=".")
+    deadline_check_parser.add_argument("--output", default=None)
+    deadline_check_parser.add_argument("--json", default=None)
+
     next_actions_parser = subparsers.add_parser("next-actions", help="Generate a safe next-action plan from workspace doctor findings.")
     next_actions_parser.add_argument("--root", default=".")
     next_actions_parser.add_argument("--output", default=None)
@@ -425,7 +441,7 @@ def main(argv: list[str] | None = None) -> int:
 
     review_pack_parser = subparsers.add_parser(
         "workspace-review-pack",
-        help="Generate readiness, next-action, summary, profile, source, approval, report, bibliography, reference-corpus, citation-support, trace-passport, and trace artifacts in one local review pack.",
+        help="Generate readiness, next-action, summary, goals, profile, source, approval, report, bibliography, reference-corpus, citation-support, trace-passport, and trace artifacts in one local review pack.",
     )
     review_pack_parser.add_argument("--root", default=".")
     review_pack_parser.add_argument("--reports-dir", default=None)
@@ -756,6 +772,14 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if args.command == "artifact-authority":
         result = generate_artifact_authority(args.root, output_path=args.output, json_path=args.json)
+        print(result.model_dump_json(indent=2))
+        return 0
+    if args.command == "goals-init":
+        result = initialize_project_goals(args.root, output_path=args.output, overwrite=args.force)
+        print(result.model_dump_json(indent=2))
+        return 0
+    if args.command in {"goals-review", "deadline-check"}:
+        result = generate_goals_review(args.root, output_path=args.output, json_path=args.json)
         print(result.model_dump_json(indent=2))
         return 0
     if args.command == "next-actions":

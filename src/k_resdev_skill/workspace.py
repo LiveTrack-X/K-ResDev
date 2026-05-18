@@ -13,6 +13,7 @@ from .budget_ledger import generate_workspace_budget_ledger
 from .citation_support import generate_workspace_citation_support_integrity
 from .evidence_index import load_evidence_index
 from .models import (
+    ProjectGoalsFile,
     ProjectProfile,
     ProjectState,
     WorkspaceDoctorFinding,
@@ -21,6 +22,7 @@ from .models import (
 )
 from .profile_registry import default_agency_templates_root, load_project_profile
 from .profile_sources import generate_profile_integrity
+from .project_goals import generate_goals_review
 from .reference_corpus import build_reference_corpus
 from .research_claims import generate_research_claim_matrix
 from .report_integrity import generate_workspace_report_integrity
@@ -55,6 +57,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "citation-support.md",
     "citation-support-summary.md",
     "evidence-bundle-index.md",
+    "goals-review.md",
     "next-actions.md",
     "profile-integrity.md",
     "profile-source-summary.md",
@@ -119,6 +122,19 @@ def initialize_workspace(
         created,
         skipped,
     )
+    _write_if_missing(
+        workspace / "state" / "project-goals.json",
+        ProjectGoalsFile(
+            project_id=project_id,
+            title=title,
+            status="needs_review",
+            notes="Local goals/deadlines operating file. Add reviewed objectives and deadlines before relying on goals-review.",
+            warnings=["starter_needs_review"],
+        ).model_dump_json(indent=2)
+        + "\n",
+        created,
+        skipped,
+    )
 
     _write_if_missing(
         workspace / "README.k-resdev.md",
@@ -159,6 +175,7 @@ def run_workspace_doctor(
     _check_reports(workspace, findings)
     _check_report_integrity(workspace, findings)
     _check_artifact_authority(workspace, findings)
+    _check_goals_review(workspace, findings)
     _check_bibliography_integrity(workspace, findings)
     _check_reference_corpus(workspace, findings)
     _check_citation_support_integrity(workspace, findings)
@@ -617,6 +634,42 @@ def _check_artifact_authority(workspace: Path, findings: list[WorkspaceDoctorFin
         )
 
 
+def _check_goals_review(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> None:
+    result = generate_goals_review(workspace)
+    path = workspace / "state" / "project-goals.json"
+    if result.status == "not_configured":
+        findings.append(
+            _finding(
+                "project_goals_missing",
+                "low",
+                "No project goals/deadlines operating file found.",
+                path,
+                "Run goals-init, then review local objectives and deadlines before weekly/project review.",
+            )
+        )
+        return
+    if result.high_count:
+        findings.append(
+            _finding(
+                "goals_review_high_findings",
+                "high",
+                f"{result.high_count} high-severity goals/deadline finding(s) were detected.",
+                path,
+                "Run goals-review and resolve overdue or broken objective/deadline links.",
+            )
+        )
+    if result.medium_count or result.low_count or result.warnings:
+        findings.append(
+            _finding(
+                "goals_review_findings",
+                "medium" if result.medium_count else "low",
+                f"{result.medium_count + result.low_count} goals/deadline review finding(s) or warnings were detected.",
+                path,
+                "Review goals-review before relying on local objectives, deadlines, or weekly project status.",
+            )
+        )
+
+
 def _check_bibliography_integrity(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> None:
     result = generate_workspace_bibliography_integrity(workspace)
     if result.status == "not_configured":
@@ -879,6 +932,7 @@ def _starter_readme(project_id: str, title: str, profile_id: str) -> str:
             "- Put BibTeX/RIS/CSL JSON bibliography files in `references/`.",
             "- Run `k-resdev discover-workspace --root . --output reports/workspace-discovery.md --json state/workspace-discovery.json` to inspect folder layout before setup or migration.",
             "- Run `k-resdev artifact-authority --root . --output reports/artifact-authority.md --json state/artifact-authority.json` to review local artifact authority levels before external use.",
+            "- Run `k-resdev goals-review --root . --output reports/goals-review.md --json state/goals-review.json` to review local objectives, deadlines, evidence, report, and approval readiness.",
             "- Run `k-resdev intake --inbox inbox --state-dir state --evidence-dir evidence` to build evidence metadata.",
             "- Run `k-resdev bib-import references/library.bib --state-dir state --literature-matrix reports/literature-review-matrix.md` to build bibliography metadata.",
             "- Run `k-resdev reference-corpus --root . --output reports/reference-corpus-summary.md --json state/literature-corpus.json --rejections state/reference-rejection-log.json` to scan local PDFs, Zotero JSON exports, and Markdown notes into a reviewable corpus.",
@@ -897,7 +951,7 @@ def _starter_readme(project_id: str, title: str, profile_id: str) -> str:
             "- Run `k-resdev checkpoint-resume-plan --root . --output reports/checkpoint-resume-plan.md --json state/checkpoint-resume-plan.json` before resuming from a saved checkpoint.",
             "- Run `k-resdev doctor --root . --output reports/readiness.md --json state/readiness.json` before reporting.",
             "- Run `k-resdev workspace-summary --root . --output reports/workspace-summary.md --json state/workspace-summary.json` for a one-page status handoff.",
-            "- Run `k-resdev workspace-review-pack --root .` to refresh discovery, readiness, next actions, summary, source-verification, artifact-authority, budget-ledger, approval-coverage, report-integrity, bibliography-integrity, reference-corpus, citation-support, research-claim-matrix, trace-passport, and trace artifacts together.",
+            "- Run `k-resdev workspace-review-pack --root .` to refresh discovery, readiness, next actions, summary, source-verification, artifact-authority, goals-review, budget-ledger, approval-coverage, report-integrity, bibliography-integrity, reference-corpus, citation-support, research-claim-matrix, trace-passport, and trace artifacts together.",
             "- Run `k-resdev verify-review-pack state/workspace-review-pack.json` to check saved review-pack artifact hashes.",
             "- Run `k-resdev verify-evidence-sources state/evidence-index.json --root . --output reports/source-verification.md --json state/source-verification.json` to check indexed source hashes.",
             "- Run `k-resdev approval-coverage --root . --output reports/approval-coverage.md --json state/approval-coverage.json` to check report approval coverage.",

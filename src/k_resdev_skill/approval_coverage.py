@@ -19,6 +19,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "citation-support.md",
     "citation-support-summary.md",
     "evidence-bundle-index.md",
+    "goals-review.md",
     "profile-integrity.md",
     "profile-source-summary.md",
     "reference-corpus-summary.md",

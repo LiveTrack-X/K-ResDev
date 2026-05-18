@@ -16,6 +16,7 @@ from .bibliography_integrity import generate_workspace_bibliography_integrity
 from .budget_ledger import generate_workspace_budget_ledger
 from .citation_support import generate_workspace_citation_support_integrity
 from .profile_sources import generate_profile_integrity
+from .project_goals import generate_goals_review
 from .reference_corpus import build_reference_corpus
 from .research_claims import generate_research_claim_matrix
 from .report_integrity import generate_workspace_report_integrity
@@ -34,7 +35,7 @@ def generate_workspace_review_pack(
     state_dir: str | Path | None = None,
     max_actions: int = 5,
 ) -> WorkspaceReviewPackResult:
-    """Generate a bundled local review pack for discovery, authority, readiness, traceability, checkpoint, budget, profile, source, approval, report, bibliography, reference corpus, citation-support, and research-claim checks."""
+    """Generate a bundled local review pack for discovery, authority, goals, readiness, traceability, checkpoint, budget, profile, source, approval, report, bibliography, reference corpus, citation-support, and research-claim checks."""
 
     workspace = Path(root)
     reports = Path(reports_dir) if reports_dir is not None else workspace / "reports"
@@ -54,6 +55,8 @@ def generate_workspace_review_pack(
     source_json = state / "source-verification.json"
     authority_md = reports / "artifact-authority.md"
     authority_json = state / "artifact-authority.json"
+    goals_md = reports / "goals-review.md"
+    goals_json = state / "goals-review.json"
     approval_md = reports / "approval-coverage.md"
     approval_json = state / "approval-coverage.json"
     report_integrity_md = reports / "report-integrity.md"
@@ -82,6 +85,7 @@ def generate_workspace_review_pack(
     doctor = run_workspace_doctor(workspace, readiness_md, readiness_json)
     source_verification = verify_evidence_sources(state / "evidence-index.json", root=workspace, output_path=source_md, json_path=source_json)
     artifact_authority = generate_artifact_authority(workspace, output_path=authority_md, json_path=authority_json)
+    goals_review = generate_goals_review(workspace, output_path=goals_md, json_path=goals_json)
     approval_coverage = generate_workspace_approval_coverage(workspace, output_path=approval_md, json_path=approval_json)
     report_integrity = generate_workspace_report_integrity(workspace, output_path=report_integrity_md, json_path=report_integrity_json)
     budget_ledger = generate_workspace_budget_ledger(workspace, output_path=budget_ledger_md, json_path=budget_ledger_json)
@@ -114,6 +118,8 @@ def generate_workspace_review_pack(
         str(source_json),
         str(authority_md),
         str(authority_json),
+        str(goals_md),
+        str(goals_json),
         str(approval_md),
         str(approval_json),
         str(report_integrity_md),
@@ -152,6 +158,14 @@ def generate_workspace_review_pack(
         artifact_authority_count=artifact_authority.artifact_count,
         artifact_authority_finding_count=artifact_authority.finding_count,
         artifact_authority_high_count=artifact_authority.high_count,
+        goals_review_status=goals_review.status,
+        objective_count=goals_review.objective_count,
+        deadline_count=goals_review.deadline_count,
+        goals_review_finding_count=goals_review.finding_count,
+        goals_review_high_count=goals_review.high_count,
+        goals_due_soon_count=goals_review.due_soon_count,
+        goals_overdue_count=goals_review.overdue_count,
+        goals_at_risk_deadline_count=goals_review.at_risk_deadline_count,
         approval_coverage_status=approval_coverage.status,
         approval_missing_count=approval_coverage.missing_count,
         approval_not_approved_count=approval_coverage.not_approved_count,
@@ -257,7 +271,7 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
     lines = [
         "# K-ResDev Workspace Review Pack",
         "",
-        "> Review pack projection only. It bundles local discovery, authority, readiness, next-action, summary, source-verification, budget-ledger, approval-coverage, report-integrity, bibliography-integrity, reference-corpus, citation-support, research-claim-matrix, trace-passport, profile-integrity, and trace artifacts; it does not certify official agency compliance.",
+        "> Review pack projection only. It bundles local discovery, authority, goals, readiness, next-action, summary, source-verification, budget-ledger, approval-coverage, report-integrity, bibliography-integrity, reference-corpus, citation-support, research-claim-matrix, trace-passport, profile-integrity, and trace artifacts; it does not certify official agency compliance.",
         "",
         "| Field | Value |",
         "|---|---|",
@@ -274,6 +288,14 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
         f"| Artifact authority count | {result.artifact_authority_count} |",
         f"| Artifact authority finding count | {result.artifact_authority_finding_count} |",
         f"| Artifact authority high count | {result.artifact_authority_high_count} |",
+        f"| Goals review status | {_escape(result.goals_review_status or '-')} |",
+        f"| Objective count | {result.objective_count} |",
+        f"| Deadline count | {result.deadline_count} |",
+        f"| Goals review finding count | {result.goals_review_finding_count} |",
+        f"| Goals review high count | {result.goals_review_high_count} |",
+        f"| Due soon deadlines | {result.goals_due_soon_count} |",
+        f"| Overdue deadlines | {result.goals_overdue_count} |",
+        f"| At-risk deadlines | {result.goals_at_risk_deadline_count} |",
         f"| Approval coverage status | {_escape(result.approval_coverage_status or '-')} |",
         f"| Approval missing count | {result.approval_missing_count} |",
         f"| Approval not approved count | {result.approval_not_approved_count} |",
@@ -350,6 +372,7 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
             "- Use `workspace-summary.md` as a one-page handoff/status snapshot.",
             "- Use `source-verification.md` to check local source presence and hash drift.",
             "- Use `artifact-authority.md` to check whether artifacts are raw sources, extracted candidates, accepted evidence, drafts, reviewed projections, or approved projections.",
+            "- Use `goals-review.md` to check local objectives, deadlines, evidence links, report drafts, and approval readiness.",
             "- Use `approval-coverage.md` to check report artifacts against supplied human decisions.",
             "- Use `report-integrity.md` to check draft report claims against indexed evidence.",
             "- Use `budget-ledger.md` to check budget ledger proof, approval, duplicate, and evidence-link gaps.",
@@ -383,6 +406,8 @@ def _artifact_label(path: str) -> str:
         "source-verification.json": "Evidence source verification JSON",
         "artifact-authority.md": "Artifact authority",
         "artifact-authority.json": "Artifact authority JSON",
+        "goals-review.md": "Goals review",
+        "goals-review.json": "Goals review JSON",
         "approval-coverage.md": "Approval coverage",
         "approval-coverage.json": "Approval coverage JSON",
         "report-integrity.md": "Report integrity",

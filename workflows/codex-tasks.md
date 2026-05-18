@@ -429,10 +429,12 @@ Authority levels are workflow metadata only. They do not create approvals or cer
 
 ### Task 41: Goals and deadlines review
 
-Planned:
+Implemented:
 - `ProjectObjective` and `ProjectDeadline` models
 - `state/project-goals.json`, `reports/goals-review.md`, and deadline readiness checks
-- KPI/milestone/evidence/report linkage without official agency schedule claims
+- `goals-init`, `goals-review`, and `deadline-check` commands
+- KPI/milestone/evidence/report/approval linkage without official agency schedule claims
+- workspace doctor, next-action, summary, review-pack, schema, template, and trace integration
 
 Goals review is an operating projection only.
 

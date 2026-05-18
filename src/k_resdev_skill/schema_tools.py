@@ -25,8 +25,16 @@ SCHEMA_ALIASES = {
     "citation-support": "citation_support_record.schema.json",
     "citation_support": "citation_support_record.schema.json",
     "evidence": "evidence.schema.json",
+    "goals-review": "goals_review.schema.json",
+    "goals_review": "goals_review.schema.json",
     "profile-source": "profile_source.schema.json",
     "profile_source": "profile_source.schema.json",
+    "project-deadline": "project_deadline.schema.json",
+    "project_deadline": "project_deadline.schema.json",
+    "project-goals": "project_goals.schema.json",
+    "project_goals": "project_goals.schema.json",
+    "project-objective": "project_objective.schema.json",
+    "project_objective": "project_objective.schema.json",
     "project-profile": "project_profile.schema.json",
     "project_state": "project_state.schema.json",
     "project-state": "project_state.schema.json",
@@ -108,6 +116,8 @@ def _validation_targets(document: Any, schema_payload: dict[str, Any]) -> list[t
         "CitationSupportRecord",
         "EvidenceItem",
         "ProfileSource",
+        "ProjectDeadline",
+        "ProjectObjective",
         "ReferenceCorpusItem",
         "ReferenceCorpusRejection",
         "ResearchClaim",
@@ -124,6 +134,10 @@ def _validation_targets(document: Any, schema_payload: dict[str, Any]) -> list[t
             return [(f"$.records[{index}]", item) for index, item in enumerate(document["records"])]
         if title == "ArtifactAuthorityFinding" and isinstance(document, dict) and isinstance(document.get("findings"), list):
             return [(f"$.findings[{index}]", item) for index, item in enumerate(document["findings"])]
+        if title == "ProjectObjective" and isinstance(document, dict) and isinstance(document.get("objectives"), list):
+            return [(f"$.objectives[{index}]", item) for index, item in enumerate(document["objectives"])]
+        if title == "ProjectDeadline" and isinstance(document, dict) and isinstance(document.get("deadlines"), list):
+            return [(f"$.deadlines[{index}]", item) for index, item in enumerate(document["deadlines"])]
         if isinstance(document, dict) and isinstance(document.get("items"), list):
             return [(f"$.items[{index}]", item) for index, item in enumerate(document["items"])]
     return [("$", document)]

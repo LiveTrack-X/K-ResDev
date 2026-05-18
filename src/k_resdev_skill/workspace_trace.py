@@ -30,6 +30,7 @@ from .models import (
     WorkspaceTraceResult,
 )
 from .profile_sources import load_profile_sources
+from .project_goals import generate_goals_review
 from .reference_corpus import build_reference_corpus
 from .research_claims import generate_research_claim_matrix, load_research_claims
 from .trace_passport import generate_trace_passport, load_checkpoint_entries
@@ -46,6 +47,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "citation-support.md",
     "citation-support-summary.md",
     "evidence-bundle-index.md",
+    "goals-review.md",
     "next-actions.md",
     "profile-integrity.md",
     "profile-source-summary.md",
@@ -75,6 +77,7 @@ def generate_workspace_trace(
     workspace = Path(root)
     builder = _TraceBuilder(workspace)
     builder.add_evidence()
+    builder.add_project_goals()
     builder.add_budget_ledger()
     builder.add_profile_sources()
     builder.add_bibliography()
@@ -249,6 +252,96 @@ class _TraceBuilder:
                     path=item.source_file,
                     suggested_action="Remove downstream citations or replace the evidence.",
                 )
+
+    def add_project_goals(self) -> None:
+        goals_path = self.workspace / "state" / "project-goals.json"
+        review = generate_goals_review(self.workspace)
+        if review.status == "not_configured":
+            return
+        goals_node = self.node(
+            "project_goals",
+            str(goals_path),
+            "project-goals.json",
+            path=str(goals_path),
+            status=review.status,
+            sha256=_sha256_file(goals_path) if goals_path.exists() else None,
+            metadata={
+                "objective_count": review.objective_count,
+                "deadline_count": review.deadline_count,
+                "due_soon_count": review.due_soon_count,
+                "overdue_count": review.overdue_count,
+                "at_risk_deadline_count": review.at_risk_deadline_count,
+            },
+        )
+        for objective in review.objectives:
+            objective_node = self.node(
+                "project_objective",
+                objective.objective_id,
+                objective.title,
+                ref_id=objective.objective_id,
+                status=objective.review_status,
+                path=str(goals_path),
+                metadata={
+                    "objective_status": objective.status,
+                    "weight": objective.weight,
+                    "risk_flags": objective.risk_flags,
+                },
+            )
+            self.edge(goals_node.node_id, objective_node.node_id, "defines_objective")
+            for kpi_id in objective.linked_kpis:
+                self.edge(objective_node.node_id, self.node("kpi", kpi_id, kpi_id, ref_id=kpi_id).node_id, "tracks_kpi")
+            for milestone_id in objective.linked_milestones:
+                self.edge(objective_node.node_id, self.node("milestone", milestone_id, milestone_id, ref_id=milestone_id).node_id, "tracks_milestone")
+            for evidence_id in objective.linked_evidence_ids:
+                self.edge(objective_node.node_id, _node_id("evidence", evidence_id), "references_evidence")
+            for report_path in objective.linked_report_paths:
+                resolved = self._resolve_path(report_path)
+                report_node = self.node("report", str(resolved), Path(report_path).name, path=str(resolved), sha256=_sha256_file(resolved) if resolved.exists() else None)
+                self.edge(objective_node.node_id, report_node.node_id, "references_report")
+        for deadline in review.deadlines:
+            deadline_node = self.node(
+                "project_deadline",
+                deadline.deadline_id,
+                deadline.title,
+                ref_id=deadline.deadline_id,
+                status=deadline.status,
+                path=str(goals_path),
+                metadata={
+                    "due_date": deadline.due_date.isoformat(),
+                    "deliverable_type": deadline.deliverable_type,
+                    "review_status": deadline.review_status,
+                    "approval_required": deadline.approval_required,
+                    "risk_flags": deadline.risk_flags,
+                },
+            )
+            self.edge(goals_node.node_id, deadline_node.node_id, "defines_deadline")
+            for objective_id in deadline.linked_objective_ids:
+                self.edge(deadline_node.node_id, _node_id("project_objective", objective_id), "serves_objective")
+            for kpi_id in deadline.linked_kpis:
+                self.edge(deadline_node.node_id, self.node("kpi", kpi_id, kpi_id, ref_id=kpi_id).node_id, "tracks_kpi")
+            for milestone_id in deadline.linked_milestones:
+                self.edge(deadline_node.node_id, self.node("milestone", milestone_id, milestone_id, ref_id=milestone_id).node_id, "tracks_milestone")
+            for evidence_id in deadline.linked_evidence_ids:
+                self.edge(deadline_node.node_id, _node_id("evidence", evidence_id), "references_evidence")
+            for report_path in deadline.linked_report_paths:
+                resolved = self._resolve_path(report_path)
+                report_node = self.node("report", str(resolved), Path(report_path).name, path=str(resolved), sha256=_sha256_file(resolved) if resolved.exists() else None)
+                self.edge(deadline_node.node_id, report_node.node_id, "requires_report")
+        for finding in review.findings:
+            severity = "high" if finding.severity == "high" else "medium" if finding.severity == "medium" else "low"
+            node_id = None
+            if finding.objective_id:
+                node_id = _node_id("project_objective", finding.objective_id)
+            if finding.deadline_id:
+                node_id = _node_id("project_deadline", finding.deadline_id)
+            self.finding(
+                "trace_goals_review_finding",
+                severity,
+                finding.message,
+                node_id=node_id or goals_node.node_id,
+                path=finding.path or str(goals_path),
+                suggested_action=finding.suggested_action or "Review goals/deadline operating file before project status use.",
+            )
 
     def add_reports(self) -> None:
         for report in self._reports():

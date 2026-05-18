@@ -99,6 +99,16 @@ def test_validate_json_file_accepts_artifact_authority_aliases():
     assert finding["valid"] is True
 
 
+def test_validate_json_file_accepts_project_goals_aliases():
+    goals = validate_json_file("templates/project-goals.json", "project-goals")
+    objective = validate_json_file("templates/project-objective.json", "project-objective")
+    deadline = validate_json_file("templates/project-deadline.json", "project-deadline")
+
+    assert goals["valid"] is True
+    assert objective["valid"] is True
+    assert deadline["valid"] is True
+
+
 def test_validate_json_cli_returns_nonzero_for_invalid(tmp_path, capsys):
     path = tmp_path / "bad-approval.json"
     path.write_text(json.dumps({"approval_id": "APR-2026-BAD"}), encoding="utf-8")

@@ -86,6 +86,7 @@ def _actions_for_findings(root: Path, findings: list[WorkspaceDoctorFinding]) ->
         _action_for_approval_coverage(root, by_code),
         _action_for_report_integrity(root, by_code),
         _action_for_artifact_authority(root, by_code),
+        _action_for_goals_review(root, by_code),
         _action_for_bibliography_integrity(root, by_code),
         _action_for_reference_corpus(root, by_code),
         _action_for_citation_support_integrity(root, by_code),
@@ -309,6 +310,32 @@ def _action_for_artifact_authority(root: Path, by_code: dict[str, list[Workspace
         "Review artifact authority levels",
         "Generated reports, exports, evidence, and operating summaries should not be treated as approved unless supplied human approval records support that authority.",
         f'python -m k_resdev_skill artifact-authority --root "{root}" --output "{root / "reports" / "artifact-authority.md"}" --json "{root / "state" / "artifact-authority.json"}"',
+        by_code,
+        codes,
+    )
+
+
+def _action_for_goals_review(root: Path, by_code: dict[str, list[WorkspaceDoctorFinding]]) -> WorkspaceActionItem | None:
+    codes = ["project_goals_missing", "goals_review_high_findings", "goals_review_findings"]
+    if not any(code in by_code for code in codes):
+        return None
+    if "project_goals_missing" in by_code:
+        return _action(
+            root,
+            "low",
+            "Create a project goals operating file",
+            "Local objectives and deadlines should be explicit before weekly/project review.",
+            f'python -m k_resdev_skill goals-init --root "{root}"',
+            by_code,
+            codes,
+        )
+    priority = "high" if "goals_review_high_findings" in by_code else "medium"
+    return _action(
+        root,
+        priority,
+        "Review project goals and deadlines",
+        "Objectives and deadlines should link to valid KPIs, milestones, evidence, reports, and approvals before being used for project status.",
+        f'python -m k_resdev_skill goals-review --root "{root}" --output "{root / "reports" / "goals-review.md"}" --json "{root / "state" / "goals-review.json"}"',
         by_code,
         codes,
     )

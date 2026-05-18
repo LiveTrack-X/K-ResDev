@@ -27,6 +27,7 @@ BIBLIOGRAPHY_OPERATIONAL_NAMES = {
     "citation-support.md",
     "citation-support-summary.md",
     "evidence-bundle-index.md",
+    "goals-review.md",
     "next-actions.md",
     "profile-integrity.md",
     "profile-source-summary.md",

@@ -34,6 +34,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "citation-support.md",
     "citation-support-summary.md",
     "evidence-bundle-index.md",
+    "goals-review.md",
     "next-actions.md",
     "profile-integrity.md",
     "profile-source-summary.md",
@@ -284,7 +285,7 @@ def authority_for_trace_node(node_type: str, status: str | None = None, path: st
         return authority_for_evidence_status(status)
     if node_type in {"report"}:
         return "draft_projection"
-    if node_type in {"generated_artifact", "review_pack", "checkpoint", "analysis_manifest"}:
+    if node_type in {"generated_artifact", "review_pack", "checkpoint", "analysis_manifest", "project_goals", "project_objective", "project_deadline"}:
         return "operating_summary"
     if node_type in {"reference", "bibliography", "research_claim"}:
         if str(status) in {"accepted", "supports", "verified"}:
@@ -409,6 +410,7 @@ def _operating_artifact_paths(workspace: Path) -> list[Path]:
             "workspace-discovery.json",
             "workspace-trace.json",
             "artifact-authority.json",
+            "goals-review.json",
         ):
             target = state / name
             if target.exists():

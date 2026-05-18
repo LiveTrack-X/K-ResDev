@@ -1,0 +1,16 @@
+{
+  "deadline_id": "DL-2026-0001",
+  "due_date": "2026-06-30",
+  "title": "Monthly report review",
+  "deliverable_type": "report_review",
+  "linked_objective_ids": ["OBJ-2026-0001"],
+  "linked_kpis": [],
+  "linked_milestones": [],
+  "linked_evidence_ids": [],
+  "linked_report_paths": ["reports/monthly-report.md"],
+  "approval_required": true,
+  "status": "planned",
+  "review_status": "needs_review",
+  "notes": "Local operating deadline; not an official agency schedule.",
+  "risk_flags": []
+}

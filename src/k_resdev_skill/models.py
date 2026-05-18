@@ -202,6 +202,61 @@ class ProjectState(StrictModel):
     budget_categories: list[dict[str, Any]] = Field(default_factory=list)
 
 
+class ProjectObjective(StrictModel):
+    objective_id: str
+    title: str
+    weight: float | None = None
+    status: str = "active"
+    linked_kpis: list[str] = Field(default_factory=list)
+    linked_milestones: list[str] = Field(default_factory=list)
+    linked_evidence_ids: list[str] = Field(default_factory=list)
+    linked_report_paths: list[str] = Field(default_factory=list)
+    review_status: str = "needs_review"
+    notes: str | None = None
+    risk_flags: list[str] = Field(default_factory=list)
+
+    @field_validator("objective_id", "title", "status", "review_status")
+    @classmethod
+    def _objective_field_must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
+class ProjectDeadline(StrictModel):
+    deadline_id: str
+    due_date: date
+    title: str
+    deliverable_type: str
+    linked_objective_ids: list[str] = Field(default_factory=list)
+    linked_kpis: list[str] = Field(default_factory=list)
+    linked_milestones: list[str] = Field(default_factory=list)
+    linked_evidence_ids: list[str] = Field(default_factory=list)
+    linked_report_paths: list[str] = Field(default_factory=list)
+    approval_required: bool = True
+    status: str = "planned"
+    review_status: str = "needs_review"
+    notes: str | None = None
+    risk_flags: list[str] = Field(default_factory=list)
+
+    @field_validator("deadline_id", "title", "deliverable_type", "status", "review_status")
+    @classmethod
+    def _deadline_field_must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
+class ProjectGoalsFile(StrictModel):
+    project_id: str | None = None
+    title: str | None = None
+    status: str = "needs_review"
+    objectives: list[ProjectObjective] = Field(default_factory=list)
+    deadlines: list[ProjectDeadline] = Field(default_factory=list)
+    notes: str | None = None
+    warnings: list[str] = Field(default_factory=list)
+
+
 class ResearchInsight(StrictModel):
     insight_id: str
     claim: str
@@ -761,6 +816,45 @@ class WorkspaceArtifactAuthorityResult(StrictModel):
     warnings: list[str] = Field(default_factory=list)
 
 
+class GoalsReviewFinding(StrictModel):
+    code: str
+    severity: str
+    message: str
+    objective_id: str | None = None
+    deadline_id: str | None = None
+    path: str | None = None
+    suggested_action: str | None = None
+
+    @field_validator("code", "severity", "message")
+    @classmethod
+    def _goals_finding_field_must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
+class WorkspaceGoalsReviewResult(StrictModel):
+    root: str
+    status: str
+    project_id: str | None = None
+    title: str | None = None
+    objective_count: int = 0
+    deadline_count: int = 0
+    due_soon_count: int = 0
+    overdue_count: int = 0
+    at_risk_deadline_count: int = 0
+    finding_count: int = 0
+    high_count: int = 0
+    medium_count: int = 0
+    low_count: int = 0
+    objectives: list[ProjectObjective] = Field(default_factory=list)
+    deadlines: list[ProjectDeadline] = Field(default_factory=list)
+    findings: list[GoalsReviewFinding] = Field(default_factory=list)
+    markdown_path: str | None = None
+    json_path: str | None = None
+    warnings: list[str] = Field(default_factory=list)
+
+
 class WorkspaceDoctorFinding(StrictModel):
     code: str
     severity: str
@@ -888,6 +982,14 @@ class WorkspaceSummaryResult(StrictModel):
     artifact_authority_finding_count: int = 0
     artifact_authority_high_count: int = 0
     artifact_authority_level_counts: dict[str, int] = Field(default_factory=dict)
+    goals_review_status: str | None = None
+    objective_count: int = 0
+    deadline_count: int = 0
+    goals_review_finding_count: int = 0
+    goals_review_high_count: int = 0
+    goals_due_soon_count: int = 0
+    goals_overdue_count: int = 0
+    goals_at_risk_deadline_count: int = 0
     reference_corpus_status: str | None = None
     reference_corpus_count: int = 0
     reference_rejection_count: int = 0
@@ -1105,6 +1207,14 @@ class WorkspaceReviewPackResult(StrictModel):
     artifact_authority_count: int = 0
     artifact_authority_finding_count: int = 0
     artifact_authority_high_count: int = 0
+    goals_review_status: str | None = None
+    objective_count: int = 0
+    deadline_count: int = 0
+    goals_review_finding_count: int = 0
+    goals_review_high_count: int = 0
+    goals_due_soon_count: int = 0
+    goals_overdue_count: int = 0
+    goals_at_risk_deadline_count: int = 0
     bibliography_integrity_status: str | None = None
     bibliography_entry_count: int = 0
     bibliography_review_count: int = 0

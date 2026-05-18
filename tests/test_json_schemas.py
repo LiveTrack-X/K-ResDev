@@ -154,3 +154,30 @@ def test_artifact_authority_finding_template_matches_json_schema():
         sample = json.load(handle)
 
     jsonschema.validate(sample, schema)
+
+
+def test_project_goals_template_matches_json_schema():
+    with open("schemas/project_goals.schema.json", encoding="utf-8") as handle:
+        schema = json.load(handle)
+    with open("templates/project-goals.json", encoding="utf-8") as handle:
+        sample = json.load(handle)
+
+    jsonschema.validate(sample, schema)
+
+
+def test_project_objective_template_matches_json_schema():
+    with open("schemas/project_objective.schema.json", encoding="utf-8") as handle:
+        schema = json.load(handle)
+    with open("templates/project-objective.json", encoding="utf-8") as handle:
+        sample = json.load(handle)
+
+    jsonschema.validate(sample, schema)
+
+
+def test_project_deadline_template_matches_json_schema():
+    with open("schemas/project_deadline.schema.json", encoding="utf-8") as handle:
+        schema = json.load(handle)
+    with open("templates/project-deadline.json", encoding="utf-8") as handle:
+        sample = json.load(handle)
+
+    jsonschema.validate(sample, schema)

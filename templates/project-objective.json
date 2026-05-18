@@ -1,0 +1,13 @@
+{
+  "objective_id": "OBJ-2026-0001",
+  "title": "Review project KPI readiness",
+  "weight": null,
+  "status": "active",
+  "linked_kpis": ["KPI-01"],
+  "linked_milestones": [],
+  "linked_evidence_ids": [],
+  "linked_report_paths": [],
+  "review_status": "needs_review",
+  "notes": "Local operating objective; review before use.",
+  "risk_flags": []
+}

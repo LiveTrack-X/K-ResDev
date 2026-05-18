@@ -1,12 +1,12 @@
 # K-ResDev Next Planning
 
-This planning note starts after `0.1.0b30`.
+This planning note starts after `0.1.0b31`.
 
 ## Current Diagnosis
 
-K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, budget ledger review, bibliography metadata, reference corpus adapters, read-only workspace discovery, bibliography review, citation support, research claim matrices, profile source records, profile integrity, workspace traceability graph, trace passport checkpoints, artifact authority labels, workspace doctor, next actions, workspace summary, and review packs.
+K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, budget ledger review, bibliography metadata, reference corpus adapters, read-only workspace discovery, bibliography review, citation support, research claim matrices, profile source records, profile integrity, workspace traceability graph, trace passport checkpoints, artifact authority labels, goals/deadline review, workspace doctor, next actions, workspace summary, and review packs.
 
-The next bottleneck is maintaining local project objectives and deadlines as first-class operating artifacts. A real R&D workspace now needs a lightweight goals/deadline file that links KPIs, milestones, evidence, reports, approvals, and upcoming review dates without pretending to know official agency schedules.
+The next bottleneck is turning the existing operating artifacts into a local weekly review/dashboard. A real R&D workspace now has evidence, claims, authority, goals, deadlines, approvals, and trace data, but the user still needs one routine view for what moved, what is due soon, and what human decisions are waiting.
 
 ## Planning Principles
 
@@ -26,7 +26,7 @@ Most important takeaways:
 - keep artifact authority levels visible across reports, evidence, approvals, bibliography, and claims;
 - grow bibliography support into local corpus adapters for folder scans, Zotero exports, and Markdown notes;
 - add read-only workspace discovery before setup or migration;
-- add goals/deadline review and a local weekly dashboard for ongoing project operation.
+- use goals/deadline review and add a local weekly dashboard for ongoing project operation.
 
 ## Priority Roadmap
 
@@ -176,20 +176,32 @@ Expected scope:
 Safety boundary:
 - Authority levels are labels and checks only. They do not create approvals or certify truth.
 
-### Beta 31 - Goals, Deadlines, and Local Weekly Review
+### Beta 31 - Goals and Deadline Review
 
-Goal: maintain local objectives/deadlines linked to KPIs, milestones, evidence, and reports, then generate a local R&D weekly dashboard from workspace artifacts.
+Goal: maintain local objectives/deadlines linked to KPIs, milestones, evidence, reports, and approvals.
+
+Status: implemented as a local first pass in `src/k_resdev_skill/project_goals.py`, with `goals-init`, `goals-review`, `deadline-check`, schema/template, doctor, next-action, summary, review-pack, and trace integration.
 
 Expected scope:
 - `ProjectObjective` and `ProjectDeadline` models.
 - `state/project-goals.json`, `reports/goals-review.md`, and deadline readiness checks.
-- `weekly-review` and `workspace-dashboard` commands.
-- local artifact-only inputs by default; no Gmail, WhatsApp, Google Docs, Slack, or Teams connector actions.
 
 Safety boundary:
-- Goals review and weekly reviews are team operating summaries, not final official reports or official schedule claims.
+- Goals review is a team operating summary, not a final official report or official schedule claim.
 
-### Beta 32 - Thin Workflow Router
+### Beta 32 - Local Weekly Review and Workspace Dashboard
+
+Goal: generate a local R&D weekly review/dashboard from K-ResDev artifacts.
+
+Expected scope:
+- `weekly-review` and `workspace-dashboard` commands.
+- local artifact-only inputs by default; no Gmail, WhatsApp, Google Docs, Slack, or Teams connector actions.
+- sections for KPI movement, evidence added, goals/deadlines, open review findings, budget gaps, research insight candidates, and human decisions needed.
+
+Safety boundary:
+- Weekly reviews are team operating summaries, not final official reports or official schedule claims.
+
+### Beta 33 - Thin Workflow Router
 
 Goal: add a thin router for common Admin, Research, and Integrity review workflows.
 
@@ -211,6 +223,6 @@ These should wait until traceability, impact analysis, and verified profile sour
 
 ## Recommended Next Slice
 
-Implement Beta 31 next.
+Implement Beta 32 next.
 
-Beta 31 should add a goals/deadlines operating layer so users can review objectives, KPI and milestone links, report readiness, and approaching deadlines from local K-ResDev artifacts. It should stay an operating projection only and must not hardcode official schedule or agency submission rules.
+Beta 32 should add a local weekly review and workspace dashboard generated from existing K-ResDev artifacts. It should use local files only by default and keep all status language as operating projection, not official report readiness or agency schedule certification.

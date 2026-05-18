@@ -1,0 +1,20 @@
+{
+  "queue_id": "PSQ-2026ABCD1234",
+  "scope": "template",
+  "profile_id": "iris-innopolis-2026-017795",
+  "profile_status": "needs_review",
+  "profile_path": "templates/agencies/iris-innopolis-2026-017795/project-profile.json",
+  "source_id": "PRS-IRIS-017795-20260519",
+  "source_title": "IRIS announcement 017795 source note",
+  "source_status": "needs_review",
+  "source_url": "https://www.iris.go.kr/contents/retrieveBsnsAncmView.do?ancmId=017795",
+  "source_file": "sources/iris-announcement-017795-source-note.md",
+  "source_record_path": "templates/agencies/iris-innopolis-2026-017795/profile-sources.json",
+  "issue_code": "profile_source_not_verified",
+  "severity": "medium",
+  "message": "Profile source `PRS-IRIS-017795-20260519` is `needs_review`.",
+  "suggested_action": "Keep profile packs in needs_review or record supplied human verification.",
+  "risk_flags": [
+    "human_verification_required"
+  ]
+}

@@ -66,6 +66,7 @@ from .profile_sources import (
 )
 from .profile_registry import generate_profile_registry, list_project_profiles, load_project_profile
 from .profile_review import generate_profile_review
+from .profile_source_queue import generate_profile_source_queue
 from .project_goals import generate_goals_review, initialize_project_goals
 from .projection_export import export_projection
 from .reference_corpus import build_reference_corpus
@@ -322,6 +323,12 @@ def main(argv: list[str] | None = None) -> int:
     profile_source_summary_parser.add_argument("--profile-path", default=None)
     profile_source_summary_parser.add_argument("--output", default=None)
     profile_source_summary_parser.add_argument("--json", default=None)
+
+    profile_source_queue_parser = subparsers.add_parser("profile-source-queue", help="Scan profile source packs into a review queue.")
+    profile_source_queue_parser.add_argument("--root", default=".")
+    profile_source_queue_parser.add_argument("--templates-root", default=None)
+    profile_source_queue_parser.add_argument("--output", default=None)
+    profile_source_queue_parser.add_argument("--json", default=None)
 
     profile_integrity_parser = subparsers.add_parser("profile-integrity", help="Check project profile source records and review status.")
     profile_integrity_parser.add_argument("--root", default=".")
@@ -809,6 +816,10 @@ def main(argv: list[str] | None = None) -> int:
         )
         print(result.model_dump_json(indent=2))
         return 0
+    if args.command == "profile-source-queue":
+        result = generate_profile_source_queue(args.root, templates_root=args.templates_root, output_path=args.output, json_path=args.json)
+        print(result.model_dump_json(indent=2))
+        return 0 if result.status != "blocked" else 1
     if args.command == "profile-integrity":
         result = generate_profile_integrity(args.root, output_path=args.output, json_path=args.json)
         print(result.model_dump_json(indent=2))

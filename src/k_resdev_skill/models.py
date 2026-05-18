@@ -1124,6 +1124,9 @@ class WorkspaceSummaryResult(StrictModel):
     profile_source_count: int = 0
     profile_verified_source_count: int = 0
     profile_integrity_finding_count: int = 0
+    profile_source_queue_status: str | None = None
+    profile_source_queue_item_count: int = 0
+    profile_source_queue_high_count: int = 0
     profile_review_status: str | None = None
     profile_review_can_promote: bool = False
     profile_review_failed_count: int = 0
@@ -1393,6 +1396,9 @@ class WorkspaceReviewPackResult(StrictModel):
     profile_verified_source_count: int = 0
     profile_integrity_finding_count: int = 0
     profile_integrity_high_count: int = 0
+    profile_source_queue_status: str | None = None
+    profile_source_queue_item_count: int = 0
+    profile_source_queue_high_count: int = 0
     profile_review_status: str | None = None
     profile_review_can_promote: bool = False
     profile_review_failed_count: int = 0
@@ -1539,6 +1545,50 @@ class ProfileIntegrityResult(StrictModel):
     low_count: int = 0
     findings: list[ProfileIntegrityFinding] = Field(default_factory=list)
     profile_pack: VerifiedProfilePack | None = None
+    markdown_path: str | None = None
+    json_path: str | None = None
+    warnings: list[str] = Field(default_factory=list)
+
+
+class ProfileSourceQueueItem(StrictModel):
+    queue_id: str
+    scope: str
+    profile_id: str
+    profile_status: str | None = None
+    profile_path: str | None = None
+    source_id: str | None = None
+    source_title: str | None = None
+    source_status: str | None = None
+    source_url: str | None = None
+    source_file: str | None = None
+    source_record_path: str | None = None
+    issue_code: str
+    severity: str
+    message: str
+    suggested_action: str | None = None
+    risk_flags: list[str] = Field(default_factory=list)
+
+    @field_validator("queue_id", "scope", "profile_id", "issue_code", "severity", "message")
+    @classmethod
+    def _profile_source_queue_field_must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
+class ProfileSourceQueueResult(StrictModel):
+    root: str
+    status: str
+    templates_root: str | None = None
+    profile_count: int = 0
+    template_profile_count: int = 0
+    workspace_profile_count: int = 0
+    source_count: int = 0
+    queue_item_count: int = 0
+    high_count: int = 0
+    medium_count: int = 0
+    low_count: int = 0
+    items: list[ProfileSourceQueueItem] = Field(default_factory=list)
     markdown_path: str | None = None
     json_path: str | None = None
     warnings: list[str] = Field(default_factory=list)

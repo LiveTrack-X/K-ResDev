@@ -38,6 +38,7 @@ CITATION_SUPPORT_OPERATIONAL_NAMES = {
     "profile-promotion-revoke-result.md",
     "profile-promotion-summary.md",
     "profile-review.md",
+    "profile-source-queue.md",
     "profile-source-summary.md",
     "readiness.md",
     "reference-corpus-summary.md",

@@ -59,6 +59,7 @@ def test_initialize_workspace_creates_standard_layout(tmp_path):
     assert "profile-promotion-revoke-plan" in readme
     assert "profile-promotion-revoke --root" in readme
     assert "profile-lifecycle-ledger" in readme
+    assert "profile-source-queue" in readme
     assert "budget-ledger-import" in readme
     assert "budget-ledger-integrity" in readme
     assert "checkpoint-create" in readme

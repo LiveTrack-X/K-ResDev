@@ -28,6 +28,7 @@ from .profile_promotion_revoke import load_profile_promotion_revoke_plan, load_p
 from .profile_lifecycle import generate_profile_lifecycle_ledger
 from .profile_registry import default_agency_templates_root, load_project_profile
 from .profile_review import generate_profile_review
+from .profile_source_queue import generate_profile_source_queue
 from .profile_sources import generate_profile_integrity, load_profile_sources
 from .project_goals import generate_goals_review
 from .reference_corpus import build_reference_corpus
@@ -76,6 +77,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "profile-promotion-revoke-result.md",
     "profile-promotion-summary.md",
     "profile-review.md",
+    "profile-source-queue.md",
     "profile-source-summary.md",
     "readiness.md",
     "reference-corpus-summary.md",
@@ -190,6 +192,7 @@ def run_workspace_doctor(
     _check_approval_coverage(workspace, findings)
     _check_budget_ledger(workspace, findings)
     _check_profile(workspace, findings)
+    _check_profile_source_queue(workspace, findings)
     _check_profile_integrity(workspace, findings)
     _check_profile_review(workspace, findings)
     _check_profile_promotion(workspace, findings)
@@ -585,6 +588,33 @@ def _check_profile_integrity(workspace: Path, findings: list[WorkspaceDoctorFind
                 f"{result.medium_count + result.low_count} profile source review finding(s) or warnings were detected.",
                 path,
                 "Review profile-integrity output before treating any agency/profile template as verified.",
+            )
+        )
+
+
+def _check_profile_source_queue(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> None:
+    result = generate_profile_source_queue(workspace)
+    if result.status == "not_configured":
+        return
+    path = workspace / "state" / "profile-source-queue.json"
+    if result.high_count:
+        findings.append(
+            _finding(
+                "profile_source_queue_high_findings",
+                "high",
+                f"{result.high_count} high-severity profile source queue item(s) were detected.",
+                path,
+                "Run profile-source-queue and resolve missing files, hash drift, or invalid verified source state before profile promotion.",
+            )
+        )
+    if result.medium_count or result.low_count or result.warnings:
+        findings.append(
+            _finding(
+                "profile_source_queue_review_findings",
+                "medium" if result.medium_count else "low",
+                f"{result.medium_count + result.low_count} profile source queue item(s) or warnings were detected.",
+                path,
+                "Review profile-source-queue before adding or promoting agency profile packs.",
             )
         )
 
@@ -1383,6 +1413,7 @@ def _starter_readme(project_id: str, title: str, profile_id: str) -> str:
             "- Run `k-resdev research-claim-import references/research-claims.csv --state-dir state --markdown reports/research-claims.md` to import supplied research claim records.",
             "- Run `k-resdev research-claim-matrix --root . --output reports/research-claim-matrix.md --json state/research-claim-matrix.json` to check claims against evidence, bibliography, and citation support.",
             "- Run `k-resdev profile-source-record --profile-id <profile-id> --title \"<official source title>\" --source-url <url> --review-status needs_review` to record official-source metadata for profile review.",
+            "- Run `k-resdev profile-source-queue --root . --output reports/profile-source-queue.md --json state/profile-source-queue.json` to review source-pack gaps before profile promotion.",
             "- Run `k-resdev profile-integrity --root . --output reports/profile-integrity.md --json state/profile-integrity.json` to check profile source records.",
             "- Run `k-resdev profile-review --root . --output reports/profile-review.md --json state/profile-review.json` before promoting any profile to verified.",
             "- Run `k-resdev profile-promotion-record --root . --decision verified --reviewer <reviewer> --profile-review-hash <sha256>` only after a supplied human promotion decision.",

@@ -36,6 +36,7 @@ from .models import (
 from .profile_promotion import load_profile_promotion_records
 from .profile_lifecycle import load_profile_lifecycle_ledger
 from .profile_review import load_profile_review
+from .profile_source_queue import load_profile_source_queue
 from .profile_sources import load_profile_sources
 from .project_goals import generate_goals_review
 from .reference_corpus import build_reference_corpus
@@ -64,6 +65,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "profile-promotion-revoke-result.md",
     "profile-promotion-summary.md",
     "profile-review.md",
+    "profile-source-queue.md",
     "profile-source-summary.md",
     "readiness.md",
     "reference-corpus-summary.md",
@@ -96,6 +98,7 @@ def generate_workspace_trace(
     builder.add_project_goals()
     builder.add_budget_ledger()
     builder.add_profile_sources()
+    builder.add_profile_source_queue()
     builder.add_profile_review()
     builder.add_profile_promotions()
     builder.add_profile_promotion_apply_plan()
@@ -524,6 +527,49 @@ class _TraceBuilder:
                     path=source.source_file,
                     suggested_action="Record verified_by and a hash-backed local source/reference artifact.",
                 )
+
+    def add_profile_source_queue(self) -> None:
+        path = self.workspace / "state" / "profile-source-queue.json"
+        if not path.exists():
+            return
+        try:
+            queue = load_profile_source_queue(path)
+        except Exception as exc:
+            self.finding(
+                "trace_profile_source_queue_unreadable",
+                "medium",
+                f"Profile source queue could not be read: {exc}",
+                path=path,
+                suggested_action="Regenerate profile-source-queue before relying on source-pack trace state.",
+            )
+            return
+        node = self.node(
+            "profile_source_queue",
+            "profile-source-queue",
+            "Profile source queue",
+            status=queue.status,
+            path=str(path),
+            sha256=_sha256_file(path),
+            metadata={
+                "profile_count": queue.profile_count,
+                "source_count": queue.source_count,
+                "queue_item_count": queue.queue_item_count,
+                "high_count": queue.high_count,
+            },
+        )
+        for item in queue.items:
+            self.edge(node.node_id, _node_id("profile", item.profile_id), "reviews_profile_sources")
+            if item.source_id:
+                self.edge(node.node_id, _node_id("profile_source", item.source_id), "reviews_source")
+            severity = "high" if item.severity == "high" else "medium" if item.severity == "medium" else "low"
+            self.finding(
+                "trace_profile_source_queue_item",
+                severity,
+                item.message,
+                node_id=node.node_id,
+                path=item.source_file or item.source_record_path or item.profile_path,
+                suggested_action=item.suggested_action or "Review profile-source-queue before profile promotion.",
+            )
 
     def add_profile_review(self) -> None:
         path = self.workspace / "state" / "profile-review.json"

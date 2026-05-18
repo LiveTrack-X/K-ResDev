@@ -2,7 +2,7 @@
 
 Purpose: 한국형 국책 R&D 환경에서 연구 행정 문서화, 증빙 정합성, 보고서 생성, 논문/데이터 인사이트 보조를 evidence-first 방식으로 지원하는 Codex/Skill 프로젝트입니다.
 
-Current release: `0.1 BETA 41` (`0.1.0b41`).
+Current release: `0.1 BETA 42` (`0.1.0b42`).
 
 Core principle:
 
@@ -46,6 +46,7 @@ This repository does not encode any single ministry/institution form as authorit
 - Research claim import and matrix checks for supplied claims against local evidence, bibliography, and citation-support records.
 - Workspace traceability graph for local source, evidence, report, approval, bibliography, citation-support, research claims, analysis, and review-pack impact review.
 - Profile source records for official-source metadata, retrieved date, hash, reviewer, and review status without hardcoding agency rules.
+- Profile source pack review queue for missing source locators, retrieved dates, hashes, reviewers, unresolved risk flags, stale local hashes, and non-verified source statuses.
 - Profile integrity checker for profile source drift, missing source records, and invalid verified profile states.
 - Data insight candidate reports that keep findings in hypothesis/review state.
 - Experiment comparison table and reproducibility checklist generators.
@@ -78,7 +79,7 @@ This repository does not encode any single ministry/institution form as authorit
 - Profile lifecycle ledger that combines current profile status, profile-review, human promotion records, guarded apply plans/results, and guarded revoke plans/results into one chronological operating projection.
 - Workspace next-action planner that converts doctor findings into deterministic, reviewable commands.
 - Workspace summary report that combines readiness, next actions, evidence counts, approvals, reports, exports, and analysis manifests.
-- Workspace review pack command that refreshes discovery, readiness, next actions, workspace summary, artifact-authority, goals-review, weekly-review, workspace-dashboard, budget-ledger, profile-integrity, profile-promotion-summary, profile-promotion-apply-plan, profile-promotion-apply-result when present, profile-promotion-revoke-plan/result when present, profile-lifecycle-ledger, source-verification, approval-coverage, report-integrity, bibliography-integrity, reference-corpus, citation-support, research-claim-matrix, and workspace-trace artifacts together.
+- Workspace review pack command that refreshes discovery, readiness, next actions, workspace summary, artifact-authority, goals-review, weekly-review, workspace-dashboard, budget-ledger, profile-source-queue, profile-integrity, profile-promotion-summary, profile-promotion-apply-plan, profile-promotion-apply-result when present, profile-promotion-revoke-plan/result when present, profile-lifecycle-ledger, source-verification, approval-coverage, report-integrity, bibliography-integrity, reference-corpus, citation-support, research-claim-matrix, and workspace-trace artifacts together.
 - Review pack artifact hash manifest and verifier for detecting missing or changed generated artifacts.
 - Evidence source verifier that checks indexed source files against saved source hashes.
 - Workspace doctor and review pack integration for local evidence-source presence/hash drift checks.
@@ -94,6 +95,7 @@ This repository does not encode any single ministry/institution form as authorit
 - Workspace doctor and review pack integration for citation support findings.
 - Workspace doctor, next-action, summary, review-pack, and trace integration for research claim matrix findings.
 - Workspace doctor, next-action, summary, and review-pack integration for profile source integrity findings.
+- Workspace doctor, next-action, summary, review-pack, and trace integration for profile source queue findings.
 - Workspace doctor, next-action, summary, review-pack, and trace integration for profile lifecycle ledger findings.
 - Workspace doctor, next-action, summary, and review-pack integration for trace impact findings.
 - Trace passport and checkpoint ledger for compact resume checkpoints, artifact hash drift detection, and checkpoint-based resume plans.
@@ -147,6 +149,7 @@ python -m k_resdev_skill research-claim-summary .\state\research-claims.json --o
 python -m k_resdev_skill research-claim-matrix --root . --output .\reports\research-claim-matrix.md --json .\state\research-claim-matrix.json
 python -m k_resdev_skill profile-source-record --profile-id national-rnd-basic --title "Official source snapshot" --source-url https://example.org/official-source --retrieved-at 2026-05-18 --review-status needs_review
 python -m k_resdev_skill profile-source-summary --root . --output .\reports\profile-source-summary.md --json .\state\profile-source-summary.json
+python -m k_resdev_skill profile-source-queue --root . --output .\reports\profile-source-queue.md --json .\state\profile-source-queue.json
 python -m k_resdev_skill profile-integrity --root . --output .\reports\profile-integrity.md --json .\state\profile-integrity.json
 python -m k_resdev_skill profile-review --root . --output .\reports\profile-review.md --json .\state\profile-review.json
 python -m k_resdev_skill profile-promotion-record --root . --decision verified --reviewer reviewer-name --profile-review .\state\profile-review.json --profile-review-hash <sha256>
@@ -170,6 +173,7 @@ python -m k_resdev_skill profiles --markdown --output .\reports\agency-profiles.
 python -m k_resdev_skill validate-profile .\templates\agencies\national-rnd-basic\project-profile.json
 python -m k_resdev_skill validate-profile .\templates\agencies\iris-innopolis-2026-017795\project-profile.json
 python -m k_resdev_skill validate-json profile-source .\state\profile-sources.json
+python -m k_resdev_skill validate-json profile-source-queue .\state\profile-source-queue.json
 python -m k_resdev_skill validate-json profile-promotion-apply-plan .\state\profile-promotion-apply-plan.json
 python -m k_resdev_skill validate-json profile-promotion-apply-result .\state\profile-promotion-apply-result.json
 python -m k_resdev_skill validate-json profile-promotion-revoke-plan .\state\profile-promotion-revoke-plan.json

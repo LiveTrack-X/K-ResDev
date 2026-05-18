@@ -578,15 +578,28 @@ Profile lifecycle ledgers are operating projections only. They do not certify of
 
 ### Task 52: Profile source pack review queue
 
-Planned:
-- add `profile-source-queue` command and public API
-- scan `templates/agencies/` and workspace `state/profile-sources.json`
-- group source-pack review gaps by profile ID
-- flag missing source URL/file, retrieved date, source hash, reviewer, unresolved risk flags, stale source hashes, and non-verified source statuses
-- write `reports/profile-source-queue.md` and `state/profile-source-queue.json`
-- integrate queue counts into doctor, next-action, summary, review-pack, and trace
+Implemented:
+- `ProfileSourceQueueItem` and `ProfileSourceQueueResult` models
+- `profile-source-queue` command and public API
+- scan of `templates/agencies/` and workspace `state/profile-sources.json`
+- profile-grouped review queue for missing source records, missing source URL/file locators, missing retrieved dates, missing source hashes, missing reviewers, unresolved risk flags, stale local hashes, missing files, and non-verified source statuses
+- `reports/profile-source-queue.md` and `state/profile-source-queue.json`
+- schema/template coverage and validation aliases
+- doctor, next-action, workspace-summary, review-pack, operational Markdown filtering, and trace integration
 
 Profile source queues must remain local operating projections. Do not add new official agency packs without current official source verification.
+
+### Task 53: Profile source queue fix plan
+
+Planned:
+- add `profile-source-fix-plan` command and public API
+- read `state/profile-source-queue.json`
+- group queue items by profile ID and severity
+- propose reviewable next commands or manual review steps without executing them
+- write `reports/profile-source-fix-plan.md` and `state/profile-source-fix-plan.json`
+- integrate plan counts into doctor, next-action, summary, review-pack, and trace
+
+Profile source fix plans must not fetch official sources, mutate profile packs, or mark sources verified.
 
 ## Safety constraints
 

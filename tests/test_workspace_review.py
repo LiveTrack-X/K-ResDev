@@ -236,6 +236,7 @@ def test_operational_markdown_does_not_satisfy_report_draft_check(tmp_path):
         "profile-promotion-revoke-result.md",
         "profile-promotion-summary.md",
         "profile-review.md",
+        "profile-source-queue.md",
         "profile-source-summary.md",
         "workspace-trace.md",
         "workspace-review-pack.md",

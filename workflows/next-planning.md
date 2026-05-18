@@ -1,12 +1,12 @@
 # K-ResDev Next Planning
 
-This planning note starts after `0.1.0b41`.
+This planning note starts after `0.1.0b42`.
 
 ## Current Diagnosis
 
-K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, budget ledger review, bibliography metadata, reference corpus adapters, read-only workspace discovery, bibliography review, citation support, research claim matrices, profile source records, profile integrity, a narrow source-backed IRIS/Innopolis profile seed, profile promotion review, hash-bound profile promotion records, non-destructive profile promotion apply plans, guarded profile promotion apply results/backups, non-destructive profile promotion revocation plans, guarded profile promotion revocation results/backups, a profile lifecycle ledger, workspace traceability graph, trace passport checkpoints, artifact authority labels, goals/deadline review, weekly operating reviews, workspace dashboards, thin local workflow router, workspace doctor, next actions, workspace summary, and review packs.
+K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, budget ledger review, bibliography metadata, reference corpus adapters, read-only workspace discovery, bibliography review, citation support, research claim matrices, profile source records, profile source-pack review queues, profile integrity, a narrow source-backed IRIS/Innopolis profile seed, profile promotion review, hash-bound profile promotion records, non-destructive profile promotion apply plans, guarded profile promotion apply results/backups, non-destructive profile promotion revocation plans, guarded profile promotion revocation results/backups, a profile lifecycle ledger, workspace traceability graph, trace passport checkpoints, artifact authority labels, goals/deadline review, weekly operating reviews, workspace dashboards, thin local workflow router, workspace doctor, next actions, workspace summary, and review packs.
 
-The next bottleneck is deciding how much agency/profile specificity to add without crossing the safety boundary. K-ResDev can now show the full local profile lifecycle from one ledger, so the next useful slice should improve profile source-pack intake/review queues while still keeping official rules pluggable and source-verified.
+The next bottleneck is turning profile-source queue gaps into a safer, reviewable remediation plan without automatically fetching official sources or rewriting profile packs. Operators can now see source-pack gaps, but they still need a command-oriented fix plan that keeps source verification human-controlled.
 
 ## Planning Principles
 
@@ -348,6 +348,8 @@ Safety boundary:
 
 Goal: make verified-agency-profile work easier to stage without hardcoding time-sensitive official rules.
 
+Status: implemented in `src/k_resdev_skill/profile_source_queue.py` with CLI/API, schema/template coverage, doctor, next-action, workspace-summary, review-pack, operational Markdown filtering, and trace integration.
+
 Expected scope:
 - `profile-source-queue` command that scans `templates/agencies/` and workspace `state/profile-sources.json`;
 - surface profiles with missing source URL/file, missing retrieved date, missing source hash, missing reviewer, unresolved risk flags, stale local source hash, or `needs_review`/`rejected` source records;
@@ -359,6 +361,23 @@ Expected scope:
 Safety boundary:
 - This queue is an operating projection only. It must not certify current law, ministry guidance, or agency forms.
 - Any specific agency/profile pack still requires current official source verification before promotion.
+
+### Beta 43 - Profile Source Queue Fix Plan
+
+Goal: turn profile source queue items into a reviewable local remediation plan.
+
+Expected scope:
+- `profile-source-fix-plan` command that reads `state/profile-source-queue.json`;
+- produce proposed next commands for each queue item without executing them;
+- group actions by profile ID and severity;
+- suggest local-only operations such as `profile-source-record`, `profile-source-summary`, `profile-integrity`, and `validate-json`;
+- explicitly mark actions requiring current official-source browsing or human review as manual steps;
+- write `reports/profile-source-fix-plan.md` and `state/profile-source-fix-plan.json`;
+- integrate plan counts into doctor, next actions, workspace-summary, review-pack, and trace.
+
+Safety boundary:
+- The fix plan must never fetch official sources, mutate profile packs, or mark sources verified by itself.
+- Any official source update still requires explicit human/source verification.
 
 ## Deferred Ideas
 
@@ -372,6 +391,6 @@ These should wait until traceability, impact analysis, and verified profile sour
 
 ## Recommended Next Slice
 
-Implement Beta 42 next.
+Implement Beta 43 next.
 
-Beta 42 should make the source-pack review queue explicit before adding more agency-specific profile packs.
+Beta 43 should make profile-source remediation command-oriented while keeping official-source verification manual and explicit.

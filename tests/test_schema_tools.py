@@ -126,6 +126,8 @@ def test_validate_json_file_accepts_workflow_aliases():
 
 
 def test_validate_json_file_accepts_profile_review_aliases():
+    source_queue_item = validate_json_file("templates/profile-source-queue-item.json", "profile-source-queue-item")
+    source_queue = validate_json_file("templates/profile-source-queue.json", "profile-source-queue")
     check = validate_json_file("templates/profile-review-check.json", "profile-review-check")
     promotion = validate_json_file("templates/profile-promotion-record.json", "profile-promotion-record")
     apply_plan = validate_json_file("templates/profile-promotion-apply-plan.json", "profile-promotion-apply-plan")
@@ -136,6 +138,8 @@ def test_validate_json_file_accepts_profile_review_aliases():
     lifecycle_finding = validate_json_file("templates/profile-lifecycle-finding.json", "profile-lifecycle-finding")
     lifecycle_ledger = validate_json_file("templates/profile-lifecycle-ledger.json", "profile-lifecycle-ledger")
 
+    assert source_queue_item["valid"] is True
+    assert source_queue["valid"] is True
     assert check["valid"] is True
     assert promotion["valid"] is True
     assert apply_plan["valid"] is True

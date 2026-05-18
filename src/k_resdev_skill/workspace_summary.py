@@ -19,6 +19,7 @@ from .profile_promotion_apply import generate_profile_promotion_apply_plan, load
 from .profile_promotion_revoke import load_profile_promotion_revoke_plan, load_profile_promotion_revoke_result
 from .profile_lifecycle import generate_profile_lifecycle_ledger
 from .profile_review import generate_profile_review
+from .profile_source_queue import generate_profile_source_queue
 from .profile_sources import generate_profile_integrity
 from .budget_ledger import generate_workspace_budget_ledger
 from .project_goals import generate_goals_review
@@ -59,6 +60,7 @@ def generate_workspace_summary(
     reference_corpus = build_reference_corpus(workspace)
     research_claim_matrix = generate_research_claim_matrix(workspace)
     profile_integrity = generate_profile_integrity(workspace)
+    profile_source_queue = generate_profile_source_queue(workspace)
     profile_review = generate_profile_review(workspace)
     profile_promotion = summarize_profile_promotions(workspace)
     profile_apply = generate_profile_promotion_apply_plan(workspace)
@@ -126,6 +128,9 @@ def generate_workspace_summary(
         profile_source_count=profile_integrity.source_count,
         profile_verified_source_count=profile_integrity.verified_source_count,
         profile_integrity_finding_count=profile_integrity.finding_count,
+        profile_source_queue_status=profile_source_queue.status,
+        profile_source_queue_item_count=profile_source_queue.queue_item_count,
+        profile_source_queue_high_count=profile_source_queue.high_count,
         profile_review_status=profile_review.status,
         profile_review_can_promote=profile_review.can_promote,
         profile_review_failed_count=profile_review.failed_count,
@@ -186,6 +191,8 @@ def render_workspace_summary_markdown(summary: WorkspaceSummaryResult) -> str:
         f"| Profile | {_escape(summary.profile_id or 'missing')} |",
         f"| Profile status | {_escape(summary.profile_status or 'missing')} |",
         f"| Profile integrity | {_escape(summary.profile_integrity_status or '-')} |",
+        f"| Profile source queue | {_escape(summary.profile_source_queue_status or '-')} |",
+        f"| Profile source queue items | {summary.profile_source_queue_item_count} |",
         f"| Profile review | {_escape(summary.profile_review_status or '-')} |",
         f"| Profile can promote | {summary.profile_review_can_promote} |",
         f"| Profile promotion | {_escape(summary.profile_promotion_status or '-')} |",
@@ -263,6 +270,7 @@ def render_workspace_summary_markdown(summary: WorkspaceSummaryResult) -> str:
         f"| Reference corpus | {summary.reference_corpus_count} | status: {_escape(summary.reference_corpus_status or '-')}; rejections: {summary.reference_rejection_count}; high: {summary.reference_corpus_high_count} |",
         f"| Research claim matrix | {summary.research_claim_count} | status: {_escape(summary.research_claim_matrix_status or '-')}; findings: {summary.research_claim_matrix_finding_count} |",
         f"| Profile integrity | {summary.profile_integrity_finding_count} | status: {_escape(summary.profile_integrity_status or '-')}; verified sources: {summary.profile_verified_source_count} |",
+        f"| Profile source queue | {summary.profile_source_queue_item_count} | status: {_escape(summary.profile_source_queue_status or '-')}; high: {summary.profile_source_queue_high_count} |",
         f"| Profile review | {summary.profile_review_failed_count} | status: {_escape(summary.profile_review_status or '-')}; can promote: {summary.profile_review_can_promote} |",
         f"| Profile promotion | {summary.profile_promotion_record_count} | status: {_escape(summary.profile_promotion_status or '-')}; latest decision: {_escape(summary.latest_profile_promotion_decision or '-')} |",
         f"| Profile promotion apply plan | {summary.profile_promotion_apply_change_count} | status: {_escape(summary.profile_promotion_apply_status or '-')}; can apply: {summary.profile_promotion_apply_can_apply} |",

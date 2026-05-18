@@ -29,6 +29,10 @@ SCHEMA_ALIASES = {
     "goals_review": "goals_review.schema.json",
     "profile-source": "profile_source.schema.json",
     "profile_source": "profile_source.schema.json",
+    "profile-source-queue": "profile_source_queue.schema.json",
+    "profile_source_queue": "profile_source_queue.schema.json",
+    "profile-source-queue-item": "profile_source_queue_item.schema.json",
+    "profile_source_queue_item": "profile_source_queue_item.schema.json",
     "profile-review": "profile_review.schema.json",
     "profile_review": "profile_review.schema.json",
     "profile-review-check": "profile_review_check.schema.json",
@@ -153,6 +157,7 @@ def _validation_targets(document: Any, schema_payload: dict[str, Any]) -> list[t
         "DashboardCard",
         "EvidenceItem",
         "ProfileSource",
+        "ProfileSourceQueueItem",
         "ProfileLifecycleLedgerEntry",
         "ProfileLifecycleLedgerFinding",
         "ProjectDeadline",
@@ -183,6 +188,8 @@ def _validation_targets(document: Any, schema_payload: dict[str, Any]) -> list[t
             return [(f"$.entries[{index}]", item) for index, item in enumerate(document["entries"])]
         if title == "ProfileLifecycleLedgerFinding" and isinstance(document, dict) and isinstance(document.get("findings"), list):
             return [(f"$.findings[{index}]", item) for index, item in enumerate(document["findings"])]
+        if title == "ProfileSourceQueueItem" and isinstance(document, dict) and isinstance(document.get("items"), list):
+            return [(f"$.items[{index}]", item) for index, item in enumerate(document["items"])]
         if isinstance(document, dict) and isinstance(document.get("items"), list):
             return [(f"$.items[{index}]", item) for index, item in enumerate(document["items"])]
         if title == "DashboardCard" and isinstance(document, dict) and isinstance(document.get("cards"), list):

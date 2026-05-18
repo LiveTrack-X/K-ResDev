@@ -82,6 +82,7 @@ def _actions_for_findings(root: Path, findings: list[WorkspaceDoctorFinding]) ->
         _action_for_budget_gaps(root, by_code),
         _action_for_budget_ledger(root, by_code),
         _action_for_profile(root, by_code),
+        _action_for_profile_source_queue(root, by_code),
         _action_for_profile_integrity(root, by_code),
         _action_for_profile_review(root, by_code),
         _action_for_profile_promotion(root, by_code),
@@ -265,6 +266,22 @@ def _action_for_profile_integrity(root: Path, by_code: dict[str, list[WorkspaceD
         "Review profile source integrity",
         "Agency/project profiles should stay needs_review until official-source records are hash-backed and human-reviewed.",
         f'python -m k_resdev_skill profile-integrity --root "{root}" --output "{root / "reports" / "profile-integrity.md"}" --json "{root / "state" / "profile-integrity.json"}"',
+        by_code,
+        codes,
+    )
+
+
+def _action_for_profile_source_queue(root: Path, by_code: dict[str, list[WorkspaceDoctorFinding]]) -> WorkspaceActionItem | None:
+    codes = ["profile_source_queue_high_findings", "profile_source_queue_review_findings"]
+    if not any(code in by_code for code in codes):
+        return None
+    priority = "high" if "profile_source_queue_high_findings" in by_code else "medium"
+    return _action(
+        root,
+        priority,
+        "Review profile source pack queue",
+        "Profile source packs should have URL/file locators, retrieval dates, hashes, reviewers, and resolved risk flags before promotion.",
+        f'python -m k_resdev_skill profile-source-queue --root "{root}" --output "{root / "reports" / "profile-source-queue.md"}" --json "{root / "state" / "profile-source-queue.json"}"',
         by_code,
         codes,
     )

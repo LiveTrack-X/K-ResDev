@@ -85,6 +85,7 @@ def _actions_for_findings(root: Path, findings: list[WorkspaceDoctorFinding]) ->
         _action_for_approval_coverage(root, by_code),
         _action_for_report_integrity(root, by_code),
         _action_for_bibliography_integrity(root, by_code),
+        _action_for_reference_corpus(root, by_code),
         _action_for_citation_support_integrity(root, by_code),
         _action_for_research_claim_matrix(root, by_code),
         _action_for_workspace_trace(root, by_code),
@@ -290,6 +291,22 @@ def _action_for_bibliography_integrity(root: Path, by_code: dict[str, list[Works
         "Review bibliography integrity",
         "Bibliography metadata and Markdown citation keys should be present, reviewed, and source-hash-consistent before external manuscript or report use.",
         f'python -m k_resdev_skill bib-integrity --root "{root}" --output "{root / "reports" / "bibliography-integrity.md"}" --json "{root / "state" / "bibliography-integrity.json"}"',
+        by_code,
+        codes,
+    )
+
+
+def _action_for_reference_corpus(root: Path, by_code: dict[str, list[WorkspaceDoctorFinding]]) -> WorkspaceActionItem | None:
+    codes = ["reference_corpus_high_findings", "reference_corpus_review_findings"]
+    if not any(code in by_code for code in codes):
+        return None
+    priority = "high" if "reference_corpus_high_findings" in by_code else "medium"
+    return _action(
+        root,
+        priority,
+        "Review reference corpus import",
+        "Local reference adapters may have unsupported files, duplicate metadata, or omitted copyright-risk text.",
+        f'python -m k_resdev_skill reference-corpus --root "{root}" --output "{root / "reports" / "reference-corpus-summary.md"}" --json "{root / "state" / "literature-corpus.json"}" --rejections "{root / "state" / "reference-rejection-log.json"}"',
         by_code,
         codes,
     )

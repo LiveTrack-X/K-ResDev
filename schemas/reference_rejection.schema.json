@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ReferenceCorpusRejection",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "rejection_id",
+    "adapter",
+    "source_file",
+    "reason",
+    "message",
+    "severity"
+  ],
+  "properties": {
+    "rejection_id": { "type": "string", "minLength": 1 },
+    "adapter": { "type": "string", "minLength": 1 },
+    "source_file": { "type": "string", "minLength": 1 },
+    "reason": { "type": "string", "minLength": 1 },
+    "message": { "type": "string", "minLength": 1 },
+    "severity": { "type": "string", "enum": ["high", "medium", "low"] },
+    "source_hash": { "type": ["string", "null"] },
+    "citation_key": { "type": ["string", "null"] },
+    "reference_id": { "type": ["string", "null"] },
+    "path": { "type": ["string", "null"] },
+    "metadata": { "type": "object" }
+  }
+}

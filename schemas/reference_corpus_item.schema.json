@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ReferenceCorpusItem",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "reference_id",
+    "adapter",
+    "source_file",
+    "source_format",
+    "status"
+  ],
+  "properties": {
+    "reference_id": { "type": "string", "minLength": 1 },
+    "adapter": { "type": "string", "minLength": 1 },
+    "source_file": { "type": "string", "minLength": 1 },
+    "source_hash": { "type": ["string", "null"] },
+    "source_format": { "type": "string", "minLength": 1 },
+    "citation_key": { "type": ["string", "null"] },
+    "title": { "type": ["string", "null"] },
+    "authors": { "type": "array", "items": { "type": "string" } },
+    "year": { "type": ["integer", "null"], "minimum": 1000, "maximum": 9999 },
+    "venue": { "type": ["string", "null"] },
+    "doi": { "type": ["string", "null"] },
+    "url": { "type": ["string", "null"] },
+    "keywords": { "type": "array", "items": { "type": "string" } },
+    "user_notes": { "type": ["string", "null"] },
+    "status": { "type": "string" },
+    "risk_flags": { "type": "array", "items": { "type": "string" } },
+    "metadata": { "type": "object" }
+  }
+}

@@ -21,6 +21,7 @@ from .models import (
     CitationSupportRecord,
     EvidenceItem,
     ProfileSource,
+    ReferenceCorpusItem,
     ResearchClaim,
     WorkspaceTraceEdge,
     WorkspaceTraceFinding,
@@ -28,6 +29,7 @@ from .models import (
     WorkspaceTraceResult,
 )
 from .profile_sources import load_profile_sources
+from .reference_corpus import build_reference_corpus
 from .research_claims import generate_research_claim_matrix, load_research_claims
 from .trace_passport import generate_trace_passport, load_checkpoint_entries
 
@@ -46,6 +48,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "profile-integrity.md",
     "profile-source-summary.md",
     "readiness.md",
+    "reference-corpus-summary.md",
     "research-claim-matrix.md",
     "research-claims.md",
     "report-integrity.md",
@@ -72,6 +75,7 @@ def generate_workspace_trace(
     builder.add_budget_ledger()
     builder.add_profile_sources()
     builder.add_bibliography()
+    builder.add_reference_corpus()
     builder.add_reports()
     builder.add_approvals()
     builder.add_bibliography_reviews()
@@ -181,6 +185,7 @@ class _TraceBuilder:
         self.budget_ledger_by_id: dict[str, BudgetLedgerItem] = {}
         self.bibliography_by_id: dict[str, BibliographyEntry] = {}
         self.bibliography_by_key: dict[str, BibliographyEntry] = {}
+        self.reference_corpus_by_id: dict[str, ReferenceCorpusItem] = {}
         self.citation_support_by_id: dict[str, CitationSupportRecord] = {}
         self.profile_sources_by_id: dict[str, ProfileSource] = {}
 
@@ -469,6 +474,42 @@ class _TraceBuilder:
                     path=entry.source_file,
                     suggested_action="Record a supplied bibliography review decision before external manuscript/report use.",
                 )
+
+    def add_reference_corpus(self) -> None:
+        corpus = build_reference_corpus(self.workspace)
+        if corpus.status == "not_configured":
+            return
+        for item in corpus.items:
+            self.reference_corpus_by_id[item.reference_id] = item
+            source_node = self.source_node(item.source_file, item.source_hash)
+            reference_node = self.node(
+                "reference",
+                item.reference_id,
+                item.title or item.reference_id,
+                ref_id=item.reference_id,
+                status=item.status,
+                path=item.source_file,
+                sha256=item.source_hash,
+                metadata={
+                    "adapter": item.adapter,
+                    "citation_key": item.citation_key,
+                    "doi": item.doi,
+                    "year": item.year,
+                    "risk_flags": item.risk_flags,
+                },
+            )
+            self.edge(source_node.node_id, reference_node.node_id, "reference_metadata_source")
+            if item.citation_key and item.citation_key in self.bibliography_by_key:
+                self.edge(reference_node.node_id, _node_id("bibliography", self.bibliography_by_key[item.citation_key].bibliography_id), "candidate_for_bibliography")
+        for rejection in corpus.rejections:
+            self.finding(
+                "trace_reference_corpus_rejection",
+                rejection.severity if rejection.severity in {"high", "medium", "low"} else "medium",
+                rejection.message,
+                node_id=_node_id("reference", rejection.reference_id) if rejection.reference_id else None,
+                path=rejection.source_file,
+                suggested_action="Run reference-corpus and review state/reference-rejection-log.json before bibliography promotion.",
+            )
 
     def add_bibliography_reviews(self) -> None:
         reviews_dir = self.workspace / "state" / "bibliography-reviews"

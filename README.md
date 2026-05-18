@@ -2,7 +2,7 @@
 
 Purpose: 한국형 국책 R&D 환경에서 연구 행정 문서화, 증빙 정합성, 보고서 생성, 논문/데이터 인사이트 보조를 evidence-first 방식으로 지원하는 Codex/Skill 프로젝트입니다.
 
-Current release: `0.1 BETA 27` (`0.1.0b27`).
+Current release: `0.1 BETA 28` (`0.1.0b28`).
 
 Core principle:
 
@@ -38,6 +38,7 @@ This repository does not encode any single ministry/institution form as authorit
 - Numeric evidence-mismatch detection when a report cites an evidence ID but uses unsupported numbers.
 - Paper card extraction from supplied metadata text without citation invention.
 - Bibliography management import for BibTeX/RIS/CSL JSON into `state/bibliography-index.*`, with optional literature matrix projection.
+- Reference corpus adapter bridge for local PDFs, Markdown notes/frontmatter, BibTeX/RIS/CSL JSON, and Zotero JSON exports into `state/literature-corpus.json` plus `state/reference-rejection-log.json`.
 - Bibliography review records for supplied human metadata decisions under `state/bibliography-reviews/`.
 - Bibliography integrity checker for Markdown citation keys, duplicate citation metadata, and bibliography source hash drift.
 - Citation support records for supplied human paper-claim support decisions under `state/citation-support/`.
@@ -64,7 +65,7 @@ This repository does not encode any single ministry/institution form as authorit
 - Workspace initializer and readiness doctor for standard local workspace setup and pre-reporting checks.
 - Workspace next-action planner that converts doctor findings into deterministic, reviewable commands.
 - Workspace summary report that combines readiness, next actions, evidence counts, approvals, reports, exports, and analysis manifests.
-- Workspace review pack command that refreshes readiness, next actions, workspace summary, budget-ledger, profile-integrity, source-verification, approval-coverage, report-integrity, bibliography-integrity, citation-support, research-claim-matrix, and workspace-trace artifacts together.
+- Workspace review pack command that refreshes readiness, next actions, workspace summary, budget-ledger, profile-integrity, source-verification, approval-coverage, report-integrity, bibliography-integrity, reference-corpus, citation-support, research-claim-matrix, and workspace-trace artifacts together.
 - Review pack artifact hash manifest and verifier for detecting missing or changed generated artifacts.
 - Evidence source verifier that checks indexed source files against saved source hashes.
 - Workspace doctor and review pack integration for local evidence-source presence/hash drift checks.
@@ -73,6 +74,7 @@ This repository does not encode any single ministry/institution form as authorit
 - Workspace doctor and review pack integration for report claim integrity findings.
 - Workspace doctor, next-action, summary, review-pack, and trace integration for budget ledger findings.
 - Workspace doctor and review pack integration for bibliography integrity findings.
+- Workspace doctor, next-action, summary, review-pack, and trace integration for reference corpus rejection logs.
 - Workspace doctor and review pack integration for citation support findings.
 - Workspace doctor, next-action, summary, review-pack, and trace integration for research claim matrix findings.
 - Workspace doctor, next-action, summary, and review-pack integration for profile source integrity findings.
@@ -103,6 +105,7 @@ python -m k_resdev_skill draft-report .\state\evidence-index.json --project-stat
 python -m k_resdev_skill audit-qna .\state\evidence-index.json
 python -m k_resdev_skill paper-card .\inbox\paper-notes.txt --markdown --output .\reports\paper-card.md
 python -m k_resdev_skill bib-import .\references\library.bib --state-dir .\state --literature-matrix .\reports\literature-review-matrix.md
+python -m k_resdev_skill reference-corpus --root . --output .\reports\reference-corpus-summary.md --json .\state\literature-corpus.json --rejections .\state\reference-rejection-log.json
 python -m k_resdev_skill bib-review-record --bibliography-id BIB-2026-ABCD1234 --decision accepted --reviewer reviewer-name --citation-key kim2026 --reviews-dir .\state\bibliography-reviews
 python -m k_resdev_skill bib-review-summary .\state\bibliography-reviews --output .\reports\bibliography-review-summary.md
 python -m k_resdev_skill bib-review-status .\state\bibliography-reviews --bibliography-id BIB-2026-ABCD1234
@@ -134,6 +137,9 @@ python -m k_resdev_skill validate-json profile-source .\state\profile-sources.js
 python -m k_resdev_skill validate-json budget-ledger .\state\budget-ledger.json
 python -m k_resdev_skill validate-json research-claim .\state\research-claims.json
 python -m k_resdev_skill validate-json checkpoint .\templates\trace-passport-entry.json
+python -m k_resdev_skill validate-json reference-corpus .\state\literature-corpus.json
+python -m k_resdev_skill validate-json reference-corpus-item .\templates\reference-corpus-item.json
+python -m k_resdev_skill validate-json reference-rejection .\state\reference-rejection-log.json
 python -m k_resdev_skill validate-json evidence .\state\evidence-index.json
 python -m k_resdev_skill validate-json bibliography-review .\templates\bibliography-review-record.json
 python -m k_resdev_skill approval-record --target-type report --target-id monthly-2026-05 --target-path .\reports\monthly-report-2026-05.md --decision needs_changes --reviewer reviewer-name --approvals-dir .\state\approvals

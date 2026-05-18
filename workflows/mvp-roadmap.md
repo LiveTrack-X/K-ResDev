@@ -23,7 +23,7 @@ P0 intake hardening now includes DOCX/XLSX/HWPX/PDF text extraction, optional HW
 5. Reproducibility checklist.
 6. Hypothesis-to-experiment planner.
 
-Status: paper card extraction, BibTeX/RIS/CSL JSON bibliography intake, bibliography review records, citation support records, bibliography integrity checks, citation-support integrity checks, research claim import/matrix checks, literature matrix, data insight candidate report, experiment comparison table, reproducibility checklist, and hypothesis-to-experiment planning are implemented. Generated experiment plans and research claims remain validation drafts unless human-reviewed.
+Status: paper card extraction, BibTeX/RIS/CSL JSON bibliography intake, reference corpus adapters for local PDFs/notes/Zotero exports, bibliography review records, citation support records, bibliography integrity checks, citation-support integrity checks, research claim import/matrix checks, literature matrix, data insight candidate report, experiment comparison table, reproducibility checklist, and hypothesis-to-experiment planning are implemented. Generated experiment plans and research claims remain validation drafts unless human-reviewed.
 
 ## P2 - Korean R&D specialization
 
@@ -65,4 +65,4 @@ Status: workspace traceability graph and impact review are implemented as a loca
 6. Local weekly review and workspace dashboard generated from K-ResDev artifacts.
 7. Thin workflow router for Admin, Research, Integrity, and Weekly review paths after concrete commands are stable.
 
-Status: trace passport and checkpoint ledger are implemented as a local first pass. The remaining workflow-layer items are specified in `workflows/external-academic-workflow-ideas-spec.md` and should continue to adapt external academic workflow ideas into K-ResDev-native, evidence-first behavior without vendoring external skill content.
+Status: trace passport/checkpoint ledger and reference corpus adapters are implemented as local first passes. The remaining workflow-layer items are specified in `workflows/external-academic-workflow-ideas-spec.md` and should continue to adapt external academic workflow ideas into K-ResDev-native, evidence-first behavior without vendoring external skill content.

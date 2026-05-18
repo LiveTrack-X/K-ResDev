@@ -96,6 +96,9 @@ from .models import (
     ProjectState,
     ProjectProfile,
     ProjectionExportResult,
+    ReferenceCorpusItem,
+    ReferenceCorpusRejection,
+    ReferenceCorpusResult,
     ReportDraftPaths,
     ReviewPackArtifact,
     ReviewPackVerificationItem,
@@ -145,6 +148,12 @@ from .profile_sources import (
 )
 from .profile_registry import generate_profile_registry, list_project_profiles, load_project_profile
 from .projection_export import export_projection, write_projection_docx, write_projection_html, write_projection_text
+from .reference_corpus import (
+    build_reference_corpus,
+    load_reference_corpus,
+    load_reference_rejections,
+    render_reference_corpus_summary,
+)
 from .report_integrity import generate_workspace_report_integrity, render_report_integrity_markdown
 from .research_claims import (
     generate_research_claim_matrix,
@@ -220,6 +229,9 @@ __all__ = [
     "ProjectState",
     "ProjectProfile",
     "ProjectionExportResult",
+    "ReferenceCorpusItem",
+    "ReferenceCorpusRejection",
+    "ReferenceCorpusResult",
     "ReportDraftPaths",
     "ReviewPackArtifact",
     "ReviewPackVerificationItem",
@@ -257,6 +269,7 @@ __all__ = [
     "approval_gate_status",
     "bibliography_review_status",
     "budget_evidence_gaps",
+    "build_reference_corpus",
     "citation_support_status",
     "create_approval_record",
     "create_bibliography_review_record",
@@ -316,6 +329,8 @@ __all__ = [
     "load_evidence_index",
     "load_project_profile",
     "load_profile_sources",
+    "load_reference_corpus",
+    "load_reference_rejections",
     "load_research_claims",
     "load_checkpoint_entries",
     "profile_data_file",
@@ -338,6 +353,7 @@ __all__ = [
     "render_evidence_source_verification_markdown",
     "render_profile_integrity_markdown",
     "render_profile_source_summary_markdown",
+    "render_reference_corpus_summary",
     "render_report_integrity_markdown",
     "render_research_claim_matrix_markdown",
     "render_research_claims_markdown",
@@ -365,4 +381,4 @@ __all__ = [
     "write_research_claims",
 ]
 
-__version__ = "0.1.0b27"
+__version__ = "0.1.0b28"

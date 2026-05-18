@@ -20,6 +20,7 @@ from .models import (
 )
 from .profile_registry import default_agency_templates_root, load_project_profile
 from .profile_sources import generate_profile_integrity
+from .reference_corpus import build_reference_corpus
 from .research_claims import generate_research_claim_matrix
 from .report_integrity import generate_workspace_report_integrity
 from .schema_tools import validate_json_file
@@ -55,6 +56,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "profile-integrity.md",
     "profile-source-summary.md",
     "readiness.md",
+    "reference-corpus-summary.md",
     "research-claim-matrix.md",
     "research-claims.md",
     "report-integrity.md",
@@ -152,6 +154,7 @@ def run_workspace_doctor(
     _check_reports(workspace, findings)
     _check_report_integrity(workspace, findings)
     _check_bibliography_integrity(workspace, findings)
+    _check_reference_corpus(workspace, findings)
     _check_citation_support_integrity(workspace, findings)
     _check_research_claim_matrix(workspace, findings)
     _check_workspace_trace(workspace, findings)
@@ -573,6 +576,33 @@ def _check_bibliography_integrity(workspace: Path, findings: list[WorkspaceDocto
         )
 
 
+def _check_reference_corpus(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> None:
+    result = build_reference_corpus(workspace)
+    if result.status == "not_configured":
+        return
+    path = workspace / "state" / "literature-corpus.json"
+    if result.high_count:
+        findings.append(
+            _finding(
+                "reference_corpus_high_findings",
+                "high",
+                f"{result.high_count} high-severity reference corpus rejection(s) were detected.",
+                path,
+                "Run reference-corpus and resolve unreadable or invalid local reference files before using the corpus.",
+            )
+        )
+    if result.medium_count or result.low_count or result.warnings:
+        findings.append(
+            _finding(
+                "reference_corpus_review_findings",
+                "medium",
+                f"{result.medium_count + result.low_count} reference corpus review rejection(s) or warnings were detected.",
+                path,
+                "Review reference-corpus-summary and reference-rejection-log before using imported metadata.",
+            )
+        )
+
+
 def _check_citation_support_integrity(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> None:
     result = generate_workspace_citation_support_integrity(workspace)
     if result.status == "not_configured":
@@ -781,6 +811,7 @@ def _starter_readme(project_id: str, title: str, profile_id: str) -> str:
             "- Put BibTeX/RIS/CSL JSON bibliography files in `references/`.",
             "- Run `k-resdev intake --inbox inbox --state-dir state --evidence-dir evidence` to build evidence metadata.",
             "- Run `k-resdev bib-import references/library.bib --state-dir state --literature-matrix reports/literature-review-matrix.md` to build bibliography metadata.",
+            "- Run `k-resdev reference-corpus --root . --output reports/reference-corpus-summary.md --json state/literature-corpus.json --rejections state/reference-rejection-log.json` to scan local PDFs, Zotero JSON exports, and Markdown notes into a reviewable corpus.",
             "- Run `k-resdev bib-review-record --bibliography-id <BIB-ID> --decision accepted --reviewer <reviewer> --reviews-dir state/bibliography-reviews` to record supplied bibliography metadata review decisions.",
             "- Run `k-resdev bib-integrity --root . --output reports/bibliography-integrity.md --json state/bibliography-integrity.json` to check citation keys and bibliography source hashes.",
             "- Run `k-resdev citation-support-record --bibliography-id <BIB-ID> --citation-key <key> --claim \"<claim>\" --decision needs_review --reviewer <reviewer> --support-dir state/citation-support` to record paper-claim support decisions.",
@@ -796,7 +827,7 @@ def _starter_readme(project_id: str, title: str, profile_id: str) -> str:
             "- Run `k-resdev checkpoint-resume-plan --root . --output reports/checkpoint-resume-plan.md --json state/checkpoint-resume-plan.json` before resuming from a saved checkpoint.",
             "- Run `k-resdev doctor --root . --output reports/readiness.md --json state/readiness.json` before reporting.",
             "- Run `k-resdev workspace-summary --root . --output reports/workspace-summary.md --json state/workspace-summary.json` for a one-page status handoff.",
-            "- Run `k-resdev workspace-review-pack --root .` to refresh readiness, next actions, summary, source-verification, budget-ledger, approval-coverage, report-integrity, bibliography-integrity, citation-support, research-claim-matrix, trace-passport, and trace artifacts together.",
+            "- Run `k-resdev workspace-review-pack --root .` to refresh readiness, next actions, summary, source-verification, budget-ledger, approval-coverage, report-integrity, bibliography-integrity, reference-corpus, citation-support, research-claim-matrix, trace-passport, and trace artifacts together.",
             "- Run `k-resdev verify-review-pack state/workspace-review-pack.json` to check saved review-pack artifact hashes.",
             "- Run `k-resdev verify-evidence-sources state/evidence-index.json --root . --output reports/source-verification.md --json state/source-verification.json` to check indexed source hashes.",
             "- Run `k-resdev approval-coverage --root . --output reports/approval-coverage.md --json state/approval-coverage.json` to check report approval coverage.",

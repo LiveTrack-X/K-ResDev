@@ -395,21 +395,20 @@ Safety rule:
 
 ## Implementation Order
 
-Recommended order after the traceability graph, research-claim matrix, and trace-passport first passes:
+Recommended order after the traceability graph, research-claim matrix, trace-passport, and corpus-adapter first passes:
 
-1. Implement corpus adapter bridge for folder, Zotero JSON export, and Markdown notes.
+1. Implement workspace discovery and setup proposal.
 2. Add `artifact_authority_level` to trace nodes and generated artifact metadata.
-3. Implement workspace discovery and setup proposal.
-4. Implement goals/deadline operating file and goals review.
-5. Implement local weekly review and dashboard.
-6. Add thin workflow router only after the concrete commands are stable.
+3. Implement goals/deadline operating file and goals review.
+4. Implement local weekly review and dashboard.
+5. Add thin workflow router only after the concrete commands are stable.
 
 ## Open Questions
 
 1. Should `project-goals.json` be a new file, or should it extend `project-state.json`?
 2. Should `workspace-review-pack` stay checkpoint-neutral, or should a separate opt-in flag create a checkpoint?
 3. Should artifact authority levels be represented as trace-node metadata only, or also as a standalone schema for generated artifacts?
-4. Should Zotero import support only exported files, or later add an optional Web API connector?
+4. Should Zotero support stay exported-file only for 0.x, or later add an optional Web API connector behind an explicit flag?
 5. Should weekly review stay Markdown-only, or should DOCX/HTML export be added after the projection exporter?
 
 ## Traceability To Planned Tasks
@@ -421,7 +420,7 @@ Recommended order after the traceability graph, research-claim matrix, and trace
 | Budget ledger | Task 34 |
 | Research claim matrix | Task 35 |
 | Trace passport and checkpoints | Task 37 |
-| Corpus adapter bridge | New Task 38 |
+| Corpus adapter bridge | Task 38 |
 | Workspace discovery and setup proposal | New Task 39 |
 | Goals/deadline operating file | New Task 39 |
 | Local weekly review and dashboard | New Task 40 |

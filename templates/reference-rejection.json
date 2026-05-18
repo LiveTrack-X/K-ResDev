@@ -1,0 +1,15 @@
+{
+  "rejection_id": "RRJ-0000000000",
+  "adapter": "zotero-json",
+  "source_file": "references/zotero-export.json",
+  "reason": "copyright_risk_text_omitted",
+  "message": "Long abstract or note text was omitted from the corpus index.",
+  "severity": "low",
+  "source_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "citation_key": "kim2026",
+  "reference_id": null,
+  "path": "references/zotero-export.json",
+  "metadata": {
+    "field": "abstractNote"
+  }
+}

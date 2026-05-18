@@ -55,6 +55,7 @@ from .profile_sources import (
 )
 from .profile_registry import generate_profile_registry, list_project_profiles, load_project_profile
 from .projection_export import export_projection
+from .reference_corpus import build_reference_corpus
 from .report_integrity import generate_workspace_report_integrity
 from .research_claims import generate_research_claim_matrix, import_research_claims, load_research_claims, render_research_claims_markdown
 from .research_assistant import (
@@ -134,6 +135,13 @@ def main(argv: list[str] | None = None) -> int:
     bib_integrity_parser.add_argument("--root", default=".")
     bib_integrity_parser.add_argument("--output", default=None)
     bib_integrity_parser.add_argument("--json", default=None)
+
+    reference_corpus_parser = subparsers.add_parser("reference-corpus", help="Scan local reference files into a reviewable corpus and rejection log.")
+    reference_corpus_parser.add_argument("--root", default=".")
+    reference_corpus_parser.add_argument("--references", default=None)
+    reference_corpus_parser.add_argument("--output", default=None)
+    reference_corpus_parser.add_argument("--json", default=None)
+    reference_corpus_parser.add_argument("--rejections", default=None)
 
     bib_review_record_parser = subparsers.add_parser("bib-review-record", help="Record a supplied human bibliography metadata review decision.")
     bib_review_record_parser.add_argument("--bibliography-id", required=True)
@@ -404,7 +412,7 @@ def main(argv: list[str] | None = None) -> int:
 
     review_pack_parser = subparsers.add_parser(
         "workspace-review-pack",
-        help="Generate readiness, next-action, summary, profile, source, approval, report, bibliography, citation-support, trace-passport, and trace artifacts in one local review pack.",
+        help="Generate readiness, next-action, summary, profile, source, approval, report, bibliography, reference-corpus, citation-support, trace-passport, and trace artifacts in one local review pack.",
     )
     review_pack_parser.add_argument("--root", default=".")
     review_pack_parser.add_argument("--reports-dir", default=None)
@@ -486,6 +494,16 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if args.command == "bib-integrity":
         result = generate_workspace_bibliography_integrity(args.root, output_path=args.output, json_path=args.json)
+        print(result.model_dump_json(indent=2))
+        return 0
+    if args.command == "reference-corpus":
+        result = build_reference_corpus(
+            args.root,
+            references_dir=args.references,
+            output_path=args.output,
+            json_path=args.json,
+            rejection_json_path=args.rejections,
+        )
         print(result.model_dump_json(indent=2))
         return 0
     if args.command == "bib-review-record":

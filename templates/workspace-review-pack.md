@@ -1,6 +1,6 @@
 # K-ResDev Workspace Review Pack
 
-> Review pack projection only. It bundles local readiness, next-action, summary, source-verification, budget-ledger, approval-coverage, report-integrity, bibliography-integrity, citation-support, research-claim-matrix, trace-passport, profile-integrity, and trace artifacts; it does not certify official agency compliance.
+> Review pack projection only. It bundles local readiness, next-action, summary, source-verification, budget-ledger, approval-coverage, report-integrity, bibliography-integrity, reference-corpus, citation-support, research-claim-matrix, trace-passport, profile-integrity, and trace artifacts; it does not certify official agency compliance.
 
 | Field | Value |
 |---|---|
@@ -31,6 +31,10 @@
 | Bibliography citation count | `{{bibliography_citation_count}}` |
 | Bibliography integrity finding count | `{{bibliography_integrity_finding_count}}` |
 | Bibliography integrity high count | `{{bibliography_integrity_high_count}}` |
+| Reference corpus status | `{{reference_corpus_status}}` |
+| Reference corpus count | `{{reference_corpus_count}}` |
+| Reference rejection count | `{{reference_rejection_count}}` |
+| Reference corpus high count | `{{reference_corpus_high_count}}` |
 | Citation support status | `{{citation_support_status}}` |
 | Citation support records | `{{citation_support_count}}` |
 | Citation support citation count | `{{citation_support_citation_count}}` |
@@ -65,6 +69,7 @@
 | Report integrity | `reports/report-integrity.md` |
 | Budget ledger integrity | `reports/budget-ledger.md` |
 | Bibliography integrity | `reports/bibliography-integrity.md` |
+| Reference corpus summary | `reports/reference-corpus-summary.md` |
 | Citation support | `reports/citation-support.md` |
 | Research claim matrix | `reports/research-claim-matrix.md` |
 | Profile integrity | `reports/profile-integrity.md` |

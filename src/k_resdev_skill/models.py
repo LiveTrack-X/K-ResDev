@@ -422,6 +422,71 @@ class BibliographyImportResult(StrictModel):
     warnings: list[str] = Field(default_factory=list)
 
 
+class ReferenceCorpusItem(StrictModel):
+    reference_id: str
+    adapter: str
+    source_file: str
+    source_hash: str | None = None
+    source_format: str
+    citation_key: str | None = None
+    title: str | None = None
+    authors: list[str] = Field(default_factory=list)
+    year: int | None = None
+    venue: str | None = None
+    doi: str | None = None
+    url: str | None = None
+    keywords: list[str] = Field(default_factory=list)
+    user_notes: str | None = None
+    status: str = "needs_review"
+    risk_flags: list[str] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+    @field_validator("reference_id", "adapter", "source_file", "source_format")
+    @classmethod
+    def _must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
+class ReferenceCorpusRejection(StrictModel):
+    rejection_id: str
+    adapter: str
+    source_file: str
+    reason: str
+    message: str
+    severity: str = "medium"
+    source_hash: str | None = None
+    citation_key: str | None = None
+    reference_id: str | None = None
+    path: str | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+    @field_validator("rejection_id", "adapter", "source_file", "reason", "message")
+    @classmethod
+    def _must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
+class ReferenceCorpusResult(StrictModel):
+    root: str
+    references_dir: str
+    status: str
+    item_count: int = 0
+    rejection_count: int = 0
+    high_count: int = 0
+    medium_count: int = 0
+    low_count: int = 0
+    items: list[ReferenceCorpusItem] = Field(default_factory=list)
+    rejections: list[ReferenceCorpusRejection] = Field(default_factory=list)
+    summary_markdown_path: str | None = None
+    corpus_json_path: str | None = None
+    rejection_log_json_path: str | None = None
+    warnings: list[str] = Field(default_factory=list)
+
+
 class BibliographyReviewRecord(StrictModel):
     review_id: str
     bibliography_id: str
@@ -703,6 +768,10 @@ class WorkspaceSummaryResult(StrictModel):
     budget_ledger_count: int = 0
     budget_ledger_finding_count: int = 0
     budget_total_by_currency: dict[str, float] = Field(default_factory=dict)
+    reference_corpus_status: str | None = None
+    reference_corpus_count: int = 0
+    reference_rejection_count: int = 0
+    reference_corpus_high_count: int = 0
     research_claim_matrix_status: str | None = None
     research_claim_count: int = 0
     research_claim_matrix_finding_count: int = 0
@@ -913,6 +982,10 @@ class WorkspaceReviewPackResult(StrictModel):
     bibliography_citation_count: int = 0
     bibliography_integrity_finding_count: int = 0
     bibliography_integrity_high_count: int = 0
+    reference_corpus_status: str | None = None
+    reference_corpus_count: int = 0
+    reference_rejection_count: int = 0
+    reference_corpus_high_count: int = 0
     citation_support_status: str | None = None
     citation_support_count: int = 0
     citation_support_citation_count: int = 0

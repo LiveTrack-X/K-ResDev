@@ -100,3 +100,21 @@ def test_trace_passport_entry_template_matches_json_schema():
         sample = json.load(handle)
 
     jsonschema.validate(sample, schema)
+
+
+def test_reference_corpus_item_template_matches_json_schema():
+    with open("schemas/reference_corpus_item.schema.json", encoding="utf-8") as handle:
+        schema = json.load(handle)
+    with open("templates/reference-corpus-item.json", encoding="utf-8") as handle:
+        sample = json.load(handle)
+
+    jsonschema.validate(sample, schema)
+
+
+def test_reference_rejection_template_matches_json_schema():
+    with open("schemas/reference_rejection.schema.json", encoding="utf-8") as handle:
+        schema = json.load(handle)
+    with open("templates/reference-rejection.json", encoding="utf-8") as handle:
+        sample = json.load(handle)
+
+    jsonschema.validate(sample, schema)

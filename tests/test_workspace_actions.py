@@ -143,6 +143,27 @@ def test_workspace_action_plan_maps_bibliography_integrity_findings(tmp_path):
     assert "bib-integrity" in (action.command or "")
 
 
+def test_workspace_action_plan_maps_reference_corpus_findings(tmp_path):
+    doctor_result = WorkspaceDoctorResult(
+        root=str(tmp_path),
+        status="needs_review",
+        findings=[
+            WorkspaceDoctorFinding(
+                code="reference_corpus_review_findings",
+                severity="medium",
+                message="reference corpus issue",
+                path=str(tmp_path / "state" / "literature-corpus.json"),
+            )
+        ],
+    )
+
+    plan = generate_workspace_action_plan(tmp_path, doctor_result=doctor_result)
+    action = next(item for item in plan.actions if item.title == "Review reference corpus import")
+
+    assert action.priority == "medium"
+    assert "reference-corpus" in (action.command or "")
+
+
 def test_workspace_action_plan_maps_citation_support_findings(tmp_path):
     doctor_result = WorkspaceDoctorResult(
         root=str(tmp_path),

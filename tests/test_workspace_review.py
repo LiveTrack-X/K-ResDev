@@ -32,6 +32,9 @@ def test_workspace_review_pack_writes_all_review_artifacts(tmp_path):
         tmp_path / "state" / "budget-ledger-integrity.json",
         tmp_path / "reports" / "bibliography-integrity.md",
         tmp_path / "state" / "bibliography-integrity.json",
+        tmp_path / "reports" / "reference-corpus-summary.md",
+        tmp_path / "state" / "literature-corpus.json",
+        tmp_path / "state" / "reference-rejection-log.json",
         tmp_path / "reports" / "citation-support.md",
         tmp_path / "state" / "citation-support.json",
         tmp_path / "reports" / "research-claim-matrix.md",
@@ -59,6 +62,9 @@ def test_workspace_review_pack_writes_all_review_artifacts(tmp_path):
     assert result.bibliography_integrity_status == "not_configured"
     assert result.bibliography_review_count == 0
     assert result.bibliography_integrity_finding_count == 0
+    assert result.reference_corpus_status == "not_configured"
+    assert result.reference_corpus_count == 0
+    assert result.reference_rejection_count == 0
     assert result.citation_support_status == "not_configured"
     assert result.citation_support_count == 0
     assert result.citation_support_finding_count == 0
@@ -82,6 +88,7 @@ def test_workspace_review_pack_writes_all_review_artifacts(tmp_path):
     assert "Report integrity status" in rendered
     assert "Budget ledger status" in rendered
     assert "Bibliography integrity status" in rendered
+    assert "Reference corpus status" in rendered
     assert "Citation support status" in rendered
     assert "Research claim matrix status" in rendered
     assert "Profile integrity status" in rendered
@@ -97,6 +104,7 @@ def test_workspace_review_pack_writes_all_review_artifacts(tmp_path):
     assert json.loads((tmp_path / "state" / "report-integrity.json").read_text(encoding="utf-8"))["status"] == "no_reports"
     assert json.loads((tmp_path / "state" / "budget-ledger-integrity.json").read_text(encoding="utf-8"))["status"] == "not_configured"
     assert json.loads((tmp_path / "state" / "bibliography-integrity.json").read_text(encoding="utf-8"))["status"] == "not_configured"
+    assert json.loads((tmp_path / "state" / "literature-corpus.json").read_text(encoding="utf-8"))["status"] == "not_configured"
     assert json.loads((tmp_path / "state" / "citation-support.json").read_text(encoding="utf-8"))["status"] == "not_configured"
     assert json.loads((tmp_path / "state" / "research-claim-matrix.json").read_text(encoding="utf-8"))["status"] == "not_configured"
     assert json.loads((tmp_path / "state" / "profile-integrity.json").read_text(encoding="utf-8"))["status"] == "needs_review"
@@ -119,6 +127,7 @@ def test_workspace_review_pack_cli(tmp_path, capsys):
     assert (tmp_path / "reports" / "report-integrity.md").exists()
     assert (tmp_path / "reports" / "budget-ledger.md").exists()
     assert (tmp_path / "reports" / "bibliography-integrity.md").exists()
+    assert (tmp_path / "reports" / "reference-corpus-summary.md").exists()
     assert (tmp_path / "reports" / "citation-support.md").exists()
     assert (tmp_path / "reports" / "research-claim-matrix.md").exists()
     assert (tmp_path / "reports" / "profile-integrity.md").exists()
@@ -154,6 +163,7 @@ def test_operational_markdown_does_not_satisfy_report_draft_check(tmp_path):
         "report-integrity.md",
         "budget-ledger.md",
         "bibliography-integrity.md",
+        "reference-corpus-summary.md",
         "citation-support.md",
         "citation-support-summary.md",
         "research-claim-matrix.md",

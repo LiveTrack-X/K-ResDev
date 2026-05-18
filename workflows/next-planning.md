@@ -1,12 +1,12 @@
 # K-ResDev Next Planning
 
-This planning note starts after `0.1.0b27`.
+This planning note starts after `0.1.0b28`.
 
 ## Current Diagnosis
 
-K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, budget ledger review, bibliography metadata, bibliography review, citation support, research claim matrices, profile source records, profile integrity, workspace traceability graph, trace passport checkpoints, workspace doctor, next actions, workspace summary, and review packs.
+K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, budget ledger review, bibliography metadata, reference corpus adapters, bibliography review, citation support, research claim matrices, profile source records, profile integrity, workspace traceability graph, trace passport checkpoints, workspace doctor, next actions, workspace summary, and review packs.
 
-The next bottleneck is expanding the research-reference operating layer without weakening the evidence-first boundary. A real R&D workspace next needs local corpus adapters, explicit rejection logs, artifact authority levels, and eventually verified agency profile packs based on current official sources.
+The next bottleneck is read-only workspace discovery and setup planning without weakening the evidence-first boundary. A real R&D workspace next needs folder discovery, setup/migration proposals, explicit artifact authority levels, and eventually verified agency profile packs based on current official sources.
 
 ## Planning Principles
 
@@ -135,6 +135,8 @@ Safety boundary:
 
 Goal: extend bibliography intake into local corpus adapters while keeping rejection logs explicit and non-fabricating.
 
+Status: implemented as a local first pass in `src/k_resdev_skill/reference_corpus.py`, with CLI/API, schema/template, doctor, next-action, summary, review-pack, and trace integration.
+
 Expected scope:
 - folder scan adapter for local PDFs/notes;
 - Zotero exported JSON adapter, not the Zotero Web API by default;
@@ -180,6 +182,6 @@ These should wait until traceability, impact analysis, and verified profile sour
 
 ## Recommended Next Slice
 
-Implement Beta 28 next.
+Implement Beta 29 next.
 
-Beta 28 should add a reference corpus adapter bridge so local PDFs, exported Zotero JSON, and Markdown notes can be scanned into reviewable metadata and rejection logs without default Web API access or fabricated citation details.
+Beta 29 should add read-only workspace discovery and setup planning so a new or messy R&D folder can be inspected before initialization or migration. Discovery should produce additive setup proposals only and must not alter raw files by default.

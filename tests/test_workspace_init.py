@@ -35,6 +35,7 @@ def test_initialize_workspace_creates_standard_layout(tmp_path):
     assert "profile_needs_review" in result.warnings
     assert "Evidence is source of truth" in readme
     assert "bib-import" in readme
+    assert "reference-corpus" in readme
     assert "bib-review-record" in readme
     assert "bib-integrity" in readme
     assert "citation-support-record" in readme

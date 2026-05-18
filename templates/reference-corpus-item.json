@@ -1,0 +1,19 @@
+{
+  "reference_id": "REF-2026-0000000000",
+  "adapter": "markdown-note",
+  "source_file": "references/example-paper.md",
+  "source_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "source_format": "md",
+  "citation_key": "kim2026",
+  "title": "Example Paper Title",
+  "authors": ["Kim, A."],
+  "year": 2026,
+  "venue": "Example Venue",
+  "doi": null,
+  "url": null,
+  "keywords": ["needs_review"],
+  "user_notes": "Short user-authored note only.",
+  "status": "needs_review",
+  "risk_flags": ["needs_human_review"],
+  "metadata": {}
+}

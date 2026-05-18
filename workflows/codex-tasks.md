@@ -393,12 +393,13 @@ Trace passports are resume aids only. They must not copy raw restricted source b
 
 ### Task 38: Reference corpus adapter bridge
 
-Planned:
-- local folder scan adapter for PDFs and notes
-- Zotero exported JSON adapter without default Web API access
-- Markdown note/frontmatter adapter
+Implemented:
+- local folder scan adapter for PDFs, BibTeX/RIS/CSL JSON files, and Markdown/TXT notes
+- Zotero exported JSON adapter without Web API access
+- Markdown note/frontmatter adapter for user-supplied metadata and short user notes
 - `state/literature-corpus.json`, `state/reference-rejection-log.json`, and `reports/reference-corpus-summary.md`
-- deterministic rejection reasons for missing metadata, duplicate keys, invalid fields, unsupported files, and copyright-risk text fields
+- deterministic rejection-log entries for duplicate references, invalid citation keys, unsupported files, unreadable files, and copyright-risk text fields that are omitted
+- workspace doctor, next-action, summary, review-pack, schema, template, and trace integration
 
 Adapters must never fabricate citation metadata, paper relevance, or claim support.
 

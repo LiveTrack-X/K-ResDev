@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ReferenceCorpusResult",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "root",
+    "references_dir",
+    "status",
+    "item_count",
+    "rejection_count",
+    "items",
+    "rejections"
+  ],
+  "properties": {
+    "root": { "type": "string" },
+    "references_dir": { "type": "string" },
+    "status": { "type": "string" },
+    "item_count": { "type": "integer", "minimum": 0 },
+    "rejection_count": { "type": "integer", "minimum": 0 },
+    "high_count": { "type": "integer", "minimum": 0 },
+    "medium_count": { "type": "integer", "minimum": 0 },
+    "low_count": { "type": "integer", "minimum": 0 },
+    "items": { "type": "array", "items": { "type": "object" } },
+    "rejections": { "type": "array", "items": { "type": "object" } },
+    "summary_markdown_path": { "type": ["string", "null"] },
+    "corpus_json_path": { "type": ["string", "null"] },
+    "rejection_log_json_path": { "type": ["string", "null"] },
+    "warnings": { "type": "array", "items": { "type": "string" } }
+  }
+}

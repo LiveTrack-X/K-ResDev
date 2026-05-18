@@ -75,6 +75,14 @@ def test_validate_json_file_accepts_checkpoint_alias():
     assert result["error_count"] == 0
 
 
+def test_validate_json_file_accepts_reference_aliases():
+    item = validate_json_file("templates/reference-corpus-item.json", "reference-corpus-item")
+    rejection = validate_json_file("templates/reference-rejection.json", "reference-rejection")
+
+    assert item["valid"] is True
+    assert rejection["valid"] is True
+
+
 def test_validate_json_cli_returns_nonzero_for_invalid(tmp_path, capsys):
     path = tmp_path / "bad-approval.json"
     path.write_text(json.dumps({"approval_id": "APR-2026-BAD"}), encoding="utf-8")

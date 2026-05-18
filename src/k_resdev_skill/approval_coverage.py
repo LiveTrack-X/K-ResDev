@@ -20,6 +20,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "evidence-bundle-index.md",
     "profile-integrity.md",
     "profile-source-summary.md",
+    "reference-corpus-summary.md",
     "research-claim-matrix.md",
     "research-claims.md",
     "report-integrity.md",

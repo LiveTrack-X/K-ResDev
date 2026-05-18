@@ -1,0 +1,16 @@
+{
+  "source_id": "PSRC-NEEDS-REVIEW",
+  "profile_id": "national-rnd-basic",
+  "title": "Official source title needs_review",
+  "source_url": null,
+  "source_file": null,
+  "retrieved_at": null,
+  "source_hash": null,
+  "source_size_bytes": null,
+  "verified_by": null,
+  "review_status": "needs_review",
+  "validity_notes": "Record official source metadata; this template does not certify agency rules.",
+  "risk_flags": [
+    "needs_review"
+  ]
+}

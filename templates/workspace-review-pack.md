@@ -1,6 +1,6 @@
 # K-ResDev Workspace Review Pack
 
-> Review pack projection only. It bundles local readiness, next-action, summary, source-verification, approval-coverage, report-integrity, bibliography-integrity, and citation-support artifacts; it does not certify official agency compliance.
+> Review pack projection only. It bundles local readiness, next-action, summary, source-verification, approval-coverage, report-integrity, bibliography-integrity, citation-support, profile-integrity, and trace artifacts; it does not certify official agency compliance.
 
 | Field | Value |
 |---|---|
@@ -32,6 +32,13 @@
 | Citation support citation count | `{{citation_support_citation_count}}` |
 | Citation support finding count | `{{citation_support_finding_count}}` |
 | Citation support high count | `{{citation_support_high_count}}` |
+| Profile integrity status | `{{profile_integrity_status}}` |
+| Profile source count | `{{profile_source_count}}` |
+| Profile verified source count | `{{profile_verified_source_count}}` |
+| Profile integrity finding count | `{{profile_integrity_finding_count}}` |
+| Profile integrity high count | `{{profile_integrity_high_count}}` |
+| Workspace trace status | `{{workspace_trace_status}}` |
+| Workspace trace finding count | `{{workspace_trace_finding_count}}` |
 
 ## Generated Artifacts
 
@@ -45,6 +52,8 @@
 | Report integrity | `reports/report-integrity.md` |
 | Bibliography integrity | `reports/bibliography-integrity.md` |
 | Citation support | `reports/citation-support.md` |
+| Profile integrity | `reports/profile-integrity.md` |
+| Workspace trace | `reports/workspace-trace.md` |
 | Review pack index | `reports/workspace-review-pack.md` |
 
 ## Manifest

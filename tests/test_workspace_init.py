@@ -22,6 +22,7 @@ def test_initialize_workspace_creates_standard_layout(tmp_path):
 
     state = json.loads((tmp_path / "state" / "project-state.json").read_text(encoding="utf-8"))
     profile = json.loads((tmp_path / "state" / "project-profile.json").read_text(encoding="utf-8"))
+    profile_sources = json.loads((tmp_path / "state" / "profile-sources.json").read_text(encoding="utf-8"))
     readme = (tmp_path / "README.k-resdev.md").read_text(encoding="utf-8")
 
     assert state["project_id"] == "PRJ-2026-0001"
@@ -29,6 +30,7 @@ def test_initialize_workspace_creates_standard_layout(tmp_path):
     assert state["period"] == "needs_review"
     assert profile["profile_id"] == "national-rnd-basic"
     assert profile["status"] == "needs_review"
+    assert profile_sources == []
     assert "profile_needs_review" in result.warnings
     assert "Evidence is source of truth" in readme
     assert "bib-import" in readme
@@ -36,6 +38,8 @@ def test_initialize_workspace_creates_standard_layout(tmp_path):
     assert "bib-integrity" in readme
     assert "citation-support-record" in readme
     assert "citation-support-integrity" in readme
+    assert "profile-source-record" in readme
+    assert "profile-integrity" in readme
     assert "workspace-summary" in readme
     assert "workspace-review-pack" in readme
     assert "verify-review-pack" in readme
@@ -75,3 +79,4 @@ def test_init_workspace_cli(tmp_path, capsys):
     payload = json.loads(capsys.readouterr().out)
     assert payload["project_id"] == "PRJ-2026-0001"
     assert (tmp_path / "state" / "project-profile.json").exists()
+    assert (tmp_path / "state" / "profile-sources.json").exists()

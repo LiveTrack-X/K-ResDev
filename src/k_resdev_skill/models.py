@@ -560,6 +560,10 @@ class WorkspaceSummaryResult(StrictModel):
     report_paths: list[str] = Field(default_factory=list)
     export_paths: list[str] = Field(default_factory=list)
     analysis_manifest_paths: list[str] = Field(default_factory=list)
+    profile_integrity_status: str | None = None
+    profile_source_count: int = 0
+    profile_verified_source_count: int = 0
+    profile_integrity_finding_count: int = 0
     trace_status: str | None = None
     trace_node_count: int = 0
     trace_edge_count: int = 0
@@ -686,6 +690,11 @@ class WorkspaceReviewPackResult(StrictModel):
     citation_support_citation_count: int = 0
     citation_support_finding_count: int = 0
     citation_support_high_count: int = 0
+    profile_integrity_status: str | None = None
+    profile_source_count: int = 0
+    profile_verified_source_count: int = 0
+    profile_integrity_finding_count: int = 0
+    profile_integrity_high_count: int = 0
     workspace_trace_status: str | None = None
     workspace_trace_node_count: int = 0
     workspace_trace_edge_count: int = 0
@@ -741,6 +750,73 @@ class ProjectProfile(StrictModel):
     field_map: dict[str, str] = Field(default_factory=dict)
     status: str = "needs_review"
     notes: str | None = None
+
+
+class ProfileSource(StrictModel):
+    source_id: str
+    profile_id: str
+    title: str
+    source_url: str | None = None
+    source_file: str | None = None
+    retrieved_at: str | None = None
+    source_hash: str | None = None
+    source_size_bytes: int | None = None
+    verified_by: str | None = None
+    review_status: str = "needs_review"
+    validity_notes: str | None = None
+    risk_flags: list[str] = Field(default_factory=list)
+
+    @field_validator("source_id", "profile_id", "title")
+    @classmethod
+    def _must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
+class VerifiedProfilePack(StrictModel):
+    profile_id: str
+    profile_path: str | None = None
+    profile_status: str | None = None
+    status: str
+    source_count: int = 0
+    verified_source_count: int = 0
+    needs_review_source_count: int = 0
+    rejected_source_count: int = 0
+    missing_retrieved_at_count: int = 0
+    missing_hash_count: int = 0
+    latest_retrieved_at: str | None = None
+    sources: list[ProfileSource] = Field(default_factory=list)
+    warnings: list[str] = Field(default_factory=list)
+    markdown_path: str | None = None
+    json_path: str | None = None
+
+
+class ProfileIntegrityFinding(StrictModel):
+    code: str
+    severity: str
+    message: str
+    source_id: str | None = None
+    path: str | None = None
+    suggested_action: str | None = None
+
+
+class ProfileIntegrityResult(StrictModel):
+    root: str
+    profile_id: str | None = None
+    profile_status: str | None = None
+    status: str
+    source_count: int = 0
+    verified_source_count: int = 0
+    finding_count: int = 0
+    high_count: int = 0
+    medium_count: int = 0
+    low_count: int = 0
+    findings: list[ProfileIntegrityFinding] = Field(default_factory=list)
+    profile_pack: VerifiedProfilePack | None = None
+    markdown_path: str | None = None
+    json_path: str | None = None
+    warnings: list[str] = Field(default_factory=list)
 
 
 class PaperRecord(StrictModel):

@@ -1,12 +1,12 @@
 # K-ResDev Next Planning
 
-This planning note starts after `0.1.0b23`.
+This planning note starts after `0.1.0b24`.
 
 ## Current Diagnosis
 
-K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, bibliography metadata, bibliography review, citation support, workspace traceability graph, workspace doctor, next actions, workspace summary, and review packs.
+K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, bibliography metadata, bibliography review, citation support, profile source records, profile integrity, workspace traceability graph, workspace doctor, next actions, workspace summary, and review packs.
 
-The next bottleneck is still operational continuity, but the first traceability layer now exists. A real R&D workspace next needs compact checkpoints, explicit artifact authority levels, and verified official profile source handling.
+The next bottleneck is still operational continuity, but the first traceability and profile-source layers now exist. A real R&D workspace next needs a budget evidence ledger, compact checkpoints, explicit artifact authority levels, and eventually verified agency profile packs based on current official sources.
 
 ## Planning Principles
 
@@ -63,8 +63,11 @@ Suggested tests:
 
 Goal: add a pluggable profile-source registry that can distinguish generic needs-review profiles from profiles backed by cited official source documents.
 
-Why later:
-- This requires checking current official agency sources before implementation.
+Status: implemented as a generic local source-recording and integrity shell. No official agency rules or forms are hardcoded.
+
+Implementation note:
+- The generic shell is implemented.
+- Adding a specific verified agency profile still requires checking current official sources first.
 - Rules and forms are time-sensitive and should not be invented from memory.
 
 Expected scope:
@@ -73,6 +76,7 @@ Expected scope:
 - profile fields for `source_url`, `retrieved_at`, `source_hash`, `verified_by`, `review_status`, and `validity_notes`.
 - CLI commands for `profile-source-record`, `profile-source-summary`, and `profile-integrity`.
 - Keep official rules as data profiles, not hardcoded Python logic.
+- Integration into workspace doctor, next actions, summary, review pack, and trace.
 
 Safety boundary:
 - Browse and cite official sources before adding any agency-specific profile pack.
@@ -169,6 +173,6 @@ These should wait until traceability, impact analysis, and verified profile sour
 
 ## Recommended Next Slice
 
-Implement Beta 24 next, with care.
+Implement Beta 25 next.
 
-Beta 24 should add verified profile source records without hardcoding official rules from memory. If current official sources cannot be verified in a development session, implement only the generic source-recording and integrity shell, keeping every agency profile in `needs_review`.
+Beta 25 should add a generic budget evidence ledger without inferring official cost eligibility. Amount rollups, duplicate detection, and proof/approval gaps can be implemented locally while keeping budget categories profile-driven and needs-review until verified against official guidance.

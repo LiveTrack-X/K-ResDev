@@ -18,6 +18,7 @@ from .models import (
     WorkspaceInitResult,
 )
 from .profile_registry import default_agency_templates_root, load_project_profile
+from .profile_sources import generate_profile_integrity
 from .report_integrity import generate_workspace_report_integrity
 from .schema_tools import validate_json_file
 from .source_verification import verify_evidence_sources
@@ -45,6 +46,8 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "citation-support-summary.md",
     "evidence-bundle-index.md",
     "next-actions.md",
+    "profile-integrity.md",
+    "profile-source-summary.md",
     "readiness.md",
     "report-integrity.md",
     "source-verification.md",
@@ -95,6 +98,12 @@ def initialize_workspace(
         created,
         skipped,
     )
+    _write_if_missing(
+        workspace / "state" / "profile-sources.json",
+        "[]\n",
+        created,
+        skipped,
+    )
 
     _write_if_missing(
         workspace / "README.k-resdev.md",
@@ -129,6 +138,7 @@ def run_workspace_doctor(
     approval_count = _check_approvals(workspace, findings)
     _check_approval_coverage(workspace, findings)
     _check_profile(workspace, findings)
+    _check_profile_integrity(workspace, findings)
     _check_reports(workspace, findings)
     _check_report_integrity(workspace, findings)
     _check_bibliography_integrity(workspace, findings)
@@ -428,6 +438,31 @@ def _check_profile(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> N
         )
 
 
+def _check_profile_integrity(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> None:
+    result = generate_profile_integrity(workspace)
+    path = workspace / "state" / "profile-sources.json"
+    if result.high_count:
+        findings.append(
+            _finding(
+                "profile_integrity_high_findings",
+                "high",
+                f"{result.high_count} high-severity profile source finding(s) were detected.",
+                path,
+                "Run profile-integrity and resolve profile source drift or invalid verified state.",
+            )
+        )
+    if result.medium_count or result.low_count or result.warnings:
+        findings.append(
+            _finding(
+                "profile_integrity_review_findings",
+                "medium",
+                f"{result.medium_count + result.low_count} profile source review finding(s) or warnings were detected.",
+                path,
+                "Review profile-integrity output before treating any agency/profile template as verified.",
+            )
+        )
+
+
 def _check_reports(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> None:
     reports_dir = workspace / "reports"
     reports = [path for path in reports_dir.glob("*.md") if path.name not in OPERATIONAL_MARKDOWN_NAMES] if reports_dir.exists() else []
@@ -648,6 +683,8 @@ def _starter_readme(project_id: str, title: str, profile_id: str) -> str:
             "- Run `k-resdev bib-integrity --root . --output reports/bibliography-integrity.md --json state/bibliography-integrity.json` to check citation keys and bibliography source hashes.",
             "- Run `k-resdev citation-support-record --bibliography-id <BIB-ID> --citation-key <key> --claim \"<claim>\" --decision needs_review --reviewer <reviewer> --support-dir state/citation-support` to record paper-claim support decisions.",
             "- Run `k-resdev citation-support-integrity --root . --output reports/citation-support.md --json state/citation-support.json` to check cited papers against supplied support records.",
+            "- Run `k-resdev profile-source-record --profile-id <profile-id> --title \"<official source title>\" --source-url <url> --review-status needs_review` to record official-source metadata for profile review.",
+            "- Run `k-resdev profile-integrity --root . --output reports/profile-integrity.md --json state/profile-integrity.json` to check profile source records.",
             "- Run `k-resdev doctor --root . --output reports/readiness.md --json state/readiness.json` before reporting.",
             "- Run `k-resdev workspace-summary --root . --output reports/workspace-summary.md --json state/workspace-summary.json` for a one-page status handoff.",
             "- Run `k-resdev workspace-review-pack --root .` to refresh readiness, next actions, summary, source-verification, approval-coverage, report-integrity, bibliography-integrity, and citation-support artifacts together.",

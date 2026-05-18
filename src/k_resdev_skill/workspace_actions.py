@@ -80,6 +80,7 @@ def _actions_for_findings(root: Path, findings: list[WorkspaceDoctorFinding]) ->
         _action_for_review_evidence(root, by_code),
         _action_for_budget_gaps(root, by_code),
         _action_for_profile(root, by_code),
+        _action_for_profile_integrity(root, by_code),
         _action_for_approval_coverage(root, by_code),
         _action_for_report_integrity(root, by_code),
         _action_for_bibliography_integrity(root, by_code),
@@ -202,6 +203,22 @@ def _action_for_profile(root: Path, by_code: dict[str, list[WorkspaceDoctorFindi
         f'python -m k_resdev_skill validate-profile "{root / "state" / "project-profile.json"}"',
         by_code,
         ["profile_missing", "profile_unreadable", "profile_needs_review"],
+    )
+
+
+def _action_for_profile_integrity(root: Path, by_code: dict[str, list[WorkspaceDoctorFinding]]) -> WorkspaceActionItem | None:
+    codes = ["profile_integrity_high_findings", "profile_integrity_review_findings"]
+    if not any(code in by_code for code in codes):
+        return None
+    priority = "high" if "profile_integrity_high_findings" in by_code else "medium"
+    return _action(
+        root,
+        priority,
+        "Review profile source integrity",
+        "Agency/project profiles should stay needs_review until official-source records are hash-backed and human-reviewed.",
+        f'python -m k_resdev_skill profile-integrity --root "{root}" --output "{root / "reports" / "profile-integrity.md"}" --json "{root / "state" / "profile-integrity.json"}"',
+        by_code,
+        codes,
     )
 
 

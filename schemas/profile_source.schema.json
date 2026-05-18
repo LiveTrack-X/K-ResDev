@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ProfileSource",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["source_id", "profile_id", "title", "review_status", "risk_flags"],
+  "properties": {
+    "source_id": {"type": "string"},
+    "profile_id": {"type": "string"},
+    "title": {"type": "string"},
+    "source_url": {"type": ["string", "null"]},
+    "source_file": {"type": ["string", "null"]},
+    "retrieved_at": {"type": ["string", "null"]},
+    "source_hash": {"type": ["string", "null"]},
+    "source_size_bytes": {"type": ["integer", "null"], "minimum": 0},
+    "verified_by": {"type": ["string", "null"]},
+    "review_status": {
+      "type": "string",
+      "enum": ["needs_review", "verified", "rejected", "superseded"]
+    },
+    "validity_notes": {"type": ["string", "null"]},
+    "risk_flags": {"type": "array", "items": {"type": "string"}}
+  }
+}

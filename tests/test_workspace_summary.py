@@ -50,6 +50,8 @@ def test_workspace_summary_combines_operational_counts(tmp_path):
     assert summary.evidence_count == 2
     assert summary.approval_count == 1
     assert summary.profile_id == "national-rnd-basic"
+    assert summary.profile_integrity_status == "needs_review"
+    assert summary.profile_source_count == 0
     assert summary.evidence_by_type["budget_evidence"] == 1
     assert summary.evidence_by_status["needs_review"] == 1
     assert summary.risk_flag_counts["budget_metadata_incomplete"] == 1

@@ -44,6 +44,14 @@ from .intake import run_intake
 from .literature import generate_literature_matrix
 from .models import EvidenceItem, PaperRecord, ProjectState, ResearchInsight
 from .plan_mapper import extract_project_state_from_text
+from .profile_sources import (
+    create_profile_source_record,
+    default_profile_sources_path,
+    generate_profile_integrity,
+    record_profile_source,
+    summarize_profile_sources,
+    utc_now_iso,
+)
 from .profile_registry import generate_profile_registry, list_project_profiles, load_project_profile
 from .projection_export import export_projection
 from .report_integrity import generate_workspace_report_integrity
@@ -239,8 +247,41 @@ def main(argv: list[str] | None = None) -> int:
     validate_profile_parser = subparsers.add_parser("validate-profile", help="Validate a project profile JSON file.")
     validate_profile_parser.add_argument("profile_json")
 
+    profile_source_record_parser = subparsers.add_parser("profile-source-record", help="Record a supplied profile official-source review record.")
+    profile_source_record_parser.add_argument("--profile-id", required=True)
+    profile_source_record_parser.add_argument("--title", required=True)
+    profile_source_record_parser.add_argument("--source-url", default=None)
+    profile_source_record_parser.add_argument("--source-file", default=None)
+    profile_source_record_parser.add_argument("--retrieved-at", default=None)
+    profile_source_record_parser.add_argument("--source-hash", default=None)
+    profile_source_record_parser.add_argument("--verified-by", default=None)
+    profile_source_record_parser.add_argument("--review-status", default="needs_review", choices=["needs_review", "verified", "rejected", "superseded"])
+    profile_source_record_parser.add_argument("--validity-note", default=None)
+    profile_source_record_parser.add_argument("--risk-flag", action="append", default=[])
+    profile_source_record_parser.add_argument("--root", default=".")
+    profile_source_record_parser.add_argument("--profile-sources", default=None)
+    profile_source_record_parser.add_argument("--source-id", default=None)
+    profile_source_record_parser.add_argument("--now", action="store_true", help="Use the current UTC time as retrieved_at when omitted.")
+    profile_source_record_parser.add_argument("--print-only", action="store_true")
+
+    profile_source_summary_parser = subparsers.add_parser("profile-source-summary", help="Summarize profile source records for one profile.")
+    profile_source_summary_parser.add_argument("--root", default=".")
+    profile_source_summary_parser.add_argument("--profile-id", default=None)
+    profile_source_summary_parser.add_argument("--profile-sources", default=None)
+    profile_source_summary_parser.add_argument("--profile-path", default=None)
+    profile_source_summary_parser.add_argument("--output", default=None)
+    profile_source_summary_parser.add_argument("--json", default=None)
+
+    profile_integrity_parser = subparsers.add_parser("profile-integrity", help="Check project profile source records and review status.")
+    profile_integrity_parser.add_argument("--root", default=".")
+    profile_integrity_parser.add_argument("--output", default=None)
+    profile_integrity_parser.add_argument("--json", default=None)
+
     validate_json_parser = subparsers.add_parser("validate-json", help="Validate JSON files against bundled or custom JSON schema.")
-    validate_json_parser.add_argument("schema", help="Schema alias such as evidence, research-insight, project-profile, approval, or a schema path.")
+    validate_json_parser.add_argument(
+        "schema",
+        help="Schema alias such as evidence, research-insight, project-profile, profile-source, approval, or a schema path.",
+    )
     validate_json_parser.add_argument("json_paths", nargs="+")
 
     approval_record_parser = subparsers.add_parser("approval-record", help="Record a supplied human approval/review decision.")
@@ -315,7 +356,7 @@ def main(argv: list[str] | None = None) -> int:
 
     review_pack_parser = subparsers.add_parser(
         "workspace-review-pack",
-        help="Generate readiness, next-action, summary, source-verification, approval-coverage, and report-integrity artifacts in one local review pack.",
+        help="Generate readiness, next-action, summary, profile, source, approval, report, bibliography, citation-support, and trace artifacts in one local review pack.",
     )
     review_pack_parser.add_argument("--root", default=".")
     review_pack_parser.add_argument("--reports-dir", default=None)
@@ -521,6 +562,42 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "validate-profile":
         profile = load_project_profile(args.profile_json)
         print(profile.model_dump_json(indent=2))
+        return 0
+    if args.command == "profile-source-record":
+        source_path = Path(args.profile_sources) if args.profile_sources else default_profile_sources_path(args.root)
+        retrieved_at = args.retrieved_at or (utc_now_iso() if args.now else None)
+        record = create_profile_source_record(
+            profile_id=args.profile_id,
+            title=args.title,
+            source_url=args.source_url,
+            source_file=args.source_file,
+            retrieved_at=retrieved_at,
+            source_hash=args.source_hash,
+            verified_by=args.verified_by,
+            review_status=args.review_status,
+            validity_notes=args.validity_note,
+            risk_flags=args.risk_flag,
+            source_id=args.source_id,
+            root=args.root,
+        )
+        if not args.print_only:
+            record_profile_source(record, source_path)
+        print(record.model_dump_json(indent=2))
+        return 0
+    if args.command == "profile-source-summary":
+        result = summarize_profile_sources(
+            args.root,
+            profile_id=args.profile_id,
+            profile_sources_path=args.profile_sources,
+            profile_path=args.profile_path,
+            output_path=args.output,
+            json_path=args.json,
+        )
+        print(result.model_dump_json(indent=2))
+        return 0
+    if args.command == "profile-integrity":
+        result = generate_profile_integrity(args.root, output_path=args.output, json_path=args.json)
+        print(result.model_dump_json(indent=2))
         return 0
     if args.command == "validate-json":
         result = validate_json_files(args.json_paths, args.schema)

@@ -336,14 +336,15 @@ The traceability graph is a local operational projection. It must not certify of
 
 ### Task 33: Verified profile source pack
 
-Planned after source verification:
+Implemented:
 - `ProfileSource` and `VerifiedProfilePack` models
 - `state/profile-sources.json`
 - commands for recording and summarizing profile source verification
 - profile fields for source URL, retrieval date, source hash, reviewer, and review status
 - profile-integrity checks that keep unverified profiles in `needs_review`
+- workspace doctor, next-action, summary, review-pack, and trace integration for profile source integrity
 
-This task requires checking current official agency sources before implementation. Do not hardcode IRIS, NTIS, ministry, or agency rules from memory.
+This task implements the generic source-recording and integrity shell only. It does not hardcode IRIS, NTIS, ministry, or agency rules from memory; any agency-specific verified profile still requires current official source review.
 
 ### Task 34: Budget evidence ledger
 

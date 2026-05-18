@@ -13,6 +13,7 @@ from .models import (
     WorkspaceSummaryResult,
 )
 from .profile_registry import load_project_profile
+from .profile_sources import generate_profile_integrity
 from .workspace import OPERATIONAL_MARKDOWN_NAMES, run_workspace_doctor
 from .workspace_actions import generate_workspace_action_plan
 from .workspace_trace import generate_workspace_trace
@@ -38,6 +39,7 @@ def generate_workspace_summary(
     reports = _report_paths(workspace / "reports")
     exports = _sorted_paths(workspace / "reports", ["*.docx", "*.html", "*.txt"])
     manifests = _sorted_paths(workspace / "reports" / "analysis", ["*-analysis-run.json"])
+    profile_integrity = generate_profile_integrity(workspace)
     trace = generate_workspace_trace(workspace)
 
     summary = WorkspaceSummaryResult(
@@ -57,6 +59,10 @@ def generate_workspace_summary(
         report_paths=reports,
         export_paths=exports,
         analysis_manifest_paths=manifests,
+        profile_integrity_status=profile_integrity.status,
+        profile_source_count=profile_integrity.source_count,
+        profile_verified_source_count=profile_integrity.verified_source_count,
+        profile_integrity_finding_count=profile_integrity.finding_count,
         trace_status=trace.status,
         trace_node_count=trace.node_count,
         trace_edge_count=trace.edge_count,
@@ -90,6 +96,9 @@ def render_workspace_summary_markdown(summary: WorkspaceSummaryResult) -> str:
         f"| Readiness status | {_escape(summary.status)} |",
         f"| Profile | {_escape(summary.profile_id or 'missing')} |",
         f"| Profile status | {_escape(summary.profile_status or 'missing')} |",
+        f"| Profile integrity | {_escape(summary.profile_integrity_status or '-')} |",
+        f"| Profile sources | {summary.profile_source_count} |",
+        f"| Verified profile sources | {summary.profile_verified_source_count} |",
         f"| Evidence count | {summary.evidence_count} |",
         f"| Approval count | {summary.approval_count} |",
         f"| Finding count | {summary.finding_count} |",
@@ -115,6 +124,7 @@ def render_workspace_summary_markdown(summary: WorkspaceSummaryResult) -> str:
         f"| Report Markdown | {len(summary.report_paths)} | {_format_paths(summary.report_paths)} |",
         f"| Projection exports | {len(summary.export_paths)} | {_format_paths(summary.export_paths)} |",
         f"| Analysis manifests | {len(summary.analysis_manifest_paths)} | {_format_paths(summary.analysis_manifest_paths)} |",
+        f"| Profile integrity | {summary.profile_integrity_finding_count} | status: {_escape(summary.profile_integrity_status or '-')}; verified sources: {summary.profile_verified_source_count} |",
         f"| Workspace trace | {summary.trace_node_count} | status: {_escape(summary.trace_status or '-')}; findings: {summary.trace_finding_count} |",
         "",
         "## Top Actions",

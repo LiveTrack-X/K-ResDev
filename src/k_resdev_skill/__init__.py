@@ -75,6 +75,9 @@ from .models import (
     KPI,
     Milestone,
     PaperRecord,
+    ProfileIntegrityFinding,
+    ProfileIntegrityResult,
+    ProfileSource,
     ProjectState,
     ProjectProfile,
     ProjectionExportResult,
@@ -101,8 +104,20 @@ from .models import (
     WorkspaceTraceFinding,
     WorkspaceTraceNode,
     WorkspaceTraceResult,
+    VerifiedProfilePack,
 )
 from .plan_mapper import extract_project_state_from_text
+from .profile_sources import (
+    create_profile_source_record,
+    default_profile_sources_path,
+    generate_profile_integrity,
+    load_profile_sources,
+    record_profile_source,
+    render_profile_integrity_markdown,
+    render_profile_source_summary_markdown,
+    summarize_profile_sources,
+    write_profile_sources,
+)
 from .profile_registry import generate_profile_registry, list_project_profiles, load_project_profile
 from .projection_export import export_projection, write_projection_docx, write_projection_html, write_projection_text
 from .report_integrity import generate_workspace_report_integrity, render_report_integrity_markdown
@@ -140,6 +155,7 @@ __all__ = [
     "CitationSupportFinding",
     "CitationSupportRecord",
     "DataProfile",
+    "default_profile_sources_path",
     "EvidenceSourceVerificationItem",
     "EvidenceSourceVerificationResult",
     "EvidenceItem",
@@ -150,6 +166,9 @@ __all__ = [
     "KPI",
     "Milestone",
     "PaperRecord",
+    "ProfileIntegrityFinding",
+    "ProfileIntegrityResult",
+    "ProfileSource",
     "ProjectState",
     "ProjectProfile",
     "ProjectionExportResult",
@@ -176,6 +195,7 @@ __all__ = [
     "WorkspaceTraceFinding",
     "WorkspaceTraceNode",
     "WorkspaceTraceResult",
+    "VerifiedProfilePack",
     "approval_gate_status",
     "bibliography_review_status",
     "budget_evidence_gaps",
@@ -183,6 +203,7 @@ __all__ = [
     "create_approval_record",
     "create_bibliography_review_record",
     "create_citation_support_record",
+    "create_profile_source_record",
     "check_unsupported_claims",
     "classify_file",
     "draft_monthly_report",
@@ -205,6 +226,7 @@ __all__ = [
     "generate_evidence_bundle_index",
     "generate_literature_matrix",
     "generate_paper_card_markdown",
+    "generate_profile_integrity",
     "generate_profile_registry",
     "generate_reproducibility_checklist",
     "generate_workspace_action_plan",
@@ -227,6 +249,7 @@ __all__ = [
     "load_citation_support_records",
     "load_evidence_index",
     "load_project_profile",
+    "load_profile_sources",
     "profile_data_file",
     "paper_records_from_bibliography",
     "paper_card_from_text",
@@ -241,11 +264,15 @@ __all__ = [
     "render_action_plan_markdown",
     "render_approval_coverage_markdown",
     "render_evidence_source_verification_markdown",
+    "render_profile_integrity_markdown",
+    "render_profile_source_summary_markdown",
     "render_report_integrity_markdown",
     "render_workspace_review_pack_markdown",
     "render_workspace_summary_markdown",
     "render_workspace_trace_markdown",
     "run_workspace_doctor",
+    "record_profile_source",
+    "summarize_profile_sources",
     "validate_json_file",
     "validate_json_files",
     "verify_evidence_sources",
@@ -254,9 +281,10 @@ __all__ = [
     "write_bibliography_review_record",
     "write_citation_support_record",
     "write_evidence_index",
+    "write_profile_sources",
     "write_projection_docx",
     "write_projection_html",
     "write_projection_text",
 ]
 
-__version__ = "0.1.0b23"
+__version__ = "0.1.0b24"

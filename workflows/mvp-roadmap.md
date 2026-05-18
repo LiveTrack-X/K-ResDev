@@ -33,7 +33,7 @@ Status: paper card extraction, BibTeX/RIS/CSL JSON bibliography intake, bibliogr
 4. Audit-defense Q&A generator.
 5. IRIS/NTIS-style field mapper after official template verification.
 
-Status: `national-rnd-basic` is present as a generic needs-review template skeleton only. It is not an official agency profile. A profile registry/validator and generic budget evidence checklist are implemented so local profiles can be inspected without hardcoding unverified rules.
+Status: `national-rnd-basic` is present as a generic needs-review template skeleton only. It is not an official agency profile. A profile registry/validator, profile-source record shell, profile-integrity checker, and generic budget evidence checklist are implemented so local profiles can be inspected without hardcoding unverified rules.
 
 ## P3 - Automation and validation
 
@@ -49,11 +49,11 @@ Status: JSON schema validation, evidence bundle indexes, human approval records/
 
 1. Workspace traceability graph across sources, evidence, reports, approvals, bibliography, citation support, analysis manifests, and generated artifacts.
 2. Change impact review for source drift, approval target drift, bibliography source drift, and unresolved citation support.
-3. Verified profile source pack for official agency templates and rules after current source verification.
+3. Verified agency-specific profile packs for official templates and rules after current source verification.
 4. Budget evidence ledger with category rollups and proof completeness checks.
 5. Research claim matrix connecting paper claims, experiment evidence, citation support, and insight candidates.
 
-Status: workspace traceability graph and impact review are implemented as a local first pass. Verified profile source packs, budget ledgers, and research claim matrices should plug into the same trace layer instead of becoming separate disconnected checklists.
+Status: workspace traceability graph and impact review are implemented as a local first pass. Generic profile source records now plug into the same doctor/review-pack/trace layer. Verified agency-specific packs, budget ledgers, and research claim matrices should continue to plug into that trace layer instead of becoming separate disconnected checklists.
 
 ## P5 - Research operations workflow layer
 

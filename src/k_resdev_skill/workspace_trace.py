@@ -18,11 +18,13 @@ from .models import (
     BibliographyReviewRecord,
     CitationSupportRecord,
     EvidenceItem,
+    ProfileSource,
     WorkspaceTraceEdge,
     WorkspaceTraceFinding,
     WorkspaceTraceNode,
     WorkspaceTraceResult,
 )
+from .profile_sources import load_profile_sources
 
 OPERATIONAL_MARKDOWN_NAMES = {
     "agency-profiles.md",
@@ -34,6 +36,8 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "citation-support-summary.md",
     "evidence-bundle-index.md",
     "next-actions.md",
+    "profile-integrity.md",
+    "profile-source-summary.md",
     "readiness.md",
     "report-integrity.md",
     "source-verification.md",
@@ -55,6 +59,7 @@ def generate_workspace_trace(
     workspace = Path(root)
     builder = _TraceBuilder(workspace)
     builder.add_evidence()
+    builder.add_profile_sources()
     builder.add_bibliography()
     builder.add_reports()
     builder.add_approvals()
@@ -162,6 +167,7 @@ class _TraceBuilder:
         self.evidence_by_id: dict[str, EvidenceItem] = {}
         self.bibliography_by_id: dict[str, BibliographyEntry] = {}
         self.bibliography_by_key: dict[str, BibliographyEntry] = {}
+        self.profile_sources_by_id: dict[str, ProfileSource] = {}
 
     def add_evidence(self) -> None:
         path = self.workspace / "state" / "evidence-index.json"
@@ -264,6 +270,64 @@ class _TraceBuilder:
                     self.node("bibliography", citation_key, citation_key, ref_id=citation_key, status="missing", metadata={"citation_key": citation_key})
                 target = _node_id("bibliography", bib.bibliography_id if bib else citation_key)
                 self.edge(node.node_id, target, "cites_paper", {"citation_key": citation_key})
+
+    def add_profile_sources(self) -> None:
+        path = self.workspace / "state" / "profile-sources.json"
+        if not path.exists():
+            return
+        try:
+            sources = load_profile_sources(path)
+        except Exception as exc:
+            self.finding(
+                "trace_profile_sources_unreadable",
+                "medium",
+                f"Profile source index could not be read: {exc}",
+                path=path,
+                suggested_action="Fix state/profile-sources.json before relying on profile trace impact review.",
+            )
+            return
+        for source in sources:
+            self.profile_sources_by_id[source.source_id] = source
+            node = self.node(
+                "profile_source",
+                source.source_id,
+                source.title,
+                ref_id=source.source_id,
+                status=source.review_status,
+                path=source.source_file,
+                sha256=source.source_hash,
+                metadata={
+                    "profile_id": source.profile_id,
+                    "source_url": source.source_url,
+                    "retrieved_at": source.retrieved_at,
+                    "verified_by": source.verified_by,
+                    "risk_flags": source.risk_flags,
+                },
+            )
+            self.edge(node.node_id, _node_id("profile", source.profile_id), "supports_profile")
+            if source.source_file:
+                source_node = self.source_node(source.source_file, source.source_hash)
+                self.edge(source_node.node_id, node.node_id, "source_of")
+                self._source_hash_findings(source_node, source.source_hash, "profile")
+            if source.review_status != "verified":
+                severity = "high" if source.review_status in {"rejected", "superseded"} else "medium"
+                self.finding(
+                    "trace_profile_source_not_verified",
+                    severity,
+                    f"Profile source `{source.source_id}` is `{source.review_status}`.",
+                    node_id=node.node_id,
+                    path=source.source_file,
+                    suggested_action="Keep profile templates in needs_review until official source records are supplied and reviewed.",
+                )
+            if source.review_status == "verified" and (not source.verified_by or not source.source_hash):
+                self.finding(
+                    "trace_profile_source_verification_incomplete",
+                    "medium",
+                    f"Verified profile source `{source.source_id}` is missing reviewer or hash metadata.",
+                    node_id=node.node_id,
+                    path=source.source_file,
+                    suggested_action="Record verified_by and a hash-backed local source/reference artifact.",
+                )
 
     def add_approvals(self) -> None:
         approvals_dir = self.workspace / "state" / "approvals"

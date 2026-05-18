@@ -39,6 +39,7 @@ CITATION_SUPPORT_OPERATIONAL_NAMES = {
     "profile-promotion-summary.md",
     "profile-review.md",
     "profile-source-fix-plan.md",
+    "profile-source-fix-summary.md",
     "profile-source-queue.md",
     "profile-source-summary.md",
     "readiness.md",

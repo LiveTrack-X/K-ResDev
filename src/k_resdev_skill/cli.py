@@ -67,6 +67,12 @@ from .profile_sources import (
 from .profile_registry import generate_profile_registry, list_project_profiles, load_project_profile
 from .profile_review import generate_profile_review
 from .profile_source_fix_plan import generate_profile_source_fix_plan
+from .profile_source_fix_review import (
+    create_profile_source_fix_review_record,
+    default_profile_source_fix_reviews_dir,
+    summarize_profile_source_fix_reviews,
+    write_profile_source_fix_review_record,
+)
 from .profile_source_queue import generate_profile_source_queue
 from .project_goals import generate_goals_review, initialize_project_goals
 from .projection_export import export_projection
@@ -337,6 +343,26 @@ def main(argv: list[str] | None = None) -> int:
     profile_source_fix_plan_parser.add_argument("--output", default=None)
     profile_source_fix_plan_parser.add_argument("--json", default=None)
 
+    profile_source_fix_record_parser = subparsers.add_parser("profile-source-fix-record", help="Record a supplied human review decision for one profile-source fix-plan action.")
+    profile_source_fix_record_parser.add_argument("--root", default=".")
+    profile_source_fix_record_parser.add_argument("--action-id", required=True)
+    profile_source_fix_record_parser.add_argument("--decision", required=True, choices=["resolved", "accepted_risk", "deferred", "rejected"])
+    profile_source_fix_record_parser.add_argument("--reviewer", required=True)
+    profile_source_fix_record_parser.add_argument("--fix-plan", default=None)
+    profile_source_fix_record_parser.add_argument("--fix-plan-hash", required=True)
+    profile_source_fix_record_parser.add_argument("--reviewed-at", default=None)
+    profile_source_fix_record_parser.add_argument("--note", default=None)
+    profile_source_fix_record_parser.add_argument("--risk-flag", action="append", default=[])
+    profile_source_fix_record_parser.add_argument("--reviews-dir", default=None)
+    profile_source_fix_record_parser.add_argument("--print-only", action="store_true")
+
+    profile_source_fix_summary_parser = subparsers.add_parser("profile-source-fix-summary", help="Summarize supplied profile-source fix action review records.")
+    profile_source_fix_summary_parser.add_argument("--root", default=".")
+    profile_source_fix_summary_parser.add_argument("--fix-plan", default=None)
+    profile_source_fix_summary_parser.add_argument("--reviews-dir", default=None)
+    profile_source_fix_summary_parser.add_argument("--output", default=None)
+    profile_source_fix_summary_parser.add_argument("--json", default=None)
+
     profile_integrity_parser = subparsers.add_parser("profile-integrity", help="Check project profile source records and review status.")
     profile_integrity_parser.add_argument("--root", default=".")
     profile_integrity_parser.add_argument("--output", default=None)
@@ -405,7 +431,7 @@ def main(argv: list[str] | None = None) -> int:
     validate_json_parser = subparsers.add_parser("validate-json", help="Validate JSON files against bundled or custom JSON schema.")
     validate_json_parser.add_argument(
         "schema",
-        help="Schema alias such as evidence, research-insight, project-profile, profile-source, profile-source-fix-plan, budget-ledger, approval, or a schema path.",
+        help="Schema alias such as evidence, research-insight, project-profile, profile-source, profile-source-fix-plan, profile-source-fix-review, budget-ledger, approval, or a schema path.",
     )
     validate_json_parser.add_argument("json_paths", nargs="+")
 
@@ -831,6 +857,33 @@ def main(argv: list[str] | None = None) -> int:
         result = generate_profile_source_fix_plan(args.root, queue_path=args.queue, output_path=args.output, json_path=args.json)
         print(result.model_dump_json(indent=2))
         return 0 if result.status not in {"blocked", "missing_queue", "unreadable_queue"} else 1
+    if args.command == "profile-source-fix-record":
+        record = create_profile_source_fix_review_record(
+            args.root,
+            action_id=args.action_id,
+            decision=args.decision,
+            reviewer=args.reviewer,
+            fix_plan_hash=args.fix_plan_hash,
+            fix_plan_path=args.fix_plan,
+            reviewed_at=args.reviewed_at,
+            notes=args.note,
+            risk_flags=args.risk_flag,
+        )
+        if not args.print_only:
+            reviews_dir = Path(args.reviews_dir) if args.reviews_dir else default_profile_source_fix_reviews_dir(args.root)
+            write_profile_source_fix_review_record(record, reviews_dir)
+        print(record.model_dump_json(indent=2))
+        return 0
+    if args.command == "profile-source-fix-summary":
+        result = summarize_profile_source_fix_reviews(
+            args.root,
+            fix_plan_path=args.fix_plan,
+            reviews_dir=args.reviews_dir,
+            output_path=args.output,
+            json_path=args.json,
+        )
+        print(result.model_dump_json(indent=2))
+        return 0 if result.status != "blocked" else 1
     if args.command == "profile-integrity":
         result = generate_profile_integrity(args.root, output_path=args.output, json_path=args.json)
         print(result.model_dump_json(indent=2))

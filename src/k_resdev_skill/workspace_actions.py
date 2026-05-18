@@ -84,6 +84,7 @@ def _actions_for_findings(root: Path, findings: list[WorkspaceDoctorFinding]) ->
         _action_for_profile(root, by_code),
         _action_for_profile_source_queue(root, by_code),
         _action_for_profile_source_fix_plan(root, by_code),
+        _action_for_profile_source_fix_reviews(root, by_code),
         _action_for_profile_integrity(root, by_code),
         _action_for_profile_review(root, by_code),
         _action_for_profile_promotion(root, by_code),
@@ -303,6 +304,26 @@ def _action_for_profile_source_fix_plan(root: Path, by_code: dict[str, list[Work
         "Plan profile source queue fixes",
         "Profile-source queue findings should be translated into explicit local commands and manual official-source checks before metadata changes.",
         f'python -m k_resdev_skill profile-source-fix-plan --root "{root}" --output "{root / "reports" / "profile-source-fix-plan.md"}" --json "{root / "state" / "profile-source-fix-plan.json"}"',
+        by_code,
+        codes,
+    )
+
+
+def _action_for_profile_source_fix_reviews(root: Path, by_code: dict[str, list[WorkspaceDoctorFinding]]) -> WorkspaceActionItem | None:
+    codes = [
+        "profile_source_fix_summary_missing",
+        "profile_source_fix_review_high_findings",
+        "profile_source_fix_review_findings",
+    ]
+    if not any(code in by_code for code in codes):
+        return None
+    priority = "high" if "profile_source_fix_review_high_findings" in by_code else "medium"
+    return _action(
+        root,
+        priority,
+        "Summarize profile source fix reviews",
+        "Profile-source fix actions should have supplied human decisions bound to the current fix-plan hash.",
+        f'python -m k_resdev_skill profile-source-fix-summary --root "{root}" --output "{root / "reports" / "profile-source-fix-summary.md"}" --json "{root / "state" / "profile-source-fix-summary.json"}"',
         by_code,
         codes,
     )

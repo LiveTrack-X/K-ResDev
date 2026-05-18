@@ -1,0 +1,43 @@
+{
+  "root": ".",
+  "status": "needs_review",
+  "fix_plan_path": "state/profile-source-fix-plan.json",
+  "fix_plan_hash": "sha256:example",
+  "fix_plan_status": "needs_review",
+  "action_count": 1,
+  "record_count": 1,
+  "resolved_count": 1,
+  "accepted_risk_count": 0,
+  "deferred_count": 0,
+  "rejected_count": 0,
+  "unresolved_count": 0,
+  "high_unresolved_count": 0,
+  "stale_record_count": 0,
+  "missing_action_count": 0,
+  "finding_count": 0,
+  "high_count": 0,
+  "medium_count": 0,
+  "low_count": 0,
+  "records": [
+    {
+      "review_id": "PSFR-2026-EXAMPLE1",
+      "action_id": "PSF-EXAMPLE0001",
+      "decision": "resolved",
+      "reviewer": "reviewer-name",
+      "reviewed_at": "2026-05-19T00:00:00Z",
+      "fix_plan_path": "state/profile-source-fix-plan.json",
+      "fix_plan_hash": "sha256:example",
+      "fix_plan_status": "needs_review",
+      "action_issue_code": "profile_source_hash_missing",
+      "action_severity": "medium",
+      "profile_id": "national-rnd-basic",
+      "source_id": "PRS-EXAMPLE0001",
+      "notes": "Reviewer checked the action and supplied a resolution decision.",
+      "risk_flags": []
+    }
+  ],
+  "findings": [],
+  "markdown_path": "reports/profile-source-fix-summary.md",
+  "json_path": "state/profile-source-fix-summary.json",
+  "warnings": []
+}

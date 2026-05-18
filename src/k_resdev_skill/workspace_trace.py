@@ -37,6 +37,7 @@ from .profile_promotion import load_profile_promotion_records
 from .profile_lifecycle import load_profile_lifecycle_ledger
 from .profile_review import load_profile_review
 from .profile_source_fix_plan import load_profile_source_fix_plan
+from .profile_source_fix_review import load_profile_source_fix_review_summary
 from .profile_source_queue import load_profile_source_queue
 from .profile_sources import load_profile_sources
 from .project_goals import generate_goals_review
@@ -67,6 +68,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "profile-promotion-summary.md",
     "profile-review.md",
     "profile-source-fix-plan.md",
+    "profile-source-fix-summary.md",
     "profile-source-queue.md",
     "profile-source-summary.md",
     "readiness.md",
@@ -102,6 +104,7 @@ def generate_workspace_trace(
     builder.add_profile_sources()
     builder.add_profile_source_queue()
     builder.add_profile_source_fix_plan()
+    builder.add_profile_source_fix_reviews()
     builder.add_profile_review()
     builder.add_profile_promotions()
     builder.add_profile_promotion_apply_plan()
@@ -620,6 +623,77 @@ class _TraceBuilder:
                     path=action.source_file or action.source_record_path,
                     suggested_action=action.manual_step or action.command or "Review profile-source-fix-plan.",
                 )
+
+    def add_profile_source_fix_reviews(self) -> None:
+        path = self.workspace / "state" / "profile-source-fix-summary.json"
+        if not path.exists():
+            return
+        try:
+            summary = load_profile_source_fix_review_summary(path)
+        except Exception as exc:
+            self.finding(
+                "trace_profile_source_fix_review_summary_unreadable",
+                "medium",
+                f"Profile source fix review summary could not be read: {exc}",
+                path=path,
+                suggested_action="Regenerate profile-source-fix-summary before relying on remediation review trace state.",
+            )
+            return
+        node = self.node(
+            "profile_source_fix_review_summary",
+            "profile-source-fix-summary",
+            "Profile source fix review summary",
+            status=summary.status,
+            path=str(path),
+            sha256=_sha256_file(path),
+            metadata={
+                "fix_plan_hash": summary.fix_plan_hash,
+                "fix_plan_status": summary.fix_plan_status,
+                "action_count": summary.action_count,
+                "record_count": summary.record_count,
+                "unresolved_count": summary.unresolved_count,
+                "high_unresolved_count": summary.high_unresolved_count,
+                "stale_record_count": summary.stale_record_count,
+            },
+        )
+        self.edge(node.node_id, _node_id("profile_source_fix_plan", "profile-source-fix-plan"), "reviews_fix_plan_actions")
+        for record in summary.records:
+            record_node = self.node(
+                "profile_source_fix_review",
+                record.review_id,
+                record.review_id,
+                ref_id=record.review_id,
+                status=str(record.decision),
+                path=str(path),
+                metadata={
+                    "action_id": record.action_id,
+                    "reviewer": record.reviewer,
+                    "reviewed_at": record.reviewed_at,
+                    "fix_plan_hash": record.fix_plan_hash,
+                    "profile_id": record.profile_id,
+                    "source_id": record.source_id,
+                    "risk_flags": record.risk_flags,
+                },
+            )
+            self.edge(node.node_id, record_node.node_id, "summarizes_review")
+            self.edge(record_node.node_id, _node_id("profile_source_fix_plan", "profile-source-fix-plan"), "reviews_fix_action")
+            if record.profile_id:
+                self.edge(record_node.node_id, _node_id("profile", record.profile_id), "reviews_profile_source_fix")
+            if record.source_id:
+                self.edge(record_node.node_id, _node_id("profile_source", record.source_id), "reviews_source_fix")
+        for finding in summary.findings:
+            severity = "high" if finding.severity == "high" else "medium" if finding.severity == "medium" else "low"
+            node_id = node.node_id
+            if finding.review_id:
+                node_id = _node_id("profile_source_fix_review", finding.review_id)
+            self.finding(
+                "trace_profile_source_fix_review_finding",
+                severity,
+                finding.message,
+                node_id=node_id,
+                path=finding.path or str(path),
+                suggested_action=finding.suggested_action or "Review profile-source-fix-summary before relying on profile-source remediation state.",
+            )
 
     def add_profile_review(self) -> None:
         path = self.workspace / "state" / "profile-review.json"

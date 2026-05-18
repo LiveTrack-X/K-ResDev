@@ -29,6 +29,7 @@ from .profile_lifecycle import generate_profile_lifecycle_ledger
 from .profile_registry import default_agency_templates_root, load_project_profile
 from .profile_review import generate_profile_review
 from .profile_source_fix_plan import generate_profile_source_fix_plan
+from .profile_source_fix_review import summarize_profile_source_fix_reviews
 from .profile_source_queue import generate_profile_source_queue
 from .profile_sources import generate_profile_integrity, load_profile_sources
 from .project_goals import generate_goals_review
@@ -55,6 +56,7 @@ STANDARD_DIRS = (
     "state/checkpoints",
     "state/profile-backups",
     "state/profile-promotions",
+    "state/profile-source-fix-reviews",
 )
 OPERATIONAL_MARKDOWN_NAMES = {
     "agency-profiles.md",
@@ -79,6 +81,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "profile-promotion-summary.md",
     "profile-review.md",
     "profile-source-fix-plan.md",
+    "profile-source-fix-summary.md",
     "profile-source-queue.md",
     "profile-source-summary.md",
     "readiness.md",
@@ -196,6 +199,7 @@ def run_workspace_doctor(
     _check_profile(workspace, findings)
     _check_profile_source_queue(workspace, findings)
     _check_profile_source_fix_plan(workspace, findings)
+    _check_profile_source_fix_reviews(workspace, findings)
     _check_profile_integrity(workspace, findings)
     _check_profile_review(workspace, findings)
     _check_profile_promotion(workspace, findings)
@@ -658,6 +662,46 @@ def _check_profile_source_fix_plan(workspace: Path, findings: list[WorkspaceDoct
                 f"{result.medium_count + result.low_count} profile source fix action(s) or warnings remain.",
                 plan_path,
                 "Review suggested local commands and manual official-source checks before changing profile-source metadata.",
+            )
+        )
+
+
+def _check_profile_source_fix_reviews(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> None:
+    plan_path = workspace / "state" / "profile-source-fix-plan.json"
+    summary_path = workspace / "state" / "profile-source-fix-summary.json"
+    if not plan_path.exists():
+        return
+    result = summarize_profile_source_fix_reviews(workspace)
+    if result.status == "ready":
+        return
+    if not summary_path.exists() and result.action_count:
+        findings.append(
+            _finding(
+                "profile_source_fix_summary_missing",
+                "medium",
+                f"{result.action_count} profile source fix action(s) exist but no fix review summary artifact exists.",
+                summary_path,
+                "Run profile-source-fix-summary to compare supplied review records with the current fix plan.",
+            )
+        )
+    if result.high_count:
+        findings.append(
+            _finding(
+                "profile_source_fix_review_high_findings",
+                "high",
+                f"{result.high_count} high-severity profile source fix review finding(s) were detected.",
+                summary_path,
+                "Review stale hashes, missing action IDs, and high-severity unresolved fix actions.",
+            )
+        )
+    if result.medium_count or result.low_count or result.warnings:
+        findings.append(
+            _finding(
+                "profile_source_fix_review_findings",
+                "medium" if result.medium_count else "low",
+                f"{result.medium_count + result.low_count} profile source fix review finding(s) or warnings remain.",
+                summary_path,
+                "Record supplied review decisions or keep unresolved source/profile items in needs_review.",
             )
         )
 
@@ -1458,6 +1502,7 @@ def _starter_readme(project_id: str, title: str, profile_id: str) -> str:
             "- Run `k-resdev profile-source-record --profile-id <profile-id> --title \"<official source title>\" --source-url <url> --review-status needs_review` to record official-source metadata for profile review.",
             "- Run `k-resdev profile-source-queue --root . --output reports/profile-source-queue.md --json state/profile-source-queue.json` to review source-pack gaps before profile promotion.",
             "- Run `k-resdev profile-source-fix-plan --root . --output reports/profile-source-fix-plan.md --json state/profile-source-fix-plan.json` to turn source-pack gaps into reviewable local commands and manual checks.",
+            "- Run `k-resdev profile-source-fix-summary --root . --output reports/profile-source-fix-summary.md --json state/profile-source-fix-summary.json` to summarize supplied fix-action review decisions.",
             "- Run `k-resdev profile-integrity --root . --output reports/profile-integrity.md --json state/profile-integrity.json` to check profile source records.",
             "- Run `k-resdev profile-review --root . --output reports/profile-review.md --json state/profile-review.json` before promoting any profile to verified.",
             "- Run `k-resdev profile-promotion-record --root . --decision verified --reviewer <reviewer> --profile-review-hash <sha256>` only after a supplied human promotion decision.",

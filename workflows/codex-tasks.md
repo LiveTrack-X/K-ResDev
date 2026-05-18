@@ -605,15 +605,27 @@ Profile source fix plans must not fetch official sources, mutate profile packs, 
 
 ### Task 54: Profile source fix review records
 
-Planned:
-- add supplied human review records for individual profile-source fix-plan actions
-- bind each review record to `state/profile-source-fix-plan.json` SHA-256 and `action_id`
-- support decisions such as `resolved`, `accepted_risk`, `deferred`, and `rejected`
-- write records under `state/profile-source-fix-reviews/`
-- summarize unresolved fix actions with `profile-source-fix-summary`
-- integrate review counts into doctor, next-action, summary, review-pack, and trace
+Implemented:
+- `ProfileSourceFixReviewRecord`, `ProfileSourceFixReviewFinding`, and `ProfileSourceFixReviewSummaryResult` models
+- `profile-source-fix-record` command and public API for supplied reviewer decisions on individual fix-plan actions
+- fix-plan SHA-256 and `action_id` binding before a record is accepted
+- `resolved`, `accepted_risk`, `deferred`, and `rejected` decisions
+- records under `state/profile-source-fix-reviews/`
+- `profile-source-fix-summary` command for unresolved, stale-hash, missing-action, accepted-risk, deferred, and rejected action summaries
+- schema/template coverage and validation aliases
+- doctor, next-action, workspace-summary, review-pack, operational Markdown filtering, and trace integration
 
 Profile source fix review records should document supplied human decisions only. They must not mutate source records or upgrade any source/profile to verified by themselves.
+
+### Task 55: Agency profile pack readiness dashboard
+
+Planned:
+- summarize profile-source queue, fix-plan, fix-review, profile-review, promotion, apply/revoke, and lifecycle status across available workspace/profile packs
+- show which profiles are blocked by missing sources, stale hashes, unresolved fix actions, unreviewed promotions, or guarded mutation gaps
+- keep every agency/profile status as an operating projection unless a supplied human record and guarded apply result exist
+- avoid fetching official sources or hardcoding changing agency rules
+
+This should help decide which verified agency profile pack work is ready to attempt next, without confusing readiness with official compliance.
 
 ## Safety constraints
 

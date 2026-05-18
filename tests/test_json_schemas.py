@@ -120,6 +120,25 @@ def test_profile_source_fix_plan_templates_match_json_schemas():
     jsonschema.validate(plan, plan_schema)
 
 
+def test_profile_source_fix_review_templates_match_json_schemas():
+    with open("schemas/profile_source_fix_review_record.schema.json", encoding="utf-8") as handle:
+        record_schema = json.load(handle)
+    with open("schemas/profile_source_fix_review_finding.schema.json", encoding="utf-8") as handle:
+        finding_schema = json.load(handle)
+    with open("schemas/profile_source_fix_review_summary.schema.json", encoding="utf-8") as handle:
+        summary_schema = json.load(handle)
+    with open("templates/profile-source-fix-review-record.json", encoding="utf-8") as handle:
+        record = json.load(handle)
+    with open("templates/profile-source-fix-review-finding.json", encoding="utf-8") as handle:
+        finding = json.load(handle)
+    with open("templates/profile-source-fix-review-summary.json", encoding="utf-8") as handle:
+        summary = json.load(handle)
+
+    jsonschema.validate(record, record_schema)
+    jsonschema.validate(finding, finding_schema)
+    jsonschema.validate(summary, summary_schema)
+
+
 def test_profile_review_check_template_matches_json_schema():
     with open("schemas/profile_review_check.schema.json", encoding="utf-8") as handle:
         schema = json.load(handle)

@@ -33,6 +33,16 @@ SCHEMA_ALIASES = {
     "profile_source_fix_plan": "profile_source_fix_plan.schema.json",
     "profile-source-fix-plan-action": "profile_source_fix_plan_action.schema.json",
     "profile_source_fix_plan_action": "profile_source_fix_plan_action.schema.json",
+    "profile-source-fix-review": "profile_source_fix_review_record.schema.json",
+    "profile_source_fix_review": "profile_source_fix_review_record.schema.json",
+    "profile-source-fix-review-record": "profile_source_fix_review_record.schema.json",
+    "profile_source_fix_review_record": "profile_source_fix_review_record.schema.json",
+    "profile-source-fix-review-finding": "profile_source_fix_review_finding.schema.json",
+    "profile_source_fix_review_finding": "profile_source_fix_review_finding.schema.json",
+    "profile-source-fix-summary": "profile_source_fix_review_summary.schema.json",
+    "profile_source_fix_summary": "profile_source_fix_review_summary.schema.json",
+    "profile-source-fix-review-summary": "profile_source_fix_review_summary.schema.json",
+    "profile_source_fix_review_summary": "profile_source_fix_review_summary.schema.json",
     "profile-source-queue": "profile_source_queue.schema.json",
     "profile_source_queue": "profile_source_queue.schema.json",
     "profile-source-queue-item": "profile_source_queue_item.schema.json",
@@ -162,6 +172,8 @@ def _validation_targets(document: Any, schema_payload: dict[str, Any]) -> list[t
         "EvidenceItem",
         "ProfileSource",
         "ProfileSourceFixPlanAction",
+        "ProfileSourceFixReviewFinding",
+        "ProfileSourceFixReviewRecord",
         "ProfileSourceQueueItem",
         "ProfileLifecycleLedgerEntry",
         "ProfileLifecycleLedgerFinding",
@@ -195,6 +207,10 @@ def _validation_targets(document: Any, schema_payload: dict[str, Any]) -> list[t
             return [(f"$.findings[{index}]", item) for index, item in enumerate(document["findings"])]
         if title == "ProfileSourceQueueItem" and isinstance(document, dict) and isinstance(document.get("items"), list):
             return [(f"$.items[{index}]", item) for index, item in enumerate(document["items"])]
+        if title == "ProfileSourceFixReviewRecord" and isinstance(document, dict) and isinstance(document.get("records"), list):
+            return [(f"$.records[{index}]", item) for index, item in enumerate(document["records"])]
+        if title == "ProfileSourceFixReviewFinding" and isinstance(document, dict) and isinstance(document.get("findings"), list):
+            return [(f"$.findings[{index}]", item) for index, item in enumerate(document["findings"])]
         if isinstance(document, dict) and isinstance(document.get("items"), list):
             return [(f"$.items[{index}]", item) for index, item in enumerate(document["items"])]
         if title == "DashboardCard" and isinstance(document, dict) and isinstance(document.get("cards"), list):

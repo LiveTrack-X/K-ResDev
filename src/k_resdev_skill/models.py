@@ -97,6 +97,13 @@ class CitationSupportDecision(str, Enum):
     SUPERSEDED = "superseded"
 
 
+class ProfileSourceFixReviewDecision(str, Enum):
+    RESOLVED = "resolved"
+    ACCEPTED_RISK = "accepted_risk"
+    DEFERRED = "deferred"
+    REJECTED = "rejected"
+
+
 class ResearchClaimStatus(str, Enum):
     HYPOTHESIS = "hypothesis"
     CANDIDATE = "candidate"
@@ -1132,6 +1139,11 @@ class WorkspaceSummaryResult(StrictModel):
     profile_source_fix_plan_manual_count: int = 0
     profile_source_fix_plan_official_check_count: int = 0
     profile_source_fix_plan_high_count: int = 0
+    profile_source_fix_review_status: str | None = None
+    profile_source_fix_review_record_count: int = 0
+    profile_source_fix_review_unresolved_count: int = 0
+    profile_source_fix_review_high_unresolved_count: int = 0
+    profile_source_fix_review_stale_count: int = 0
     profile_review_status: str | None = None
     profile_review_can_promote: bool = False
     profile_review_failed_count: int = 0
@@ -1409,6 +1421,11 @@ class WorkspaceReviewPackResult(StrictModel):
     profile_source_fix_plan_manual_count: int = 0
     profile_source_fix_plan_official_check_count: int = 0
     profile_source_fix_plan_high_count: int = 0
+    profile_source_fix_review_status: str | None = None
+    profile_source_fix_review_record_count: int = 0
+    profile_source_fix_review_unresolved_count: int = 0
+    profile_source_fix_review_high_unresolved_count: int = 0
+    profile_source_fix_review_stale_count: int = 0
     profile_review_status: str | None = None
     profile_review_can_promote: bool = False
     profile_review_failed_count: int = 0
@@ -1648,6 +1665,74 @@ class ProfileSourceFixPlanResult(StrictModel):
     medium_count: int = 0
     low_count: int = 0
     actions: list[ProfileSourceFixPlanAction] = Field(default_factory=list)
+    markdown_path: str | None = None
+    json_path: str | None = None
+    warnings: list[str] = Field(default_factory=list)
+
+
+class ProfileSourceFixReviewRecord(StrictModel):
+    review_id: str
+    action_id: str
+    decision: ProfileSourceFixReviewDecision
+    reviewer: str
+    reviewed_at: str
+    fix_plan_path: str
+    fix_plan_hash: str
+    fix_plan_status: str | None = None
+    action_issue_code: str | None = None
+    action_severity: str | None = None
+    profile_id: str | None = None
+    source_id: str | None = None
+    notes: str | None = None
+    risk_flags: list[str] = Field(default_factory=list)
+
+    @field_validator("review_id", "action_id", "decision", "reviewer", "reviewed_at", "fix_plan_path", "fix_plan_hash")
+    @classmethod
+    def _profile_source_fix_review_record_field_must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
+class ProfileSourceFixReviewFinding(StrictModel):
+    code: str
+    severity: str
+    message: str
+    action_id: str | None = None
+    review_id: str | None = None
+    path: str | None = None
+    suggested_action: str | None = None
+
+    @field_validator("code", "severity", "message")
+    @classmethod
+    def _profile_source_fix_review_finding_field_must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
+class ProfileSourceFixReviewSummaryResult(StrictModel):
+    root: str
+    status: str
+    fix_plan_path: str
+    fix_plan_hash: str | None = None
+    fix_plan_status: str | None = None
+    action_count: int = 0
+    record_count: int = 0
+    resolved_count: int = 0
+    accepted_risk_count: int = 0
+    deferred_count: int = 0
+    rejected_count: int = 0
+    unresolved_count: int = 0
+    high_unresolved_count: int = 0
+    stale_record_count: int = 0
+    missing_action_count: int = 0
+    finding_count: int = 0
+    high_count: int = 0
+    medium_count: int = 0
+    low_count: int = 0
+    records: list[ProfileSourceFixReviewRecord] = Field(default_factory=list)
+    findings: list[ProfileSourceFixReviewFinding] = Field(default_factory=list)
     markdown_path: str | None = None
     json_path: str | None = None
     warnings: list[str] = Field(default_factory=list)

@@ -1,12 +1,12 @@
 # K-ResDev Next Planning
 
-This planning note starts after `0.1.0b43`.
+This planning note starts after `0.1.0b44`.
 
 ## Current Diagnosis
 
-K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, budget ledger review, bibliography metadata, reference corpus adapters, read-only workspace discovery, bibliography review, citation support, research claim matrices, profile source records, profile source-pack review queues, profile source fix plans, profile integrity, a narrow source-backed IRIS/Innopolis profile seed, profile promotion review, hash-bound profile promotion records, non-destructive profile promotion apply plans, guarded profile promotion apply results/backups, non-destructive profile promotion revocation plans, guarded profile promotion revocation results/backups, a profile lifecycle ledger, workspace traceability graph, trace passport checkpoints, artifact authority labels, goals/deadline review, weekly operating reviews, workspace dashboards, thin local workflow router, workspace doctor, next actions, workspace summary, and review packs.
+K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, budget ledger review, bibliography metadata, reference corpus adapters, read-only workspace discovery, bibliography review, citation support, research claim matrices, profile source records, profile source-pack review queues, profile source fix plans, profile source fix review records, profile integrity, a narrow source-backed IRIS/Innopolis profile seed, profile promotion review, hash-bound profile promotion records, non-destructive profile promotion apply plans, guarded profile promotion apply results/backups, non-destructive profile promotion revocation plans, guarded profile promotion revocation results/backups, a profile lifecycle ledger, workspace traceability graph, trace passport checkpoints, artifact authority labels, goals/deadline review, weekly operating reviews, workspace dashboards, thin local workflow router, workspace doctor, next actions, workspace summary, and review packs.
 
-The next bottleneck is preserving a supplied human review trail for profile-source fix actions. Operators can now see source-pack gaps and generate a local remediation plan, but there is not yet a durable way to record which fix-plan actions were resolved, deferred, rejected, or accepted as known risk without mutating source records or promoting profiles.
+The next bottleneck is making the full agency/profile pack pipeline scan-friendly. Operators can now see source-pack gaps, generate local remediation plans, and record supplied fix-action decisions, but they still need one dashboard that says which profile packs are blocked by source gaps, unresolved fix reviews, promotion review failures, guarded apply/revoke gaps, or lifecycle drift.
 
 ## Planning Principles
 
@@ -385,6 +385,8 @@ Safety boundary:
 
 Goal: record supplied human decisions about profile-source fix-plan actions without mutating profile/source state.
 
+Status: implemented in `src/k_resdev_skill/profile_source_fix_review.py` with CLI/API, schema/template coverage, doctor, next-action, workspace-summary, review-pack, operational Markdown filtering, and trace integration.
+
 Expected scope:
 - `profile-source-fix-record` command for a supplied reviewer decision on one `action_id`;
 - bind records to `state/profile-source-fix-plan.json` SHA-256 and the selected action;
@@ -398,6 +400,20 @@ Safety boundary:
 - Fix review records are supplied human decision records only.
 - They must not edit `state/profile-sources.json`, fetch official documents, or promote source/profile status.
 
+### Beta 45 - Agency Profile Pack Readiness Dashboard
+
+Goal: make the profile/source operating state scan-friendly before adding more verified agency packs.
+
+Expected scope:
+- aggregate profile-source queue, fix-plan, fix-review, profile-review, profile-promotion, apply/revoke, and lifecycle status;
+- show per-profile blockers such as missing source files, stale hashes, unresolved fix actions, unreviewed promotion decisions, and guarded mutation gaps;
+- write `reports/profile-pack-readiness.md` and `state/profile-pack-readiness.json`;
+- integrate readiness counts into doctor, next actions, workspace-summary, review-pack, and trace;
+- keep all agency/profile readiness statuses as local operating projections.
+
+Safety boundary:
+- The dashboard must not fetch official sources, create agency rules, mutate profile/source records, or treat accepted risk as compliance proof.
+
 ## Deferred Ideas
 
 - Direct official HWP/HWPX form generation.
@@ -410,6 +426,6 @@ These should wait until traceability, impact analysis, and verified profile sour
 
 ## Recommended Next Slice
 
-Implement Beta 44 next.
+Implement Beta 45 next.
 
-Beta 44 should make profile-source remediation auditable by recording supplied human resolution decisions while keeping source/profile mutation separate and guarded.
+Beta 45 should make the agency/profile pack pipeline easier to judge before adding new official-source-backed profile packs.

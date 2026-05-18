@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ProfileSourceFixReviewRecord",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "review_id",
+    "action_id",
+    "decision",
+    "reviewer",
+    "reviewed_at",
+    "fix_plan_path",
+    "fix_plan_hash",
+    "fix_plan_status",
+    "action_issue_code",
+    "action_severity",
+    "profile_id",
+    "source_id",
+    "notes",
+    "risk_flags"
+  ],
+  "properties": {
+    "review_id": {"type": "string"},
+    "action_id": {"type": "string"},
+    "decision": {"type": "string", "enum": ["resolved", "accepted_risk", "deferred", "rejected"]},
+    "reviewer": {"type": "string"},
+    "reviewed_at": {"type": "string"},
+    "fix_plan_path": {"type": "string"},
+    "fix_plan_hash": {"type": "string"},
+    "fix_plan_status": {"type": ["string", "null"]},
+    "action_issue_code": {"type": ["string", "null"]},
+    "action_severity": {"type": ["string", "null"]},
+    "profile_id": {"type": ["string", "null"]},
+    "source_id": {"type": ["string", "null"]},
+    "notes": {"type": ["string", "null"]},
+    "risk_flags": {"type": "array", "items": {"type": "string"}}
+  }
+}

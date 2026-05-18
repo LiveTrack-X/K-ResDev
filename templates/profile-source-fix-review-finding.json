@@ -1,0 +1,9 @@
+{
+  "code": "profile_source_fix_action_unreviewed",
+  "severity": "medium",
+  "message": "Fix-plan action `PSF-EXAMPLE0001` has no supplied human review record.",
+  "action_id": "PSF-EXAMPLE0001",
+  "review_id": null,
+  "path": "state/profile-source-fix-plan.json",
+  "suggested_action": "Record a supplied profile-source-fix-record decision for this action."
+}

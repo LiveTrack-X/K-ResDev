@@ -108,6 +108,10 @@ from .models import (
     ProfileLifecycleLedgerResult,
     ProfileSourceFixPlanAction,
     ProfileSourceFixPlanResult,
+    ProfileSourceFixReviewDecision,
+    ProfileSourceFixReviewFinding,
+    ProfileSourceFixReviewRecord,
+    ProfileSourceFixReviewSummaryResult,
     ProfileSourceQueueItem,
     ProfileSourceQueueResult,
     ProfilePromotionApplyChange,
@@ -203,6 +207,15 @@ from .profile_promotion_revoke import (
 from .profile_lifecycle import generate_profile_lifecycle_ledger, load_profile_lifecycle_ledger, render_profile_lifecycle_ledger_markdown
 from .profile_review import generate_profile_review, load_profile_review, render_profile_review_markdown
 from .profile_source_fix_plan import generate_profile_source_fix_plan, load_profile_source_fix_plan, render_profile_source_fix_plan_markdown
+from .profile_source_fix_review import (
+    create_profile_source_fix_review_record,
+    default_profile_source_fix_reviews_dir,
+    load_profile_source_fix_review_records,
+    load_profile_source_fix_review_summary,
+    render_profile_source_fix_review_summary_markdown,
+    summarize_profile_source_fix_reviews,
+    write_profile_source_fix_review_record,
+)
 from .profile_sources import (
     create_profile_source_record,
     default_profile_sources_path,
@@ -308,6 +321,7 @@ __all__ = [
     "DashboardCard",
     "DataProfile",
     "default_profile_promotions_dir",
+    "default_profile_source_fix_reviews_dir",
     "default_profile_sources_path",
     "EvidenceSourceVerificationItem",
     "EvidenceSourceVerificationResult",
@@ -327,6 +341,10 @@ __all__ = [
     "ProfileLifecycleLedgerResult",
     "ProfileSourceFixPlanAction",
     "ProfileSourceFixPlanResult",
+    "ProfileSourceFixReviewDecision",
+    "ProfileSourceFixReviewFinding",
+    "ProfileSourceFixReviewRecord",
+    "ProfileSourceFixReviewSummaryResult",
     "ProfileSourceQueueItem",
     "ProfileSourceQueueResult",
     "ProfilePromotionApplyChange",
@@ -405,6 +423,7 @@ __all__ = [
     "create_approval_record",
     "create_bibliography_review_record",
     "create_citation_support_record",
+    "create_profile_source_fix_review_record",
     "create_profile_promotion_record",
     "create_profile_source_record",
     "create_checkpoint",
@@ -437,6 +456,7 @@ __all__ = [
     "generate_profile_integrity",
     "generate_profile_lifecycle_ledger",
     "generate_profile_source_fix_plan",
+    "summarize_profile_source_fix_reviews",
     "generate_profile_source_queue",
     "generate_profile_promotion_apply_plan",
     "generate_profile_promotion_revoke_plan",
@@ -484,6 +504,8 @@ __all__ = [
     "load_profile_promotion_revoke_result",
     "load_profile_lifecycle_ledger",
     "load_profile_source_fix_plan",
+    "load_profile_source_fix_review_records",
+    "load_profile_source_fix_review_summary",
     "load_profile_source_queue",
     "load_reference_corpus",
     "load_reference_rejections",
@@ -518,6 +540,7 @@ __all__ = [
     "render_profile_integrity_markdown",
     "render_profile_lifecycle_ledger_markdown",
     "render_profile_source_fix_plan_markdown",
+    "render_profile_source_fix_review_summary_markdown",
     "render_profile_source_queue_markdown",
     "render_profile_promotion_apply_plan_markdown",
     "render_profile_promotion_apply_result_markdown",
@@ -554,6 +577,7 @@ __all__ = [
     "write_budget_ledger",
     "write_evidence_index",
     "write_profile_promotion_record",
+    "write_profile_source_fix_review_record",
     "write_profile_sources",
     "write_projection_docx",
     "write_projection_html",
@@ -561,4 +585,4 @@ __all__ = [
     "write_research_claims",
 ]
 
-__version__ = "0.1.0b43"
+__version__ = "0.1.0b44"

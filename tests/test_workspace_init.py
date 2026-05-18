@@ -21,6 +21,7 @@ def test_initialize_workspace_creates_standard_layout(tmp_path):
         "state/checkpoints",
         "state/profile-backups",
         "state/profile-promotions",
+        "state/profile-source-fix-reviews",
     ]:
         assert (tmp_path / relative).is_dir()
 
@@ -61,6 +62,7 @@ def test_initialize_workspace_creates_standard_layout(tmp_path):
     assert "profile-lifecycle-ledger" in readme
     assert "profile-source-queue" in readme
     assert "profile-source-fix-plan" in readme
+    assert "profile-source-fix-summary" in readme
     assert "budget-ledger-import" in readme
     assert "budget-ledger-integrity" in readme
     assert "checkpoint-create" in readme

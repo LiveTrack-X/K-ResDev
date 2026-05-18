@@ -237,6 +237,7 @@ def test_operational_markdown_does_not_satisfy_report_draft_check(tmp_path):
         "profile-promotion-summary.md",
         "profile-review.md",
         "profile-source-fix-plan.md",
+        "profile-source-fix-summary.md",
         "profile-source-queue.md",
         "profile-source-summary.md",
         "workspace-trace.md",

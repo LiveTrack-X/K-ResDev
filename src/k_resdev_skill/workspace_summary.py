@@ -20,6 +20,7 @@ from .profile_promotion_revoke import load_profile_promotion_revoke_plan, load_p
 from .profile_lifecycle import generate_profile_lifecycle_ledger
 from .profile_review import generate_profile_review
 from .profile_source_fix_plan import generate_profile_source_fix_plan
+from .profile_source_fix_review import summarize_profile_source_fix_reviews
 from .profile_source_queue import generate_profile_source_queue
 from .profile_sources import generate_profile_integrity
 from .budget_ledger import generate_workspace_budget_ledger
@@ -63,6 +64,7 @@ def generate_workspace_summary(
     profile_integrity = generate_profile_integrity(workspace)
     profile_source_queue = generate_profile_source_queue(workspace)
     profile_source_fix_plan = generate_profile_source_fix_plan(workspace)
+    profile_source_fix_review = summarize_profile_source_fix_reviews(workspace)
     profile_review = generate_profile_review(workspace)
     profile_promotion = summarize_profile_promotions(workspace)
     profile_apply = generate_profile_promotion_apply_plan(workspace)
@@ -138,6 +140,11 @@ def generate_workspace_summary(
         profile_source_fix_plan_manual_count=profile_source_fix_plan.manual_count,
         profile_source_fix_plan_official_check_count=profile_source_fix_plan.official_source_check_count,
         profile_source_fix_plan_high_count=profile_source_fix_plan.high_count,
+        profile_source_fix_review_status=profile_source_fix_review.status,
+        profile_source_fix_review_record_count=profile_source_fix_review.record_count,
+        profile_source_fix_review_unresolved_count=profile_source_fix_review.unresolved_count,
+        profile_source_fix_review_high_unresolved_count=profile_source_fix_review.high_unresolved_count,
+        profile_source_fix_review_stale_count=profile_source_fix_review.stale_record_count,
         profile_review_status=profile_review.status,
         profile_review_can_promote=profile_review.can_promote,
         profile_review_failed_count=profile_review.failed_count,
@@ -202,6 +209,9 @@ def render_workspace_summary_markdown(summary: WorkspaceSummaryResult) -> str:
         f"| Profile source queue items | {summary.profile_source_queue_item_count} |",
         f"| Profile source fix plan | {_escape(summary.profile_source_fix_plan_status or '-')} |",
         f"| Profile source fix actions | {summary.profile_source_fix_plan_action_count} |",
+        f"| Profile source fix reviews | {_escape(summary.profile_source_fix_review_status or '-')} |",
+        f"| Profile source fix review records | {summary.profile_source_fix_review_record_count} |",
+        f"| Profile source fix unresolved | {summary.profile_source_fix_review_unresolved_count} |",
         f"| Profile review | {_escape(summary.profile_review_status or '-')} |",
         f"| Profile can promote | {summary.profile_review_can_promote} |",
         f"| Profile promotion | {_escape(summary.profile_promotion_status or '-')} |",
@@ -281,6 +291,7 @@ def render_workspace_summary_markdown(summary: WorkspaceSummaryResult) -> str:
         f"| Profile integrity | {summary.profile_integrity_finding_count} | status: {_escape(summary.profile_integrity_status or '-')}; verified sources: {summary.profile_verified_source_count} |",
         f"| Profile source queue | {summary.profile_source_queue_item_count} | status: {_escape(summary.profile_source_queue_status or '-')}; high: {summary.profile_source_queue_high_count} |",
         f"| Profile source fix plan | {summary.profile_source_fix_plan_action_count} | status: {_escape(summary.profile_source_fix_plan_status or '-')}; manual: {summary.profile_source_fix_plan_manual_count}; official checks: {summary.profile_source_fix_plan_official_check_count}; high: {summary.profile_source_fix_plan_high_count} |",
+        f"| Profile source fix reviews | {summary.profile_source_fix_review_record_count} | status: {_escape(summary.profile_source_fix_review_status or '-')}; unresolved: {summary.profile_source_fix_review_unresolved_count}; high unresolved: {summary.profile_source_fix_review_high_unresolved_count}; stale: {summary.profile_source_fix_review_stale_count} |",
         f"| Profile review | {summary.profile_review_failed_count} | status: {_escape(summary.profile_review_status or '-')}; can promote: {summary.profile_review_can_promote} |",
         f"| Profile promotion | {summary.profile_promotion_record_count} | status: {_escape(summary.profile_promotion_status or '-')}; latest decision: {_escape(summary.latest_profile_promotion_decision or '-')} |",
         f"| Profile promotion apply plan | {summary.profile_promotion_apply_change_count} | status: {_escape(summary.profile_promotion_apply_status or '-')}; can apply: {summary.profile_promotion_apply_can_apply} |",

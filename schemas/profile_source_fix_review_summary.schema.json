@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ProfileSourceFixReviewSummaryResult",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "root",
+    "status",
+    "fix_plan_path",
+    "fix_plan_hash",
+    "fix_plan_status",
+    "action_count",
+    "record_count",
+    "resolved_count",
+    "accepted_risk_count",
+    "deferred_count",
+    "rejected_count",
+    "unresolved_count",
+    "high_unresolved_count",
+    "stale_record_count",
+    "missing_action_count",
+    "finding_count",
+    "high_count",
+    "medium_count",
+    "low_count",
+    "records",
+    "findings",
+    "markdown_path",
+    "json_path",
+    "warnings"
+  ],
+  "properties": {
+    "root": {"type": "string"},
+    "status": {"type": "string"},
+    "fix_plan_path": {"type": "string"},
+    "fix_plan_hash": {"type": ["string", "null"]},
+    "fix_plan_status": {"type": ["string", "null"]},
+    "action_count": {"type": "integer", "minimum": 0},
+    "record_count": {"type": "integer", "minimum": 0},
+    "resolved_count": {"type": "integer", "minimum": 0},
+    "accepted_risk_count": {"type": "integer", "minimum": 0},
+    "deferred_count": {"type": "integer", "minimum": 0},
+    "rejected_count": {"type": "integer", "minimum": 0},
+    "unresolved_count": {"type": "integer", "minimum": 0},
+    "high_unresolved_count": {"type": "integer", "minimum": 0},
+    "stale_record_count": {"type": "integer", "minimum": 0},
+    "missing_action_count": {"type": "integer", "minimum": 0},
+    "finding_count": {"type": "integer", "minimum": 0},
+    "high_count": {"type": "integer", "minimum": 0},
+    "medium_count": {"type": "integer", "minimum": 0},
+    "low_count": {"type": "integer", "minimum": 0},
+    "records": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "review_id",
+          "action_id",
+          "decision",
+          "reviewer",
+          "reviewed_at",
+          "fix_plan_path",
+          "fix_plan_hash",
+          "fix_plan_status",
+          "action_issue_code",
+          "action_severity",
+          "profile_id",
+          "source_id",
+          "notes",
+          "risk_flags"
+        ],
+        "properties": {
+          "review_id": {"type": "string"},
+          "action_id": {"type": "string"},
+          "decision": {"type": "string", "enum": ["resolved", "accepted_risk", "deferred", "rejected"]},
+          "reviewer": {"type": "string"},
+          "reviewed_at": {"type": "string"},
+          "fix_plan_path": {"type": "string"},
+          "fix_plan_hash": {"type": "string"},
+          "fix_plan_status": {"type": ["string", "null"]},
+          "action_issue_code": {"type": ["string", "null"]},
+          "action_severity": {"type": ["string", "null"]},
+          "profile_id": {"type": ["string", "null"]},
+          "source_id": {"type": ["string", "null"]},
+          "notes": {"type": ["string", "null"]},
+          "risk_flags": {"type": "array", "items": {"type": "string"}}
+        }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code", "severity", "message", "action_id", "review_id", "path", "suggested_action"],
+        "properties": {
+          "code": {"type": "string"},
+          "severity": {"type": "string", "enum": ["high", "medium", "low"]},
+          "message": {"type": "string"},
+          "action_id": {"type": ["string", "null"]},
+          "review_id": {"type": ["string", "null"]},
+          "path": {"type": ["string", "null"]},
+          "suggested_action": {"type": ["string", "null"]}
+        }
+      }
+    },
+    "markdown_path": {"type": ["string", "null"]},
+    "json_path": {"type": ["string", "null"]},
+    "warnings": {"type": "array", "items": {"type": "string"}}
+  }
+}

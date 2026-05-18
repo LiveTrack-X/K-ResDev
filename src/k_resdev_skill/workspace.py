@@ -4,6 +4,7 @@ import json
 import zipfile
 from pathlib import Path
 
+from .artifact_authority import generate_artifact_authority
 from .approval import load_approval_records
 from .approval_coverage import generate_workspace_approval_coverage
 from .bibliography_integrity import generate_workspace_bibliography_integrity
@@ -46,6 +47,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "agency-profiles.md",
     "approval-coverage.md",
     "approval-summary.md",
+    "artifact-authority.md",
     "bibliography-integrity.md",
     "budget-ledger.md",
     "budget-checklist.md",
@@ -156,6 +158,7 @@ def run_workspace_doctor(
     _check_profile_integrity(workspace, findings)
     _check_reports(workspace, findings)
     _check_report_integrity(workspace, findings)
+    _check_artifact_authority(workspace, findings)
     _check_bibliography_integrity(workspace, findings)
     _check_reference_corpus(workspace, findings)
     _check_citation_support_integrity(workspace, findings)
@@ -587,6 +590,33 @@ def _check_report_integrity(workspace: Path, findings: list[WorkspaceDoctorFindi
         )
 
 
+def _check_artifact_authority(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> None:
+    result = generate_artifact_authority(workspace)
+    if result.status == "not_configured":
+        return
+    path = workspace / "state" / "artifact-authority.json"
+    if result.high_count:
+        findings.append(
+            _finding(
+                "artifact_authority_high_findings",
+                "high",
+                f"{result.high_count} high-severity artifact authority finding(s) were detected.",
+                path,
+                "Run artifact-authority and resolve invalid or falsely-final projection authority.",
+            )
+        )
+    if result.medium_count or result.low_count or result.warnings:
+        findings.append(
+            _finding(
+                "artifact_authority_review_findings",
+                "medium",
+                f"{result.medium_count + result.low_count} artifact authority review finding(s) or warnings were detected.",
+                path,
+                "Review artifact-authority before treating generated artifacts as approved or externally ready.",
+            )
+        )
+
+
 def _check_bibliography_integrity(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> None:
     result = generate_workspace_bibliography_integrity(workspace)
     if result.status == "not_configured":
@@ -848,6 +878,7 @@ def _starter_readme(project_id: str, title: str, profile_id: str) -> str:
             "- Put raw files in `inbox/`.",
             "- Put BibTeX/RIS/CSL JSON bibliography files in `references/`.",
             "- Run `k-resdev discover-workspace --root . --output reports/workspace-discovery.md --json state/workspace-discovery.json` to inspect folder layout before setup or migration.",
+            "- Run `k-resdev artifact-authority --root . --output reports/artifact-authority.md --json state/artifact-authority.json` to review local artifact authority levels before external use.",
             "- Run `k-resdev intake --inbox inbox --state-dir state --evidence-dir evidence` to build evidence metadata.",
             "- Run `k-resdev bib-import references/library.bib --state-dir state --literature-matrix reports/literature-review-matrix.md` to build bibliography metadata.",
             "- Run `k-resdev reference-corpus --root . --output reports/reference-corpus-summary.md --json state/literature-corpus.json --rejections state/reference-rejection-log.json` to scan local PDFs, Zotero JSON exports, and Markdown notes into a reviewable corpus.",
@@ -866,7 +897,7 @@ def _starter_readme(project_id: str, title: str, profile_id: str) -> str:
             "- Run `k-resdev checkpoint-resume-plan --root . --output reports/checkpoint-resume-plan.md --json state/checkpoint-resume-plan.json` before resuming from a saved checkpoint.",
             "- Run `k-resdev doctor --root . --output reports/readiness.md --json state/readiness.json` before reporting.",
             "- Run `k-resdev workspace-summary --root . --output reports/workspace-summary.md --json state/workspace-summary.json` for a one-page status handoff.",
-            "- Run `k-resdev workspace-review-pack --root .` to refresh discovery, readiness, next actions, summary, source-verification, budget-ledger, approval-coverage, report-integrity, bibliography-integrity, reference-corpus, citation-support, research-claim-matrix, trace-passport, and trace artifacts together.",
+            "- Run `k-resdev workspace-review-pack --root .` to refresh discovery, readiness, next actions, summary, source-verification, artifact-authority, budget-ledger, approval-coverage, report-integrity, bibliography-integrity, reference-corpus, citation-support, research-claim-matrix, trace-passport, and trace artifacts together.",
             "- Run `k-resdev verify-review-pack state/workspace-review-pack.json` to check saved review-pack artifact hashes.",
             "- Run `k-resdev verify-evidence-sources state/evidence-index.json --root . --output reports/source-verification.md --json state/source-verification.json` to check indexed source hashes.",
             "- Run `k-resdev approval-coverage --root . --output reports/approval-coverage.md --json state/approval-coverage.json` to check report approval coverage.",

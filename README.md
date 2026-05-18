@@ -2,7 +2,7 @@
 
 Purpose: 한국형 국책 R&D 환경에서 연구 행정 문서화, 증빙 정합성, 보고서 생성, 논문/데이터 인사이트 보조를 evidence-first 방식으로 지원하는 Codex/Skill 프로젝트입니다.
 
-Current release: `0.1 BETA 29` (`0.1.0b29`).
+Current release: `0.1 BETA 30` (`0.1.0b30`).
 
 Core principle:
 
@@ -64,13 +64,15 @@ This repository does not encode any single ministry/institution form as authorit
 - Projection export workflow for Markdown drafts to DOCX, TXT, HTML, or HWPX-compatible HTML review files.
 - Workspace initializer and readiness doctor for standard local workspace setup and pre-reporting checks.
 - Read-only workspace discovery and additive setup planning for new or messy R&D folders before initialization or migration.
+- Artifact authority level classifier for raw sources, extracted candidates, evidence states, draft/reviewed/approved projections, and operating summaries.
 - Workspace next-action planner that converts doctor findings into deterministic, reviewable commands.
 - Workspace summary report that combines readiness, next actions, evidence counts, approvals, reports, exports, and analysis manifests.
-- Workspace review pack command that refreshes discovery, readiness, next actions, workspace summary, budget-ledger, profile-integrity, source-verification, approval-coverage, report-integrity, bibliography-integrity, reference-corpus, citation-support, research-claim-matrix, and workspace-trace artifacts together.
+- Workspace review pack command that refreshes discovery, readiness, next actions, workspace summary, artifact-authority, budget-ledger, profile-integrity, source-verification, approval-coverage, report-integrity, bibliography-integrity, reference-corpus, citation-support, research-claim-matrix, and workspace-trace artifacts together.
 - Review pack artifact hash manifest and verifier for detecting missing or changed generated artifacts.
 - Evidence source verifier that checks indexed source files against saved source hashes.
 - Workspace doctor and review pack integration for local evidence-source presence/hash drift checks.
 - Workspace doctor, next-action, summary, and review-pack integration for workspace discovery/setup findings.
+- Workspace doctor, next-action, summary, review-pack, and trace metadata integration for artifact authority findings.
 - Next-action routing for source-integrity findings.
 - Workspace doctor and review pack integration for report approval coverage.
 - Workspace doctor and review pack integration for report claim integrity findings.
@@ -92,6 +94,7 @@ python -m pytest
 python -m k_resdev_skill intake --inbox .\inbox --project my-rnd-project
 python -m k_resdev_skill init-workspace --root .\demo-workspace --project-id PRJ-2026-0001 --title "Demo R&D Project"
 python -m k_resdev_skill discover-workspace --root .\demo-workspace --output .\demo-workspace\reports\workspace-discovery.md --json .\demo-workspace\state\workspace-discovery.json
+python -m k_resdev_skill artifact-authority --root .\demo-workspace --output .\demo-workspace\reports\artifact-authority.md --json .\demo-workspace\state\artifact-authority.json
 python -m k_resdev_skill doctor --root .\demo-workspace --output .\demo-workspace\reports\readiness.md --json .\demo-workspace\state\readiness.json
 python -m k_resdev_skill next-actions --root .\demo-workspace --output .\demo-workspace\reports\next-actions.md --json .\demo-workspace\state\next-actions.json
 python -m k_resdev_skill approval-coverage --root .\demo-workspace --output .\demo-workspace\reports\approval-coverage.md --json .\demo-workspace\state\approval-coverage.json
@@ -146,6 +149,9 @@ python -m k_resdev_skill validate-json reference-rejection .\state\reference-rej
 python -m k_resdev_skill validate-json workspace-discovery .\state\workspace-discovery.json
 python -m k_resdev_skill validate-json workspace-discovery-item .\templates\workspace-discovery-item.json
 python -m k_resdev_skill validate-json workspace-setup-proposal .\templates\workspace-setup-proposal.json
+python -m k_resdev_skill validate-json artifact-authority .\state\artifact-authority.json
+python -m k_resdev_skill validate-json artifact-authority-record .\templates\artifact-authority-record.json
+python -m k_resdev_skill validate-json artifact-authority-finding .\templates\artifact-authority-finding.json
 python -m k_resdev_skill validate-json evidence .\state\evidence-index.json
 python -m k_resdev_skill validate-json bibliography-review .\templates\bibliography-review-record.json
 python -m k_resdev_skill approval-record --target-type report --target-id monthly-2026-05 --target-path .\reports\monthly-report-2026-05.md --decision needs_changes --reviewer reviewer-name --approvals-dir .\state\approvals

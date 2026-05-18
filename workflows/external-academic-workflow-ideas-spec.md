@@ -119,7 +119,7 @@ rejected
 ```
 
 Proposed implementation:
-- Add `authority_level` as optional metadata to generated artifacts and trace graph nodes.
+- Add `artifact_authority_level` as optional metadata to generated artifacts and trace graph nodes.
 - Derive default authority from existing status fields where possible.
 - Doctor warnings should fire when high-authority outputs cite low-authority inputs without a human review record.
 
@@ -397,7 +397,7 @@ Safety rule:
 
 Recommended order after the traceability graph, research-claim matrix, trace-passport, corpus-adapter, and workspace-discovery first passes:
 
-1. Add `artifact_authority_level` to trace nodes and generated artifact metadata.
+1. Artifact authority levels are implemented as Task 40.
 2. Implement goals/deadline operating file and goals review.
 3. Implement local weekly review and dashboard.
 4. Add thin workflow router only after the concrete commands are stable.
@@ -421,6 +421,7 @@ Recommended order after the traceability graph, research-claim matrix, trace-pas
 | Trace passport and checkpoints | Task 37 |
 | Corpus adapter bridge | Task 38 |
 | Workspace discovery and setup proposal | Task 39 |
-| Goals/deadline operating file | Task 40 |
-| Local weekly review and dashboard | Task 41 |
-| Single router UX | Task 42 |
+| Artifact authority levels | Task 40 |
+| Goals/deadline operating file | Task 41 |
+| Local weekly review and dashboard | Task 42 |
+| Single router UX | Task 43 |

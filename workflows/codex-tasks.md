@@ -415,7 +415,19 @@ Implemented:
 
 Discovery is read-only by default. It must not move, rename, delete, or modify raw files.
 
-### Task 40: Goals and deadlines review
+### Task 40: Artifact authority levels
+
+Implemented:
+- `ArtifactAuthorityRecord`, `ArtifactAuthorityFinding`, and `WorkspaceArtifactAuthorityResult` models
+- `artifact-authority` command
+- `state/artifact-authority.json` and `reports/artifact-authority.md`
+- default authority labels for raw sources, extracted candidates, evidence states, draft/reviewed/approved projections, operating summaries, rejected, and superseded artifacts
+- high-severity warnings for final/submission-named projections without current approval and projections citing rejected or superseded evidence
+- workspace doctor, next-action, summary, review-pack, schema, template, and trace metadata integration
+
+Authority levels are workflow metadata only. They do not create approvals or certify official compliance, legal status, or scientific truth.
+
+### Task 41: Goals and deadlines review
 
 Planned:
 - `ProjectObjective` and `ProjectDeadline` models
@@ -424,7 +436,7 @@ Planned:
 
 Goals review is an operating projection only.
 
-### Task 41: Local weekly review and workspace dashboard
+### Task 42: Local weekly review and workspace dashboard
 
 Planned:
 - local artifact-only weekly review generator
@@ -434,7 +446,7 @@ Planned:
 
 Weekly reviews are team operating summaries, not final official reports.
 
-### Task 42: Thin workflow router
+### Task 43: Thin workflow router
 
 Planned:
 - `workflow admin-review`, `workflow research-review`, `workflow integrity-review`, and `workflow weekly`

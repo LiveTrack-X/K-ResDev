@@ -1,12 +1,12 @@
 # K-ResDev Next Planning
 
-This planning note starts after `0.1.0b29`.
+This planning note starts after `0.1.0b30`.
 
 ## Current Diagnosis
 
-K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, budget ledger review, bibliography metadata, reference corpus adapters, read-only workspace discovery, bibliography review, citation support, research claim matrices, profile source records, profile integrity, workspace traceability graph, trace passport checkpoints, workspace doctor, next actions, workspace summary, and review packs.
+K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, budget ledger review, bibliography metadata, reference corpus adapters, read-only workspace discovery, bibliography review, citation support, research claim matrices, profile source records, profile integrity, workspace traceability graph, trace passport checkpoints, artifact authority labels, workspace doctor, next actions, workspace summary, and review packs.
 
-The next bottleneck is making artifact authority levels explicit without weakening the evidence-first boundary. A real R&D workspace now needs visible distinctions between raw sources, extracted candidates, reviewed evidence, draft projections, approved projections, and operating summaries.
+The next bottleneck is maintaining local project objectives and deadlines as first-class operating artifacts. A real R&D workspace now needs a lightweight goals/deadline file that links KPIs, milestones, evidence, reports, approvals, and upcoming review dates without pretending to know official agency schedules.
 
 ## Planning Principles
 
@@ -23,7 +23,7 @@ The next bottleneck is making artifact authority levels explicit without weakeni
 
 Most important takeaways:
 - add a K-ResDev trace passport/checkpoint layer after the traceability graph;
-- make artifact authority levels explicit across reports, evidence, approvals, bibliography, and claims;
+- keep artifact authority levels visible across reports, evidence, approvals, bibliography, and claims;
 - grow bibliography support into local corpus adapters for folder scans, Zotero exports, and Markdown notes;
 - add read-only workspace discovery before setup or migration;
 - add goals/deadline review and a local weekly dashboard for ongoing project operation.
@@ -165,6 +165,8 @@ Safety boundary:
 
 Goal: make authority boundaries visible across raw sources, extracted candidates, reviewed evidence, draft projections, approved projections, and operating summaries.
 
+Status: implemented as a local first pass in `src/k_resdev_skill/artifact_authority.py`, with CLI/API, doctor, next-action, summary, review-pack, schema, template, and trace metadata integration.
+
 Expected scope:
 - `artifact_authority_level` metadata for generated artifacts and trace nodes.
 - authority summary in workspace summary and review pack.
@@ -209,6 +211,6 @@ These should wait until traceability, impact analysis, and verified profile sour
 
 ## Recommended Next Slice
 
-Implement Beta 30 next.
+Implement Beta 31 next.
 
-Beta 30 should add artifact authority levels so generated artifacts visibly declare whether they are raw source references, extracted candidates, reviewed evidence, draft projections, approved projections, or operating summaries. This should be metadata/checking only and must not promote any artifact without supplied human approval.
+Beta 31 should add a goals/deadlines operating layer so users can review objectives, KPI and milestone links, report readiness, and approaching deadlines from local K-ResDev artifacts. It should stay an operating projection only and must not hardcode official schedule or agency submission rules.

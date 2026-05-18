@@ -15,6 +15,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "agency-profiles.md",
     "approval-coverage.md",
     "approval-summary.md",
+    "artifact-authority.md",
     "bibliography-integrity.md",
     "bibliography-review-summary.md",
     "budget-ledger.md",

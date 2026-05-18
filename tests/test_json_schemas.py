@@ -136,3 +136,21 @@ def test_workspace_setup_proposal_template_matches_json_schema():
         sample = json.load(handle)
 
     jsonschema.validate(sample, schema)
+
+
+def test_artifact_authority_record_template_matches_json_schema():
+    with open("schemas/artifact_authority_record.schema.json", encoding="utf-8") as handle:
+        schema = json.load(handle)
+    with open("templates/artifact-authority-record.json", encoding="utf-8") as handle:
+        sample = json.load(handle)
+
+    jsonschema.validate(sample, schema)
+
+
+def test_artifact_authority_finding_template_matches_json_schema():
+    with open("schemas/artifact_authority_finding.schema.json", encoding="utf-8") as handle:
+        schema = json.load(handle)
+    with open("templates/artifact-authority-finding.json", encoding="utf-8") as handle:
+        sample = json.load(handle)
+
+    jsonschema.validate(sample, schema)

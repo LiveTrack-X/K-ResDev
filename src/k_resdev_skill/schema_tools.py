@@ -9,6 +9,12 @@ from jsonschema import Draft202012Validator
 
 SCHEMA_ALIASES = {
     "approval": "approval_record.schema.json",
+    "artifact-authority": "artifact_authority.schema.json",
+    "artifact_authority": "artifact_authority.schema.json",
+    "artifact-authority-record": "artifact_authority_record.schema.json",
+    "artifact_authority_record": "artifact_authority_record.schema.json",
+    "artifact-authority-finding": "artifact_authority_finding.schema.json",
+    "artifact_authority_finding": "artifact_authority_finding.schema.json",
     "bibliography": "bibliography_entry.schema.json",
     "bibliography-entry": "bibliography_entry.schema.json",
     "bibliography-review": "bibliography_review_record.schema.json",
@@ -94,6 +100,8 @@ def _validation_targets(document: Any, schema_payload: dict[str, Any]) -> list[t
     title = schema_payload.get("title")
     if title in {
         "ApprovalRecord",
+        "ArtifactAuthorityFinding",
+        "ArtifactAuthorityRecord",
         "BibliographyEntry",
         "BibliographyReviewRecord",
         "BudgetLedgerItem",
@@ -112,6 +120,10 @@ def _validation_targets(document: Any, schema_payload: dict[str, Any]) -> list[t
             return [(f"$[{index}]", item) for index, item in enumerate(document)]
         if title == "WorkspaceSetupProposal" and isinstance(document, dict) and isinstance(document.get("proposals"), list):
             return [(f"$.proposals[{index}]", item) for index, item in enumerate(document["proposals"])]
+        if title == "ArtifactAuthorityRecord" and isinstance(document, dict) and isinstance(document.get("records"), list):
+            return [(f"$.records[{index}]", item) for index, item in enumerate(document["records"])]
+        if title == "ArtifactAuthorityFinding" and isinstance(document, dict) and isinstance(document.get("findings"), list):
+            return [(f"$.findings[{index}]", item) for index, item in enumerate(document["findings"])]
         if isinstance(document, dict) and isinstance(document.get("items"), list):
             return [(f"$.items[{index}]", item) for index, item in enumerate(document["items"])]
     return [("$", document)]

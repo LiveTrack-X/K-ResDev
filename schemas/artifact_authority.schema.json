@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "WorkspaceArtifactAuthorityResult",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["root", "status"],
+  "properties": {
+    "root": { "type": "string", "minLength": 1 },
+    "status": { "type": "string", "minLength": 1 },
+    "artifact_count": { "type": "integer", "minimum": 0 },
+    "finding_count": { "type": "integer", "minimum": 0 },
+    "high_count": { "type": "integer", "minimum": 0 },
+    "medium_count": { "type": "integer", "minimum": 0 },
+    "low_count": { "type": "integer", "minimum": 0 },
+    "authority_level_counts": { "type": "object", "additionalProperties": { "type": "integer" } },
+    "records": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["artifact_id", "artifact_type", "authority_level"],
+        "properties": {
+          "artifact_id": { "type": "string", "minLength": 1 },
+          "path": { "type": ["string", "null"] },
+          "artifact_type": { "type": "string", "minLength": 1 },
+          "authority_level": { "type": "string", "minLength": 1 },
+          "status": { "type": ["string", "null"] },
+          "ref_id": { "type": ["string", "null"] },
+          "target_id": { "type": ["string", "null"] },
+          "approval_id": { "type": ["string", "null"] },
+          "source_hash": { "type": ["string", "null"] },
+          "risk_flags": { "type": "array", "items": { "type": "string" } },
+          "metadata": { "type": "object" }
+        }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code", "severity", "message"],
+        "properties": {
+          "code": { "type": "string", "minLength": 1 },
+          "severity": { "type": "string", "minLength": 1 },
+          "message": { "type": "string", "minLength": 1 },
+          "path": { "type": ["string", "null"] },
+          "artifact_id": { "type": ["string", "null"] },
+          "authority_level": { "type": ["string", "null"] },
+          "suggested_action": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "markdown_path": { "type": ["string", "null"] },
+    "json_path": { "type": ["string", "null"] },
+    "warnings": { "type": "array", "items": { "type": "string" } }
+  }
+}

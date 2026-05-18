@@ -1,0 +1,9 @@
+{
+  "code": "authority_projection_not_approved",
+  "severity": "medium",
+  "message": "Projection has no current approved authority.",
+  "path": "reports/monthly-report-2026-05.md",
+  "artifact_id": "AUTH-2026-ABCD1234",
+  "authority_level": "draft_projection",
+  "suggested_action": "Record a supplied human approval with target_path before treating this artifact as approved."
+}

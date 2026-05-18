@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 
 from . import __version__
+from .artifact_authority import generate_artifact_authority
 from .audit import generate_audit_qna
 from .approval import (
     approval_gate_status,
@@ -369,6 +370,11 @@ def main(argv: list[str] | None = None) -> int:
     discovery_parser.add_argument("--output", default=None)
     discovery_parser.add_argument("--json", default=None)
     discovery_parser.add_argument("--max-items", type=int, default=500)
+
+    authority_parser = subparsers.add_parser("artifact-authority", help="Classify local artifact authority levels and detect projection authority risks.")
+    authority_parser.add_argument("--root", default=".")
+    authority_parser.add_argument("--output", default=None)
+    authority_parser.add_argument("--json", default=None)
 
     next_actions_parser = subparsers.add_parser("next-actions", help="Generate a safe next-action plan from workspace doctor findings.")
     next_actions_parser.add_argument("--root", default=".")
@@ -746,6 +752,10 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if args.command == "discover-workspace":
         result = discover_workspace(args.root, output_path=args.output, json_path=args.json, max_items=args.max_items)
+        print(result.model_dump_json(indent=2))
+        return 0
+    if args.command == "artifact-authority":
+        result = generate_artifact_authority(args.root, output_path=args.output, json_path=args.json)
         print(result.model_dump_json(indent=2))
         return 0
     if args.command == "next-actions":

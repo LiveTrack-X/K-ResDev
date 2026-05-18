@@ -91,6 +91,14 @@ def test_validate_json_file_accepts_workspace_discovery_aliases():
     assert proposal["valid"] is True
 
 
+def test_validate_json_file_accepts_artifact_authority_aliases():
+    record = validate_json_file("templates/artifact-authority-record.json", "artifact-authority-record")
+    finding = validate_json_file("templates/artifact-authority-finding.json", "artifact-authority-finding")
+
+    assert record["valid"] is True
+    assert finding["valid"] is True
+
+
 def test_validate_json_cli_returns_nonzero_for_invalid(tmp_path, capsys):
     path = tmp_path / "bad-approval.json"
     path.write_text(json.dumps({"approval_id": "APR-2026-BAD"}), encoding="utf-8")

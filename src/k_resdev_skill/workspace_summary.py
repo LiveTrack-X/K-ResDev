@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from .artifact_authority import generate_artifact_authority
 from .approval import load_approval_records
 from .evidence_index import load_evidence_index
 from .models import (
@@ -46,6 +47,7 @@ def generate_workspace_summary(
     manifests = _sorted_paths(workspace / "reports" / "analysis", ["*-analysis-run.json"])
     budget_ledger = generate_workspace_budget_ledger(workspace)
     discovery = discover_workspace(workspace)
+    artifact_authority = generate_artifact_authority(workspace)
     reference_corpus = build_reference_corpus(workspace)
     research_claim_matrix = generate_research_claim_matrix(workspace)
     profile_integrity = generate_profile_integrity(workspace)
@@ -78,6 +80,11 @@ def generate_workspace_summary(
         discovery_missing_standard_dir_count=len(discovery.missing_standard_dirs),
         discovery_loose_candidate_count=discovery.loose_candidate_count,
         discovery_setup_proposal_count=len(discovery.proposals),
+        artifact_authority_status=artifact_authority.status,
+        artifact_authority_count=artifact_authority.artifact_count,
+        artifact_authority_finding_count=artifact_authority.finding_count,
+        artifact_authority_high_count=artifact_authority.high_count,
+        artifact_authority_level_counts=artifact_authority.authority_level_counts,
         reference_corpus_status=reference_corpus.status,
         reference_corpus_count=reference_corpus.item_count,
         reference_rejection_count=reference_corpus.rejection_count,
@@ -133,6 +140,9 @@ def render_workspace_summary_markdown(summary: WorkspaceSummaryResult) -> str:
         f"| Discovery scanned paths | {summary.discovery_scanned_count} |",
         f"| Discovery missing dirs | {summary.discovery_missing_standard_dir_count} |",
         f"| Discovery loose candidates | {summary.discovery_loose_candidate_count} |",
+        f"| Artifact authority | {_escape(summary.artifact_authority_status or '-')} |",
+        f"| Authority artifacts | {summary.artifact_authority_count} |",
+        f"| Authority findings | {summary.artifact_authority_finding_count} |",
         f"| Budget ledger | {_escape(summary.budget_ledger_status or '-')} |",
         f"| Budget ledger rows | {summary.budget_ledger_count} |",
         f"| Reference corpus | {_escape(summary.reference_corpus_status or '-')} |",
@@ -169,6 +179,7 @@ def render_workspace_summary_markdown(summary: WorkspaceSummaryResult) -> str:
         f"| Projection exports | {len(summary.export_paths)} | {_format_paths(summary.export_paths)} |",
         f"| Analysis manifests | {len(summary.analysis_manifest_paths)} | {_format_paths(summary.analysis_manifest_paths)} |",
         f"| Workspace discovery | {summary.discovery_scanned_count} | status: {_escape(summary.discovery_status or '-')}; missing dirs: {summary.discovery_missing_standard_dir_count}; loose candidates: {summary.discovery_loose_candidate_count}; proposals: {summary.discovery_setup_proposal_count} |",
+        f"| Artifact authority | {summary.artifact_authority_count} | status: {_escape(summary.artifact_authority_status or '-')}; findings: {summary.artifact_authority_finding_count}; high: {summary.artifact_authority_high_count}; levels: {_format_counts(summary.artifact_authority_level_counts)} |",
         f"| Budget ledger | {summary.budget_ledger_count} | status: {_escape(summary.budget_ledger_status or '-')}; findings: {summary.budget_ledger_finding_count}; totals: {_format_float_counts(summary.budget_total_by_currency)} |",
         f"| Reference corpus | {summary.reference_corpus_count} | status: {_escape(summary.reference_corpus_status or '-')}; rejections: {summary.reference_rejection_count}; high: {summary.reference_corpus_high_count} |",
         f"| Research claim matrix | {summary.research_claim_count} | status: {_escape(summary.research_claim_matrix_status or '-')}; findings: {summary.research_claim_matrix_finding_count} |",

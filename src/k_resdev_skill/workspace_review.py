@@ -4,6 +4,7 @@ import hashlib
 import json
 from pathlib import Path
 
+from .artifact_authority import generate_artifact_authority
 from .models import (
     ReviewPackArtifact,
     ReviewPackVerificationItem,
@@ -33,7 +34,7 @@ def generate_workspace_review_pack(
     state_dir: str | Path | None = None,
     max_actions: int = 5,
 ) -> WorkspaceReviewPackResult:
-    """Generate a bundled local review pack for discovery, readiness, traceability, checkpoint, budget, profile, source, approval, report, bibliography, reference corpus, citation-support, and research-claim checks."""
+    """Generate a bundled local review pack for discovery, authority, readiness, traceability, checkpoint, budget, profile, source, approval, report, bibliography, reference corpus, citation-support, and research-claim checks."""
 
     workspace = Path(root)
     reports = Path(reports_dir) if reports_dir is not None else workspace / "reports"
@@ -51,6 +52,8 @@ def generate_workspace_review_pack(
     summary_json = state / "workspace-summary.json"
     source_md = reports / "source-verification.md"
     source_json = state / "source-verification.json"
+    authority_md = reports / "artifact-authority.md"
+    authority_json = state / "artifact-authority.json"
     approval_md = reports / "approval-coverage.md"
     approval_json = state / "approval-coverage.json"
     report_integrity_md = reports / "report-integrity.md"
@@ -78,6 +81,7 @@ def generate_workspace_review_pack(
     discovery = discover_workspace(workspace, output_path=discovery_md, json_path=discovery_json)
     doctor = run_workspace_doctor(workspace, readiness_md, readiness_json)
     source_verification = verify_evidence_sources(state / "evidence-index.json", root=workspace, output_path=source_md, json_path=source_json)
+    artifact_authority = generate_artifact_authority(workspace, output_path=authority_md, json_path=authority_json)
     approval_coverage = generate_workspace_approval_coverage(workspace, output_path=approval_md, json_path=approval_json)
     report_integrity = generate_workspace_report_integrity(workspace, output_path=report_integrity_md, json_path=report_integrity_json)
     budget_ledger = generate_workspace_budget_ledger(workspace, output_path=budget_ledger_md, json_path=budget_ledger_json)
@@ -108,6 +112,8 @@ def generate_workspace_review_pack(
         str(summary_json),
         str(source_md),
         str(source_json),
+        str(authority_md),
+        str(authority_json),
         str(approval_md),
         str(approval_json),
         str(report_integrity_md),
@@ -142,6 +148,10 @@ def generate_workspace_review_pack(
         source_verification_valid=source_verification.valid,
         source_missing_count=source_verification.missing_count,
         source_mismatch_count=source_verification.mismatch_count,
+        artifact_authority_status=artifact_authority.status,
+        artifact_authority_count=artifact_authority.artifact_count,
+        artifact_authority_finding_count=artifact_authority.finding_count,
+        artifact_authority_high_count=artifact_authority.high_count,
         approval_coverage_status=approval_coverage.status,
         approval_missing_count=approval_coverage.missing_count,
         approval_not_approved_count=approval_coverage.not_approved_count,
@@ -247,7 +257,7 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
     lines = [
         "# K-ResDev Workspace Review Pack",
         "",
-        "> Review pack projection only. It bundles local discovery, readiness, next-action, summary, source-verification, budget-ledger, approval-coverage, report-integrity, bibliography-integrity, reference-corpus, citation-support, research-claim-matrix, trace-passport, profile-integrity, and trace artifacts; it does not certify official agency compliance.",
+        "> Review pack projection only. It bundles local discovery, authority, readiness, next-action, summary, source-verification, budget-ledger, approval-coverage, report-integrity, bibliography-integrity, reference-corpus, citation-support, research-claim-matrix, trace-passport, profile-integrity, and trace artifacts; it does not certify official agency compliance.",
         "",
         "| Field | Value |",
         "|---|---|",
@@ -260,6 +270,10 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
         f"| Source verification valid | {result.source_verification_valid} |",
         f"| Source missing count | {result.source_missing_count} |",
         f"| Source mismatch count | {result.source_mismatch_count} |",
+        f"| Artifact authority status | {_escape(result.artifact_authority_status or '-')} |",
+        f"| Artifact authority count | {result.artifact_authority_count} |",
+        f"| Artifact authority finding count | {result.artifact_authority_finding_count} |",
+        f"| Artifact authority high count | {result.artifact_authority_high_count} |",
         f"| Approval coverage status | {_escape(result.approval_coverage_status or '-')} |",
         f"| Approval missing count | {result.approval_missing_count} |",
         f"| Approval not approved count | {result.approval_not_approved_count} |",
@@ -335,6 +349,7 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
             "- Use `next-actions.md` as a reviewable command plan.",
             "- Use `workspace-summary.md` as a one-page handoff/status snapshot.",
             "- Use `source-verification.md` to check local source presence and hash drift.",
+            "- Use `artifact-authority.md` to check whether artifacts are raw sources, extracted candidates, accepted evidence, drafts, reviewed projections, or approved projections.",
             "- Use `approval-coverage.md` to check report artifacts against supplied human decisions.",
             "- Use `report-integrity.md` to check draft report claims against indexed evidence.",
             "- Use `budget-ledger.md` to check budget ledger proof, approval, duplicate, and evidence-link gaps.",
@@ -366,6 +381,8 @@ def _artifact_label(path: str) -> str:
         "workspace-summary.json": "Workspace summary JSON",
         "source-verification.md": "Evidence source verification",
         "source-verification.json": "Evidence source verification JSON",
+        "artifact-authority.md": "Artifact authority",
+        "artifact-authority.json": "Artifact authority JSON",
         "approval-coverage.md": "Approval coverage",
         "approval-coverage.json": "Approval coverage JSON",
         "report-integrity.md": "Report integrity",

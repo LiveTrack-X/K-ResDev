@@ -707,6 +707,60 @@ class WorkspaceDiscoveryResult(StrictModel):
     warnings: list[str] = Field(default_factory=list)
 
 
+class ArtifactAuthorityRecord(StrictModel):
+    artifact_id: str
+    path: str | None = None
+    artifact_type: str
+    authority_level: str
+    status: str | None = None
+    ref_id: str | None = None
+    target_id: str | None = None
+    approval_id: str | None = None
+    source_hash: str | None = None
+    risk_flags: list[str] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+    @field_validator("artifact_id", "artifact_type", "authority_level")
+    @classmethod
+    def _authority_field_must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
+class ArtifactAuthorityFinding(StrictModel):
+    code: str
+    severity: str
+    message: str
+    path: str | None = None
+    artifact_id: str | None = None
+    authority_level: str | None = None
+    suggested_action: str | None = None
+
+    @field_validator("code", "severity", "message")
+    @classmethod
+    def _finding_field_must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
+class WorkspaceArtifactAuthorityResult(StrictModel):
+    root: str
+    status: str
+    artifact_count: int = 0
+    finding_count: int = 0
+    high_count: int = 0
+    medium_count: int = 0
+    low_count: int = 0
+    authority_level_counts: dict[str, int] = Field(default_factory=dict)
+    records: list[ArtifactAuthorityRecord] = Field(default_factory=list)
+    findings: list[ArtifactAuthorityFinding] = Field(default_factory=list)
+    markdown_path: str | None = None
+    json_path: str | None = None
+    warnings: list[str] = Field(default_factory=list)
+
+
 class WorkspaceDoctorFinding(StrictModel):
     code: str
     severity: str
@@ -829,6 +883,11 @@ class WorkspaceSummaryResult(StrictModel):
     discovery_missing_standard_dir_count: int = 0
     discovery_loose_candidate_count: int = 0
     discovery_setup_proposal_count: int = 0
+    artifact_authority_status: str | None = None
+    artifact_authority_count: int = 0
+    artifact_authority_finding_count: int = 0
+    artifact_authority_high_count: int = 0
+    artifact_authority_level_counts: dict[str, int] = Field(default_factory=dict)
     reference_corpus_status: str | None = None
     reference_corpus_count: int = 0
     reference_rejection_count: int = 0
@@ -1042,6 +1101,10 @@ class WorkspaceReviewPackResult(StrictModel):
     discovery_missing_standard_dir_count: int = 0
     discovery_loose_candidate_count: int = 0
     discovery_setup_proposal_count: int = 0
+    artifact_authority_status: str | None = None
+    artifact_authority_count: int = 0
+    artifact_authority_finding_count: int = 0
+    artifact_authority_high_count: int = 0
     bibliography_integrity_status: str | None = None
     bibliography_entry_count: int = 0
     bibliography_review_count: int = 0

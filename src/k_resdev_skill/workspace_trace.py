@@ -6,6 +6,7 @@ import re
 from pathlib import Path
 from typing import Any
 
+from .artifact_authority import authority_for_trace_node
 from .approval import load_approval_records
 from .bibliography import load_bibliography_index
 from .bibliography_integrity import extract_markdown_citation_keys
@@ -37,6 +38,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "agency-profiles.md",
     "approval-coverage.md",
     "approval-summary.md",
+    "artifact-authority.md",
     "bibliography-integrity.md",
     "budget-ledger.md",
     "budget-checklist.md",
@@ -913,9 +915,12 @@ class _TraceBuilder:
         metadata: dict[str, Any] | None = None,
     ) -> WorkspaceTraceNode:
         node_id = _node_id(node_type, key)
+        incoming_metadata = dict(metadata or {})
+        incoming_metadata.setdefault("artifact_authority_level", authority_for_trace_node(node_type, status, path, incoming_metadata))
         existing = self.nodes.get(node_id)
         if existing is not None:
-            merged_metadata = {**existing.metadata, **(metadata or {})}
+            merged_metadata = {**existing.metadata, **incoming_metadata}
+            merged_metadata.setdefault("artifact_authority_level", authority_for_trace_node(node_type, existing.status or status, existing.path or path, merged_metadata))
             updated = existing.model_copy(
                 update={
                     "path": existing.path or path,
@@ -935,7 +940,7 @@ class _TraceBuilder:
             ref_id=ref_id,
             status=status,
             sha256=_normalize_hash(sha256) if sha256 else None,
-            metadata=metadata or {},
+            metadata=incoming_metadata,
         )
         self.nodes[node_id] = node
         return node

@@ -1,0 +1,15 @@
+{
+  "artifact_id": "AUTH-2026-ABCD1234",
+  "path": "reports/monthly-report-2026-05.md",
+  "artifact_type": "report_draft",
+  "authority_level": "draft_projection",
+  "status": "missing",
+  "ref_id": null,
+  "target_id": "monthly-2026-05",
+  "approval_id": null,
+  "source_hash": "sha256:example",
+  "risk_flags": ["approval_missing"],
+  "metadata": {
+    "hash_status": "not_checked"
+  }
+}

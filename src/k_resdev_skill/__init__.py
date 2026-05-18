@@ -1,5 +1,12 @@
 """K-ResDev evidence-first R&D skill helpers."""
 
+from .artifact_authority import (
+    authority_for_evidence_status,
+    authority_for_trace_node,
+    generate_artifact_authority,
+    load_artifact_authority,
+    render_artifact_authority_markdown,
+)
 from .approval import (
     approval_gate_status,
     create_approval_record,
@@ -63,6 +70,8 @@ from .intake import run_intake
 from .literature import generate_literature_matrix
 from .models import (
     ApprovalRecord,
+    ArtifactAuthorityFinding,
+    ArtifactAuthorityRecord,
     AnalysisRunResult,
     BibliographyEntry,
     BibliographyIntegrityFinding,
@@ -118,6 +127,7 @@ from .models import (
     WorkspaceActionPlan,
     WorkspaceApprovalCoverageItem,
     WorkspaceApprovalCoverageResult,
+    WorkspaceArtifactAuthorityResult,
     WorkspaceBibliographyIntegrityResult,
     WorkspaceBudgetLedgerResult,
     WorkspaceCitationSupportResult,
@@ -199,6 +209,8 @@ from .workspace_trace import generate_workspace_trace, render_workspace_trace_ma
 
 __all__ = [
     "ApprovalRecord",
+    "ArtifactAuthorityFinding",
+    "ArtifactAuthorityRecord",
     "AnalysisRunResult",
     "BibliographyEntry",
     "BibliographyIntegrityFinding",
@@ -255,6 +267,7 @@ __all__ = [
     "WorkspaceActionPlan",
     "WorkspaceApprovalCoverageItem",
     "WorkspaceApprovalCoverageResult",
+    "WorkspaceArtifactAuthorityResult",
     "WorkspaceBibliographyIntegrityResult",
     "WorkspaceBudgetLedgerResult",
     "WorkspaceCitationSupportResult",
@@ -274,6 +287,8 @@ __all__ = [
     "WorkspaceTraceResult",
     "VerifiedProfilePack",
     "approval_gate_status",
+    "authority_for_evidence_status",
+    "authority_for_trace_node",
     "bibliography_review_status",
     "budget_evidence_gaps",
     "build_reference_corpus",
@@ -294,6 +309,7 @@ __all__ = [
     "extract_markdown_citation_keys",
     "generate_audit_qna",
     "generate_approval_summary",
+    "generate_artifact_authority",
     "generate_analysis_script",
     "generate_budget_evidence_checklist",
     "generate_workspace_budget_ledger",
@@ -332,6 +348,7 @@ __all__ = [
     "latest_bibliography_review",
     "latest_citation_support",
     "load_approval_records",
+    "load_artifact_authority",
     "load_bibliography_review_records",
     "load_citation_support_records",
     "load_evidence_index",
@@ -359,6 +376,7 @@ __all__ = [
     "render_doctor_markdown",
     "render_action_plan_markdown",
     "render_approval_coverage_markdown",
+    "render_artifact_authority_markdown",
     "render_evidence_source_verification_markdown",
     "render_profile_integrity_markdown",
     "render_profile_source_summary_markdown",
@@ -391,4 +409,4 @@ __all__ = [
     "write_research_claims",
 ]
 
-__version__ = "0.1.0b29"
+__version__ = "0.1.0b30"

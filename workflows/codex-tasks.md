@@ -403,18 +403,28 @@ Implemented:
 
 Adapters must never fabricate citation metadata, paper relevance, or claim support.
 
-### Task 39: Workspace discovery, goals, and deadlines
+### Task 39: Workspace discovery and setup planning
+
+Implemented:
+- read-only `discover-workspace` command
+- additive setup proposals before initialization or migration
+- `WorkspaceDiscoveryItem`, `WorkspaceSetupProposal`, and `WorkspaceDiscoveryResult` models
+- `state/workspace-discovery.json` and `reports/workspace-discovery.md`
+- loose source candidate detection outside standard K-ResDev folders
+- workspace doctor, next-action, summary, review-pack, schema, and template integration
+
+Discovery is read-only by default. It must not move, rename, delete, or modify raw files.
+
+### Task 40: Goals and deadlines review
 
 Planned:
-- read-only `workspace-discover` command
-- additive `workspace-setup-plan` output before initialization or migration
 - `ProjectObjective` and `ProjectDeadline` models
 - `state/project-goals.json`, `reports/goals-review.md`, and deadline readiness checks
 - KPI/milestone/evidence/report linkage without official agency schedule claims
 
-Discovery is read-only by default. Goals review is an operating projection only.
+Goals review is an operating projection only.
 
-### Task 40: Local weekly review and workspace dashboard
+### Task 41: Local weekly review and workspace dashboard
 
 Planned:
 - local artifact-only weekly review generator
@@ -424,7 +434,7 @@ Planned:
 
 Weekly reviews are team operating summaries, not final official reports.
 
-### Task 41: Thin workflow router
+### Task 42: Thin workflow router
 
 Planned:
 - `workflow admin-review`, `workflow research-review`, `workflow integrity-review`, and `workflow weekly`

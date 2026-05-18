@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "WorkspaceSetupProposal",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["proposal_id", "priority", "title", "rationale"],
+  "properties": {
+    "proposal_id": { "type": "string", "minLength": 1 },
+    "priority": { "type": "string", "minLength": 1 },
+    "title": { "type": "string", "minLength": 1 },
+    "rationale": { "type": "string", "minLength": 1 },
+    "command": { "type": ["string", "null"] },
+    "operation_type": { "type": "string", "minLength": 1 },
+    "destructive": { "type": "boolean" },
+    "creates_paths": { "type": "array", "items": { "type": "string" } },
+    "review_paths": { "type": "array", "items": { "type": "string" } },
+    "related_roles": { "type": "array", "items": { "type": "string" } }
+  }
+}

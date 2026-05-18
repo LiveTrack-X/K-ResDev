@@ -26,6 +26,7 @@ from .report_integrity import generate_workspace_report_integrity
 from .schema_tools import validate_json_file
 from .source_verification import verify_evidence_sources
 from .trace_passport import generate_trace_passport
+from .workspace_discovery import discover_workspace
 from .workspace_trace import generate_workspace_trace
 
 DRAFT_NOTICE = "Draft projection only"
@@ -62,6 +63,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "report-integrity.md",
     "source-verification.md",
     "trace-passport.md",
+    "workspace-discovery.md",
     "workspace-review-pack.md",
     "workspace-summary.md",
     "workspace-trace.md",
@@ -145,6 +147,7 @@ def run_workspace_doctor(
 
     workspace = Path(root)
     findings: list[WorkspaceDoctorFinding] = []
+    _check_workspace_discovery(workspace, findings)
     evidence_count = _check_evidence(workspace, findings)
     approval_count = _check_approvals(workspace, findings)
     _check_approval_coverage(workspace, findings)
@@ -282,6 +285,41 @@ def _check_evidence(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> 
         )
     _check_source_integrity(workspace, index_path, findings)
     return len(evidence)
+
+
+def _check_workspace_discovery(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> None:
+    result = discover_workspace(workspace)
+    if result.status == "blocked":
+        findings.append(
+            _finding(
+                "workspace_discovery_blocked",
+                "high",
+                "Workspace discovery could not inspect the selected root.",
+                workspace,
+                "Choose a directory root before running K-ResDev setup or intake.",
+            )
+        )
+        return
+    if result.status == "needs_setup":
+        findings.append(
+            _finding(
+                "workspace_discovery_setup_needed",
+                "high",
+                f"{len(result.missing_standard_dirs)} standard folder(s) and {len(result.missing_starter_files)} starter file(s) are missing.",
+                workspace,
+                "Run discover-workspace, review the setup proposal, then run init-workspace if appropriate.",
+            )
+        )
+    if result.loose_candidate_count:
+        findings.append(
+            _finding(
+                "workspace_discovery_review_needed",
+                "medium",
+                f"{result.loose_candidate_count} loose source candidate(s) were found outside standard K-ResDev folders.",
+                workspace,
+                "Run discover-workspace and manually place raw source files before intake.",
+            )
+        )
 
 
 def _check_source_integrity(workspace: Path, index_path: Path, findings: list[WorkspaceDoctorFinding]) -> None:
@@ -809,6 +847,7 @@ def _starter_readme(project_id: str, title: str, profile_id: str) -> str:
             f"- Profile: `{profile_id}`",
             "- Put raw files in `inbox/`.",
             "- Put BibTeX/RIS/CSL JSON bibliography files in `references/`.",
+            "- Run `k-resdev discover-workspace --root . --output reports/workspace-discovery.md --json state/workspace-discovery.json` to inspect folder layout before setup or migration.",
             "- Run `k-resdev intake --inbox inbox --state-dir state --evidence-dir evidence` to build evidence metadata.",
             "- Run `k-resdev bib-import references/library.bib --state-dir state --literature-matrix reports/literature-review-matrix.md` to build bibliography metadata.",
             "- Run `k-resdev reference-corpus --root . --output reports/reference-corpus-summary.md --json state/literature-corpus.json --rejections state/reference-rejection-log.json` to scan local PDFs, Zotero JSON exports, and Markdown notes into a reviewable corpus.",
@@ -827,7 +866,7 @@ def _starter_readme(project_id: str, title: str, profile_id: str) -> str:
             "- Run `k-resdev checkpoint-resume-plan --root . --output reports/checkpoint-resume-plan.md --json state/checkpoint-resume-plan.json` before resuming from a saved checkpoint.",
             "- Run `k-resdev doctor --root . --output reports/readiness.md --json state/readiness.json` before reporting.",
             "- Run `k-resdev workspace-summary --root . --output reports/workspace-summary.md --json state/workspace-summary.json` for a one-page status handoff.",
-            "- Run `k-resdev workspace-review-pack --root .` to refresh readiness, next actions, summary, source-verification, budget-ledger, approval-coverage, report-integrity, bibliography-integrity, reference-corpus, citation-support, research-claim-matrix, trace-passport, and trace artifacts together.",
+            "- Run `k-resdev workspace-review-pack --root .` to refresh discovery, readiness, next actions, summary, source-verification, budget-ledger, approval-coverage, report-integrity, bibliography-integrity, reference-corpus, citation-support, research-claim-matrix, trace-passport, and trace artifacts together.",
             "- Run `k-resdev verify-review-pack state/workspace-review-pack.json` to check saved review-pack artifact hashes.",
             "- Run `k-resdev verify-evidence-sources state/evidence-index.json --root . --output reports/source-verification.md --json state/source-verification.json` to check indexed source hashes.",
             "- Run `k-resdev approval-coverage --root . --output reports/approval-coverage.md --json state/approval-coverage.json` to check report approval coverage.",

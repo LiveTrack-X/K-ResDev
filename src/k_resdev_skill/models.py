@@ -651,6 +651,62 @@ class WorkspaceInitResult(StrictModel):
     warnings: list[str] = Field(default_factory=list)
 
 
+class WorkspaceDiscoveryItem(StrictModel):
+    path: str
+    path_type: str
+    role: str
+    size_bytes: int | None = None
+    suffix: str | None = None
+    confidence: str = "medium"
+    risk_flags: list[str] = Field(default_factory=list)
+    notes: list[str] = Field(default_factory=list)
+
+    @field_validator("path", "path_type", "role", "confidence")
+    @classmethod
+    def _must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
+class WorkspaceSetupProposal(StrictModel):
+    proposal_id: str
+    priority: str
+    title: str
+    rationale: str
+    command: str | None = None
+    operation_type: str = "review"
+    destructive: bool = False
+    creates_paths: list[str] = Field(default_factory=list)
+    review_paths: list[str] = Field(default_factory=list)
+    related_roles: list[str] = Field(default_factory=list)
+
+    @field_validator("proposal_id", "priority", "title", "rationale", "operation_type")
+    @classmethod
+    def _proposal_field_must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
+class WorkspaceDiscoveryResult(StrictModel):
+    root: str
+    status: str
+    scanned_count: int = 0
+    file_count: int = 0
+    directory_count: int = 0
+    standard_dir_count: int = 0
+    missing_standard_dirs: list[str] = Field(default_factory=list)
+    missing_starter_files: list[str] = Field(default_factory=list)
+    loose_candidate_count: int = 0
+    role_counts: dict[str, int] = Field(default_factory=dict)
+    items: list[WorkspaceDiscoveryItem] = Field(default_factory=list)
+    proposals: list[WorkspaceSetupProposal] = Field(default_factory=list)
+    markdown_path: str | None = None
+    json_path: str | None = None
+    warnings: list[str] = Field(default_factory=list)
+
+
 class WorkspaceDoctorFinding(StrictModel):
     code: str
     severity: str
@@ -768,6 +824,11 @@ class WorkspaceSummaryResult(StrictModel):
     budget_ledger_count: int = 0
     budget_ledger_finding_count: int = 0
     budget_total_by_currency: dict[str, float] = Field(default_factory=dict)
+    discovery_status: str | None = None
+    discovery_scanned_count: int = 0
+    discovery_missing_standard_dir_count: int = 0
+    discovery_loose_candidate_count: int = 0
+    discovery_setup_proposal_count: int = 0
     reference_corpus_status: str | None = None
     reference_corpus_count: int = 0
     reference_rejection_count: int = 0
@@ -976,6 +1037,11 @@ class WorkspaceReviewPackResult(StrictModel):
     report_integrity_status: str | None = None
     report_integrity_finding_count: int = 0
     report_integrity_high_count: int = 0
+    discovery_status: str | None = None
+    discovery_scanned_count: int = 0
+    discovery_missing_standard_dir_count: int = 0
+    discovery_loose_candidate_count: int = 0
+    discovery_setup_proposal_count: int = 0
     bibliography_integrity_status: str | None = None
     bibliography_entry_count: int = 0
     bibliography_review_count: int = 0

@@ -22,6 +22,7 @@ from .source_verification import verify_evidence_sources
 from .trace_passport import generate_trace_passport
 from .workspace import run_workspace_doctor
 from .workspace_actions import generate_workspace_action_plan
+from .workspace_discovery import discover_workspace
 from .workspace_summary import generate_workspace_summary
 from .workspace_trace import generate_workspace_trace
 
@@ -32,7 +33,7 @@ def generate_workspace_review_pack(
     state_dir: str | Path | None = None,
     max_actions: int = 5,
 ) -> WorkspaceReviewPackResult:
-    """Generate a bundled local review pack for readiness, traceability, checkpoint, budget, profile, source, approval, report, bibliography, reference corpus, citation-support, and research-claim checks."""
+    """Generate a bundled local review pack for discovery, readiness, traceability, checkpoint, budget, profile, source, approval, report, bibliography, reference corpus, citation-support, and research-claim checks."""
 
     workspace = Path(root)
     reports = Path(reports_dir) if reports_dir is not None else workspace / "reports"
@@ -42,6 +43,8 @@ def generate_workspace_review_pack(
 
     readiness_md = reports / "readiness.md"
     readiness_json = state / "readiness.json"
+    discovery_md = reports / "workspace-discovery.md"
+    discovery_json = state / "workspace-discovery.json"
     actions_md = reports / "next-actions.md"
     actions_json = state / "next-actions.json"
     summary_md = reports / "workspace-summary.md"
@@ -72,6 +75,7 @@ def generate_workspace_review_pack(
     index_md = reports / "workspace-review-pack.md"
     index_json = state / "workspace-review-pack.json"
 
+    discovery = discover_workspace(workspace, output_path=discovery_md, json_path=discovery_json)
     doctor = run_workspace_doctor(workspace, readiness_md, readiness_json)
     source_verification = verify_evidence_sources(state / "evidence-index.json", root=workspace, output_path=source_md, json_path=source_json)
     approval_coverage = generate_workspace_approval_coverage(workspace, output_path=approval_md, json_path=approval_json)
@@ -96,6 +100,8 @@ def generate_workspace_review_pack(
     generated_paths = [
         str(readiness_md),
         str(readiness_json),
+        str(discovery_md),
+        str(discovery_json),
         str(actions_md),
         str(actions_json),
         str(summary_md),
@@ -144,6 +150,11 @@ def generate_workspace_review_pack(
         report_integrity_status=report_integrity.status,
         report_integrity_finding_count=report_integrity.finding_count,
         report_integrity_high_count=report_integrity.high_count,
+        discovery_status=discovery.status,
+        discovery_scanned_count=discovery.scanned_count,
+        discovery_missing_standard_dir_count=len(discovery.missing_standard_dirs),
+        discovery_loose_candidate_count=discovery.loose_candidate_count,
+        discovery_setup_proposal_count=len(discovery.proposals),
         budget_ledger_status=budget_ledger.status,
         budget_ledger_count=budget_ledger.ledger_count,
         budget_ledger_finding_count=budget_ledger.finding_count,
@@ -236,7 +247,7 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
     lines = [
         "# K-ResDev Workspace Review Pack",
         "",
-        "> Review pack projection only. It bundles local readiness, next-action, summary, source-verification, budget-ledger, approval-coverage, report-integrity, bibliography-integrity, reference-corpus, citation-support, research-claim-matrix, trace-passport, profile-integrity, and trace artifacts; it does not certify official agency compliance.",
+        "> Review pack projection only. It bundles local discovery, readiness, next-action, summary, source-verification, budget-ledger, approval-coverage, report-integrity, bibliography-integrity, reference-corpus, citation-support, research-claim-matrix, trace-passport, profile-integrity, and trace artifacts; it does not certify official agency compliance.",
         "",
         "| Field | Value |",
         "|---|---|",
@@ -257,6 +268,11 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
         f"| Report integrity status | {_escape(result.report_integrity_status or '-')} |",
         f"| Report integrity finding count | {result.report_integrity_finding_count} |",
         f"| Report integrity high count | {result.report_integrity_high_count} |",
+        f"| Workspace discovery status | {_escape(result.discovery_status or '-')} |",
+        f"| Discovery scanned paths | {result.discovery_scanned_count} |",
+        f"| Discovery missing standard dirs | {result.discovery_missing_standard_dir_count} |",
+        f"| Discovery loose candidates | {result.discovery_loose_candidate_count} |",
+        f"| Discovery setup proposals | {result.discovery_setup_proposal_count} |",
         f"| Budget ledger status | {_escape(result.budget_ledger_status or '-')} |",
         f"| Budget ledger count | {result.budget_ledger_count} |",
         f"| Budget ledger finding count | {result.budget_ledger_finding_count} |",
@@ -314,6 +330,7 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
             "",
             "## Use",
             "",
+            "- Start with `workspace-discovery.md` when the folder is new, messy, or has not been initialized.",
             "- Start with `readiness.md` for blockers and warnings.",
             "- Use `next-actions.md` as a reviewable command plan.",
             "- Use `workspace-summary.md` as a one-page handoff/status snapshot.",
@@ -341,6 +358,8 @@ def _artifact_label(path: str) -> str:
     labels = {
         "readiness.md": "Readiness report",
         "readiness.json": "Readiness JSON",
+        "workspace-discovery.md": "Workspace discovery",
+        "workspace-discovery.json": "Workspace discovery JSON",
         "next-actions.md": "Next actions",
         "next-actions.json": "Next actions JSON",
         "workspace-summary.md": "Workspace summary",

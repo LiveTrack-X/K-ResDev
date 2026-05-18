@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "WorkspaceDiscoveryItem",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["path", "path_type", "role"],
+  "properties": {
+    "path": { "type": "string", "minLength": 1 },
+    "path_type": { "type": "string", "minLength": 1 },
+    "role": { "type": "string", "minLength": 1 },
+    "size_bytes": { "type": ["integer", "null"], "minimum": 0 },
+    "suffix": { "type": ["string", "null"] },
+    "confidence": { "type": "string", "minLength": 1 },
+    "risk_flags": { "type": "array", "items": { "type": "string" } },
+    "notes": { "type": "array", "items": { "type": "string" } }
+  }
+}

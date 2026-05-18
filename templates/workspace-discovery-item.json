@@ -1,0 +1,10 @@
+{
+  "path": "inbox/plan.pdf",
+  "path_type": "file",
+  "role": "plan_candidate",
+  "size_bytes": 12345,
+  "suffix": ".pdf",
+  "confidence": "medium",
+  "risk_flags": ["raw_candidate_needs_manual_placement"],
+  "notes": []
+}

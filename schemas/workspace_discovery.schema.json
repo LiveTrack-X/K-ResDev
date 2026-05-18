@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "WorkspaceDiscoveryResult",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["root", "status"],
+  "properties": {
+    "root": { "type": "string", "minLength": 1 },
+    "status": { "type": "string", "minLength": 1 },
+    "scanned_count": { "type": "integer", "minimum": 0 },
+    "file_count": { "type": "integer", "minimum": 0 },
+    "directory_count": { "type": "integer", "minimum": 0 },
+    "standard_dir_count": { "type": "integer", "minimum": 0 },
+    "missing_standard_dirs": { "type": "array", "items": { "type": "string" } },
+    "missing_starter_files": { "type": "array", "items": { "type": "string" } },
+    "loose_candidate_count": { "type": "integer", "minimum": 0 },
+    "role_counts": { "type": "object", "additionalProperties": { "type": "integer" } },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "path_type", "role"],
+        "properties": {
+          "path": { "type": "string", "minLength": 1 },
+          "path_type": { "type": "string", "minLength": 1 },
+          "role": { "type": "string", "minLength": 1 },
+          "size_bytes": { "type": ["integer", "null"], "minimum": 0 },
+          "suffix": { "type": ["string", "null"] },
+          "confidence": { "type": "string", "minLength": 1 },
+          "risk_flags": { "type": "array", "items": { "type": "string" } },
+          "notes": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "proposals": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["proposal_id", "priority", "title", "rationale"],
+        "properties": {
+          "proposal_id": { "type": "string", "minLength": 1 },
+          "priority": { "type": "string", "minLength": 1 },
+          "title": { "type": "string", "minLength": 1 },
+          "rationale": { "type": "string", "minLength": 1 },
+          "command": { "type": ["string", "null"] },
+          "operation_type": { "type": "string", "minLength": 1 },
+          "destructive": { "type": "boolean" },
+          "creates_paths": { "type": "array", "items": { "type": "string" } },
+          "review_paths": { "type": "array", "items": { "type": "string" } },
+          "related_roles": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "markdown_path": { "type": ["string", "null"] },
+    "json_path": { "type": ["string", "null"] },
+    "warnings": { "type": "array", "items": { "type": "string" } }
+  }
+}

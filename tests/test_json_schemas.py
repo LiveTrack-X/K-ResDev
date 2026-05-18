@@ -118,3 +118,21 @@ def test_reference_rejection_template_matches_json_schema():
         sample = json.load(handle)
 
     jsonschema.validate(sample, schema)
+
+
+def test_workspace_discovery_item_template_matches_json_schema():
+    with open("schemas/workspace_discovery_item.schema.json", encoding="utf-8") as handle:
+        schema = json.load(handle)
+    with open("templates/workspace-discovery-item.json", encoding="utf-8") as handle:
+        sample = json.load(handle)
+
+    jsonschema.validate(sample, schema)
+
+
+def test_workspace_setup_proposal_template_matches_json_schema():
+    with open("schemas/workspace_setup_proposal.schema.json", encoding="utf-8") as handle:
+        schema = json.load(handle)
+    with open("templates/workspace-setup-proposal.json", encoding="utf-8") as handle:
+        sample = json.load(handle)
+
+    jsonschema.validate(sample, schema)

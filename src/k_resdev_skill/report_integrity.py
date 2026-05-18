@@ -33,6 +33,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "report-integrity.md",
     "source-verification.md",
     "trace-passport.md",
+    "workspace-discovery.md",
     "workspace-review-pack.md",
     "workspace-summary.md",
     "workspace-trace.md",

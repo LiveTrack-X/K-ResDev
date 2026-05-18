@@ -226,12 +226,12 @@ K-ResDev adaptation:
 Proposed artifacts:
 - `reports/workspace-discovery.md`
 - `state/workspace-discovery.json`
-- `reports/workspace-setup-proposal.md`
+- setup proposals embedded in `workspace-discovery` output
 
 Proposed CLI:
-- `workspace-discover --root .`
-- `workspace-setup-plan --root . --profile national-rnd-basic`
-- `init-workspace --from-plan state/workspace-setup-plan.json`
+- `discover-workspace --root .`
+- later optional `workspace-setup-plan --root . --profile national-rnd-basic`
+- later optional `init-workspace --from-plan state/workspace-setup-plan.json`
 
 Acceptance tests:
 - Discovery never creates or modifies project files unless output paths are explicitly supplied.
@@ -395,13 +395,12 @@ Safety rule:
 
 ## Implementation Order
 
-Recommended order after the traceability graph, research-claim matrix, trace-passport, and corpus-adapter first passes:
+Recommended order after the traceability graph, research-claim matrix, trace-passport, corpus-adapter, and workspace-discovery first passes:
 
-1. Implement workspace discovery and setup proposal.
-2. Add `artifact_authority_level` to trace nodes and generated artifact metadata.
-3. Implement goals/deadline operating file and goals review.
-4. Implement local weekly review and dashboard.
-5. Add thin workflow router only after the concrete commands are stable.
+1. Add `artifact_authority_level` to trace nodes and generated artifact metadata.
+2. Implement goals/deadline operating file and goals review.
+3. Implement local weekly review and dashboard.
+4. Add thin workflow router only after the concrete commands are stable.
 
 ## Open Questions
 
@@ -421,7 +420,7 @@ Recommended order after the traceability graph, research-claim matrix, trace-pas
 | Research claim matrix | Task 35 |
 | Trace passport and checkpoints | Task 37 |
 | Corpus adapter bridge | Task 38 |
-| Workspace discovery and setup proposal | New Task 39 |
-| Goals/deadline operating file | New Task 39 |
-| Local weekly review and dashboard | New Task 40 |
-| Single router UX | New Task 41 |
+| Workspace discovery and setup proposal | Task 39 |
+| Goals/deadline operating file | Task 40 |
+| Local weekly review and dashboard | Task 41 |
+| Single router UX | Task 42 |

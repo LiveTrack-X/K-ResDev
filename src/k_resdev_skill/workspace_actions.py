@@ -74,6 +74,7 @@ def _actions_for_findings(root: Path, findings: list[WorkspaceDoctorFinding]) ->
 
     candidates = [
         _action_for_workspace_skeleton(root, by_code),
+        _action_for_workspace_discovery(root, by_code),
         _action_for_missing_evidence(root, by_code),
         _action_for_invalid_evidence(root, by_code),
         _action_for_source_integrity(root, by_code),
@@ -113,6 +114,22 @@ def _action_for_workspace_skeleton(root: Path, by_code: dict[str, list[Workspace
         f'python -m k_resdev_skill init-workspace --root "{root}" --project-id "<project-id>" --title "<project-title>"',
         by_code,
         ["missing_evidence_index", "approval_missing", "profile_missing", "export_missing", "analysis_manifest_missing"],
+    )
+
+
+def _action_for_workspace_discovery(root: Path, by_code: dict[str, list[WorkspaceDoctorFinding]]) -> WorkspaceActionItem | None:
+    codes = ["workspace_discovery_blocked", "workspace_discovery_setup_needed", "workspace_discovery_review_needed"]
+    if not any(code in by_code for code in codes):
+        return None
+    priority = "high" if any(code in by_code for code in ("workspace_discovery_blocked", "workspace_discovery_setup_needed")) else "medium"
+    return _action(
+        root,
+        priority,
+        "Review workspace discovery proposal",
+        "Discovery shows missing setup or loose source candidates; review the additive setup plan before intake or migration.",
+        f'python -m k_resdev_skill discover-workspace --root "{root}" --output "{root / "reports" / "workspace-discovery.md"}" --json "{root / "state" / "workspace-discovery.json"}"',
+        by_code,
+        codes,
     )
 
 

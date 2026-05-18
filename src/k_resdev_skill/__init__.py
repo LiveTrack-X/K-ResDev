@@ -111,6 +111,9 @@ from .models import (
     TracePassportEntry,
     TracePassportFinding,
     TracePassportStatus,
+    WorkspaceDiscoveryItem,
+    WorkspaceDiscoveryResult,
+    WorkspaceSetupProposal,
     WorkspaceActionItem,
     WorkspaceActionPlan,
     WorkspaceApprovalCoverageItem,
@@ -185,6 +188,7 @@ from .trace_passport import (
 )
 from .workspace import initialize_workspace, render_doctor_markdown, run_workspace_doctor
 from .workspace_actions import generate_workspace_action_plan, render_action_plan_markdown
+from .workspace_discovery import discover_workspace, load_workspace_discovery, render_workspace_discovery_markdown
 from .workspace_review import (
     generate_workspace_review_pack,
     render_workspace_review_pack_markdown,
@@ -244,6 +248,9 @@ __all__ = [
     "TracePassportEntry",
     "TracePassportFinding",
     "TracePassportStatus",
+    "WorkspaceDiscoveryItem",
+    "WorkspaceDiscoveryResult",
+    "WorkspaceSetupProposal",
     "WorkspaceActionItem",
     "WorkspaceActionPlan",
     "WorkspaceApprovalCoverageItem",
@@ -278,6 +285,7 @@ __all__ = [
     "create_checkpoint",
     "check_unsupported_claims",
     "classify_file",
+    "discover_workspace",
     "draft_monthly_report",
     "extract_document_text",
     "extract_evidence_items_from_document",
@@ -332,6 +340,7 @@ __all__ = [
     "load_reference_corpus",
     "load_reference_rejections",
     "load_research_claims",
+    "load_workspace_discovery",
     "load_checkpoint_entries",
     "profile_data_file",
     "paper_records_from_bibliography",
@@ -359,6 +368,7 @@ __all__ = [
     "render_research_claims_markdown",
     "render_checkpoint_resume_plan_markdown",
     "render_trace_passport_markdown",
+    "render_workspace_discovery_markdown",
     "render_workspace_review_pack_markdown",
     "render_workspace_summary_markdown",
     "render_workspace_trace_markdown",
@@ -381,4 +391,4 @@ __all__ = [
     "write_research_claims",
 ]
 
-__version__ = "0.1.0b28"
+__version__ = "0.1.0b29"

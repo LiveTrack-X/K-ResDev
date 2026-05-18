@@ -1,12 +1,12 @@
 # K-ResDev Next Planning
 
-This planning note starts after `0.1.0b28`.
+This planning note starts after `0.1.0b29`.
 
 ## Current Diagnosis
 
-K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, budget ledger review, bibliography metadata, reference corpus adapters, bibliography review, citation support, research claim matrices, profile source records, profile integrity, workspace traceability graph, trace passport checkpoints, workspace doctor, next actions, workspace summary, and review packs.
+K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, budget ledger review, bibliography metadata, reference corpus adapters, read-only workspace discovery, bibliography review, citation support, research claim matrices, profile source records, profile integrity, workspace traceability graph, trace passport checkpoints, workspace doctor, next actions, workspace summary, and review packs.
 
-The next bottleneck is read-only workspace discovery and setup planning without weakening the evidence-first boundary. A real R&D workspace next needs folder discovery, setup/migration proposals, explicit artifact authority levels, and eventually verified agency profile packs based on current official sources.
+The next bottleneck is making artifact authority levels explicit without weakening the evidence-first boundary. A real R&D workspace now needs visible distinctions between raw sources, extracted candidates, reviewed evidence, draft projections, approved projections, and operating summaries.
 
 ## Planning Principles
 
@@ -146,25 +146,52 @@ Expected scope:
 Safety boundary:
 - Corpus adapters import metadata and user notes only. They do not verify paper relevance or claim support.
 
-### Beta 29 - Workspace Discovery, Goals, and Deadlines
+### Beta 29 - Workspace Discovery and Setup Planning
 
-Goal: help a new team understand a folder before initializing or migrating it, then maintain local objectives and deadlines linked to KPIs, milestones, evidence, and reports.
+Goal: help a new team understand a folder before initializing or migrating it.
+
+Status: implemented as a read-only first pass in `src/k_resdev_skill/workspace_discovery.py`, with CLI/API, schema/template, doctor, next-action, summary, and review-pack integration.
 
 Expected scope:
-- `workspace-discover` and `workspace-setup-plan` commands.
+- `discover-workspace` command.
 - `state/workspace-discovery.json` and `reports/workspace-discovery.md`.
-- `state/project-goals.json`, `reports/goals-review.md`, and deadline readiness checks.
+- additive setup proposals before initialization or migration.
+- loose source candidate detection outside standard K-ResDev folders.
 
 Safety boundary:
-- Discovery is read-only by default. Goals review is an operating projection, not an official reporting schedule.
+- Discovery is read-only by default. It must not move, rename, delete, or modify raw files.
 
-### Beta 30 - Local Weekly Review and Workflow Router
+### Beta 30 - Artifact Authority Levels
 
-Goal: generate a local R&D weekly dashboard from workspace artifacts and add a thin router for common Admin, Research, and Integrity review workflows.
+Goal: make authority boundaries visible across raw sources, extracted candidates, reviewed evidence, draft projections, approved projections, and operating summaries.
 
 Expected scope:
+- `artifact_authority_level` metadata for generated artifacts and trace nodes.
+- authority summary in workspace summary and review pack.
+- doctor warnings when draft projections are treated as approved artifacts.
+- no automatic approval promotion.
+
+Safety boundary:
+- Authority levels are labels and checks only. They do not create approvals or certify truth.
+
+### Beta 31 - Goals, Deadlines, and Local Weekly Review
+
+Goal: maintain local objectives/deadlines linked to KPIs, milestones, evidence, and reports, then generate a local R&D weekly dashboard from workspace artifacts.
+
+Expected scope:
+- `ProjectObjective` and `ProjectDeadline` models.
+- `state/project-goals.json`, `reports/goals-review.md`, and deadline readiness checks.
 - `weekly-review` and `workspace-dashboard` commands.
 - local artifact-only inputs by default; no Gmail, WhatsApp, Google Docs, Slack, or Teams connector actions.
+
+Safety boundary:
+- Goals review and weekly reviews are team operating summaries, not final official reports or official schedule claims.
+
+### Beta 32 - Thin Workflow Router
+
+Goal: add a thin router for common Admin, Research, and Integrity review workflows.
+
+Expected scope:
 - `workflow admin-review`, `workflow research-review`, and `workflow integrity-review` commands that print the concrete commands they run.
 
 Safety boundary:
@@ -182,6 +209,6 @@ These should wait until traceability, impact analysis, and verified profile sour
 
 ## Recommended Next Slice
 
-Implement Beta 29 next.
+Implement Beta 30 next.
 
-Beta 29 should add read-only workspace discovery and setup planning so a new or messy R&D folder can be inspected before initialization or migration. Discovery should produce additive setup proposals only and must not alter raw files by default.
+Beta 30 should add artifact authority levels so generated artifacts visibly declare whether they are raw source references, extracted candidates, reviewed evidence, draft projections, approved projections, or operating summaries. This should be metadata/checking only and must not promote any artifact without supplied human approval.

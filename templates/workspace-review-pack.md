@@ -1,6 +1,6 @@
 # K-ResDev Workspace Review Pack
 
-> Review pack projection only. It bundles local readiness, next-action, summary, source-verification, budget-ledger, approval-coverage, report-integrity, bibliography-integrity, reference-corpus, citation-support, research-claim-matrix, trace-passport, profile-integrity, and trace artifacts; it does not certify official agency compliance.
+> Review pack projection only. It bundles local discovery, readiness, next-action, summary, source-verification, budget-ledger, approval-coverage, report-integrity, bibliography-integrity, reference-corpus, citation-support, research-claim-matrix, trace-passport, profile-integrity, and trace artifacts; it does not certify official agency compliance.
 
 | Field | Value |
 |---|---|
@@ -21,6 +21,11 @@
 | Report integrity status | `{{report_integrity_status}}` |
 | Report integrity finding count | `{{report_integrity_finding_count}}` |
 | Report integrity high count | `{{report_integrity_high_count}}` |
+| Workspace discovery status | `{{discovery_status}}` |
+| Discovery scanned paths | `{{discovery_scanned_count}}` |
+| Discovery missing standard dirs | `{{discovery_missing_standard_dir_count}}` |
+| Discovery loose candidates | `{{discovery_loose_candidate_count}}` |
+| Discovery setup proposals | `{{discovery_setup_proposal_count}}` |
 | Budget ledger status | `{{budget_ledger_status}}` |
 | Budget ledger count | `{{budget_ledger_count}}` |
 | Budget ledger finding count | `{{budget_ledger_finding_count}}` |
@@ -61,6 +66,7 @@
 
 | Artifact | Path |
 |---|---|
+| Workspace discovery | `reports/workspace-discovery.md` |
 | Readiness report | `reports/readiness.md` |
 | Next actions | `reports/next-actions.md` |
 | Workspace summary | `reports/workspace-summary.md` |

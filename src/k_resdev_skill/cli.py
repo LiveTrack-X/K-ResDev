@@ -71,6 +71,7 @@ from .source_verification import verify_evidence_sources
 from .trace_passport import create_checkpoint, generate_checkpoint_resume_plan, generate_trace_passport
 from .workspace import initialize_workspace, run_workspace_doctor
 from .workspace_actions import generate_workspace_action_plan
+from .workspace_discovery import discover_workspace
 from .workspace_review import generate_workspace_review_pack, verify_workspace_review_pack
 from .workspace_summary import generate_workspace_summary
 from .workspace_trace import generate_workspace_trace
@@ -362,6 +363,12 @@ def main(argv: list[str] | None = None) -> int:
     doctor_parser.add_argument("--root", default=".")
     doctor_parser.add_argument("--output", default=None)
     doctor_parser.add_argument("--json", default=None)
+
+    discovery_parser = subparsers.add_parser("discover-workspace", help="Read-only workspace layout discovery and additive setup planning.")
+    discovery_parser.add_argument("--root", default=".")
+    discovery_parser.add_argument("--output", default=None)
+    discovery_parser.add_argument("--json", default=None)
+    discovery_parser.add_argument("--max-items", type=int, default=500)
 
     next_actions_parser = subparsers.add_parser("next-actions", help="Generate a safe next-action plan from workspace doctor findings.")
     next_actions_parser.add_argument("--root", default=".")
@@ -735,6 +742,10 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if args.command == "doctor":
         result = run_workspace_doctor(args.root, args.output, args.json)
+        print(result.model_dump_json(indent=2))
+        return 0
+    if args.command == "discover-workspace":
+        result = discover_workspace(args.root, output_path=args.output, json_path=args.json, max_items=args.max_items)
         print(result.model_dump_json(indent=2))
         return 0
     if args.command == "next-actions":

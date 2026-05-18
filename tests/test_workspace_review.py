@@ -18,6 +18,8 @@ def test_workspace_review_pack_writes_all_review_artifacts(tmp_path):
     expected = [
         tmp_path / "reports" / "readiness.md",
         tmp_path / "state" / "readiness.json",
+        tmp_path / "reports" / "workspace-discovery.md",
+        tmp_path / "state" / "workspace-discovery.json",
         tmp_path / "reports" / "next-actions.md",
         tmp_path / "state" / "next-actions.json",
         tmp_path / "reports" / "workspace-summary.md",
@@ -56,6 +58,11 @@ def test_workspace_review_pack_writes_all_review_artifacts(tmp_path):
     assert result.approval_hash_mismatch_count == 0
     assert result.approval_hash_unverified_count == 0
     assert result.report_integrity_status == "no_reports"
+    assert result.discovery_status == "ready_with_notes"
+    assert result.discovery_scanned_count >= 1
+    assert result.discovery_missing_standard_dir_count == 0
+    assert result.discovery_loose_candidate_count == 0
+    assert result.discovery_setup_proposal_count >= 1
     assert result.budget_ledger_status == "not_configured"
     assert result.budget_ledger_count == 0
     assert result.budget_ledger_finding_count == 0
@@ -86,6 +93,7 @@ def test_workspace_review_pack_writes_all_review_artifacts(tmp_path):
     assert "Approval coverage status" in rendered
     assert "Approval hash mismatch count" in rendered
     assert "Report integrity status" in rendered
+    assert "Workspace discovery status" in rendered
     assert "Budget ledger status" in rendered
     assert "Bibliography integrity status" in rendered
     assert "Reference corpus status" in rendered
@@ -102,6 +110,7 @@ def test_workspace_review_pack_writes_all_review_artifacts(tmp_path):
     assert json.loads((tmp_path / "state" / "source-verification.json").read_text(encoding="utf-8"))["valid"] is False
     assert json.loads((tmp_path / "state" / "approval-coverage.json").read_text(encoding="utf-8"))["status"] == "no_artifacts"
     assert json.loads((tmp_path / "state" / "report-integrity.json").read_text(encoding="utf-8"))["status"] == "no_reports"
+    assert json.loads((tmp_path / "state" / "workspace-discovery.json").read_text(encoding="utf-8"))["status"] == "ready_with_notes"
     assert json.loads((tmp_path / "state" / "budget-ledger-integrity.json").read_text(encoding="utf-8"))["status"] == "not_configured"
     assert json.loads((tmp_path / "state" / "bibliography-integrity.json").read_text(encoding="utf-8"))["status"] == "not_configured"
     assert json.loads((tmp_path / "state" / "literature-corpus.json").read_text(encoding="utf-8"))["status"] == "not_configured"
@@ -123,6 +132,7 @@ def test_workspace_review_pack_cli(tmp_path, capsys):
     assert (tmp_path / "reports" / "workspace-review-pack.md").exists()
     assert (tmp_path / "state" / "workspace-review-pack.json").exists()
     assert (tmp_path / "reports" / "source-verification.md").exists()
+    assert (tmp_path / "reports" / "workspace-discovery.md").exists()
     assert (tmp_path / "reports" / "approval-coverage.md").exists()
     assert (tmp_path / "reports" / "report-integrity.md").exists()
     assert (tmp_path / "reports" / "budget-ledger.md").exists()
@@ -169,6 +179,7 @@ def test_operational_markdown_does_not_satisfy_report_draft_check(tmp_path):
         "research-claim-matrix.md",
         "research-claims.md",
         "trace-passport.md",
+        "workspace-discovery.md",
         "checkpoint-resume-plan.md",
         "profile-integrity.md",
         "profile-source-summary.md",

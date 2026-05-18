@@ -20,6 +20,7 @@ from .research_claims import generate_research_claim_matrix
 from .trace_passport import generate_trace_passport
 from .workspace import OPERATIONAL_MARKDOWN_NAMES, run_workspace_doctor
 from .workspace_actions import generate_workspace_action_plan
+from .workspace_discovery import discover_workspace
 from .workspace_trace import generate_workspace_trace
 
 
@@ -44,6 +45,7 @@ def generate_workspace_summary(
     exports = _sorted_paths(workspace / "reports", ["*.docx", "*.html", "*.txt"])
     manifests = _sorted_paths(workspace / "reports" / "analysis", ["*-analysis-run.json"])
     budget_ledger = generate_workspace_budget_ledger(workspace)
+    discovery = discover_workspace(workspace)
     reference_corpus = build_reference_corpus(workspace)
     research_claim_matrix = generate_research_claim_matrix(workspace)
     profile_integrity = generate_profile_integrity(workspace)
@@ -71,6 +73,11 @@ def generate_workspace_summary(
         budget_ledger_count=budget_ledger.ledger_count,
         budget_ledger_finding_count=budget_ledger.finding_count,
         budget_total_by_currency=budget_ledger.total_by_currency,
+        discovery_status=discovery.status,
+        discovery_scanned_count=discovery.scanned_count,
+        discovery_missing_standard_dir_count=len(discovery.missing_standard_dirs),
+        discovery_loose_candidate_count=discovery.loose_candidate_count,
+        discovery_setup_proposal_count=len(discovery.proposals),
         reference_corpus_status=reference_corpus.status,
         reference_corpus_count=reference_corpus.item_count,
         reference_rejection_count=reference_corpus.rejection_count,
@@ -122,6 +129,10 @@ def render_workspace_summary_markdown(summary: WorkspaceSummaryResult) -> str:
         f"| Profile integrity | {_escape(summary.profile_integrity_status or '-')} |",
         f"| Profile sources | {summary.profile_source_count} |",
         f"| Verified profile sources | {summary.profile_verified_source_count} |",
+        f"| Workspace discovery | {_escape(summary.discovery_status or '-')} |",
+        f"| Discovery scanned paths | {summary.discovery_scanned_count} |",
+        f"| Discovery missing dirs | {summary.discovery_missing_standard_dir_count} |",
+        f"| Discovery loose candidates | {summary.discovery_loose_candidate_count} |",
         f"| Budget ledger | {_escape(summary.budget_ledger_status or '-')} |",
         f"| Budget ledger rows | {summary.budget_ledger_count} |",
         f"| Reference corpus | {_escape(summary.reference_corpus_status or '-')} |",
@@ -157,6 +168,7 @@ def render_workspace_summary_markdown(summary: WorkspaceSummaryResult) -> str:
         f"| Report Markdown | {len(summary.report_paths)} | {_format_paths(summary.report_paths)} |",
         f"| Projection exports | {len(summary.export_paths)} | {_format_paths(summary.export_paths)} |",
         f"| Analysis manifests | {len(summary.analysis_manifest_paths)} | {_format_paths(summary.analysis_manifest_paths)} |",
+        f"| Workspace discovery | {summary.discovery_scanned_count} | status: {_escape(summary.discovery_status or '-')}; missing dirs: {summary.discovery_missing_standard_dir_count}; loose candidates: {summary.discovery_loose_candidate_count}; proposals: {summary.discovery_setup_proposal_count} |",
         f"| Budget ledger | {summary.budget_ledger_count} | status: {_escape(summary.budget_ledger_status or '-')}; findings: {summary.budget_ledger_finding_count}; totals: {_format_float_counts(summary.budget_total_by_currency)} |",
         f"| Reference corpus | {summary.reference_corpus_count} | status: {_escape(summary.reference_corpus_status or '-')}; rejections: {summary.reference_rejection_count}; high: {summary.reference_corpus_high_count} |",
         f"| Research claim matrix | {summary.research_claim_count} | status: {_escape(summary.research_claim_matrix_status or '-')}; findings: {summary.research_claim_matrix_finding_count} |",

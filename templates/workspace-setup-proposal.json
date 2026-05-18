@@ -1,0 +1,12 @@
+{
+  "proposal_id": "WSP-2026-ABCD1234",
+  "priority": "high",
+  "title": "Initialize a K-ResDev workspace skeleton",
+  "rationale": "Standard folders or starter metadata are missing.",
+  "command": "python -m k_resdev_skill init-workspace --root . --project-id \"<project-id>\" --title \"<project-title>\"",
+  "operation_type": "initialize",
+  "destructive": false,
+  "creates_paths": ["inbox", "state", "evidence"],
+  "review_paths": [],
+  "related_roles": ["workspace_skeleton"]
+}

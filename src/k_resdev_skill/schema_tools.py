@@ -39,6 +39,12 @@ SCHEMA_ALIASES = {
     "checkpoint": "trace_passport_entry.schema.json",
     "trace-passport-entry": "trace_passport_entry.schema.json",
     "trace_passport_entry": "trace_passport_entry.schema.json",
+    "workspace-discovery": "workspace_discovery.schema.json",
+    "workspace_discovery": "workspace_discovery.schema.json",
+    "workspace-discovery-item": "workspace_discovery_item.schema.json",
+    "workspace_discovery_item": "workspace_discovery_item.schema.json",
+    "workspace-setup-proposal": "workspace_setup_proposal.schema.json",
+    "workspace_setup_proposal": "workspace_setup_proposal.schema.json",
 }
 
 
@@ -99,9 +105,13 @@ def _validation_targets(document: Any, schema_payload: dict[str, Any]) -> list[t
         "ResearchClaim",
         "ResearchInsight",
         "TracePassportEntry",
+        "WorkspaceDiscoveryItem",
+        "WorkspaceSetupProposal",
     }:
         if isinstance(document, list):
             return [(f"$[{index}]", item) for index, item in enumerate(document)]
+        if title == "WorkspaceSetupProposal" and isinstance(document, dict) and isinstance(document.get("proposals"), list):
+            return [(f"$.proposals[{index}]", item) for index, item in enumerate(document["proposals"])]
         if isinstance(document, dict) and isinstance(document.get("items"), list):
             return [(f"$.items[{index}]", item) for index, item in enumerate(document["items"])]
     return [("$", document)]

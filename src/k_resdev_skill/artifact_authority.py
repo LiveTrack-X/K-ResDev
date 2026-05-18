@@ -40,6 +40,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "profile-promotion-apply-plan.md",
     "profile-promotion-apply-result.md",
     "profile-promotion-revoke-plan.md",
+    "profile-promotion-revoke-result.md",
     "profile-promotion-summary.md",
     "profile-review.md",
     "profile-source-summary.md",

@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ProfilePromotionRevocationResult",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "root",
+    "status",
+    "revoked",
+    "revoke_plan_path",
+    "revoke_plan_hash",
+    "revoked_at",
+    "revoked_fields",
+    "before_profile",
+    "after_profile",
+    "warnings"
+  ],
+  "properties": {
+    "root": {"type": "string"},
+    "status": {"type": "string"},
+    "revoked": {"type": "boolean"},
+    "profile_id": {"type": ["string", "null"]},
+    "profile_path": {"type": ["string", "null"]},
+    "pre_revoke_backup_path": {"type": ["string", "null"]},
+    "restore_backup_path": {"type": ["string", "null"]},
+    "revoke_plan_path": {"type": "string"},
+    "revoke_plan_hash": {"type": "string"},
+    "apply_result_path": {"type": ["string", "null"]},
+    "apply_result_hash": {"type": ["string", "null"]},
+    "promotion_id": {"type": ["string", "null"]},
+    "reviewer": {"type": ["string", "null"]},
+    "reason": {"type": ["string", "null"]},
+    "requested_at": {"type": ["string", "null"]},
+    "revoked_at": {"type": "string"},
+    "revoked_fields": {"type": "array", "items": {"type": "string"}},
+    "before_profile": {"type": "object"},
+    "after_profile": {"type": "object"},
+    "rollback_note": {"type": ["string", "null"]},
+    "markdown_path": {"type": ["string", "null"]},
+    "json_path": {"type": ["string", "null"]},
+    "warnings": {"type": "array", "items": {"type": "string"}}
+  }
+}

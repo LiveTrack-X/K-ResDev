@@ -109,6 +109,7 @@ from .models import (
     ProfilePromotionRecord,
     ProfilePromotionRevocationChange,
     ProfilePromotionRevocationPlanResult,
+    ProfilePromotionRevocationResult,
     ProfilePromotionSummaryResult,
     ProfileReviewChecklistItem,
     ProfileReviewResult,
@@ -187,7 +188,10 @@ from .profile_promotion_apply import (
 from .profile_promotion_revoke import (
     generate_profile_promotion_revoke_plan,
     load_profile_promotion_revoke_plan,
+    load_profile_promotion_revoke_result,
     render_profile_promotion_revoke_plan_markdown,
+    render_profile_promotion_revoke_result_markdown,
+    revoke_profile_promotion_plan,
 )
 from .profile_review import generate_profile_review, load_profile_review, render_profile_review_markdown
 from .profile_sources import (
@@ -314,6 +318,7 @@ __all__ = [
     "ProfilePromotionRecord",
     "ProfilePromotionRevocationChange",
     "ProfilePromotionRevocationPlanResult",
+    "ProfilePromotionRevocationResult",
     "ProfilePromotionSummaryResult",
     "ProfileReviewChecklistItem",
     "ProfileReviewResult",
@@ -456,6 +461,7 @@ __all__ = [
     "load_profile_review",
     "load_profile_promotion_apply_result",
     "load_profile_promotion_revoke_plan",
+    "load_profile_promotion_revoke_result",
     "load_reference_corpus",
     "load_reference_rejections",
     "load_research_claims",
@@ -490,6 +496,7 @@ __all__ = [
     "render_profile_promotion_apply_plan_markdown",
     "render_profile_promotion_apply_result_markdown",
     "render_profile_promotion_revoke_plan_markdown",
+    "render_profile_promotion_revoke_result_markdown",
     "render_profile_promotion_summary_markdown",
     "render_profile_review_markdown",
     "render_profile_source_summary_markdown",
@@ -506,6 +513,7 @@ __all__ = [
     "render_workspace_dashboard_markdown",
     "render_workflow_plan_markdown",
     "render_workspace_trace_markdown",
+    "revoke_profile_promotion_plan",
     "run_workspace_doctor",
     "record_profile_source",
     "summarize_profile_promotions",
@@ -527,4 +535,4 @@ __all__ = [
     "write_research_claims",
 ]
 
-__version__ = "0.1.0b39"
+__version__ = "0.1.0b40"

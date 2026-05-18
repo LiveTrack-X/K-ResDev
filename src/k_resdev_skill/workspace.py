@@ -24,7 +24,7 @@ from .models import (
 )
 from .profile_promotion import summarize_profile_promotions
 from .profile_promotion_apply import generate_profile_promotion_apply_plan, load_profile_promotion_apply_result
-from .profile_promotion_revoke import load_profile_promotion_revoke_plan
+from .profile_promotion_revoke import load_profile_promotion_revoke_plan, load_profile_promotion_revoke_result
 from .profile_registry import default_agency_templates_root, load_project_profile
 from .profile_review import generate_profile_review
 from .profile_sources import generate_profile_integrity, load_profile_sources
@@ -71,6 +71,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "profile-promotion-apply-plan.md",
     "profile-promotion-apply-result.md",
     "profile-promotion-revoke-plan.md",
+    "profile-promotion-revoke-result.md",
     "profile-promotion-summary.md",
     "profile-review.md",
     "profile-source-summary.md",
@@ -192,6 +193,7 @@ def run_workspace_doctor(
     _check_profile_promotion(workspace, findings)
     _check_profile_promotion_apply(workspace, findings)
     _check_profile_promotion_revoke(workspace, findings)
+    _check_profile_promotion_revoke_result(workspace, findings)
     _check_reports(workspace, findings)
     _check_report_integrity(workspace, findings)
     _check_artifact_authority(workspace, findings)
@@ -771,6 +773,80 @@ def _check_profile_promotion_revoke(workspace: Path, findings: list[WorkspaceDoc
     )
 
 
+def _check_profile_promotion_revoke_result(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> None:
+    plan_path = workspace / "state" / "profile-promotion-revoke-plan.json"
+    result_path = workspace / "state" / "profile-promotion-revoke-result.json"
+    profile_path = workspace / "state" / "project-profile.json"
+    profile: ProjectProfile | None = None
+    if profile_path.exists():
+        try:
+            profile = load_project_profile(profile_path)
+        except Exception:
+            profile = None
+    if plan_path.exists() and not result_path.exists():
+        try:
+            plan = load_profile_promotion_revoke_plan(plan_path)
+        except Exception:
+            plan = None
+        if plan is not None and plan.status == "ready_to_revoke" and plan.can_revoke:
+            findings.append(
+                _finding(
+                    "profile_promotion_revoke_pending",
+                    "medium",
+                    "A profile promotion revocation plan is ready, but the guarded revoke command has not been run.",
+                    result_path,
+                    "Run profile-promotion-revoke with the revoke-plan hash, or leave the verified profile state unchanged.",
+                )
+            )
+    if not result_path.exists():
+        return
+    try:
+        result = load_profile_promotion_revoke_result(result_path)
+    except Exception as exc:
+        findings.append(
+            _finding(
+                "profile_promotion_revoke_result_unreadable",
+                "medium",
+                f"Profile promotion revoke result could not be read: {exc}",
+                result_path,
+                "Fix state/profile-promotion-revoke-result.json before relying on profile rollback state.",
+            )
+        )
+        return
+    pre_backup = Path(result.pre_revoke_backup_path) if result.pre_revoke_backup_path else None
+    if pre_backup is not None and not pre_backup.exists():
+        findings.append(
+            _finding(
+                "profile_promotion_revoke_pre_backup_missing",
+                "medium",
+                "Profile promotion revoke result refers to a missing pre-revoke backup file.",
+                pre_backup,
+                "Restore the pre-revoke backup artifact or review version control before relying on rollback instructions.",
+            )
+        )
+    restore_backup = Path(result.restore_backup_path) if result.restore_backup_path else None
+    if restore_backup is not None and not restore_backup.exists():
+        findings.append(
+            _finding(
+                "profile_promotion_revoke_restore_backup_missing",
+                "medium",
+                "Profile promotion revoke result refers to a missing original restore backup file.",
+                restore_backup,
+                "Restore the original profile backup artifact or review version control before relying on profile lifecycle history.",
+            )
+        )
+    if profile is not None and result.after_profile and profile.model_dump() != result.after_profile:
+        findings.append(
+            _finding(
+                "profile_promotion_revoke_result_drift",
+                "high",
+                "Current project profile no longer matches the saved profile promotion revoke result.",
+                profile_path,
+                "Inspect profile changes before relying on reverted profile status.",
+            )
+        )
+
+
 def _check_reports(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> None:
     reports_dir = workspace / "reports"
     reports = [path for path in reports_dir.glob("*.md") if not is_operational_markdown(path)] if reports_dir.exists() else []
@@ -1271,6 +1347,7 @@ def _starter_readme(project_id: str, title: str, profile_id: str) -> str:
             "- Run `k-resdev profile-promotion-apply-plan --root . --output reports/profile-promotion-apply-plan.md --json state/profile-promotion-apply-plan.json` before changing any profile status.",
             "- Run `k-resdev profile-promotion-apply --root . --apply-plan state/profile-promotion-apply-plan.json --apply-plan-hash <sha256>` only after reviewing the apply plan.",
             "- Run `k-resdev profile-promotion-revoke-plan --root . --reviewer <reviewer> --reason \"<reason>\" --output reports/profile-promotion-revoke-plan.md --json state/profile-promotion-revoke-plan.json` before rolling back an applied profile promotion.",
+            "- Run `k-resdev profile-promotion-revoke --root . --revoke-plan state/profile-promotion-revoke-plan.json --revoke-plan-hash <sha256>` only after reviewing the revoke plan.",
             "- Run `k-resdev budget-ledger-import references/budget-ledger.csv --state-dir state --markdown reports/budget-ledger-import.md` to import a reviewable budget ledger.",
             "- Run `k-resdev budget-ledger-integrity --root . --output reports/budget-ledger.md --json state/budget-ledger-integrity.json` to check ledger proof, approval, duplicate, and evidence-link gaps.",
             "- Run `k-resdev checkpoint-create --root . --stage review-pack --summary \"<summary>\" --status needs_review` to create a hash-backed resume checkpoint.",

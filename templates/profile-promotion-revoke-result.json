@@ -1,0 +1,31 @@
+{
+  "root": ".",
+  "status": "revoked",
+  "revoked": true,
+  "profile_id": "iris-innopolis-2026-017795",
+  "profile_path": "state/project-profile.json",
+  "pre_revoke_backup_path": "state/profile-backups/project-profile-pre-revoke-20260519T120000Z-abcd1234.json",
+  "restore_backup_path": "state/profile-backups/project-profile-20260519T100000Z-abcd1234.json",
+  "revoke_plan_path": "state/profile-promotion-revoke-plan.json",
+  "revoke_plan_hash": "sha256:abcd1234",
+  "apply_result_path": "state/profile-promotion-apply-result.json",
+  "apply_result_hash": "sha256:dcba4321",
+  "promotion_id": "PPR-2026-ABCD1234",
+  "reviewer": "project-owner",
+  "reason": "Supplied human decision to revoke the verified profile promotion.",
+  "requested_at": "2026-05-19T11:00:00Z",
+  "revoked_at": "2026-05-19T12:00:00Z",
+  "revoked_fields": ["status", "notes"],
+  "before_profile": {
+    "profile_id": "iris-innopolis-2026-017795",
+    "status": "verified"
+  },
+  "after_profile": {
+    "profile_id": "iris-innopolis-2026-017795",
+    "status": "needs_review"
+  },
+  "rollback_note": "Restore state/project-profile.json from the pre-revoke backup path or from version control.",
+  "markdown_path": "reports/profile-promotion-revoke-result.md",
+  "json_path": "state/profile-promotion-revoke-result.json",
+  "warnings": []
+}

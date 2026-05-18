@@ -54,7 +54,7 @@ from .profile_promotion import (
     write_profile_promotion_record,
 )
 from .profile_promotion_apply import apply_profile_promotion_plan, generate_profile_promotion_apply_plan
-from .profile_promotion_revoke import generate_profile_promotion_revoke_plan
+from .profile_promotion_revoke import generate_profile_promotion_revoke_plan, revoke_profile_promotion_plan
 from .profile_sources import (
     create_profile_source_record,
     default_profile_sources_path,
@@ -372,6 +372,15 @@ def main(argv: list[str] | None = None) -> int:
     profile_promotion_revoke_parser.add_argument("--requested-at", default=None)
     profile_promotion_revoke_parser.add_argument("--output", default=None)
     profile_promotion_revoke_parser.add_argument("--json", default=None)
+
+    profile_promotion_revoke_run_parser = subparsers.add_parser("profile-promotion-revoke", help="Apply a hash-matched profile promotion revocation plan with a backup.")
+    profile_promotion_revoke_run_parser.add_argument("--root", default=".")
+    profile_promotion_revoke_run_parser.add_argument("--revoke-plan", required=True)
+    profile_promotion_revoke_run_parser.add_argument("--revoke-plan-hash", required=True)
+    profile_promotion_revoke_run_parser.add_argument("--backup-dir", default=None)
+    profile_promotion_revoke_run_parser.add_argument("--revoked-at", default=None)
+    profile_promotion_revoke_run_parser.add_argument("--output", default=None)
+    profile_promotion_revoke_run_parser.add_argument("--json", default=None)
 
     validate_json_parser = subparsers.add_parser("validate-json", help="Validate JSON files against bundled or custom JSON schema.")
     validate_json_parser.add_argument(
@@ -855,6 +864,18 @@ def main(argv: list[str] | None = None) -> int:
         )
         print(result.model_dump_json(indent=2))
         return 0 if result.status in {"ready_to_revoke", "already_restored"} else 1
+    if args.command == "profile-promotion-revoke":
+        result = revoke_profile_promotion_plan(
+            args.root,
+            revoke_plan_path=args.revoke_plan,
+            revoke_plan_hash=args.revoke_plan_hash,
+            output_path=args.output,
+            json_path=args.json,
+            backup_dir=args.backup_dir,
+            revoked_at=args.revoked_at,
+        )
+        print(result.model_dump_json(indent=2))
+        return 0
     if args.command == "validate-json":
         result = validate_json_files(args.json_paths, args.schema)
         print(json.dumps(result, ensure_ascii=False, indent=2))

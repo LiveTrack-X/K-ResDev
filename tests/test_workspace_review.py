@@ -232,6 +232,7 @@ def test_operational_markdown_does_not_satisfy_report_draft_check(tmp_path):
         "profile-promotion-apply-plan.md",
         "profile-promotion-apply-result.md",
         "profile-promotion-revoke-plan.md",
+        "profile-promotion-revoke-result.md",
         "profile-promotion-summary.md",
         "profile-review.md",
         "profile-source-summary.md",

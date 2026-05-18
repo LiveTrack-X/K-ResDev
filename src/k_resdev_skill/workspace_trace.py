@@ -24,6 +24,7 @@ from .models import (
     ProfilePromotionApplyPlanResult,
     ProfilePromotionApplyResult,
     ProfilePromotionRevocationPlanResult,
+    ProfilePromotionRevocationResult,
     ProfileSource,
     ReferenceCorpusItem,
     ResearchClaim,
@@ -58,6 +59,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "profile-promotion-apply-plan.md",
     "profile-promotion-apply-result.md",
     "profile-promotion-revoke-plan.md",
+    "profile-promotion-revoke-result.md",
     "profile-promotion-summary.md",
     "profile-review.md",
     "profile-source-summary.md",
@@ -97,6 +99,7 @@ def generate_workspace_trace(
     builder.add_profile_promotion_apply_plan()
     builder.add_profile_promotion_apply_result()
     builder.add_profile_promotion_revoke_plan()
+    builder.add_profile_promotion_revoke_result()
     builder.add_bibliography()
     builder.add_reference_corpus()
     builder.add_reports()
@@ -745,6 +748,66 @@ class _TraceBuilder:
                 path=str(path),
                 suggested_action="Review backup, apply-result, and current profile state before rollback.",
             )
+
+    def add_profile_promotion_revoke_result(self) -> None:
+        path = self.workspace / "state" / "profile-promotion-revoke-result.json"
+        if not path.exists():
+            return
+        try:
+            result = ProfilePromotionRevocationResult.model_validate_json(path.read_text(encoding="utf-8-sig"))
+        except Exception as exc:
+            self.finding(
+                "trace_profile_promotion_revoke_result_unreadable",
+                "medium",
+                f"Profile promotion revoke result could not be read: {exc}",
+                path=path,
+                suggested_action="Fix state/profile-promotion-revoke-result.json before relying on rollback trace state.",
+            )
+            return
+        node = self.node(
+            "profile_promotion_revoke_result",
+            "profile-promotion-revoke-result",
+            "Profile promotion revocation result",
+            status=result.status,
+            path=str(path),
+            metadata={
+                "profile_id": result.profile_id,
+                "revoked": result.revoked,
+                "promotion_id": result.promotion_id,
+                "revoked_fields": result.revoked_fields,
+                "pre_revoke_backup_path": result.pre_revoke_backup_path,
+                "restore_backup_path": result.restore_backup_path,
+                "revoked_at": result.revoked_at,
+            },
+        )
+        if result.profile_id:
+            self.edge(node.node_id, _node_id("profile", result.profile_id), "restored_profile")
+        if result.promotion_id:
+            self.edge(node.node_id, _node_id("profile_promotion", result.promotion_id), "revokes_promotion")
+        self.edge(node.node_id, _node_id("profile_promotion_revoke_plan", "profile-promotion-revoke-plan"), "applies_revoke_plan")
+        self.edge(node.node_id, _node_id("profile_promotion_apply_result", "profile-promotion-apply-result"), "reverts_apply_result")
+        if result.pre_revoke_backup_path:
+            self.edge(node.node_id, _node_id("artifact", result.pre_revoke_backup_path), "created_pre_revoke_backup")
+            if not Path(result.pre_revoke_backup_path).exists():
+                self.finding(
+                    "trace_profile_promotion_revoke_pre_backup_missing",
+                    "medium",
+                    "Profile promotion revoke result pre-revoke backup path is missing.",
+                    node_id=node.node_id,
+                    path=result.pre_revoke_backup_path,
+                    suggested_action="Restore the pre-revoke profile backup or review version control rollback options.",
+                )
+        if result.restore_backup_path:
+            self.edge(node.node_id, _node_id("artifact", result.restore_backup_path), "restored_from_backup")
+            if not Path(result.restore_backup_path).exists():
+                self.finding(
+                    "trace_profile_promotion_revoke_restore_backup_missing",
+                    "medium",
+                    "Profile promotion revoke result restore backup path is missing.",
+                    node_id=node.node_id,
+                    path=result.restore_backup_path,
+                    suggested_action="Restore the original profile backup or review version control rollback options.",
+                )
 
     def add_approvals(self) -> None:
         approvals_dir = self.workspace / "state" / "approvals"

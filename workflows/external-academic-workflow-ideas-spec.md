@@ -407,6 +407,7 @@ Recommended order after the traceability graph, research-claim matrix, trace-pas
 8. Profile promotion apply-plan workflow is implemented as Task 47.
 9. Guarded profile promotion apply command is implemented as Task 48.
 10. Profile promotion revocation-plan workflow is implemented as Task 49.
+11. Guarded profile promotion revoke command is implemented as Task 50.
 
 ## Open Questions
 
@@ -438,3 +439,4 @@ Recommended order after the traceability graph, research-claim matrix, trace-pas
 | Guarded profile promotion apply results | Task 48 |
 | Profile promotion revocation plans | Task 49 |
 | Guarded profile promotion revoke results | Task 50 |
+| Profile lifecycle ledger | Task 51 |

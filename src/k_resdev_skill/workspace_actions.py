@@ -88,6 +88,7 @@ def _actions_for_findings(root: Path, findings: list[WorkspaceDoctorFinding]) ->
         _action_for_profile_promotion_apply(root, by_code),
         _action_for_profile_promotion_apply_result(root, by_code),
         _action_for_profile_promotion_revoke(root, by_code),
+        _action_for_profile_promotion_revoke_result(root, by_code),
         _action_for_approval_coverage(root, by_code),
         _action_for_report_integrity(root, by_code),
         _action_for_artifact_authority(root, by_code),
@@ -368,6 +369,30 @@ def _action_for_profile_promotion_revoke(root: Path, by_code: dict[str, list[Wor
         "Review profile promotion revocation plan",
         "A saved revocation plan is blocked or stale; inspect backup, apply-result, and current profile state before any rollback.",
         f'python -m k_resdev_skill profile-promotion-revoke-plan --root "{root}" --reviewer "<reviewer>" --reason "<reason>" --output "{root / "reports" / "profile-promotion-revoke-plan.md"}" --json "{root / "state" / "profile-promotion-revoke-plan.json"}"',
+        by_code,
+        codes,
+    )
+
+
+def _action_for_profile_promotion_revoke_result(root: Path, by_code: dict[str, list[WorkspaceDoctorFinding]]) -> WorkspaceActionItem | None:
+    codes = [
+        "profile_promotion_revoke_pending",
+        "profile_promotion_revoke_result_unreadable",
+        "profile_promotion_revoke_pre_backup_missing",
+        "profile_promotion_revoke_restore_backup_missing",
+        "profile_promotion_revoke_result_drift",
+    ]
+    if not any(code in by_code for code in codes):
+        return None
+    plan_path = root / "state" / "profile-promotion-revoke-plan.json"
+    plan_hash = _sha256_file(plan_path) if plan_path.exists() else "<sha256>"
+    priority = "high" if any(code in by_code for code in codes[1:]) else "medium"
+    return _action(
+        root,
+        priority,
+        "Apply or review profile promotion revocation plan",
+        "Profile rollback should go through the guarded revoke command with a current revoke-plan hash and pre-revoke backup.",
+        f'python -m k_resdev_skill profile-promotion-revoke --root "{root}" --revoke-plan "{plan_path}" --revoke-plan-hash "{plan_hash}" --output "{root / "reports" / "profile-promotion-revoke-result.md"}" --json "{root / "state" / "profile-promotion-revoke-result.json"}"',
         by_code,
         codes,
     )

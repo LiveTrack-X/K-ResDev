@@ -548,14 +548,28 @@ Revocation plans are proposal-only lifecycle controls. They do not restore profi
 
 ### Task 50: Guarded profile promotion revoke command
 
+Implemented:
+- `ProfilePromotionRevocationResult` model
+- `profile-promotion-revoke` command and public API
+- required current revoke-plan artifact and matching SHA-256 hash
+- backup copy of the current verified `state/project-profile.json` under `state/profile-backups/` before restoring
+- restore limited to existing `ProjectProfile` fields listed in the revoke plan
+- current-profile guard that rejects stale revoke plans when the profile no longer matches the plan current values
+- backup hash guard that rejects changed/missing restore backups
+- `reports/profile-promotion-revoke-result.md` and `state/profile-promotion-revoke-result.json`
+- schema/template coverage and validation aliases
+- doctor, next-action, workspace-summary, review-pack, operational Markdown filtering, and trace integration
+
+Guarded profile promotion revoke results are local mutation records only. They do not certify official agency compliance and they preserve promotion/apply/revoke history instead of deleting previous states.
+
+### Task 51: Profile lifecycle ledger
+
 Planned:
-- add `profile-promotion-revoke` command and public API
-- require `--revoke-plan` plus a matching `--revoke-plan-hash`
-- refuse to run unless the revoke plan is `ready_to_revoke` and `can_revoke=true`
-- write a pre-revoke backup of the current profile before restoring
-- restore only supported `ProjectProfile` fields listed in the revoke plan
-- write `reports/profile-promotion-revoke-result.md` and `state/profile-promotion-revoke-result.json`
-- integrate revoke results into doctor, next-action, summary, review-pack, and trace
+- add `profile-lifecycle-ledger` command and public API
+- combine profile-review, profile-promotion, apply-plan/result, revoke-plan/result, and current profile status into a chronological timeline
+- write `reports/profile-lifecycle-ledger.md` and `state/profile-lifecycle-ledger.json`
+- flag orphaned lifecycle artifacts, missing backups, ready revoke plans without revoke results, profile drift, and superseded transitions
+- integrate the ledger into doctor, next-action, summary, review-pack, and trace
 
 ## Safety constraints
 

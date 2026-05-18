@@ -1,12 +1,12 @@
 # K-ResDev Next Planning
 
-This planning note starts after `0.1.0b39`.
+This planning note starts after `0.1.0b40`.
 
 ## Current Diagnosis
 
-K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, budget ledger review, bibliography metadata, reference corpus adapters, read-only workspace discovery, bibliography review, citation support, research claim matrices, profile source records, profile integrity, a narrow source-backed IRIS/Innopolis profile seed, profile promotion review, hash-bound profile promotion records, non-destructive profile promotion apply plans, guarded profile promotion apply results/backups, non-destructive profile promotion revocation plans, workspace traceability graph, trace passport checkpoints, artifact authority labels, goals/deadline review, weekly operating reviews, workspace dashboards, thin local workflow router, workspace doctor, next actions, workspace summary, and review packs.
+K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, budget ledger review, bibliography metadata, reference corpus adapters, read-only workspace discovery, bibliography review, citation support, research claim matrices, profile source records, profile integrity, a narrow source-backed IRIS/Innopolis profile seed, profile promotion review, hash-bound profile promotion records, non-destructive profile promotion apply plans, guarded profile promotion apply results/backups, non-destructive profile promotion revocation plans, guarded profile promotion revocation results/backups, workspace traceability graph, trace passport checkpoints, artifact authority labels, goals/deadline review, weekly operating reviews, workspace dashboards, thin local workflow router, workspace doctor, next actions, workspace summary, and review packs.
 
-The next bottleneck is guarded profile lifecycle rollback execution. K-ResDev can now review whether an applied profile promotion can be revoked cleanly, but it does not yet have a hash-guarded command that restores `state/project-profile.json` from an approved revoke plan while preserving the promotion/apply/revoke audit trail.
+The next bottleneck is profile lifecycle readability. K-ResDev can now create review, promotion, apply, revoke-plan, and revoke-result artifacts, but an operator still has to inspect several files to understand the full profile state history and detect orphaned or superseded transitions.
 
 ## Planning Principles
 
@@ -315,6 +315,8 @@ Safety boundary:
 
 Goal: optionally execute a reviewed revocation plan with a hash guard and an additional backup of the currently verified profile.
 
+Status: implemented in `src/k_resdev_skill/profile_promotion_revoke.py` with `profile-promotion-revoke`, `ProfilePromotionRevocationResult`, schema/template coverage, doctor, next-action, workspace-summary, review-pack, operational Markdown filtering, and trace integration.
+
 Expected scope:
 - `profile-promotion-revoke` command that requires `--revoke-plan state/profile-promotion-revoke-plan.json` and `--revoke-plan-hash <sha256>`;
 - refuse to run unless the revocation plan status is `ready_to_revoke`, `can_revoke=true`, and the hash matches the supplied plan artifact;
@@ -325,6 +327,20 @@ Expected scope:
 
 Safety boundary:
 - The revoke command must be explicit and hash-guarded. It must never delete promotion/apply history, infer official agency compliance, or alter raw source files.
+
+### Beta 41 - Profile Lifecycle Ledger
+
+Goal: make profile lifecycle state readable as one chronological operating ledger.
+
+Expected scope:
+- `profile-lifecycle-ledger` command that reads profile-review, profile-promotion records, apply plans/results, revoke plans/results, and current `state/project-profile.json`;
+- write `reports/profile-lifecycle-ledger.md` and `state/profile-lifecycle-ledger.json`;
+- show timeline entries for review, promotion, apply, revoke-plan, and revoke-result artifacts with hashes, status, reviewer, and backup paths;
+- flag orphaned apply results, ready revoke plans without results, missing backups, profile drift from latest lifecycle result, and superseded transitions;
+- integrate the ledger into doctor, next actions, workspace-summary, review-pack, operational Markdown filtering, and trace.
+
+Safety boundary:
+- The ledger is an operating projection only. It must not certify agency compliance, alter profile state, or collapse human review decisions into AI-generated facts.
 
 ## Deferred Ideas
 
@@ -338,6 +354,6 @@ These should wait until traceability, impact analysis, and verified profile sour
 
 ## Recommended Next Slice
 
-Implement Beta 40 next.
+Implement Beta 41 next.
 
-Beta 40 should make profile promotion revocation executable only through a hash-matched revoke plan and a fresh backup of the current verified profile.
+Beta 41 should make the full profile lifecycle auditable from one local ledger before adding more agency-specific profile packs.

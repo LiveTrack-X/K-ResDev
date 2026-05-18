@@ -401,6 +401,7 @@ Recommended order after the traceability graph, research-claim matrix, trace-pas
 2. Goals/deadline operating file and goals review are implemented as Task 41.
 3. Local weekly review and dashboard are implemented as Task 42.
 4. Thin workflow router is implemented as Task 43.
+5. Narrow source-backed IRIS/Innopolis profile seed intake is implemented as Task 44.
 
 ## Open Questions
 
@@ -425,3 +426,4 @@ Recommended order after the traceability graph, research-claim matrix, trace-pas
 | Goals/deadline operating file | Task 41 |
 | Local weekly review and dashboard | Task 42 |
 | Single router UX | Task 43 |
+| Source-backed profile seed intake | Task 44 |

@@ -465,13 +465,24 @@ Router UX is convenience only. The underlying CLI commands and public APIs remai
 
 ### Task 44: Verified agency profile pack intake
 
-Planned:
-- choose one agency/profile candidate only after checking current official sources
-- keep official rules in pluggable profile data, not hardcoded Python behavior
-- record source URL/file, retrieved date, hash, reviewer, and review status
-- keep new profiles `needs_review` until a human verifies them
+Implemented:
+- checked the current official IRIS announcement page for one narrow source candidate
+- added `templates/agencies/iris-innopolis-2026-017795/` as a source-backed profile seed
+- kept official-use profile status and source review status as `needs_review`
+- recorded source URL, retrieved date, local source-note file, SHA-256 hash, and risk flags
+- taught `init-workspace --profile iris-innopolis-2026-017795` to install template profile source records and source notes without overwriting existing workspace files
+- surfaced template profile source counts in the agency profile registry
+- added schema, init, registry, and integrity tests around the profile-source pack
 
-This task requires current source verification before implementation.
+This task does not certify the profile as an official IRIS, NTIS, MSIT, or Innopolis rule pack.
+
+### Task 45: Verified profile review workflow
+
+Planned:
+- add a review command that compares a profile seed, source records, and supplied human verification records
+- emit a promotion checklist before any profile can move from `needs_review` to `verified`
+- require source hash freshness and explicit reviewer identity before promotion
+- keep promotion as data-only profile metadata, not Python hardcoding
 
 ## Safety constraints
 

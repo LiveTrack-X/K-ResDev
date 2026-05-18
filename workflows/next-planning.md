@@ -1,12 +1,12 @@
 # K-ResDev Next Planning
 
-This planning note starts after `0.1.0b33`.
+This planning note starts after `0.1.0b34`.
 
 ## Current Diagnosis
 
-K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, budget ledger review, bibliography metadata, reference corpus adapters, read-only workspace discovery, bibliography review, citation support, research claim matrices, profile source records, profile integrity, workspace traceability graph, trace passport checkpoints, artifact authority labels, goals/deadline review, weekly operating reviews, workspace dashboards, thin local workflow router, workspace doctor, next actions, workspace summary, and review packs.
+K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, budget ledger review, bibliography metadata, reference corpus adapters, read-only workspace discovery, bibliography review, citation support, research claim matrices, profile source records, profile integrity, a narrow source-backed IRIS/Innopolis profile seed, workspace traceability graph, trace passport checkpoints, artifact authority labels, goals/deadline review, weekly operating reviews, workspace dashboards, thin local workflow router, workspace doctor, next actions, workspace summary, and review packs.
 
-The next bottleneck is verified Korean R&D specialization. The operating layer is now broad enough; the next high-value move is to add a small verified agency/profile pack only after checking current official sources, with all rules kept pluggable and `needs_review` until human-verified.
+The next bottleneck is profile promotion governance. K-ResDev now has one official-source-backed profile seed, but it intentionally remains `needs_review`. The next high-value move is to add a deterministic review workflow that prevents profile promotion unless source hashes, human reviewer identity, and applicability notes are all supplied.
 
 ## Planning Principles
 
@@ -219,6 +219,8 @@ Safety boundary:
 
 Goal: create the first official-source-backed profile pack without hardcoding unverified agency rules.
 
+Status: implemented as a narrow `iris-innopolis-2026-017795` source-backed profile seed. The pack records official IRIS URL metadata, a local hash-backed source note, retrieved date, and risk flags, and `init-workspace` can install those source records into a workspace without overwriting existing files. The profile remains `needs_review`.
+
 Expected scope:
 - select a narrow profile candidate only after checking current official sources;
 - record source URL/file, retrieved date, hash, reviewer, and review status;
@@ -228,6 +230,20 @@ Expected scope:
 
 Safety boundary:
 - Official forms and rules are time-sensitive. Browse/cite current official sources before adding any specific profile pack.
+
+### Beta 35 - Verified Profile Review Workflow
+
+Goal: add a review workflow that can explain what is still missing before a source-backed profile may be promoted.
+
+Expected scope:
+- `profile-review` command over `state/project-profile.json` and `state/profile-sources.json`;
+- promotion checklist for source freshness, hash match, reviewer identity, applicability notes, and unresolved risk flags;
+- JSON/Markdown output under `state/profile-review.json` and `reports/profile-review.md`;
+- no automatic promotion unless a supplied human review record is present;
+- integration into doctor, next actions, summary, review pack, and trace.
+
+Safety boundary:
+- Promotion checks are guardrails only. They do not certify legal compliance or official submission readiness.
 
 ## Deferred Ideas
 
@@ -241,6 +257,6 @@ These should wait until traceability, impact analysis, and verified profile sour
 
 ## Recommended Next Slice
 
-Implement Beta 34 next.
+Implement Beta 35 next.
 
-Beta 34 should start Korean R&D specialization with one narrow verified profile-pack intake. It must use current official sources, keep rules in profile data rather than Python logic, and leave the profile `needs_review` until a supplied human review accepts it.
+Beta 35 should make profile promotion reviewable before any profile moves from `needs_review` to `verified`. It should require current source records, hash checks, and supplied human review metadata while keeping all official rules in profile data rather than Python logic.

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import shutil
 import zipfile
 from datetime import date
 from pathlib import Path
@@ -22,7 +23,7 @@ from .models import (
     WorkspaceInitResult,
 )
 from .profile_registry import default_agency_templates_root, load_project_profile
-from .profile_sources import generate_profile_integrity
+from .profile_sources import generate_profile_integrity, load_profile_sources
 from .project_goals import generate_goals_review
 from .reference_corpus import build_reference_corpus
 from .research_claims import generate_research_claim_matrix
@@ -119,12 +120,13 @@ def initialize_workspace(
         created,
         skipped,
     )
-    _write_if_missing(
-        workspace / "state" / "profile-sources.json",
-        "[]\n",
-        created,
-        skipped,
-    )
+    profile_sources_path = workspace / "state" / "profile-sources.json"
+    if profile_sources_path.exists():
+        skipped.append(str(profile_sources_path))
+    else:
+        profile_sources_text = _profile_sources_for_id(profile.profile_id, workspace, warnings, created, skipped)
+        profile_sources_path.write_text(profile_sources_text, encoding="utf-8")
+        created.append(str(profile_sources_path))
     _write_if_missing(
         workspace / "state" / "project-goals.json",
         ProjectGoalsFile(
@@ -987,6 +989,51 @@ def _profile_for_id(profile_id: str, warnings: list[str]) -> ProjectProfile:
         status="needs_review",
         notes="Profile template was not found. Add a verified local profile before official use.",
     )
+
+
+def _profile_sources_for_id(
+    profile_id: str,
+    workspace: Path,
+    warnings: list[str],
+    created: list[str],
+    skipped: list[str],
+) -> str:
+    template_dir = default_agency_templates_root() / profile_id
+    source_index = template_dir / "profile-sources.json"
+    if not source_index.exists():
+        return "[]\n"
+    try:
+        records = load_profile_sources(source_index)
+    except Exception as exc:
+        warnings.append(f"profile_template_sources_unreadable:{profile_id}:{exc}")
+        return "[]\n"
+
+    rendered_records = []
+    for record in records:
+        updated = record
+        if record.source_file:
+            source_file = Path(record.source_file)
+            template_source = source_file if source_file.is_absolute() else template_dir / source_file
+            target = workspace / "state" / "profile-sources" / source_file.name
+            risk_flags = list(record.risk_flags)
+            if template_source.exists() and template_source.is_file():
+                target.parent.mkdir(parents=True, exist_ok=True)
+                if target.exists():
+                    skipped.append(str(target))
+                else:
+                    shutil.copyfile(template_source, target)
+                    created.append(str(target))
+                updated = record.model_copy(
+                    update={
+                        "source_file": str(target.relative_to(workspace)),
+                        "source_size_bytes": target.stat().st_size,
+                    }
+                )
+            else:
+                risk_flags.append("template_source_file_missing")
+                updated = record.model_copy(update={"risk_flags": _unique(risk_flags)})
+        rendered_records.append(updated.model_dump(mode="json"))
+    return json.dumps(rendered_records, ensure_ascii=False, indent=2) + "\n"
 
 
 def _starter_readme(project_id: str, title: str, profile_id: str) -> str:

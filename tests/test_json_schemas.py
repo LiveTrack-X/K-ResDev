@@ -30,6 +30,23 @@ def test_national_rnd_basic_profile_matches_json_schema():
     jsonschema.validate(sample, schema)
 
 
+def test_iris_innopolis_profile_pack_matches_json_schemas():
+    with open("schemas/project_profile.schema.json", encoding="utf-8") as handle:
+        profile_schema = json.load(handle)
+    with open("schemas/profile_source.schema.json", encoding="utf-8") as handle:
+        source_schema = json.load(handle)
+    with open("templates/agencies/iris-innopolis-2026-017795/project-profile.json", encoding="utf-8") as handle:
+        profile = json.load(handle)
+    with open("templates/agencies/iris-innopolis-2026-017795/profile-sources.json", encoding="utf-8") as handle:
+        sources = json.load(handle)
+
+    jsonschema.validate(profile, profile_schema)
+    for source in sources:
+        jsonschema.validate(source, source_schema)
+    assert profile["status"] == "needs_review"
+    assert {source["review_status"] for source in sources} == {"needs_review"}
+
+
 def test_approval_record_template_matches_json_schema():
     with open("schemas/approval_record.schema.json", encoding="utf-8") as handle:
         schema = json.load(handle)

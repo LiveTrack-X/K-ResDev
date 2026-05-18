@@ -1,0 +1,36 @@
+{
+  "profile_id": "iris-innopolis-2026-017795",
+  "agency": "Ministry of Science and ICT / Innopolis Foundation",
+  "program": "2026 Daedeok Innopolis Campus Acceleration Support announcement 017795",
+  "report_cycle": "application submission seed needs_review",
+  "required_outputs": [
+    "research-development-plan-hwp",
+    "business-registration-certificate-pdf",
+    "eligibility-confirmation-pdf",
+    "financial-statements-or-audit-report-pdf",
+    "national-and-local-tax-payment-certificate-pdf",
+    "concurrent-rnd-project-confirmation-pdf",
+    "personal-and-tax-information-consent-pdf",
+    "research-ethics-integrity-security-pledge-pdf",
+    "rnd-cost-use-application-if-applicable-pdf",
+    "professional-research-business-certificate-if-applicable-pdf",
+    "performance-proof-if-applicable-pdf"
+  ],
+  "budget_categories": [],
+  "field_map": {
+    "application_route": "IRIS online submission needs_review",
+    "research_development_plan": "form 1 needs_review",
+    "business_registration_certificate": "PDF needs_review",
+    "eligibility_confirmation": "form 2 needs_review",
+    "financial_statements_or_audit_report": "PDF needs_review",
+    "tax_payment_certificate": "PDF needs_review",
+    "concurrent_project_confirmation": "form 3 needs_review",
+    "personal_and_tax_information_consent": "form 4 needs_review",
+    "ethics_integrity_security_pledge": "form 5 needs_review",
+    "rnd_cost_use_application": "form 6 if applicable needs_review",
+    "professional_research_business_certificate": "if applicable PDF needs_review",
+    "performance_proof": "form 7 if applicable needs_review"
+  },
+  "status": "needs_review",
+  "notes": "Narrow source-backed profile seed from IRIS announcement 017795. Do not generalize to other IRIS, MSIT, Innopolis, NTIS, or national R&D programs without current official source review and human approval."
+}

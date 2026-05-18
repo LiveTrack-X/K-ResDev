@@ -2,7 +2,7 @@
 
 Purpose: 한국형 국책 R&D 환경에서 연구 행정 문서화, 증빙 정합성, 보고서 생성, 논문/데이터 인사이트 보조를 evidence-first 방식으로 지원하는 Codex/Skill 프로젝트입니다.
 
-Current release: `0.1 BETA 33` (`0.1.0b33`).
+Current release: `0.1 BETA 34` (`0.1.0b34`).
 
 Core principle:
 
@@ -68,6 +68,7 @@ This repository does not encode any single ministry/institution form as authorit
 - Goals/deadlines operating file and review checker for local objectives, KPIs, milestones, evidence links, report drafts, and approval readiness.
 - Local weekly operating review and workspace dashboard generated from local K-ResDev artifacts.
 - Thin local workflow router for Admin, Research, Integrity, and Weekly review command plans.
+- Narrow IRIS/Innopolis 2026 source-backed profile seed that installs hash-backed profile source notes while keeping official-use status as `needs_review`.
 - Workspace next-action planner that converts doctor findings into deterministic, reviewable commands.
 - Workspace summary report that combines readiness, next actions, evidence counts, approvals, reports, exports, and analysis manifests.
 - Workspace review pack command that refreshes discovery, readiness, next actions, workspace summary, artifact-authority, goals-review, weekly-review, workspace-dashboard, budget-ledger, profile-integrity, source-verification, approval-coverage, report-integrity, bibliography-integrity, reference-corpus, citation-support, research-claim-matrix, and workspace-trace artifacts together.
@@ -97,6 +98,7 @@ python -m pip install -e .
 python -m pytest
 python -m k_resdev_skill intake --inbox .\inbox --project my-rnd-project
 python -m k_resdev_skill init-workspace --root .\demo-workspace --project-id PRJ-2026-0001 --title "Demo R&D Project"
+python -m k_resdev_skill init-workspace --root .\iris-seed-workspace --project-id PRJ-2026-0002 --title "IRIS Seed Project" --profile iris-innopolis-2026-017795
 python -m k_resdev_skill discover-workspace --root .\demo-workspace --output .\demo-workspace\reports\workspace-discovery.md --json .\demo-workspace\state\workspace-discovery.json
 python -m k_resdev_skill artifact-authority --root .\demo-workspace --output .\demo-workspace\reports\artifact-authority.md --json .\demo-workspace\state\artifact-authority.json
 python -m k_resdev_skill goals-init --root .\demo-workspace
@@ -150,6 +152,7 @@ python -m k_resdev_skill repro-check .\state\evidence-index.json --output .\repo
 python -m k_resdev_skill budget-check .\state\evidence-index.json --output .\reports\budget-checklist.md
 python -m k_resdev_skill profiles --markdown --output .\reports\agency-profiles.md
 python -m k_resdev_skill validate-profile .\templates\agencies\national-rnd-basic\project-profile.json
+python -m k_resdev_skill validate-profile .\templates\agencies\iris-innopolis-2026-017795\project-profile.json
 python -m k_resdev_skill validate-json profile-source .\state\profile-sources.json
 python -m k_resdev_skill validate-json budget-ledger .\state\budget-ledger.json
 python -m k_resdev_skill validate-json research-claim .\state\research-claims.json

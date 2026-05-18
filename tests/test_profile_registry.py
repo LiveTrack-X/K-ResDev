@@ -30,7 +30,49 @@ def test_profile_registry_lists_templates(tmp_path):
 
     assert profiles[0]["profile_id"] == "national-rnd-basic"
     assert profiles[0]["template_files"] == ["annual-report.md"]
+    assert profiles[0]["profile_source_count"] == 0
     assert "not official agency rules" in rendered
+
+
+def test_profile_registry_surfaces_template_source_records(tmp_path):
+    profile_dir = tmp_path / "agencies" / "source-backed"
+    profile_dir.mkdir(parents=True)
+    (profile_dir / "project-profile.json").write_text(
+        """{
+          "profile_id": "source-backed",
+          "required_outputs": [],
+          "budget_categories": [],
+          "field_map": {},
+          "status": "needs_review"
+        }""",
+        encoding="utf-8",
+    )
+    (profile_dir / "profile-sources.json").write_text(
+        """[
+          {
+            "source_id": "PRS-1",
+            "profile_id": "source-backed",
+            "title": "Source",
+            "source_url": "https://example.org/source",
+            "source_file": null,
+            "retrieved_at": "2026-05-19",
+            "source_hash": null,
+            "source_size_bytes": null,
+            "verified_by": null,
+            "review_status": "needs_review",
+            "validity_notes": null,
+            "risk_flags": []
+          }
+        ]""",
+        encoding="utf-8",
+    )
+
+    profiles = list_project_profiles(tmp_path / "agencies")
+    rendered = generate_profile_registry(tmp_path / "agencies")
+
+    assert profiles[0]["profile_source_count"] == 1
+    assert profiles[0]["profile_source_statuses"] == "needs_review"
+    assert "1 (needs_review)" in rendered
 
 
 def test_validate_profile_cli(tmp_path, capsys):

@@ -942,6 +942,37 @@ class WorkspaceDashboardResult(StrictModel):
     warnings: list[str] = Field(default_factory=list)
 
 
+class WorkflowStep(StrictModel):
+    step_id: str
+    title: str
+    command: str
+    operation_id: str
+    output_paths: list[str] = Field(default_factory=list)
+    status: str = "planned"
+    safety_notes: list[str] = Field(default_factory=list)
+    warnings: list[str] = Field(default_factory=list)
+
+    @field_validator("step_id", "title", "command", "operation_id", "status")
+    @classmethod
+    def _workflow_step_field_must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
+class WorkspaceWorkflowPlan(StrictModel):
+    root: str
+    workflow: str
+    status: str
+    execute: bool = False
+    step_count: int = 0
+    steps: list[WorkflowStep] = Field(default_factory=list)
+    generated_paths: list[str] = Field(default_factory=list)
+    markdown_path: str | None = None
+    json_path: str | None = None
+    warnings: list[str] = Field(default_factory=list)
+
+
 class WorkspaceDoctorFinding(StrictModel):
     code: str
     severity: str

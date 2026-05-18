@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "WorkspaceWorkflowPlan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["root", "workflow", "status", "execute"],
+  "properties": {
+    "root": { "type": "string", "minLength": 1 },
+    "workflow": { "type": "string", "minLength": 1 },
+    "status": { "type": "string", "minLength": 1 },
+    "execute": { "type": "boolean" },
+    "step_count": { "type": "integer", "minimum": 0 },
+    "steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["step_id", "title", "command", "operation_id", "status"],
+        "properties": {
+          "step_id": { "type": "string", "minLength": 1 },
+          "title": { "type": "string", "minLength": 1 },
+          "command": { "type": "string", "minLength": 1 },
+          "operation_id": { "type": "string", "minLength": 1 },
+          "output_paths": { "type": "array", "items": { "type": "string" } },
+          "status": { "type": "string", "minLength": 1 },
+          "safety_notes": { "type": "array", "items": { "type": "string" } },
+          "warnings": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "generated_paths": { "type": "array", "items": { "type": "string" } },
+    "markdown_path": { "type": ["string", "null"] },
+    "json_path": { "type": ["string", "null"] },
+    "warnings": { "type": "array", "items": { "type": "string" } }
+  }
+}

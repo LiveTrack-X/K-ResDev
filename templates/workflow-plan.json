@@ -1,0 +1,23 @@
+{
+  "root": ".",
+  "workflow": "weekly",
+  "status": "planned",
+  "execute": false,
+  "step_count": 1,
+  "steps": [
+    {
+      "step_id": "WF-WEEKLY-01",
+      "title": "Generate weekly review",
+      "command": "python -m k_resdev_skill weekly-review --root . --date 2026-05-19",
+      "operation_id": "weekly_review",
+      "output_paths": ["reports/weekly-review-2026-05-19.md", "state/weekly-review-2026-05-19.json"],
+      "status": "planned",
+      "safety_notes": ["local_only", "human_review_required", "no_connector_actions"],
+      "warnings": []
+    }
+  ],
+  "generated_paths": [],
+  "markdown_path": null,
+  "json_path": null,
+  "warnings": []
+}

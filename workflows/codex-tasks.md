@@ -452,13 +452,26 @@ Weekly reviews are team operating summaries, not final official reports.
 
 ### Task 43: Thin workflow router
 
-Planned:
+Implemented:
+- `WorkflowStep` and `WorkspaceWorkflowPlan` models
 - `workflow admin-review`, `workflow research-review`, `workflow integrity-review`, and `workflow weekly`
-- router prints concrete commands and artifact paths before running
-- router uses only stable local deterministic commands by default
+- default plan-only mode that writes `reports/workflow-<name>.md` and `state/workflow-<name>.json`
+- opt-in `--run` mode that executes only local deterministic K-ResDev functions
+- concrete command strings and artifact paths for every step
+- schema/template, CLI, operational Markdown filtering, and trace integration
 - hidden connector/network actions are out of scope
 
 Router UX is convenience only. The underlying CLI commands and public APIs remain the source of testable behavior.
+
+### Task 44: Verified agency profile pack intake
+
+Planned:
+- choose one agency/profile candidate only after checking current official sources
+- keep official rules in pluggable profile data, not hardcoded Python behavior
+- record source URL/file, retrieved date, hash, reviewer, and review status
+- keep new profiles `needs_review` until a human verifies them
+
+This task requires current source verification before implementation.
 
 ## Safety constraints
 

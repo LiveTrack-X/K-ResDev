@@ -51,7 +51,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "workspace-summary.md",
     "workspace-trace.md",
 }
-OPERATIONAL_MARKDOWN_PREFIXES = ("weekly-review-",)
+OPERATIONAL_MARKDOWN_PREFIXES = ("weekly-review-", "workflow-")
 EVIDENCE_ID_RE = re.compile(r"\bEVI-[A-Za-z0-9][A-Za-z0-9_.:-]*\b")
 HIGH_AUTHORITY_NAME_RE = re.compile(
     "(approved|final|submission|submitted|official|\uCD5C\uC885|\uC81C\uCD9C|\uC2B9\uC778)",
@@ -297,6 +297,7 @@ def authority_for_trace_node(node_type: str, status: str | None = None, path: st
         "project_deadline",
         "weekly_review",
         "workspace_dashboard",
+        "workflow_plan",
     }:
         return "operating_summary"
     if node_type in {"reference", "bibliography", "research_claim"}:
@@ -429,6 +430,7 @@ def _operating_artifact_paths(workspace: Path) -> list[Path]:
             if target.exists():
                 paths.append(target)
         paths.extend(state.glob("weekly-review-*.json"))
+        paths.extend(state.glob("workflow-*.json"))
     return sorted(paths, key=lambda item: item.as_posix())
 
 

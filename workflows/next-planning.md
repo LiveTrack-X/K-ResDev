@@ -1,12 +1,12 @@
 # K-ResDev Next Planning
 
-This planning note starts after `0.1.0b32`.
+This planning note starts after `0.1.0b33`.
 
 ## Current Diagnosis
 
-K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, budget ledger review, bibliography metadata, reference corpus adapters, read-only workspace discovery, bibliography review, citation support, research claim matrices, profile source records, profile integrity, workspace traceability graph, trace passport checkpoints, artifact authority labels, goals/deadline review, weekly operating reviews, workspace dashboards, workspace doctor, next actions, workspace summary, and review packs.
+K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, budget ledger review, bibliography metadata, reference corpus adapters, read-only workspace discovery, bibliography review, citation support, research claim matrices, profile source records, profile integrity, workspace traceability graph, trace passport checkpoints, artifact authority labels, goals/deadline review, weekly operating reviews, workspace dashboards, thin local workflow router, workspace doctor, next actions, workspace summary, and review packs.
 
-The next bottleneck is command ergonomics. A real R&D workspace now has many useful deterministic commands, but the user still has to remember which command sequence fits an admin review, research review, integrity review, or weekly review.
+The next bottleneck is verified Korean R&D specialization. The operating layer is now broad enough; the next high-value move is to add a small verified agency/profile pack only after checking current official sources, with all rules kept pluggable and `needs_review` until human-verified.
 
 ## Planning Principles
 
@@ -207,11 +207,27 @@ Safety boundary:
 
 Goal: add a thin router for common Admin, Research, and Integrity review workflows.
 
+Status: implemented as a local first pass in `src/k_resdev_skill/workflow_router.py`, with `workflow admin-review`, `workflow research-review`, `workflow integrity-review`, and `workflow weekly`, plus schema/template, operational Markdown filtering, and trace integration.
+
 Expected scope:
 - `workflow admin-review`, `workflow research-review`, and `workflow integrity-review` commands that print the concrete commands they run.
 
 Safety boundary:
 - Weekly reviews and workflow router outputs are convenience projections. They do not create approvals or final official reports.
+
+### Beta 34 - Verified Agency Profile Pack Intake
+
+Goal: create the first official-source-backed profile pack without hardcoding unverified agency rules.
+
+Expected scope:
+- select a narrow profile candidate only after checking current official sources;
+- record source URL/file, retrieved date, hash, reviewer, and review status;
+- add a pluggable profile data file under `templates/agencies/`;
+- keep generated fields `needs_review` until supplied human verification;
+- add profile-integrity tests around source records and drift.
+
+Safety boundary:
+- Official forms and rules are time-sensitive. Browse/cite current official sources before adding any specific profile pack.
 
 ## Deferred Ideas
 
@@ -225,6 +241,6 @@ These should wait until traceability, impact analysis, and verified profile sour
 
 ## Recommended Next Slice
 
-Implement Beta 33 next.
+Implement Beta 34 next.
 
-Beta 33 should add a thin workflow router that maps common review intentions to the existing deterministic commands. It should print concrete commands and output paths before running, stay local by default, and avoid hiding connector or network actions behind convenience aliases.
+Beta 34 should start Korean R&D specialization with one narrow verified profile-pack intake. It must use current official sources, keep rules in profile data rather than Python logic, and leave the profile `needs_review` until a supplied human review accepts it.

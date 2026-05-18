@@ -400,7 +400,7 @@ Recommended order after the traceability graph, research-claim matrix, trace-pas
 1. Artifact authority levels are implemented as Task 40.
 2. Goals/deadline operating file and goals review are implemented as Task 41.
 3. Local weekly review and dashboard are implemented as Task 42.
-4. Add thin workflow router only after the concrete commands are stable.
+4. Thin workflow router is implemented as Task 43.
 
 ## Open Questions
 

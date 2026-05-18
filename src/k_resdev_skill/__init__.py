@@ -153,8 +153,10 @@ from .models import (
     WorkspaceTraceNode,
     WorkspaceTraceResult,
     WorkspaceWeeklyReviewResult,
+    WorkspaceWorkflowPlan,
     VerifiedProfilePack,
     WeeklyReviewItem,
+    WorkflowStep,
 )
 from .plan_mapper import extract_project_state_from_text
 from .profile_sources import (
@@ -230,6 +232,12 @@ from .weekly_review import (
     load_workspace_dashboard,
     render_weekly_review_markdown,
     render_workspace_dashboard_markdown,
+)
+from .workflow_router import (
+    WORKFLOW_NAMES,
+    generate_workflow_plan,
+    load_workflow_plan,
+    render_workflow_plan_markdown,
 )
 
 __all__ = [
@@ -318,8 +326,11 @@ __all__ = [
     "WorkspaceTraceNode",
     "WorkspaceTraceResult",
     "WorkspaceWeeklyReviewResult",
+    "WorkspaceWorkflowPlan",
     "VerifiedProfilePack",
     "WeeklyReviewItem",
+    "WorkflowStep",
+    "WORKFLOW_NAMES",
     "approval_gate_status",
     "authority_for_evidence_status",
     "authority_for_trace_node",
@@ -373,6 +384,7 @@ __all__ = [
     "generate_workspace_summary",
     "generate_weekly_review",
     "generate_workspace_dashboard",
+    "generate_workflow_plan",
     "generate_workspace_trace",
     "import_bibliography",
     "import_budget_ledger",
@@ -401,6 +413,7 @@ __all__ = [
     "load_saved_workspace_dashboard",
     "load_weekly_review",
     "load_workspace_dashboard",
+    "load_workflow_plan",
     "load_checkpoint_entries",
     "profile_data_file",
     "paper_records_from_bibliography",
@@ -435,6 +448,7 @@ __all__ = [
     "render_workspace_summary_markdown",
     "render_weekly_review_markdown",
     "render_workspace_dashboard_markdown",
+    "render_workflow_plan_markdown",
     "render_workspace_trace_markdown",
     "run_workspace_doctor",
     "record_profile_source",
@@ -455,4 +469,4 @@ __all__ = [
     "write_research_claims",
 ]
 
-__version__ = "0.1.0b32"
+__version__ = "0.1.0b33"

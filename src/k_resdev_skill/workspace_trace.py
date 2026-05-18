@@ -64,7 +64,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "workspace-summary.md",
     "workspace-trace.md",
 }
-OPERATIONAL_MARKDOWN_PREFIXES = ("weekly-review-",)
+OPERATIONAL_MARKDOWN_PREFIXES = ("weekly-review-", "workflow-")
 
 EVIDENCE_ID_RE = re.compile(r"\bEVI-[A-Za-z0-9][A-Za-z0-9_.:-]*\b")
 
@@ -92,6 +92,7 @@ def generate_workspace_trace(
     builder.add_analysis_manifests()
     builder.add_review_pack()
     builder.add_weekly_dashboard()
+    builder.add_workflow_plans()
     builder.add_trace_passport()
 
     findings = _dedupe_findings(builder.findings)
@@ -860,6 +861,41 @@ class _TraceBuilder:
             for artifact_path in card.get("artifact_paths") or []:
                 artifact_node = self.node("generated_artifact", str(artifact_path), Path(str(artifact_path)).name, path=str(artifact_path))
                 self.edge(node.node_id, artifact_node.node_id, "summarizes_artifact")
+
+    def add_workflow_plans(self) -> None:
+        state_dir = self.workspace / "state"
+        if not state_dir.exists():
+            return
+        for path in sorted(state_dir.glob("workflow-*.json"), key=lambda item: item.name):
+            try:
+                payload = json.loads(path.read_text(encoding="utf-8-sig"))
+            except Exception as exc:
+                self.finding(
+                    "trace_workflow_plan_unreadable",
+                    "medium",
+                    f"Workflow plan could not be read: {exc}",
+                    path=path,
+                    suggested_action="Regenerate the workflow plan.",
+                )
+                continue
+            node = self.node(
+                "workflow_plan",
+                str(path),
+                path.name,
+                status=_text(payload.get("status")),
+                path=str(path),
+                sha256=_sha256_file(path),
+                metadata={"workflow": payload.get("workflow"), "execute": payload.get("execute"), "step_count": payload.get("step_count")},
+            )
+            for artifact_path in payload.get("generated_paths") or []:
+                artifact_node = self.node("generated_artifact", str(artifact_path), Path(str(artifact_path)).name, path=str(artifact_path))
+                self.edge(node.node_id, artifact_node.node_id, "generated_artifact")
+            for step in payload.get("steps") or []:
+                if not isinstance(step, dict):
+                    continue
+                for artifact_path in step.get("output_paths") or []:
+                    artifact_node = self.node("generated_artifact", str(artifact_path), Path(str(artifact_path)).name, path=str(artifact_path))
+                    self.edge(node.node_id, artifact_node.node_id, "plans_artifact")
 
     def add_trace_passport(self) -> None:
         checkpoints_dir = self.workspace / "state" / "checkpoints"

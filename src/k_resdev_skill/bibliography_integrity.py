@@ -44,7 +44,7 @@ BIBLIOGRAPHY_OPERATIONAL_NAMES = {
     "workspace-summary.md",
     "workspace-trace.md",
 }
-BIBLIOGRAPHY_OPERATIONAL_PREFIXES = ("weekly-review-",)
+BIBLIOGRAPHY_OPERATIONAL_PREFIXES = ("weekly-review-", "workflow-")
 
 
 def generate_workspace_bibliography_integrity(

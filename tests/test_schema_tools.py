@@ -117,6 +117,14 @@ def test_validate_json_file_accepts_weekly_review_and_dashboard_aliases():
     assert dashboard_card["valid"] is True
 
 
+def test_validate_json_file_accepts_workflow_aliases():
+    step = validate_json_file("templates/workflow-step.json", "workflow-step")
+    plan = validate_json_file("templates/workflow-plan.json", "workflow-plan")
+
+    assert step["valid"] is True
+    assert plan["valid"] is True
+
+
 def test_validate_json_cli_returns_nonzero_for_invalid(tmp_path, capsys):
     path = tmp_path / "bad-approval.json"
     path.write_text(json.dumps({"approval_id": "APR-2026-BAD"}), encoding="utf-8")

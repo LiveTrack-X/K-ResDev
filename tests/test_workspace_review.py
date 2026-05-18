@@ -206,6 +206,7 @@ def test_operational_markdown_does_not_satisfy_report_draft_check(tmp_path):
         "goals-review.md",
         "weekly-review-2026-05-19.md",
         "workspace-dashboard.md",
+        "workflow-weekly.md",
         "report-integrity.md",
         "budget-ledger.md",
         "bibliography-integrity.md",

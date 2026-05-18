@@ -79,6 +79,7 @@ from .workspace_review import generate_workspace_review_pack, verify_workspace_r
 from .workspace_summary import generate_workspace_summary
 from .workspace_trace import generate_workspace_trace
 from .weekly_review import generate_weekly_review, generate_workspace_dashboard
+from .workflow_router import WORKFLOW_NAMES, generate_workflow_plan
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -426,6 +427,15 @@ def main(argv: list[str] | None = None) -> int:
     workspace_dashboard_parser.add_argument("--root", default=".")
     workspace_dashboard_parser.add_argument("--output", default=None)
     workspace_dashboard_parser.add_argument("--json", default=None)
+
+    workflow_parser = subparsers.add_parser("workflow", help="Plan or run a thin local K-ResDev workflow.")
+    workflow_parser.add_argument("workflow", choices=WORKFLOW_NAMES)
+    workflow_parser.add_argument("--root", default=".")
+    workflow_parser.add_argument("--output", default=None)
+    workflow_parser.add_argument("--json", default=None)
+    workflow_parser.add_argument("--date", default=None)
+    workflow_parser.add_argument("--max-actions", type=int, default=5)
+    workflow_parser.add_argument("--run", action="store_true")
 
     workspace_trace_parser = subparsers.add_parser("workspace-trace", help="Generate a local workspace traceability graph and impact report.")
     workspace_trace_parser.add_argument("--root", default=".")
@@ -829,6 +839,21 @@ def main(argv: list[str] | None = None) -> int:
         )
         print(result.model_dump_json(indent=2))
         return 0
+    if args.command == "workflow":
+        root = Path(args.root)
+        output = args.output or root / "reports" / f"workflow-{args.workflow}.md"
+        json_output = args.json or root / "state" / f"workflow-{args.workflow}.json"
+        result = generate_workflow_plan(
+            args.root,
+            args.workflow,
+            output_path=output,
+            json_path=json_output,
+            execute=args.run,
+            review_date=args.date,
+            max_actions=args.max_actions,
+        )
+        print(result.model_dump_json(indent=2))
+        return 0 if result.status != "failed" else 1
     if args.command == "workspace-trace":
         result = generate_workspace_trace(args.root, output_path=args.output, json_path=args.json)
         print(result.model_dump_json(indent=2))

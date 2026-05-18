@@ -45,7 +45,7 @@ CITATION_SUPPORT_OPERATIONAL_NAMES = {
     "workspace-summary.md",
     "workspace-trace.md",
 }
-CITATION_SUPPORT_OPERATIONAL_PREFIXES = ("weekly-review-",)
+CITATION_SUPPORT_OPERATIONAL_PREFIXES = ("weekly-review-", "workflow-")
 
 
 def create_citation_support_record(

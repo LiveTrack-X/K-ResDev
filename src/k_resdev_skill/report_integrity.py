@@ -41,7 +41,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "workspace-summary.md",
     "workspace-trace.md",
 }
-OPERATIONAL_MARKDOWN_PREFIXES = ("weekly-review-",)
+OPERATIONAL_MARKDOWN_PREFIXES = ("weekly-review-", "workflow-")
 
 
 def generate_workspace_report_integrity(

@@ -199,3 +199,21 @@ def test_dashboard_card_template_matches_json_schema():
         sample = json.load(handle)
 
     jsonschema.validate(sample, schema)
+
+
+def test_workflow_step_template_matches_json_schema():
+    with open("schemas/workflow_step.schema.json", encoding="utf-8") as handle:
+        schema = json.load(handle)
+    with open("templates/workflow-step.json", encoding="utf-8") as handle:
+        sample = json.load(handle)
+
+    jsonschema.validate(sample, schema)
+
+
+def test_workflow_plan_template_matches_json_schema():
+    with open("schemas/workflow_plan.schema.json", encoding="utf-8") as handle:
+        schema = json.load(handle)
+    with open("templates/workflow-plan.json", encoding="utf-8") as handle:
+        sample = json.load(handle)
+
+    jsonschema.validate(sample, schema)

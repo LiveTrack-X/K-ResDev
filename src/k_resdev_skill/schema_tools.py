@@ -61,6 +61,10 @@ SCHEMA_ALIASES = {
     "workspace_dashboard": "workspace_dashboard.schema.json",
     "dashboard-card": "dashboard_card.schema.json",
     "dashboard_card": "dashboard_card.schema.json",
+    "workflow-plan": "workflow_plan.schema.json",
+    "workflow_plan": "workflow_plan.schema.json",
+    "workflow-step": "workflow_step.schema.json",
+    "workflow_step": "workflow_step.schema.json",
     "workspace-discovery": "workspace_discovery.schema.json",
     "workspace_discovery": "workspace_discovery.schema.json",
     "workspace-discovery-item": "workspace_discovery_item.schema.json",
@@ -134,6 +138,7 @@ def _validation_targets(document: Any, schema_payload: dict[str, Any]) -> list[t
         "TracePassportEntry",
         "WorkspaceDiscoveryItem",
         "WeeklyReviewItem",
+        "WorkflowStep",
         "WorkspaceSetupProposal",
     }:
         if isinstance(document, list):

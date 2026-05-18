@@ -75,7 +75,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "workspace-summary.md",
     "workspace-trace.md",
 }
-OPERATIONAL_MARKDOWN_PREFIXES = ("weekly-review-",)
+OPERATIONAL_MARKDOWN_PREFIXES = ("weekly-review-", "workflow-")
 
 
 def initialize_workspace(
@@ -1005,6 +1005,7 @@ def _starter_readme(project_id: str, title: str, profile_id: str) -> str:
             "- Run `k-resdev goals-review --root . --output reports/goals-review.md --json state/goals-review.json` to review local objectives, deadlines, evidence, report, and approval readiness.",
             "- Run `k-resdev weekly-review --root .` to create a dated local operating review.",
             "- Run `k-resdev workspace-dashboard --root .` to create a compact local status dashboard.",
+            "- Run `k-resdev workflow weekly --root .` to review the local weekly workflow command plan before optional execution.",
             "- Run `k-resdev intake --inbox inbox --state-dir state --evidence-dir evidence` to build evidence metadata.",
             "- Run `k-resdev bib-import references/library.bib --state-dir state --literature-matrix reports/literature-review-matrix.md` to build bibliography metadata.",
             "- Run `k-resdev reference-corpus --root . --output reports/reference-corpus-summary.md --json state/literature-corpus.json --rejections state/reference-rejection-log.json` to scan local PDFs, Zotero JSON exports, and Markdown notes into a reviewable corpus.",

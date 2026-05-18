@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "WorkflowStep",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["step_id", "title", "command", "operation_id", "status"],
+  "properties": {
+    "step_id": { "type": "string", "minLength": 1 },
+    "title": { "type": "string", "minLength": 1 },
+    "command": { "type": "string", "minLength": 1 },
+    "operation_id": { "type": "string", "minLength": 1 },
+    "output_paths": { "type": "array", "items": { "type": "string" } },
+    "status": { "type": "string", "minLength": 1 },
+    "safety_notes": { "type": "array", "items": { "type": "string" } },
+    "warnings": { "type": "array", "items": { "type": "string" } }
+  }
+}

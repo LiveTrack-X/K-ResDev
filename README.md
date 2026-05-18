@@ -2,7 +2,7 @@
 
 Purpose: 한국형 국책 R&D 환경에서 연구 행정 문서화, 증빙 정합성, 보고서 생성, 논문/데이터 인사이트 보조를 evidence-first 방식으로 지원하는 Codex/Skill 프로젝트입니다.
 
-Current release: `0.1 BETA 32` (`0.1.0b32`).
+Current release: `0.1 BETA 33` (`0.1.0b33`).
 
 Core principle:
 
@@ -67,6 +67,7 @@ This repository does not encode any single ministry/institution form as authorit
 - Artifact authority level classifier for raw sources, extracted candidates, evidence states, draft/reviewed/approved projections, and operating summaries.
 - Goals/deadlines operating file and review checker for local objectives, KPIs, milestones, evidence links, report drafts, and approval readiness.
 - Local weekly operating review and workspace dashboard generated from local K-ResDev artifacts.
+- Thin local workflow router for Admin, Research, Integrity, and Weekly review command plans.
 - Workspace next-action planner that converts doctor findings into deterministic, reviewable commands.
 - Workspace summary report that combines readiness, next actions, evidence counts, approvals, reports, exports, and analysis manifests.
 - Workspace review pack command that refreshes discovery, readiness, next actions, workspace summary, artifact-authority, goals-review, weekly-review, workspace-dashboard, budget-ledger, profile-integrity, source-verification, approval-coverage, report-integrity, bibliography-integrity, reference-corpus, citation-support, research-claim-matrix, and workspace-trace artifacts together.
@@ -103,6 +104,8 @@ python -m k_resdev_skill goals-review --root .\demo-workspace --output .\demo-wo
 python -m k_resdev_skill deadline-check --root .\demo-workspace --output .\demo-workspace\reports\goals-review.md --json .\demo-workspace\state\goals-review.json
 python -m k_resdev_skill weekly-review --root .\demo-workspace --date 2026-05-19
 python -m k_resdev_skill workspace-dashboard --root .\demo-workspace
+python -m k_resdev_skill workflow weekly --root .\demo-workspace --date 2026-05-19
+python -m k_resdev_skill workflow weekly --root .\demo-workspace --date 2026-05-19 --run
 python -m k_resdev_skill doctor --root .\demo-workspace --output .\demo-workspace\reports\readiness.md --json .\demo-workspace\state\readiness.json
 python -m k_resdev_skill next-actions --root .\demo-workspace --output .\demo-workspace\reports\next-actions.md --json .\demo-workspace\state\next-actions.json
 python -m k_resdev_skill approval-coverage --root .\demo-workspace --output .\demo-workspace\reports\approval-coverage.md --json .\demo-workspace\state\approval-coverage.json
@@ -164,6 +167,7 @@ python -m k_resdev_skill validate-json project-goals .\state\project-goals.json
 python -m k_resdev_skill validate-json goals-review .\state\goals-review.json
 python -m k_resdev_skill validate-json weekly-review .\state\weekly-review-2026-05-19.json
 python -m k_resdev_skill validate-json workspace-dashboard .\state\workspace-dashboard.json
+python -m k_resdev_skill validate-json workflow-plan .\state\workflow-weekly.json
 python -m k_resdev_skill validate-json project-objective .\templates\project-objective.json
 python -m k_resdev_skill validate-json project-deadline .\templates\project-deadline.json
 python -m k_resdev_skill validate-json evidence .\state\evidence-index.json

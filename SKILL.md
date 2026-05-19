@@ -1,240 +1,151 @@
 ---
 name: k-resdev
-description: Evidence-first Korean national R&D administration and research copilot. Use when working on K-ResDev or Korean R&D tasks involving evidence intake, KPI/milestone mapping, budget/report consistency, unsupported claim checks, literature review matrices, CSV/XLSX data profiling, research insight candidates, audit preparation, or safe drafting of R&D report/research projections.
+description: GPT/Codex agent skill for evidence-first Korean national R&D administration. Use when an agent helps with Korean R&D evidence intake, KPI/report/budget/admin readiness, audit preparation, literature or data support, or K-ResDev workspace review. Treat the Python package as an optional verification core, not as the user-facing product.
 ---
 
-# K-ResDev Skill
+# K-ResDev 에이전트 스킬
 
-## Mission
+## 역할
 
-Assist Korean national R&D projects by converting messy research activity into auditable evidence, report projections, and research insights.
+K-ResDev는 GPT/Codex가 한국형 국책 R&D 업무를 도울 때 쓰는 **에이전트 스킬**이다.
 
-Do not behave as a simple report writer. Behave as an evidence-first research administration and research-assistant system.
+Python 패키지와 CLI는 스킬의 본체가 아니라, 해시/스키마/승인/증빙/보고서 정합성처럼 자유서술로 처리하면 위험한 일을 검증하는 **선택적 검증 코어**다.
 
-## Non-negotiable rules
+## 절대 원칙
 
-1. Raw source files are never treated as disposable.
-2. Every report claim must be linked to evidence or marked `needs_evidence`.
-3. AI-generated scientific claims must be marked as `hypothesis`, `interpretation`, or `draft` until reviewed by a human.
-4. Do not fabricate citations, metrics, budget items, approvals, or institutional rules.
-5. Do not submit, approve, alter budgets, or finalize official documents without explicit human approval.
-6. Separate administrative projection from research truth.
-7. For data analysis, produce reproducible code/notebook steps and record assumptions.
-8. For literature review, distinguish paper fact, author claim, AI interpretation, and open question.
+1. Evidence가 source of truth다.
+2. 보고서, 요약, 대시보드, 연구 narrative는 projection이다.
+3. 최종 제출, 승인, 연구 결론은 사람이 결정한다.
+4. 원본 파일은 수정하지 않는다.
+5. 인용, 지표, 승인, 예산 적격성, 기관 규칙을 지어내지 않는다.
+6. 기관 profile과 공식 시스템 매핑은 최신 출처와 사람 검토가 없으면 `needs_review`다.
+7. 로컬 명령은 판단을 대체하지 않고, 검증과 누락 탐지에만 쓴다.
 
-## Core model
+## 기본 진행 루프
 
 ```text
-Raw source files -> Evidence items -> Semantic maps/checks -> Projections -> Human approval
+요청 이해
+-> 모드 선택
+-> 로컬 artifact 확인
+-> evidence / projection / risk 분리
+-> 필요할 때만 검증 코어 실행
+-> 누락 증빙, 위험, 사람 결정 필요 사항 보고
 ```
 
-Treat reports, summaries, literature matrices, and insight drafts as projections. Treat evidence and provenance as the durable source of truth.
+생성물은 공식 제출물이 아니다. 항상 evidence-backed fact, AI interpretation, hypothesis, missing evidence, human decision required를 분리한다.
 
-## Operating modes
+## 모드
 
-### `/intake`
+### Admin Evidence Mode
 
-Classify files and create evidence items.
+대상:
+- 계획서, KPI, milestone, 보고서
+- 예산, 정산, 증빙, 승인
+- 감사 대응, 마감, 변경 이력
 
-Inputs:
-- project plan, RFP, agreement, reports
-- meeting notes, experiment logs, datasets, code outputs
-- receipts, estimates, invoices, inspection records
-- papers, patents, software, presentations
+행동:
+- 먼저 evidence와 approval 상태를 확인한다.
+- claim은 evidence ID에 연결하거나 `needs_evidence`로 표시한다.
+- workspace가 있으면 doctor, next-actions, report-integrity, approval-coverage, budget-ledger, settlement-binder, admin-obligations를 우선 검토한다.
+- IRIS/NTIS/RCMS/Ezbaro 규칙은 Python 코드에 하드코딩하지 않고 profile data와 사람 검토 기록으로만 다룬다.
 
-Outputs:
-- `state/evidence-index.md`
-- `evidence/*.json`
-- `state/open-issues.md`
+### Research Assistant Mode
 
-### `/map-plan`
+대상:
+- 논문 카드, bibliography, literature matrix
+- 데이터 profiling, 실험 결과 비교
+- research claim, hypothesis candidate
 
-Extract goals, KPIs, milestones, deliverables, mandatory outcomes, participants, and budget categories from the project plan.
+행동:
+- 제공된 서지 metadata만 보존한다.
+- 누락된 DOI, 저자, 연도, venue를 invent하지 않는다.
+- insight는 `hypothesis`, `candidate`, `needs_review`로 둔다.
+- 데이터 분석은 재현 가능한 script/manifest와 가정을 남긴다.
 
-Outputs:
-- `state/project-state.md`
-- `state/kpi-map.md`
-- `state/milestone-map.md`
+### Integrity Mode
 
-### `/check-consistency`
+대상:
+- unsupported claim
+- 수치/지표 불일치
+- approval/source/profile hash drift
+- citation-support gap
+- reviewed-seed drift
 
-Compare plan, evidence, report drafts, budget, milestone status, and research claims.
+행동:
+- evidence ID가 있어도 값, 상태, 승인, 해시가 맞는지 확인한다.
+- finding과 repair action을 만들되, 공식 compliance 인증처럼 말하지 않는다.
 
-Outputs:
-- inconsistency table
-- missing evidence list
-- overclaim risk list
-- next action list
+## 대표 워크플로 5개
 
-### `/draft-report`
-
-Generate a report draft only from evidence items. Claims without evidence must be marked.
-
-Outputs:
-- `reports/monthly-report-YYYY-MM.md`
-- `reports/interim-report-draft.md`
-- `reports/final-report-draft.md`
-
-### `/audit-defense`
-
-Prepare audit Q&A and evidence bundles.
-
-Outputs:
-- `reports/audit-defense-qna.md`
-- `reports/evidence-bundle-index.md`
-
-### `/lit-review`
-
-Perform research paper intake and literature mapping.
-
-Outputs:
-- paper cards
-- claim matrix
-- method/dataset/metric table
-- gap/opportunity map
-
-### `/data-insight`
-
-Analyze datasets reproducibly.
-
-Outputs:
-- data profile
-- metric table
-- anomaly/quality flags
-- insight candidates with confidence and required checks
-- code/notebook plan
-
-## Bundled implementation
-
-Use the Python package under `src/k_resdev_skill/` for deterministic helpers:
-
-- `run_intake(inbox_dir, state_dir, evidence_dir, project=None)` for folder intake.
-- `classify_file(path, text=None)` for rule-based intake classification.
-- `profile_data_file(path)` for CSV/XLSX profiling.
-- `write_evidence_index(items, state_dir)` for `state/evidence-index.md` and `.json`.
-- `check_unsupported_claims(report_text, evidence_items, kpis=None)` for integrity checks.
-- `generate_literature_matrix(papers, output_path=None)` for paper comparison tables.
-- `import_bibliography(bibliography_file, state_dir, literature_matrix_path)` for BibTeX/RIS/CSL JSON bibliography intake without citation invention.
-- `load_bibliography_index(path)` and `paper_records_from_bibliography(entries)` for bibliography-to-literature-matrix projection.
-- `create_bibliography_review_record(...)`, `generate_bibliography_review_summary(...)`, and `bibliography_review_status(...)` for supplied human bibliography metadata decisions.
-- `generate_workspace_bibliography_integrity(root, output_path, json_path)` for checking Markdown citation keys, duplicate bibliography metadata, and bibliography source hash drift.
-- `create_citation_support_record(...)`, `generate_citation_support_summary(...)`, and `citation_support_status(...)` for supplied human paper-claim support decisions.
-- `generate_workspace_citation_support_integrity(root, output_path, json_path)` for checking Markdown citations against supplied paper-claim support records.
-- `extract_project_state_from_text(text, project_id)` for conservative plan mapping.
-- `write_monthly_report(evidence_items, reports_dir, project_state, period)` for non-final report drafts.
-- `generate_audit_qna(evidence_items, output_path)` for draft audit-defense Q&A.
-- `paper_card_from_text(text, paper_id, evidence_ids)` for supplied paper metadata only.
-- `generate_data_insight_report(profile, basis, output_path)` for hypothesis-level data insight candidates.
-- `generate_experiment_comparison_table(evidence_items, output_path)` for experiment/result comparison.
-- `generate_reproducibility_checklist(evidence_items, output_path)` for missing reproducibility evidence.
-- `generate_experiment_plan_bundle(insights, evidence_items, output_path)` for hypothesis validation plans.
-- `generate_budget_evidence_checklist(evidence_items, output_path)` for generic budget evidence completeness checks.
-- `generate_profile_registry(templates_root, output_path)` for local agency profile/template registry output.
-- `create_approval_record(...)`, `generate_approval_summary(...)`, and `approval_gate_status(...)` for supplied human review decisions.
-- `generate_workspace_approval_coverage(root, output_path, json_path)` for checking report artifacts against supplied human decisions.
-- `generate_workspace_report_integrity(root, output_path, json_path)` for checking Markdown report drafts against indexed evidence claims and cited evidence review status.
-- `generate_evidence_bundle_index(evidence_items, approval_records, output_path)` for audit/review bundle indexes.
-- `validate_json_files(json_paths, schema)` for bundled or custom JSON schema checks.
-- `run_data_analysis(data_file, output_dir, evidence_ids)` for reproducible CSV/XLSX profiling, insight report, replay script, and manifest output.
-- `generate_analysis_script(data_file, output_dir, evidence_ids)` for a minimal replay script.
-- `export_projection(markdown_path, output_path, output_format)` for DOCX/HTML/TXT review exports from Markdown projections.
-- `initialize_workspace(root, project_id, title, profile_id)` for standard local workspace scaffolding.
-- `run_workspace_doctor(root, output_path, json_path)` for readiness checks across evidence, profile, approvals, reports, exports, and analysis manifests.
-- `generate_workspace_action_plan(root, doctor_result, output_path, json_path)` for deterministic next actions derived from doctor findings.
-- `generate_workspace_summary(root, output_path, json_path, max_actions)` for one-page operational workspace status reports.
-- `generate_workspace_review_pack(root, reports_dir, state_dir, max_actions)` for bundled readiness, next-action, summary, source-verification, approval-coverage, report-integrity, and bibliography-integrity artifacts.
-- `verify_workspace_review_pack(manifest_json)` for checking generated review-pack artifacts against saved hashes.
-- `verify_evidence_sources(evidence_index_json, root, inbox, output_path, json_path)` for checking indexed source files against saved source hashes.
-
-Implementation guardrails:
-
-- Intake-generated IDs are stable across file-order changes and include the inbox-relative path to avoid duplicate-content collisions.
-- Intake must not scan its own `state/` or `evidence/` outputs even when those folders are inside the inbox.
-- Claim checking must treat evidence IDs as necessary but not sufficient: report numbers still need to match linked evidence values.
-- Binary `.hwp` extraction is optional. Use `rhwp dump` when an `rhwp` CLI is available; otherwise mark extraction as `needs_review` instead of pretending HWP text was parsed.
-- Paper/research outputs must never invent citations, metrics, or verified conclusions. Keep them as `needs_review` or `hypothesis` until human-reviewed.
-- Bibliography imports must preserve supplied metadata only. Missing titles, authors, years, venues, DOI, or URL must remain review flags instead of being filled in.
-- Bibliography review records must reflect supplied human decisions. The tool must not infer citation acceptance from import alone.
-- Bibliography integrity checks only validate local citation metadata, citation-key presence, review status, and source hash drift. They do not prove that a cited paper supports a claim.
-- Citation support records must reflect supplied human paper-claim review decisions. The tool must not infer that a paper supports a claim from bibliography metadata alone.
-- Citation support integrity checks only inspect supplied support records for cited papers. They do not independently prove scientific truth.
-- Agency templates under `templates/agencies/` are draft profile skeletons, not official rules.
-- Approval records must reflect supplied human decisions. The tool must not infer or invent approval.
-- Approval records should include `target_path` when available so the target hash can be captured and later checked for drift.
-- Analysis runs must leave raw data unchanged and mark generated outputs as draft/human-review-required.
-- Projection exports must retain the draft/human-approval notice and must not be described as final official documents.
-- Workspace doctor output is a readiness projection only; it does not certify official agency compliance.
-- Workspace next actions are suggestions for human review. Do not execute generated commands automatically as proof of readiness.
-- Workspace summaries are handoff/status projections only. They must not be used as final submission readiness certification.
-- Workspace review packs are local review bundles only. They must not be treated as official submissions or compliance evidence by themselves.
-- Review-pack verification only checks generated artifact presence and hashes. It does not validate raw evidence truth, official compliance, or human approval.
-- Evidence source verification only checks local file presence and hash equality. It does not prove that the source content is officially valid or scientifically correct.
-- Workspace doctor source-integrity findings are operational blockers/warnings only. They do not replace human review, source provenance judgment, or official audit checks.
-- Approval coverage only checks whether local artifacts are linked to supplied human decisions. It does not create, infer, or certify approval.
-- Approval target hash verification only detects local artifact drift after approval. It does not prove the approval was valid or sufficient.
-- Report integrity checks are draft consistency checks only. They do not certify official compliance, scientific validity, or final approval.
-- Report drafts that cite `draft`, `needs_review`, `rejected`, or `superseded` evidence must remain review-blocked or clearly disclosed; a known evidence ID is not enough by itself.
-
-When running locally, prefer:
+### 1. 워크스페이스 시작/진단
 
 ```powershell
-python -m pip install -e .
-python -m pytest
-python -m k_resdev_skill intake --inbox .\inbox --project my-rnd-project
-python -m k_resdev_skill init-workspace --root .\demo-workspace --project-id PRJ-2026-0001 --title "Demo R&D Project"
-python -m k_resdev_skill doctor --root .\demo-workspace --output .\demo-workspace\reports\readiness.md --json .\demo-workspace\state\readiness.json
-python -m k_resdev_skill next-actions --root .\demo-workspace --output .\demo-workspace\reports\next-actions.md --json .\demo-workspace\state\next-actions.json
-python -m k_resdev_skill approval-coverage --root .\demo-workspace --output .\demo-workspace\reports\approval-coverage.md --json .\demo-workspace\state\approval-coverage.json
-python -m k_resdev_skill report-integrity --root .\demo-workspace --output .\demo-workspace\reports\report-integrity.md --json .\demo-workspace\state\report-integrity.json
-python -m k_resdev_skill workspace-summary --root .\demo-workspace --output .\demo-workspace\reports\workspace-summary.md --json .\demo-workspace\state\workspace-summary.json
-python -m k_resdev_skill workspace-review-pack --root .\demo-workspace
-python -m k_resdev_skill verify-review-pack .\demo-workspace\state\workspace-review-pack.json
-python -m k_resdev_skill verify-evidence-sources .\demo-workspace\state\evidence-index.json --root .\demo-workspace --output .\demo-workspace\reports\source-verification.md --json .\demo-workspace\state\source-verification.json
-python -m k_resdev_skill bib-import .\references\library.bib --state-dir .\state --literature-matrix .\reports\literature-review-matrix.md
-python -m k_resdev_skill bib-review-record --bibliography-id BIB-2026-ABCD1234 --decision accepted --reviewer reviewer-name --citation-key kim2026 --reviews-dir .\state\bibliography-reviews
-python -m k_resdev_skill bib-review-summary .\state\bibliography-reviews --output .\reports\bibliography-review-summary.md
-python -m k_resdev_skill bib-review-status .\state\bibliography-reviews --bibliography-id BIB-2026-ABCD1234
-python -m k_resdev_skill bib-lit-matrix .\state\bibliography-index.json --output .\reports\literature-review-matrix.md
-python -m k_resdev_skill bib-integrity --root . --output .\reports\bibliography-integrity.md --json .\state\bibliography-integrity.json
-python -m k_resdev_skill citation-support-record --bibliography-id BIB-2026-ABCD1234 --citation-key kim2026 --claim "Model A underperforms on small-lesion cases." --decision needs_review --reviewer reviewer-name --support-dir .\state\citation-support
-python -m k_resdev_skill citation-support-summary .\state\citation-support --output .\reports\citation-support-summary.md
-python -m k_resdev_skill citation-support-status .\state\citation-support --bibliography-id BIB-2026-ABCD1234 --claim "Model A underperforms on small-lesion cases."
-python -m k_resdev_skill citation-support-integrity --root . --output .\reports\citation-support.md --json .\state\citation-support.json
-python -m k_resdev_skill draft-report .\state\evidence-index.json --period 2026-05
-python -m k_resdev_skill data-insights .\inbox\metrics.csv --output .\reports\data-insights.md
-python -m k_resdev_skill run-analysis .\inbox\metrics.csv --output-dir .\reports\analysis --evidence-id EVI-2026-0001
-python -m k_resdev_skill plan-experiment .\state\research-insights.json --evidence-index .\state\evidence-index.json --output .\reports\experiment-plan.md
-python -m k_resdev_skill repro-check .\state\evidence-index.json --output .\reports\repro-check.md
-python -m k_resdev_skill budget-check .\state\evidence-index.json --output .\reports\budget-checklist.md
-python -m k_resdev_skill profiles --markdown --output .\reports\agency-profiles.md
-python -m k_resdev_skill validate-json approval .\state\approvals\APR-2026-EXAMPLE.json
-python -m k_resdev_skill approval-record --target-type report --target-id monthly-2026-05 --target-path .\reports\monthly-report-2026-05.md --decision needs_changes --reviewer reviewer-name
-python -m k_resdev_skill approval-gate .\state\approvals --target-type report --target-id monthly-2026-05
-python -m k_resdev_skill bundle-index .\state\evidence-index.json --approval-records .\state\approvals --output .\reports\evidence-bundle-index.md
-python -m k_resdev_skill export-projection .\reports\monthly-report-2026-05.md --output .\reports\monthly-report-2026-05.docx --format docx
-python -m k_resdev_skill classify .\inbox\some-file.pdf --text "..."
-python -m k_resdev_skill profile .\inbox\metrics.csv
+python -m k_resdev_skill init-workspace --root . --project-id "<project-id>" --title "<project-title>"
+python -m k_resdev_skill intake --inbox .\inbox --state-dir .\state --evidence-dir .\evidence
+python -m k_resdev_skill doctor --root . --output .\reports\readiness.md --json .\state\readiness.json
+python -m k_resdev_skill next-actions --root . --output .\reports\next-actions.md --json .\state\next-actions.json
 ```
 
-## Output style
+### 2. 보고서 제출 전 점검
 
-Always separate:
+```powershell
+python -m k_resdev_skill report-integrity --root . --output .\reports\report-integrity.md --json .\state\report-integrity.json
+python -m k_resdev_skill approval-coverage --root . --output .\reports\approval-coverage.md --json .\state\approval-coverage.json
+python -m k_resdev_skill verify-evidence-sources .\state\evidence-index.json --root . --output .\reports\source-verification.md --json .\state\source-verification.json
+```
+
+### 3. 예산/정산 binder 점검
+
+```powershell
+python -m k_resdev_skill budget-ledger-integrity --root . --output .\reports\budget-ledger.md --json .\state\budget-ledger-integrity.json
+python -m k_resdev_skill settlement-binder --root . --output .\reports\settlement-binder.md --json .\state\settlement-binder.json
+```
+
+### 4. 기관 profile 기반 행정 의무 점검
+
+```powershell
+python -m k_resdev_skill profile-review --root . --output .\reports\profile-review.md --json .\state\profile-review.json
+python -m k_resdev_skill admin-profile-pack-gate --root . --output .\reports\admin-profile-pack-gate.md --json .\state\admin-profile-pack-gate.json
+python -m k_resdev_skill admin-obligations-review --root . --output .\reports\admin-obligations.md --json .\state\admin-obligations-review.json
+python -m k_resdev_skill admin-reviewed-seed-drift --root . --output .\reports\admin-reviewed-seed-drift.md --json .\state\admin-reviewed-seed-drift.json
+```
+
+### 5. 연구 evidence 지원
+
+```powershell
+python -m k_resdev_skill bib-import .\references\library.bib --state-dir .\state --literature-matrix .\reports\literature-review-matrix.md
+python -m k_resdev_skill citation-support-integrity --root . --output .\reports\citation-support.md --json .\state\citation-support.json
+python -m k_resdev_skill run-analysis .\inbox\metrics.csv --output-dir .\reports\analysis --evidence-id "<evidence-id>"
+python -m k_resdev_skill research-claim-matrix --root . --output .\reports\research-claim-matrix.md --json .\state\research-claim-matrix.json
+```
+
+## 검증 코어를 쓸 때
+
+다음이면 Python 검증 코어를 쓴다:
+- source hash, schema, approval, evidence ID, 수치 claim, budget ledger처럼 재현 가능한 검증이 필요한 경우
+- workspace 상태를 진단해야 하는 경우
+- 사람이 검토할 artifact를 남겨야 하는 경우
+
+단순 개념 설명이나 기획 대화라면 CLI를 먼저 실행하지 말고 직접 답한다.
+
+## 출력 형식
+
+비교적 큰 작업은 이 순서로 답한다:
 
 ```text
-Evidence-backed fact
-AI interpretation
-Hypothesis
-Missing evidence
-Human decision required
+Evidence-backed facts
+Draft/projection output
+Risks and missing evidence
+Human decisions required
+Suggested next actions
 ```
 
-Prefer tables for administrative checks. Prefer concise bullet points for action plans. For research insights, include assumptions and verification steps.
+## 필요할 때만 읽는 문서
 
-## Reference loading
-
-Load these files only when the task needs the detail:
-
-- `guides/intake-rules.md` for file-category and intake extraction rules.
-- `guides/research-assistant-rules.md` for literature/data/hypothesis safety rules.
-- `guides/architecture.md` for the layer model.
-- `workflows/mvp-roadmap.md` for implementation sequencing.
+- `guides/user-guide.md`: 처음 쓰는 사람용 한글 사용 가이드.
+- `guides/operations-guide.md`: 운영자/에이전트용 실행 흐름.
+- `guides/agent-skill-boundary.md`: 스킬과 검증 코어의 경계.
+- `guides/verification-core.md`: 선택적 Python 검증 명령 지도.
+- `guides/intake-rules.md`: 파일 intake 규칙.
+- `guides/research-assistant-rules.md`: 논문/데이터/가설 안전 규칙.
+- `workflows/mvp-roadmap.md`: 구현 로드맵과 beta 이력.

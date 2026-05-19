@@ -1,12 +1,12 @@
 # K-ResDev Next Planning
 
-This planning note starts after `0.1.0b58`.
+This planning note starts after `0.1.0b59`.
 
 ## Current Diagnosis
 
-K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, budget ledger review, settlement binders, admin obligation graphs, admin profile-pack seed review, admin profile-pack human review receipts, reviewed-seed drift dashboards, admin change ledgers, admin calendars, bibliography metadata, reference corpus adapters, read-only workspace discovery, bibliography review, citation support, research claim matrices, profile source records, profile source-pack review queues, profile source fix plans, profile source fix review records, profile integrity, a narrow source-backed IRIS/Innopolis profile seed, profile promotion review, hash-bound profile promotion records, non-destructive profile promotion apply plans, guarded profile promotion apply results/backups, non-destructive profile promotion revocation plans, guarded profile promotion revocation results/backups, a profile lifecycle ledger, profile pack readiness dashboard, profile pack readiness drilldown, profile pack investigation bundle, profile pack investigation package manifest/ZIP, profile pack package reviewer receipts, workspace traceability graph, trace passport checkpoints, artifact authority labels, goals/deadline review, weekly operating reviews, workspace dashboards, thin local workflow router, workspace doctor, next actions, workspace summary, and review packs.
+K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, budget ledger review, settlement binders, admin obligation graphs, admin profile-pack seed review, admin profile-pack human review receipts, reviewed-seed drift dashboards, admin change ledgers, admin calendars, bibliography metadata, reference corpus adapters, read-only workspace discovery, bibliography review, citation support, research claim matrices, profile source records, profile source-pack review queues, profile source fix plans, profile source fix review records, profile integrity, a narrow source-backed IRIS/Innopolis profile seed, profile promotion review, hash-bound profile promotion records, non-destructive profile promotion apply plans, guarded profile promotion apply results/backups, non-destructive profile promotion revocation plans, guarded profile promotion revoke results/backups, a profile lifecycle ledger, profile pack readiness dashboard, profile pack readiness drilldown, profile pack investigation bundle, profile pack investigation package manifest/ZIP, profile pack package reviewer receipts, workspace traceability graph, trace passport checkpoints, artifact authority labels, goals/deadline review, weekly operating reviews, workspace dashboards, thin local workflow router, workspace doctor, next actions, workspace summary, review packs, and a Korean-first agent skill onboarding layer.
 
-The next bottleneck is verified agency profile expansion. Beta 49-58 closed the generated package handoff loop, added a generic Korean R&D admin operating layer, made admin obligation seeds profile-data driven, added row-level human review receipts for those admin seeds, added a read-only promotion gate that checks profile review, profile promotion, and admin profile-pack review hashes, added an explicit reviewed-seed admin initialization mode gated by that result, and added a drift dashboard/action layer for reviewed-seed metadata. Official IRIS/NTIS/RCMS/Ezbaro details still must remain source-backed profile data, not hardcoded Python logic.
+The next bottleneck is no longer only verified agency profile expansion. Beta 59 clarified that K-ResDev is an agent skill first and a Python verification core second. Future work should improve the GPT/Codex workflow surface before adding more CLI reports. Official IRIS/NTIS/RCMS/Ezbaro details still must remain source-backed profile data, not hardcoded Python logic.
 
 ## Planning Principles
 
@@ -133,7 +133,22 @@ Implemented scope:
 - grouped gate, profile-review, admin profile-pack, and review receipt drift into non-destructive repair action rows;
 - added doctor, next-actions, workspace-summary, review-pack, operational Markdown filtering, trace, schema, template, and tests.
 
-### Beta 59 - Reviewed Seed Repair Review Records
+### Beta 59 - Agent Skill Boundary and Korean Onboarding
+
+Goal: reduce the sense that K-ResDev is just a large CLI program, and restore the GPT/Codex agent skill as the primary surface.
+
+Status: implemented as a documentation and skill-boundary pass.
+
+Implemented scope:
+- rewrote `SKILL.md` as a concise GPT/Codex agent entrypoint;
+- rewrote `README.md` in Korean as an onboarding page;
+- added `guides/user-guide.md` for first-time users;
+- added `guides/operations-guide.md` for operators and agents;
+- rewrote `guides/agent-skill-boundary.md` and `guides/verification-core.md` in Korean;
+- updated agent UI metadata to Korean-centered wording;
+- added doc-boundary tests so future changes keep the skill-first structure visible.
+
+### Beta 60 - Reviewed Seed Repair Review Records
 
 Goal: let humans record decisions about reviewed-seed drift repair actions without mutating local admin obligation state.
 

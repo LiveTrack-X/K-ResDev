@@ -745,6 +745,19 @@ Implemented:
 
 Reviewed-seed drift repair remains proposal-only. Regenerating review artifacts does not replace `state/admin-obligations.json`; any re-seed or supersede step must stay an explicit human action.
 
+### Task 65: Agent skill boundary and Korean onboarding
+
+Implemented:
+- `SKILL.md` rewritten as the concise GPT/Codex agent contract
+- Korean-first `README.md` onboarding that explains the skill-first / verification-core split
+- `guides/user-guide.md` for first-time users
+- `guides/operations-guide.md` for operators and Codex/GPT agents
+- Korean `guides/agent-skill-boundary.md` and `guides/verification-core.md`
+- Korean-centered `agents/openai.yaml` metadata
+- doc-boundary tests that keep `SKILL.md` compact and preserve the main onboarding phrases
+
+K-ResDev should continue to be developed as an agent skill first. The Python package and CLI are the optional verification core for deterministic checks, not the main user experience.
+
 ## Safety constraints
 
 - Never alter raw files.

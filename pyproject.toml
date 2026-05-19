@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "k-resdev-skill"
-version = "0.1.0b58"
-description = "K-ResDev evidence-first Korean R&D administration and research copilot skill pack."
+version = "0.1.0b59"
+description = "K-ResDev GPT/Codex agent skill pack with an optional Korean R&D evidence verification core."
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [

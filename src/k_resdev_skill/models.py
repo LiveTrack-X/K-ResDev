@@ -1194,6 +1194,57 @@ class AdminObligationGraphResult(StrictModel):
     warnings: list[str] = Field(default_factory=list)
 
 
+class AdminReviewedSeedDriftItem(StrictModel):
+    drift_id: str
+    category: str
+    severity: str
+    status: str
+    finding_code: str
+    message: str
+    path: str | None = None
+    recorded_hash: str | None = None
+    current_hash: str | None = None
+    review_id: str | None = None
+    repair_command: str | None = None
+    manual_step: str
+    related_findings: list[str] = Field(default_factory=list)
+
+    @field_validator("drift_id", "category", "severity", "status", "finding_code", "message", "manual_step")
+    @classmethod
+    def _admin_reviewed_seed_drift_item_field_must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
+class AdminReviewedSeedDriftDashboardResult(StrictModel):
+    root: str
+    status: str
+    profile_id: str | None = None
+    seed_mode: str | None = None
+    gate_status: str | None = None
+    gate_path: str | None = None
+    source_pack_path: str | None = None
+    recorded_review_receipt_count: int = 0
+    current_review_receipt_count: int = 0
+    drift_count: int = 0
+    action_count: int = 0
+    high_count: int = 0
+    medium_count: int = 0
+    low_count: int = 0
+    items: list[AdminReviewedSeedDriftItem] = Field(default_factory=list)
+    markdown_path: str | None = None
+    json_path: str | None = None
+    warnings: list[str] = Field(default_factory=list)
+
+    @field_validator("root", "status")
+    @classmethod
+    def _admin_reviewed_seed_drift_dashboard_field_must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
 class AdminObligationProfilePackReviewResult(StrictModel):
     root: str
     status: str
@@ -1486,6 +1537,10 @@ class WorkspaceSummaryResult(StrictModel):
     admin_profile_pack_gate_check_count: int = 0
     admin_profile_pack_gate_high_count: int = 0
     admin_profile_pack_gate_medium_count: int = 0
+    admin_reviewed_seed_drift_status: str | None = None
+    admin_reviewed_seed_drift_count: int = 0
+    admin_reviewed_seed_drift_high_count: int = 0
+    admin_reviewed_seed_drift_action_count: int = 0
     admin_obligation_status: str | None = None
     admin_obligation_count: int = 0
     admin_submission_count: int = 0
@@ -1815,6 +1870,10 @@ class WorkspaceReviewPackResult(StrictModel):
     admin_profile_pack_gate_check_count: int = 0
     admin_profile_pack_gate_high_count: int = 0
     admin_profile_pack_gate_medium_count: int = 0
+    admin_reviewed_seed_drift_status: str | None = None
+    admin_reviewed_seed_drift_count: int = 0
+    admin_reviewed_seed_drift_high_count: int = 0
+    admin_reviewed_seed_drift_action_count: int = 0
     admin_obligation_status: str | None = None
     admin_obligation_count: int = 0
     admin_submission_count: int = 0

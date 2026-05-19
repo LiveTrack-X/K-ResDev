@@ -101,6 +101,7 @@ def _actions_for_findings(root: Path, findings: list[WorkspaceDoctorFinding]) ->
         _action_for_admin_profile_pack(root, by_code),
         _action_for_admin_profile_pack_reviews(root, by_code),
         _action_for_admin_profile_pack_gate(root, by_code),
+        _action_for_admin_reviewed_seed_drift(root, by_code),
         _action_for_admin_obligations(root, by_code),
         _action_for_settlement_binder(root, by_code),
         _action_for_admin_change_ledger(root, by_code),
@@ -642,6 +643,29 @@ def _action_for_admin_profile_pack_gate(root: Path, by_code: dict[str, list[Work
         "Evaluate admin profile-pack promotion gate",
         "Reviewed-seed mode should only be considered after profile review, profile promotion, and admin profile-pack human review receipts all match current hashes.",
         f'python -m k_resdev_skill admin-profile-pack-gate --root "{root}" --output "{root / "reports" / "admin-profile-pack-gate.md"}" --json "{root / "state" / "admin-profile-pack-gate.json"}"',
+        by_code,
+        codes,
+    )
+
+
+def _action_for_admin_reviewed_seed_drift(root: Path, by_code: dict[str, list[WorkspaceDoctorFinding]]) -> WorkspaceActionItem | None:
+    codes = [
+        "admin_reviewed_seed_drift_high_findings",
+        "admin_reviewed_seed_drift_review_findings",
+        "admin_reviewed_seed_gate_hash_mismatch",
+        "admin_reviewed_seed_profile_review_hash_mismatch",
+        "admin_reviewed_seed_profile_pack_hash_mismatch",
+        "admin_reviewed_seed_review_receipts_missing",
+    ]
+    if not any(code in by_code for code in codes):
+        return None
+    priority = "high" if any(code in by_code for code in ("admin_reviewed_seed_drift_high_findings", "admin_reviewed_seed_gate_hash_mismatch", "admin_reviewed_seed_profile_review_hash_mismatch", "admin_reviewed_seed_profile_pack_hash_mismatch")) else "medium"
+    return _action(
+        root,
+        priority,
+        "Review reviewed-seed drift dashboard",
+        "Reviewed-seed admin obligations should stay hash-bound to the gate, profile review, admin profile pack, and human review receipts.",
+        f'python -m k_resdev_skill admin-reviewed-seed-drift --root "{root}" --output "{root / "reports" / "admin-reviewed-seed-drift.md"}" --json "{root / "state" / "admin-reviewed-seed-drift.json"}"',
         by_code,
         codes,
     )

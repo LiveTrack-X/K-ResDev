@@ -21,6 +21,7 @@ from .admin_profile_pack_reviews import (
     write_admin_profile_pack_review_record,
 )
 from .admin_profile_pack_gate import generate_admin_profile_pack_promotion_gate
+from .admin_reviewed_seed_drift import generate_admin_reviewed_seed_drift_dashboard
 from .artifact_authority import generate_artifact_authority
 from .audit import generate_audit_qna
 from .approval import (
@@ -505,7 +506,7 @@ def main(argv: list[str] | None = None) -> int:
     validate_json_parser = subparsers.add_parser("validate-json", help="Validate JSON files against bundled or custom JSON schema.")
     validate_json_parser.add_argument(
         "schema",
-        help="Schema alias such as evidence, research-insight, project-profile, profile-source, profile-source-fix-plan, profile-source-fix-review, profile-pack-readiness, profile-pack-readiness-drilldown, profile-pack-investigation-bundle, profile-pack-investigation-package, budget-ledger, approval, or a schema path.",
+        help="Schema alias such as evidence, research-insight, project-profile, profile-source, profile-source-fix-plan, profile-source-fix-review, profile-pack-readiness, profile-pack-readiness-drilldown, profile-pack-investigation-bundle, profile-pack-investigation-package, admin-reviewed-seed-drift, budget-ledger, approval, or a schema path.",
     )
     validate_json_parser.add_argument("json_paths", nargs="+")
 
@@ -604,6 +605,11 @@ def main(argv: list[str] | None = None) -> int:
     admin_profile_pack_gate_parser.add_argument("--templates-root", default=None)
     admin_profile_pack_gate_parser.add_argument("--output", default=None)
     admin_profile_pack_gate_parser.add_argument("--json", default=None)
+
+    admin_reviewed_seed_drift_parser = subparsers.add_parser("admin-reviewed-seed-drift", help="Summarize reviewed-seed admin obligation drift and repair actions.")
+    admin_reviewed_seed_drift_parser.add_argument("--root", default=".")
+    admin_reviewed_seed_drift_parser.add_argument("--output", default=None)
+    admin_reviewed_seed_drift_parser.add_argument("--json", default=None)
 
     settlement_binder_parser = subparsers.add_parser("settlement-binder", help="Bind budget ledger rows to evidence, proof, approval, and source-hash state.")
     settlement_binder_parser.add_argument("--root", default=".")
@@ -1268,6 +1274,10 @@ def main(argv: list[str] | None = None) -> int:
             output_path=args.output,
             json_path=args.json,
         )
+        print(result.model_dump_json(indent=2))
+        return 0 if result.status != "blocked" else 1
+    if args.command == "admin-reviewed-seed-drift":
+        result = generate_admin_reviewed_seed_drift_dashboard(args.root, output_path=args.output, json_path=args.json)
         print(result.model_dump_json(indent=2))
         return 0 if result.status != "blocked" else 1
     if args.command == "settlement-binder":

@@ -2,7 +2,7 @@
 
 Purpose: 한국형 국책 R&D 환경에서 연구 행정 문서화, 증빙 정합성, 보고서 생성, 논문/데이터 인사이트 보조를 evidence-first 방식으로 지원하는 Codex/Skill 프로젝트입니다.
 
-Current release: `0.1 BETA 57` (`0.1.0b57`).
+Current release: `0.1 BETA 58` (`0.1.0b58`).
 
 Core principle:
 
@@ -88,6 +88,7 @@ This repository does not encode any single ministry/institution form as authorit
 - Admin profile-pack human review records and summaries that bind pack-level or row-level supplied decisions to the current admin obligation profile-pack SHA-256.
 - Admin profile-pack promotion gate that joins current profile review, hash-bound profile promotion, profile-pack review, and admin profile-pack human review receipts before any reviewed-seed mode is considered.
 - Explicit reviewed-seed admin obligation initialization mode that only runs when the admin profile-pack promotion gate passes, records gate/profile/pack/review hashes, and keeps rows as local `accepted_risk` candidates rather than official rules.
+- Reviewed-seed drift dashboard that groups gate, profile-review, admin profile-pack, and review receipt drift into non-destructive repair action rows.
 - `national-rnd-basic` and narrow `iris-innopolis-2026-017795` admin obligation profile-pack seeds that remain local candidates rather than official rules.
 - Admin obligation graph starter/reviewer for local reporting, settlement, performance, agreement/change, budget, approval, and equipment obligation candidates without hardcoding official IRIS/NTIS/RCMS/Ezbaro rules.
 - Settlement evidence binder that joins budget ledger rows, proof metadata, approval references, evidence IDs, source hashes, and review findings without deciding cost eligibility.
@@ -95,7 +96,7 @@ This repository does not encode any single ministry/institution form as authorit
 - Admin calendar review that links local admin obligation candidates to reviewed project-goals deadlines and due-soon/overdue state.
 - Workspace next-action planner that converts doctor findings into deterministic, reviewable commands.
 - Workspace summary report that combines readiness, next actions, evidence counts, approvals, reports, exports, and analysis manifests.
-- Workspace review pack command that refreshes discovery, readiness, next actions, workspace summary, artifact-authority, goals-review, weekly-review, workspace-dashboard, budget-ledger, settlement-binder, admin profile-pack review, admin profile-pack human review summary, admin profile-pack promotion gate, admin obligations, admin change ledger, admin calendar, profile-source-queue, profile-source-fix-plan, profile-source-fix-summary, profile-integrity, profile-promotion-summary, profile-promotion-apply-plan, profile-promotion-apply-result when present, profile-promotion-revoke-plan/result when present, profile-lifecycle-ledger, profile-pack-readiness, profile-pack-readiness-drilldown, profile-pack-investigation-bundle, profile-pack-investigation-package, package receipt summary, source-verification, approval-coverage, report-integrity, bibliography-integrity, reference-corpus, citation-support, research-claim-matrix, and workspace-trace artifacts together.
+- Workspace review pack command that refreshes discovery, readiness, next actions, workspace summary, artifact-authority, goals-review, weekly-review, workspace-dashboard, budget-ledger, settlement-binder, admin profile-pack review, admin profile-pack human review summary, admin profile-pack promotion gate, reviewed-seed drift dashboard, admin obligations, admin change ledger, admin calendar, profile-source-queue, profile-source-fix-plan, profile-source-fix-summary, profile-integrity, profile-promotion-summary, profile-promotion-apply-plan, profile-promotion-apply-result when present, profile-promotion-revoke-plan/result when present, profile-lifecycle-ledger, profile-pack-readiness, profile-pack-readiness-drilldown, profile-pack-investigation-bundle, profile-pack-investigation-package, package receipt summary, source-verification, approval-coverage, report-integrity, bibliography-integrity, reference-corpus, citation-support, research-claim-matrix, and workspace-trace artifacts together.
 - Review pack artifact hash manifest and verifier for detecting missing or changed generated artifacts.
 - Evidence source verifier that checks indexed source files against saved source hashes.
 - Workspace doctor and review pack integration for local evidence-source presence/hash drift checks.
@@ -119,7 +120,7 @@ This repository does not encode any single ministry/institution form as authorit
 - Workspace doctor, next-action, summary, review-pack, and trace integration for profile pack readiness drilldown gaps.
 - Workspace doctor, next-action, summary, review-pack, and trace integration for profile pack investigation bundle handoff gaps.
 - Workspace doctor, next-action, summary, review-pack, and trace integration for generated profile pack investigation package handoffs and package reviewer receipts.
-- Workspace doctor, next-action, summary, review-pack, and trace integration for admin profile packs, admin profile-pack human reviews, admin profile-pack promotion gates, admin obligations, settlement binder, admin change ledger, and admin calendar findings.
+- Workspace doctor, next-action, summary, review-pack, and trace integration for admin profile packs, admin profile-pack human reviews, admin profile-pack promotion gates, reviewed-seed drift dashboards, admin obligations, settlement binder, admin change ledger, and admin calendar findings.
 - Workspace doctor, next-action, summary, and review-pack integration for trace impact findings.
 - Trace passport and checkpoint ledger for compact resume checkpoints, artifact hash drift detection, and checkpoint-based resume plans.
 - `national-rnd-basic` agency template skeleton for annual/interim/final reports, change requests, and performance registration drafts.
@@ -197,6 +198,7 @@ python -m k_resdev_skill admin-profile-pack-review-summary --root . --profile na
 python -m k_resdev_skill admin-profile-pack-gate --root . --profile national-rnd-basic --output .\reports\admin-profile-pack-gate.md --json .\state\admin-profile-pack-gate.json
 python -m k_resdev_skill admin-obligations-init --root . --profile national-rnd-basic --output .\reports\admin-obligations.md --json .\state\admin-obligations-review.json
 python -m k_resdev_skill admin-obligations-init --root . --profile national-rnd-basic --reviewed-seed --output .\reports\admin-obligations.md --json .\state\admin-obligations-review.json
+python -m k_resdev_skill admin-reviewed-seed-drift --root . --output .\reports\admin-reviewed-seed-drift.md --json .\state\admin-reviewed-seed-drift.json
 python -m k_resdev_skill admin-obligations-review --root . --output .\reports\admin-obligations.md --json .\state\admin-obligations-review.json
 python -m k_resdev_skill workspace-trace --root . --output .\reports\workspace-trace.md --json .\state\workspace-trace.json
 python -m k_resdev_skill budget-ledger-import .\references\budget-ledger.csv --state-dir .\state --markdown .\reports\budget-ledger-import.md

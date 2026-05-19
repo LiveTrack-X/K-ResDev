@@ -11,6 +11,7 @@ from .admin_operating import (
 )
 from .admin_profile_pack_reviews import summarize_admin_profile_pack_reviews
 from .admin_profile_pack_gate import generate_admin_profile_pack_promotion_gate
+from .admin_reviewed_seed_drift import generate_admin_reviewed_seed_drift_dashboard
 from .artifact_authority import generate_artifact_authority
 from .approval import load_approval_records
 from .evidence_index import load_evidence_index
@@ -102,6 +103,7 @@ def generate_workspace_summary(
     admin_profile_pack = review_admin_obligation_profile_pack(profile.profile_id) if profile else None
     admin_profile_pack_review = summarize_admin_profile_pack_reviews(workspace, profile.profile_id) if profile else None
     admin_profile_pack_gate = generate_admin_profile_pack_promotion_gate(workspace, profile.profile_id) if profile else None
+    admin_reviewed_seed_drift = generate_admin_reviewed_seed_drift_dashboard(workspace)
     admin_obligations = review_admin_obligations(workspace)
     settlement_binder = generate_settlement_binder(workspace)
     admin_change_ledger = review_admin_change_ledger(workspace)
@@ -234,6 +236,10 @@ def generate_workspace_summary(
         admin_profile_pack_gate_check_count=admin_profile_pack_gate.check_count if admin_profile_pack_gate else 0,
         admin_profile_pack_gate_high_count=admin_profile_pack_gate.high_count if admin_profile_pack_gate else 0,
         admin_profile_pack_gate_medium_count=admin_profile_pack_gate.medium_count if admin_profile_pack_gate else 0,
+        admin_reviewed_seed_drift_status=admin_reviewed_seed_drift.status,
+        admin_reviewed_seed_drift_count=admin_reviewed_seed_drift.drift_count,
+        admin_reviewed_seed_drift_high_count=admin_reviewed_seed_drift.high_count,
+        admin_reviewed_seed_drift_action_count=admin_reviewed_seed_drift.action_count,
         admin_obligation_status=admin_obligations.status,
         admin_obligation_count=admin_obligations.obligation_count,
         admin_submission_count=admin_obligations.submission_count,
@@ -333,6 +339,8 @@ def render_workspace_summary_markdown(summary: WorkspaceSummaryResult) -> str:
         f"| Admin profile pack reviewed seed candidate | {summary.admin_profile_pack_gate_can_use_reviewed_seed} |",
         f"| Admin profile pack gate checks | {summary.admin_profile_pack_gate_check_count} |",
         f"| Admin profile pack gate high/medium | {summary.admin_profile_pack_gate_high_count}/{summary.admin_profile_pack_gate_medium_count} |",
+        f"| Reviewed-seed drift | {_escape(summary.admin_reviewed_seed_drift_status or '-')} |",
+        f"| Reviewed-seed drift/action/high | {summary.admin_reviewed_seed_drift_count}/{summary.admin_reviewed_seed_drift_action_count}/{summary.admin_reviewed_seed_drift_high_count} |",
         f"| Admin obligations | {_escape(summary.admin_obligation_status or '-')} |",
         f"| Admin obligation count | {summary.admin_obligation_count} |",
         f"| Admin submission count | {summary.admin_submission_count} |",
@@ -428,6 +436,7 @@ def render_workspace_summary_markdown(summary: WorkspaceSummaryResult) -> str:
         f"| Admin profile pack | {summary.admin_profile_pack_obligation_count} | status: {_escape(summary.admin_profile_pack_status or '-')}; findings: {summary.admin_profile_pack_finding_count} |",
         f"| Admin profile pack human reviews | {summary.admin_profile_pack_review_record_count} | status: {_escape(summary.admin_profile_pack_review_status or '-')}; unresolved: {summary.admin_profile_pack_review_unresolved_count}; stale: {summary.admin_profile_pack_review_stale_count} |",
         f"| Admin profile pack gate | {summary.admin_profile_pack_gate_check_count} | status: {_escape(summary.admin_profile_pack_gate_status or '-')}; reviewed seed candidate: {summary.admin_profile_pack_gate_can_use_reviewed_seed}; high/medium: {summary.admin_profile_pack_gate_high_count}/{summary.admin_profile_pack_gate_medium_count} |",
+        f"| Reviewed-seed drift | {summary.admin_reviewed_seed_drift_count} | status: {_escape(summary.admin_reviewed_seed_drift_status or '-')}; actions: {summary.admin_reviewed_seed_drift_action_count}; high: {summary.admin_reviewed_seed_drift_high_count} |",
         f"| Admin obligations | {summary.admin_obligation_count} | status: {_escape(summary.admin_obligation_status or '-')}; submissions: {summary.admin_submission_count}; findings: {summary.admin_obligation_finding_count} |",
         f"| Admin change ledger | {summary.admin_change_count} | status: {_escape(summary.admin_change_ledger_status or '-')}; findings: {summary.admin_change_finding_count} |",
         f"| Admin calendar | {summary.admin_calendar_linked_deadline_count} | status: {_escape(summary.admin_calendar_status or '-')}; due soon: {summary.admin_calendar_due_soon_count}; overdue: {summary.admin_calendar_overdue_count} |",

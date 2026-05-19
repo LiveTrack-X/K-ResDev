@@ -15,6 +15,7 @@ from .admin_operating import (
 )
 from .admin_profile_pack_reviews import summarize_admin_profile_pack_reviews
 from .admin_profile_pack_gate import generate_admin_profile_pack_promotion_gate
+from .admin_reviewed_seed_drift import generate_admin_reviewed_seed_drift_dashboard
 from .artifact_authority import generate_artifact_authority
 from .approval import load_approval_records
 from .approval_coverage import generate_workspace_approval_coverage
@@ -85,6 +86,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "admin-profile-pack.md",
     "admin-profile-pack-gate.md",
     "admin-profile-pack-review-summary.md",
+    "admin-reviewed-seed-drift.md",
     "bibliography-integrity.md",
     "budget-ledger.md",
     "budget-checklist.md",
@@ -244,6 +246,7 @@ def run_workspace_doctor(
     _check_admin_profile_pack_reviews(workspace, findings)
     _check_admin_profile_pack_gate(workspace, findings)
     _check_admin_obligations(workspace, findings)
+    _check_admin_reviewed_seed_drift(workspace, findings)
     _check_settlement_binder(workspace, findings)
     _check_admin_change_ledger(workspace, findings)
     _check_admin_calendar(workspace, findings)
@@ -1416,6 +1419,32 @@ def _check_admin_obligations(workspace: Path, findings: list[WorkspaceDoctorFind
                 f"Admin obligation review has {result.medium_count} medium-severity finding(s).",
                 workspace / "state" / "admin-obligations.json",
                 "Run admin-obligations-init/review and keep profile-driven admin obligations as needs_review until verified.",
+            )
+        )
+
+
+def _check_admin_reviewed_seed_drift(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> None:
+    result = generate_admin_reviewed_seed_drift_dashboard(workspace)
+    if result.status == "not_configured":
+        return
+    if result.high_count:
+        findings.append(
+            _finding(
+                "admin_reviewed_seed_drift_high_findings",
+                "high",
+                f"Reviewed-seed drift dashboard has {result.high_count} high-severity drift item(s).",
+                workspace / "state" / "admin-reviewed-seed-drift.json",
+                "Run admin-reviewed-seed-drift and refresh hash-bound review artifacts before relying on reviewed-seed obligations.",
+            )
+        )
+    elif result.medium_count:
+        findings.append(
+            _finding(
+                "admin_reviewed_seed_drift_review_findings",
+                "medium",
+                f"Reviewed-seed drift dashboard has {result.medium_count} medium-severity drift item(s).",
+                workspace / "state" / "admin-reviewed-seed-drift.json",
+                "Run admin-reviewed-seed-drift and resolve review receipt or metadata gaps.",
             )
         )
 

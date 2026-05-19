@@ -45,6 +45,10 @@ from .admin_profile_pack_gate import (
     load_admin_profile_pack_promotion_gate,
     render_admin_profile_pack_promotion_gate_markdown,
 )
+from .admin_reviewed_seed_drift import (
+    generate_admin_reviewed_seed_drift_dashboard,
+    render_admin_reviewed_seed_drift_markdown,
+)
 from .bibliography import (
     import_bibliography,
     load_bibliography_index,
@@ -109,6 +113,8 @@ from .models import (
     AdminObligationGraphResult,
     AdminObligationProfilePack,
     AdminObligationProfilePackReviewResult,
+    AdminReviewedSeedDriftDashboardResult,
+    AdminReviewedSeedDriftItem,
     AdminProfilePackPromotionGateCheck,
     AdminProfilePackPromotionGateResult,
     AdminProfilePackReviewDecision,
@@ -387,6 +393,8 @@ __all__ = [
     "AdminObligationGraphResult",
     "AdminObligationProfilePack",
     "AdminObligationProfilePackReviewResult",
+    "AdminReviewedSeedDriftDashboardResult",
+    "AdminReviewedSeedDriftItem",
     "AdminProfilePackPromotionGateCheck",
     "AdminProfilePackPromotionGateResult",
     "AdminProfilePackReviewDecision",
@@ -554,6 +562,7 @@ __all__ = [
     "generate_audit_qna",
     "generate_approval_summary",
     "generate_admin_profile_pack_promotion_gate",
+    "generate_admin_reviewed_seed_drift_dashboard",
     "generate_artifact_authority",
     "generate_settlement_binder",
     "generate_analysis_script",
@@ -670,6 +679,7 @@ __all__ = [
     "render_admin_calendar_markdown",
     "render_admin_change_ledger_markdown",
     "render_admin_obligation_profile_pack_review_markdown",
+    "render_admin_reviewed_seed_drift_markdown",
     "render_admin_profile_pack_promotion_gate_markdown",
     "render_admin_profile_pack_review_summary_markdown",
     "render_admin_obligations_markdown",
@@ -737,4 +747,4 @@ __all__ = [
     "write_research_claims",
 ]
 
-__version__ = "0.1.0b57"
+__version__ = "0.1.0b58"

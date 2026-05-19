@@ -1,0 +1,17 @@
+{
+  "drift_id": "profile_review_hash",
+  "category": "profile_review",
+  "severity": "high",
+  "status": "hash_mismatch",
+  "finding_code": "admin_reviewed_seed_profile_review_hash_mismatch",
+  "message": "Current profile-review.json hash differs from the reviewed-seed metadata.",
+  "path": "state/profile-review.json",
+  "recorded_hash": "sha256:recorded",
+  "current_hash": "sha256:current",
+  "review_id": null,
+  "repair_command": "python -m k_resdev_skill profile-review --root . --output reports/profile-review.md --json state/profile-review.json",
+  "manual_step": "Re-run profile review, record/review promotion, rerun the admin profile-pack gate, then re-seed only after human approval.",
+  "related_findings": [
+    "admin_reviewed_seed_profile_review_hash_mismatch"
+  ]
+}

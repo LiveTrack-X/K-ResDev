@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AdminReviewedSeedDriftDashboardResult",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "root",
+    "status"
+  ],
+  "properties": {
+    "root": { "type": "string", "minLength": 1 },
+    "status": { "type": "string", "minLength": 1 },
+    "profile_id": { "type": ["string", "null"] },
+    "seed_mode": { "type": ["string", "null"] },
+    "gate_status": { "type": ["string", "null"] },
+    "gate_path": { "type": ["string", "null"] },
+    "source_pack_path": { "type": ["string", "null"] },
+    "recorded_review_receipt_count": { "type": "integer", "minimum": 0 },
+    "current_review_receipt_count": { "type": "integer", "minimum": 0 },
+    "drift_count": { "type": "integer", "minimum": 0 },
+    "action_count": { "type": "integer", "minimum": 0 },
+    "high_count": { "type": "integer", "minimum": 0 },
+    "medium_count": { "type": "integer", "minimum": 0 },
+    "low_count": { "type": "integer", "minimum": 0 },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "drift_id",
+          "category",
+          "severity",
+          "status",
+          "finding_code",
+          "message",
+          "manual_step"
+        ],
+        "properties": {
+          "drift_id": { "type": "string", "minLength": 1 },
+          "category": { "type": "string", "minLength": 1 },
+          "severity": { "type": "string", "enum": ["high", "medium", "low"] },
+          "status": { "type": "string", "minLength": 1 },
+          "finding_code": { "type": "string", "minLength": 1 },
+          "message": { "type": "string", "minLength": 1 },
+          "path": { "type": ["string", "null"] },
+          "recorded_hash": { "type": ["string", "null"] },
+          "current_hash": { "type": ["string", "null"] },
+          "review_id": { "type": ["string", "null"] },
+          "repair_command": { "type": ["string", "null"] },
+          "manual_step": { "type": "string", "minLength": 1 },
+          "related_findings": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      }
+    },
+    "markdown_path": { "type": ["string", "null"] },
+    "json_path": { "type": ["string", "null"] },
+    "warnings": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  }
+}

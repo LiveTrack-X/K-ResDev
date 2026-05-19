@@ -321,6 +321,8 @@ def test_admin_operating_layer_templates_match_json_schemas():
         ("schemas/admin_profile_pack_review_summary.schema.json", "templates/admin-profile-pack-review-summary.json"),
         ("schemas/admin_profile_pack_promotion_gate_check.schema.json", "templates/admin-profile-pack-gate-check.json"),
         ("schemas/admin_profile_pack_promotion_gate.schema.json", "templates/admin-profile-pack-gate.json"),
+        ("schemas/admin_reviewed_seed_drift_item.schema.json", "templates/admin-reviewed-seed-drift-item.json"),
+        ("schemas/admin_reviewed_seed_drift_dashboard.schema.json", "templates/admin-reviewed-seed-drift.json"),
         ("schemas/settlement_binder_item.schema.json", "templates/settlement-binder-item.json"),
         ("schemas/settlement_binder.schema.json", "templates/settlement-binder.json"),
         ("schemas/admin_change_record.schema.json", "templates/admin-change-record.json"),

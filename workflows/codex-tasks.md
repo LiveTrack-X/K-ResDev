@@ -732,6 +732,19 @@ Implemented:
 
 Reviewed-seed initialization is still a local operating projection. It does not mark official agency rules compliant, submit anything, or remove the requirement for human approval.
 
+### Task 64: Reviewed-seed drift dashboard and repair action routing
+
+Implemented:
+- `AdminReviewedSeedDriftItem` and `AdminReviewedSeedDriftDashboardResult` models
+- `admin-reviewed-seed-drift` command and public API
+- gate, profile-review, admin profile-pack, and admin profile-pack review receipt drift grouping
+- recorded/current hash display for reviewed-seed metadata
+- non-destructive repair commands and manual steps for each drift category
+- schema/template coverage and validation aliases
+- doctor, next-action, workspace-summary, review-pack, operational Markdown filtering, and trace integration
+
+Reviewed-seed drift repair remains proposal-only. Regenerating review artifacts does not replace `state/admin-obligations.json`; any re-seed or supersede step must stay an explicit human action.
+
 ## Safety constraints
 
 - Never alter raw files.

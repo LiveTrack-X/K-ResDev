@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AdminReviewedSeedDriftItem",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "drift_id",
+    "category",
+    "severity",
+    "status",
+    "finding_code",
+    "message",
+    "manual_step"
+  ],
+  "properties": {
+    "drift_id": { "type": "string", "minLength": 1 },
+    "category": { "type": "string", "minLength": 1 },
+    "severity": { "type": "string", "enum": ["high", "medium", "low"] },
+    "status": { "type": "string", "minLength": 1 },
+    "finding_code": { "type": "string", "minLength": 1 },
+    "message": { "type": "string", "minLength": 1 },
+    "path": { "type": ["string", "null"] },
+    "recorded_hash": { "type": ["string", "null"] },
+    "current_hash": { "type": ["string", "null"] },
+    "review_id": { "type": ["string", "null"] },
+    "repair_command": { "type": ["string", "null"] },
+    "manual_step": { "type": "string", "minLength": 1 },
+    "related_findings": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  }
+}

@@ -14,6 +14,7 @@ from .admin_operating import (
 )
 from .admin_profile_pack_reviews import summarize_admin_profile_pack_reviews
 from .admin_profile_pack_gate import generate_admin_profile_pack_promotion_gate
+from .admin_reviewed_seed_drift import generate_admin_reviewed_seed_drift_dashboard
 from .artifact_authority import generate_artifact_authority
 from .models import (
     ReviewPackArtifact,
@@ -140,6 +141,8 @@ def generate_workspace_review_pack(
     admin_profile_pack_review_json = state / "admin-profile-pack-review-summary.json"
     admin_profile_pack_gate_md = reports / "admin-profile-pack-gate.md"
     admin_profile_pack_gate_json = state / "admin-profile-pack-gate.json"
+    admin_reviewed_seed_drift_md = reports / "admin-reviewed-seed-drift.md"
+    admin_reviewed_seed_drift_json = state / "admin-reviewed-seed-drift.json"
     admin_obligations_md = reports / "admin-obligations.md"
     admin_obligations_json = state / "admin-obligations-review.json"
     settlement_binder_md = reports / "settlement-binder.md"
@@ -187,6 +190,7 @@ def generate_workspace_review_pack(
     admin_profile_pack = review_admin_obligation_profile_pack(workspace_profile_id, output_path=admin_profile_pack_md, json_path=admin_profile_pack_json)
     admin_profile_pack_review = summarize_admin_profile_pack_reviews(workspace, workspace_profile_id, output_path=admin_profile_pack_review_md, json_path=admin_profile_pack_review_json)
     admin_profile_pack_gate = generate_admin_profile_pack_promotion_gate(workspace, workspace_profile_id, output_path=admin_profile_pack_gate_md, json_path=admin_profile_pack_gate_json)
+    admin_reviewed_seed_drift = generate_admin_reviewed_seed_drift_dashboard(workspace, output_path=admin_reviewed_seed_drift_md, json_path=admin_reviewed_seed_drift_json)
     admin_obligations = review_admin_obligations(workspace, output_path=admin_obligations_md, json_path=admin_obligations_json)
     settlement_binder = generate_settlement_binder(workspace, output_path=settlement_binder_md, json_path=settlement_binder_json)
     admin_change_ledger = review_admin_change_ledger(workspace, output_path=admin_change_md, json_path=admin_change_json)
@@ -283,6 +287,8 @@ def generate_workspace_review_pack(
         str(admin_profile_pack_review_json),
         str(admin_profile_pack_gate_md),
         str(admin_profile_pack_gate_json),
+        str(admin_reviewed_seed_drift_md),
+        str(admin_reviewed_seed_drift_json),
         str(admin_obligations_md),
         str(admin_obligations_json),
         str(settlement_binder_md),
@@ -434,6 +440,10 @@ def generate_workspace_review_pack(
         admin_profile_pack_gate_check_count=admin_profile_pack_gate.check_count,
         admin_profile_pack_gate_high_count=admin_profile_pack_gate.high_count,
         admin_profile_pack_gate_medium_count=admin_profile_pack_gate.medium_count,
+        admin_reviewed_seed_drift_status=admin_reviewed_seed_drift.status,
+        admin_reviewed_seed_drift_count=admin_reviewed_seed_drift.drift_count,
+        admin_reviewed_seed_drift_high_count=admin_reviewed_seed_drift.high_count,
+        admin_reviewed_seed_drift_action_count=admin_reviewed_seed_drift.action_count,
         admin_obligation_status=admin_obligations.status,
         admin_obligation_count=admin_obligations.obligation_count,
         admin_submission_count=admin_obligations.submission_count,
@@ -669,6 +679,8 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
         f"| Admin profile pack reviewed seed candidate | {result.admin_profile_pack_gate_can_use_reviewed_seed} |",
         f"| Admin profile pack gate checks | {result.admin_profile_pack_gate_check_count} |",
         f"| Admin profile pack gate high/medium | {result.admin_profile_pack_gate_high_count}/{result.admin_profile_pack_gate_medium_count} |",
+        f"| Reviewed-seed drift status | {_escape(result.admin_reviewed_seed_drift_status or '-')} |",
+        f"| Reviewed-seed drift/action/high | {result.admin_reviewed_seed_drift_count}/{result.admin_reviewed_seed_drift_action_count}/{result.admin_reviewed_seed_drift_high_count} |",
         f"| Admin obligations status | {_escape(result.admin_obligation_status or '-')} |",
         f"| Admin obligation count | {result.admin_obligation_count} |",
         f"| Admin submission count | {result.admin_submission_count} |",
@@ -744,6 +756,7 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
             "- Use `profile-pack-package-receipt-summary.md` to inspect supplied reviewer receipt state for generated profile-pack packages.",
             "- Use `admin-profile-pack.md` to review profile-driven admin obligation seeds before copying them into a workspace.",
             "- Use `admin-profile-pack-review-summary.md` to inspect supplied hash-bound human review decisions for admin profile-pack rows.",
+            "- Use `admin-reviewed-seed-drift.md` to inspect reviewed-seed hash drift and non-destructive repair actions.",
             "- Use `admin-obligations.md` to inspect local reporting, settlement, performance, agreement/change, and equipment obligation candidates.",
             "- Use `admin-change-ledger.md` to review supplied agreement/KPI/budget/period change records before changed values appear in projections.",
             "- Use `admin-calendar.md` to connect local admin obligations to reviewed project deadlines and due-soon state.",
@@ -831,6 +844,8 @@ def _artifact_label(path: str) -> str:
         "admin-profile-pack-review.json": "Admin profile pack review JSON",
         "admin-profile-pack-review-summary.md": "Admin profile pack human review summary",
         "admin-profile-pack-review-summary.json": "Admin profile pack human review summary JSON",
+        "admin-reviewed-seed-drift.md": "Reviewed-seed drift dashboard",
+        "admin-reviewed-seed-drift.json": "Reviewed-seed drift dashboard JSON",
         "admin-obligations.md": "Admin obligations",
         "admin-obligations-review.json": "Admin obligations JSON",
         "settlement-binder.md": "Settlement binder",

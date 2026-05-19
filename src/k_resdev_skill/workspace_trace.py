@@ -15,6 +15,7 @@ from .admin_operating import (
 )
 from .admin_profile_pack_reviews import summarize_admin_profile_pack_reviews
 from .admin_profile_pack_gate import generate_admin_profile_pack_promotion_gate
+from .admin_reviewed_seed_drift import generate_admin_reviewed_seed_drift_dashboard
 from .artifact_authority import authority_for_trace_node
 from .approval import load_approval_records
 from .bibliography import load_bibliography_index
@@ -1520,6 +1521,35 @@ class _TraceBuilder:
                 self.edge(_node_id("evidence", evidence_id), submission_node.node_id, "supports_submission")
         for finding in admin.findings:
             self.finding(f"trace_{finding.code}", finding.severity, finding.message, node_id=admin_node.node_id, path=finding.path, suggested_action=finding.suggested_action)
+
+        reviewed_seed_drift = generate_admin_reviewed_seed_drift_dashboard(self.workspace)
+        if reviewed_seed_drift.status != "not_configured":
+            drift_node = self.node(
+                "admin_reviewed_seed_drift",
+                "admin-reviewed-seed-drift",
+                "Reviewed-seed drift dashboard",
+                status=reviewed_seed_drift.status,
+                path=str(self.workspace / "state" / "admin-reviewed-seed-drift.json"),
+                metadata={
+                    "profile_id": reviewed_seed_drift.profile_id,
+                    "drift_count": reviewed_seed_drift.drift_count,
+                    "action_count": reviewed_seed_drift.action_count,
+                    "high_count": reviewed_seed_drift.high_count,
+                    "medium_count": reviewed_seed_drift.medium_count,
+                    "recorded_review_receipt_count": reviewed_seed_drift.recorded_review_receipt_count,
+                    "current_review_receipt_count": reviewed_seed_drift.current_review_receipt_count,
+                },
+            )
+            self.edge(admin_node.node_id, drift_node.node_id, "checks_reviewed_seed_drift")
+            for item in reviewed_seed_drift.items:
+                self.finding(
+                    f"trace_{item.finding_code}",
+                    item.severity,
+                    item.message,
+                    node_id=drift_node.node_id,
+                    path=item.path,
+                    suggested_action=item.repair_command or item.manual_step,
+                )
 
         binder = generate_settlement_binder(self.workspace)
         binder_node = self.node(

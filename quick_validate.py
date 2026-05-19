@@ -19,6 +19,7 @@ VALIDATION_PAIRS = [
     ("admin-profile-pack-review-record", "templates/admin-profile-pack-review-record.json"),
     ("admin-profile-pack-review-summary", "templates/admin-profile-pack-review-summary.json"),
     ("admin-profile-pack-gate", "templates/admin-profile-pack-gate.json"),
+    ("admin-reviewed-seed-drift", "templates/admin-reviewed-seed-drift.json"),
     ("admin-obligations", "templates/admin-obligations.json"),
     ("settlement-binder", "templates/settlement-binder.json"),
     ("admin-change-ledger", "templates/admin-change-ledger.json"),

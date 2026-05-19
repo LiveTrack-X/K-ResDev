@@ -69,6 +69,9 @@ SKILL.md
 guides/user-guide.md
   처음 쓰는 사람을 위한 한글 진입 문서와 사용 가이드
 
+guides/documentation-map.md
+  전체 문서 읽는 순서와 역할 지도
+
 guides/operations-guide.md
   운영자/에이전트용 실행 흐름
 
@@ -87,6 +90,23 @@ schemas/
 templates/
   starter artifact와 기관 profile 후보
 ```
+
+## 문서 읽는 순서
+
+처음부터 모든 문서를 읽을 필요는 없습니다.
+
+```text
+처음 쓰는 사용자
+README.md -> guides/user-guide.md -> guides/verification-core.md
+
+GPT/Codex 에이전트
+SKILL.md -> guides/operations-guide.md -> guides/documentation-map.md
+
+개발자
+guides/agent-skill-boundary.md -> workflows/mvp-roadmap.md -> workflows/next-planning.md
+```
+
+문서가 많아 보이면 `guides/documentation-map.md`부터 보면 됩니다.
 
 ## 빠른 시작
 

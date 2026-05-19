@@ -15,13 +15,22 @@ def test_skill_entrypoint_is_agent_first_and_concise():
 def test_korean_onboarding_docs_are_present_and_role_separated():
     readme = Path("README.md").read_text(encoding="utf-8")
     user_guide = Path("guides/user-guide.md").read_text(encoding="utf-8")
+    doc_map = Path("guides/documentation-map.md").read_text(encoding="utf-8")
     operations = Path("guides/operations-guide.md").read_text(encoding="utf-8")
     boundary = Path("guides/agent-skill-boundary.md").read_text(encoding="utf-8")
     core = Path("guides/verification-core.md").read_text(encoding="utf-8")
+    architecture = Path("guides/architecture.md").read_text(encoding="utf-8")
+    intake = Path("guides/intake-rules.md").read_text(encoding="utf-8")
+    research_rules = Path("guides/research-assistant-rules.md").read_text(encoding="utf-8")
 
     assert "현재 릴리스: `0.1 BETA 59` (`0.1.0b59`)" in readme
     assert "핵심은 프로그램이 아니라 스킬입니다" in readme
+    assert "문서 읽는 순서" in readme
     assert "처음 쓰는 사람을 위한 한글 진입 문서" in user_guide
+    assert "전체 문서를 한 번에 다 읽지 않도록 돕는 길잡이" in doc_map
     assert "운영하는 GPT/Codex 에이전트와 프로젝트 관리자를 위한 문서" in operations
     assert "K-ResDev는 GPT/Codex 에이전트 스킬이 본체다." in boundary
     assert "CLI는 사용자 경험의 중심이 아니다." in core
+    assert "원본 자료\n-> evidence\n-> 연결 관계" in architecture
+    assert "원본 파일은 수정하지 않는다." in intake
+    assert "결론을 대신 내리는 기능이 아니다." in research_rules

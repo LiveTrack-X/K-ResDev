@@ -142,10 +142,12 @@ Suggested next actions
 
 ## 필요할 때만 읽는 문서
 
-- `guides/user-guide.md`: 처음 쓰는 사람용 한글 사용 가이드.
+- `guides/user-guide.md`: 처음 쓰는 사람을 위한 한글 진입 문서.
+- `guides/documentation-map.md`: 문서가 많을 때 읽는 순서와 역할 지도.
 - `guides/operations-guide.md`: 운영자/에이전트용 실행 흐름.
 - `guides/agent-skill-boundary.md`: 스킬과 검증 코어의 경계.
 - `guides/verification-core.md`: 선택적 Python 검증 명령 지도.
+- `guides/architecture.md`: evidence-first 구조와 authority layer.
 - `guides/intake-rules.md`: 파일 intake 규칙.
 - `guides/research-assistant-rules.md`: 논문/데이터/가설 안전 규칙.
 - `workflows/mvp-roadmap.md`: 구현 로드맵과 beta 이력.

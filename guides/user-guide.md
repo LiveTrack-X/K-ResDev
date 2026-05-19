@@ -4,6 +4,8 @@
 
 K-ResDev는 국책 R&D 과제에서 반복되는 행정 문서화, 증빙 정리, 보고서 점검, 연구 자료 정리를 GPT/Codex 에이전트가 evidence-first 방식으로 돕기 위한 스킬이다.
 
+전체 문서가 많아 보이면 `guides/documentation-map.md`에서 읽는 순서를 먼저 확인한다.
+
 ## 가장 먼저 알아야 할 것
 
 K-ResDev는 자동 제출기가 아니다.

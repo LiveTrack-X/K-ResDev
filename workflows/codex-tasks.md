@@ -758,6 +758,18 @@ Implemented:
 
 K-ResDev should continue to be developed as an agent skill first. The Python package and CLI are the optional verification core for deterministic checks, not the main user experience.
 
+### Task 66: Documentation map and Korean guide polish
+
+Implemented:
+- `guides/documentation-map.md` as the first navigation layer for the large documentation set
+- README "문서 읽는 순서" section for users, agents, and developers
+- `SKILL.md` reference list updated to route agents into the documentation map and architecture guide only when needed
+- Korean-first rewrites of `guides/architecture.md`, `guides/intake-rules.md`, and `guides/research-assistant-rules.md`
+- operations guide documentation maintenance criteria
+- doc-boundary tests covering the documentation map and Korean guide phrases
+
+Documentation work should reduce entry cost, not expose every internal command at the top level.
+
 ## Safety constraints
 
 - Never alter raw files.

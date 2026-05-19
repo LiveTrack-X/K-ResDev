@@ -13,6 +13,8 @@
 5. CLI는 검증용으로만 쓴다.
 6. 새 기능보다 진입 흐름과 판단 품질을 우선한다.
 
+문서가 많아서 길을 잃을 때는 `guides/documentation-map.md`를 먼저 본다.
+
 ## 에이전트의 기본 순서
 
 ```text
@@ -154,6 +156,20 @@ APR-2026-0002 승인은 현재 report hash와 맞지 않아 재검토가 필요�
 - 반복 검증이 deterministic하게 바뀐다.
 
 단순히 CLI 출력 파일이 하나 더 생기는 기능은 우선순위가 낮다.
+
+## 문서 정리 기준
+
+문서를 고칠 때는 다음 역할을 유지한다.
+
+- `README.md`: 처음 보는 사람이 K-ResDev의 정체성과 첫 실행을 이해한다.
+- `SKILL.md`: GPT/Codex 에이전트가 작업 중 따르는 짧은 운영 계약이다.
+- `guides/user-guide.md`: 사용자 입장에서 실제 워크스페이스를 시작한다.
+- `guides/operations-guide.md`: 반복 운영과 점검 bundle을 안내한다.
+- `guides/verification-core.md`: CLI 명령 목록을 모아 둔다.
+- `workflows/`: 구현 이력과 계획을 분리해서 기록한다.
+- `templates/`: 공식 양식이 아니라 projection 예시임을 드러낸다.
+
+README에 명령을 계속 추가하기보다, 상세 명령은 `guides/verification-core.md`로 보낸다.
 
 ## Release 전 확인
 

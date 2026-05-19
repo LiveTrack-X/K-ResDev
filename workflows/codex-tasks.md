@@ -619,13 +619,26 @@ Profile source fix review records should document supplied human decisions only.
 
 ### Task 55: Agency profile pack readiness dashboard
 
-Planned:
-- summarize profile-source queue, fix-plan, fix-review, profile-review, promotion, apply/revoke, and lifecycle status across available workspace/profile packs
-- show which profiles are blocked by missing sources, stale hashes, unresolved fix actions, unreviewed promotions, or guarded mutation gaps
-- keep every agency/profile status as an operating projection unless a supplied human record and guarded apply result exist
-- avoid fetching official sources or hardcoding changing agency rules
+Implemented:
+- `ProfilePackReadinessProfile`, `ProfilePackReadinessFinding`, and `ProfilePackReadinessResult` models
+- `profile-pack-readiness` command and public API
+- `reports/profile-pack-readiness.md` and `state/profile-pack-readiness.json`
+- aggregation of profile-source queue, fix-plan, fix-review, profile-review, profile-promotion, apply/revoke, and lifecycle status across available workspace/profile packs
+- per-profile blockers for missing sources, stale hashes, unresolved fix actions, unreviewed promotion states, guarded apply/revoke gaps, and lifecycle drift
+- schema/template coverage and validation aliases
+- doctor, next-action, workspace-summary, review-pack, operational Markdown filtering, and trace integration
 
-This should help decide which verified agency profile pack work is ready to attempt next, without confusing readiness with official compliance.
+Profile pack readiness helps decide which verified agency profile pack work is ready to attempt next, without confusing readiness with official compliance.
+
+### Task 56: Profile pack readiness evidence drilldown
+
+Planned:
+- add a drilldown report that links each profile-pack readiness finding to the exact upstream artifact row, action ID, review record, lifecycle entry, or command that produced it
+- include source artifact paths and SHA-256 hashes for queue, fix-plan, fix-review, promotion, apply/revoke, and lifecycle inputs
+- add `profile-pack-readiness-drilldown` as a read-only command and optional review-pack artifact
+- keep the dashboard summary compact while making blocker investigation one command away
+
+This should reduce operator time spent jumping between profile-source, promotion, and lifecycle artifacts.
 
 ## Safety constraints
 

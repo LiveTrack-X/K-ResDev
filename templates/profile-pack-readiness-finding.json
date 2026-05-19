@@ -1,0 +1,8 @@
+{
+  "code": "profile_pack_source_queue_finding",
+  "severity": "medium",
+  "message": "Profile source records need review before profile promotion.",
+  "profile_id": "national-rnd-basic",
+  "path": "state/profile-sources.json",
+  "suggested_action": "Review profile-source-queue before agency profile pack expansion."
+}

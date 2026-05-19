@@ -35,6 +35,7 @@ from .models import (
 )
 from .profile_promotion import load_profile_promotion_records
 from .profile_lifecycle import load_profile_lifecycle_ledger
+from .profile_pack_readiness import load_profile_pack_readiness
 from .profile_review import load_profile_review
 from .profile_source_fix_plan import load_profile_source_fix_plan
 from .profile_source_fix_review import load_profile_source_fix_review_summary
@@ -69,6 +70,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "profile-review.md",
     "profile-source-fix-plan.md",
     "profile-source-fix-summary.md",
+    "profile-pack-readiness.md",
     "profile-source-queue.md",
     "profile-source-summary.md",
     "readiness.md",
@@ -112,6 +114,7 @@ def generate_workspace_trace(
     builder.add_profile_promotion_revoke_plan()
     builder.add_profile_promotion_revoke_result()
     builder.add_profile_lifecycle_ledger()
+    builder.add_profile_pack_readiness()
     builder.add_bibliography()
     builder.add_reference_corpus()
     builder.add_reports()
@@ -1036,6 +1039,49 @@ class _TraceBuilder:
                 node_id=node.node_id,
                 path=finding.path or str(path),
                 suggested_action=finding.suggested_action or "Review profile-lifecycle-ledger before relying on profile status.",
+            )
+
+    def add_profile_pack_readiness(self) -> None:
+        path = self.workspace / "state" / "profile-pack-readiness.json"
+        if not path.exists():
+            return
+        try:
+            readiness = load_profile_pack_readiness(path)
+        except Exception as exc:
+            self.finding(
+                "trace_profile_pack_readiness_unreadable",
+                "medium",
+                f"Profile pack readiness could not be read: {exc}",
+                path=path,
+                suggested_action="Regenerate profile-pack-readiness before relying on profile pack readiness trace state.",
+            )
+            return
+        node = self.node(
+            "profile_pack_readiness",
+            "profile-pack-readiness",
+            "Profile pack readiness",
+            status=readiness.status,
+            path=str(path),
+            sha256=_sha256_file(path),
+            metadata={
+                "profile_count": readiness.profile_count,
+                "blocked_count": readiness.blocked_count,
+                "needs_review_count": readiness.needs_review_count,
+                "finding_count": readiness.finding_count,
+                "high_count": readiness.high_count,
+            },
+        )
+        for profile in readiness.profiles:
+            self.edge(node.node_id, _node_id("profile", profile.profile_id), "summarizes_profile_pack")
+        for finding in readiness.findings:
+            severity = "high" if finding.severity == "high" else "medium" if finding.severity == "medium" else "low"
+            self.finding(
+                "trace_profile_pack_readiness_finding",
+                severity,
+                finding.message,
+                node_id=node.node_id,
+                path=finding.path or str(path),
+                suggested_action=finding.suggested_action or "Review profile-pack-readiness before agency profile pack expansion.",
             )
 
     def add_approvals(self) -> None:

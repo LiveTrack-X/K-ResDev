@@ -18,6 +18,7 @@ from .profile_promotion import summarize_profile_promotions
 from .profile_promotion_apply import generate_profile_promotion_apply_plan, load_profile_promotion_apply_result
 from .profile_promotion_revoke import load_profile_promotion_revoke_plan, load_profile_promotion_revoke_result
 from .profile_lifecycle import generate_profile_lifecycle_ledger
+from .profile_pack_readiness import generate_profile_pack_readiness
 from .profile_review import generate_profile_review
 from .profile_source_fix_plan import generate_profile_source_fix_plan
 from .profile_source_fix_review import summarize_profile_source_fix_reviews
@@ -72,6 +73,7 @@ def generate_workspace_summary(
     profile_revoke_plan = _load_profile_revoke_plan(workspace)
     profile_revoke_result = _load_profile_revoke_result(workspace)
     profile_lifecycle = generate_profile_lifecycle_ledger(workspace)
+    profile_pack_readiness = generate_profile_pack_readiness(workspace)
     trace = generate_workspace_trace(workspace)
     trace_passport = generate_trace_passport(workspace)
     weekly_review = load_latest_weekly_review(workspace)
@@ -167,6 +169,11 @@ def generate_workspace_summary(
         profile_lifecycle_entry_count=profile_lifecycle.entry_count,
         profile_lifecycle_finding_count=profile_lifecycle.finding_count,
         profile_lifecycle_high_count=profile_lifecycle.high_count,
+        profile_pack_readiness_status=profile_pack_readiness.status,
+        profile_pack_readiness_profile_count=profile_pack_readiness.profile_count,
+        profile_pack_readiness_blocked_count=profile_pack_readiness.blocked_count,
+        profile_pack_readiness_finding_count=profile_pack_readiness.finding_count,
+        profile_pack_readiness_high_count=profile_pack_readiness.high_count,
         trace_status=trace.status,
         trace_node_count=trace.node_count,
         trace_edge_count=trace.edge_count,
@@ -227,6 +234,9 @@ def render_workspace_summary_markdown(summary: WorkspaceSummaryResult) -> str:
         f"| Profile lifecycle ledger | {_escape(summary.profile_lifecycle_status or '-')} |",
         f"| Profile lifecycle entries | {summary.profile_lifecycle_entry_count} |",
         f"| Profile lifecycle findings | {summary.profile_lifecycle_finding_count} |",
+        f"| Profile pack readiness | {_escape(summary.profile_pack_readiness_status or '-')} |",
+        f"| Profile pack readiness profiles | {summary.profile_pack_readiness_profile_count} |",
+        f"| Profile pack readiness blocked | {summary.profile_pack_readiness_blocked_count} |",
         f"| Profile sources | {summary.profile_source_count} |",
         f"| Verified profile sources | {summary.profile_verified_source_count} |",
         f"| Workspace discovery | {_escape(summary.discovery_status or '-')} |",
@@ -299,6 +309,7 @@ def render_workspace_summary_markdown(summary: WorkspaceSummaryResult) -> str:
         f"| Profile promotion revoke plan | {summary.profile_promotion_revoke_change_count} | status: {_escape(summary.profile_promotion_revoke_status or '-')}; can revoke: {summary.profile_promotion_revoke_can_revoke} |",
         f"| Profile promotion revoke result | {1 if summary.profile_promotion_revoked else 0} | status: {_escape(summary.profile_promotion_revoke_result_status or '-')}; pre-backup: {_escape(summary.profile_promotion_revoke_backup_path or '-')} |",
         f"| Profile lifecycle ledger | {summary.profile_lifecycle_entry_count} | status: {_escape(summary.profile_lifecycle_status or '-')}; findings: {summary.profile_lifecycle_finding_count}; high: {summary.profile_lifecycle_high_count} |",
+        f"| Profile pack readiness | {summary.profile_pack_readiness_profile_count} | status: {_escape(summary.profile_pack_readiness_status or '-')}; blocked: {summary.profile_pack_readiness_blocked_count}; findings: {summary.profile_pack_readiness_finding_count}; high: {summary.profile_pack_readiness_high_count} |",
         f"| Workspace trace | {summary.trace_node_count} | status: {_escape(summary.trace_status or '-')}; findings: {summary.trace_finding_count} |",
         f"| Trace passport | {summary.checkpoint_count} | status: {_escape(summary.trace_passport_status or '-')}; latest: {_escape(summary.latest_checkpoint_id or '-')}; findings: {summary.trace_passport_finding_count} |",
         "",

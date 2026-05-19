@@ -1166,6 +1166,11 @@ class WorkspaceSummaryResult(StrictModel):
     profile_lifecycle_entry_count: int = 0
     profile_lifecycle_finding_count: int = 0
     profile_lifecycle_high_count: int = 0
+    profile_pack_readiness_status: str | None = None
+    profile_pack_readiness_profile_count: int = 0
+    profile_pack_readiness_blocked_count: int = 0
+    profile_pack_readiness_finding_count: int = 0
+    profile_pack_readiness_high_count: int = 0
     trace_status: str | None = None
     trace_node_count: int = 0
     trace_edge_count: int = 0
@@ -1448,6 +1453,11 @@ class WorkspaceReviewPackResult(StrictModel):
     profile_lifecycle_entry_count: int = 0
     profile_lifecycle_finding_count: int = 0
     profile_lifecycle_high_count: int = 0
+    profile_pack_readiness_status: str | None = None
+    profile_pack_readiness_profile_count: int = 0
+    profile_pack_readiness_blocked_count: int = 0
+    profile_pack_readiness_finding_count: int = 0
+    profile_pack_readiness_high_count: int = 0
     workspace_trace_status: str | None = None
     workspace_trace_node_count: int = 0
     workspace_trace_edge_count: int = 0
@@ -1733,6 +1743,76 @@ class ProfileSourceFixReviewSummaryResult(StrictModel):
     low_count: int = 0
     records: list[ProfileSourceFixReviewRecord] = Field(default_factory=list)
     findings: list[ProfileSourceFixReviewFinding] = Field(default_factory=list)
+    markdown_path: str | None = None
+    json_path: str | None = None
+    warnings: list[str] = Field(default_factory=list)
+
+
+class ProfilePackReadinessProfile(StrictModel):
+    profile_id: str
+    status: str
+    profile_status: str | None = None
+    queue_item_count: int = 0
+    fix_action_count: int = 0
+    fix_review_record_count: int = 0
+    fix_review_unresolved_count: int = 0
+    profile_review_status: str | None = None
+    profile_review_can_promote: bool = False
+    promotion_status: str | None = None
+    promotion_record_count: int = 0
+    latest_promotion_decision: str | None = None
+    apply_status: str | None = None
+    apply_can_apply: bool = False
+    apply_applied: bool = False
+    revoke_status: str | None = None
+    revoke_can_revoke: bool = False
+    revoke_revoked: bool = False
+    lifecycle_status: str | None = None
+    finding_count: int = 0
+    high_count: int = 0
+    medium_count: int = 0
+    low_count: int = 0
+    blockers: list[str] = Field(default_factory=list)
+    warnings: list[str] = Field(default_factory=list)
+
+    @field_validator("profile_id", "status")
+    @classmethod
+    def _profile_pack_readiness_profile_field_must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
+class ProfilePackReadinessFinding(StrictModel):
+    code: str
+    severity: str
+    message: str
+    profile_id: str | None = None
+    path: str | None = None
+    suggested_action: str | None = None
+
+    @field_validator("code", "severity", "message")
+    @classmethod
+    def _profile_pack_readiness_finding_field_must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
+class ProfilePackReadinessResult(StrictModel):
+    root: str
+    status: str
+    profile_count: int = 0
+    ready_count: int = 0
+    needs_review_count: int = 0
+    blocked_count: int = 0
+    profile_without_findings_count: int = 0
+    finding_count: int = 0
+    high_count: int = 0
+    medium_count: int = 0
+    low_count: int = 0
+    profiles: list[ProfilePackReadinessProfile] = Field(default_factory=list)
+    findings: list[ProfilePackReadinessFinding] = Field(default_factory=list)
     markdown_path: str | None = None
     json_path: str | None = None
     warnings: list[str] = Field(default_factory=list)

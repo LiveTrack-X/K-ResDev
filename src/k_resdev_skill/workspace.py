@@ -26,6 +26,7 @@ from .profile_promotion import summarize_profile_promotions
 from .profile_promotion_apply import generate_profile_promotion_apply_plan, load_profile_promotion_apply_result
 from .profile_promotion_revoke import load_profile_promotion_revoke_plan, load_profile_promotion_revoke_result
 from .profile_lifecycle import generate_profile_lifecycle_ledger
+from .profile_pack_readiness import generate_profile_pack_readiness
 from .profile_registry import default_agency_templates_root, load_project_profile
 from .profile_review import generate_profile_review
 from .profile_source_fix_plan import generate_profile_source_fix_plan
@@ -82,6 +83,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "profile-review.md",
     "profile-source-fix-plan.md",
     "profile-source-fix-summary.md",
+    "profile-pack-readiness.md",
     "profile-source-queue.md",
     "profile-source-summary.md",
     "readiness.md",
@@ -207,6 +209,7 @@ def run_workspace_doctor(
     _check_profile_promotion_revoke(workspace, findings)
     _check_profile_promotion_revoke_result(workspace, findings)
     _check_profile_lifecycle(workspace, findings)
+    _check_profile_pack_readiness(workspace, findings)
     _check_reports(workspace, findings)
     _check_report_integrity(workspace, findings)
     _check_artifact_authority(workspace, findings)
@@ -1006,6 +1009,43 @@ def _check_profile_lifecycle(workspace: Path, findings: list[WorkspaceDoctorFind
         )
 
 
+def _check_profile_pack_readiness(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> None:
+    result = generate_profile_pack_readiness(workspace)
+    path = workspace / "state" / "profile-pack-readiness.json"
+    if result.status == "not_configured":
+        return
+    if not path.exists() and result.profile_count:
+        findings.append(
+            _finding(
+                "profile_pack_readiness_missing",
+                "low",
+                f"{result.profile_count} profile pack readiness profile(s) were detected but no readiness dashboard artifact exists.",
+                path,
+                "Run profile-pack-readiness to create a scan-friendly profile/source readiness dashboard.",
+            )
+        )
+    if result.high_count:
+        findings.append(
+            _finding(
+                "profile_pack_readiness_high_findings",
+                "high",
+                f"{result.high_count} high-severity profile pack readiness finding(s) were detected.",
+                path,
+                "Review profile-pack-readiness before adding or promoting agency profile packs.",
+            )
+        )
+    if result.medium_count or result.low_count or result.warnings:
+        findings.append(
+            _finding(
+                "profile_pack_readiness_findings",
+                "medium" if result.medium_count else "low",
+                f"{result.medium_count + result.low_count} profile pack readiness finding(s) or warnings were detected.",
+                path,
+                "Use profile-pack-readiness to review source, fix-plan, fix-review, promotion, apply/revoke, and lifecycle blockers together.",
+            )
+        )
+
+
 def _check_reports(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> None:
     reports_dir = workspace / "reports"
     reports = [path for path in reports_dir.glob("*.md") if not is_operational_markdown(path)] if reports_dir.exists() else []
@@ -1511,6 +1551,7 @@ def _starter_readme(project_id: str, title: str, profile_id: str) -> str:
             "- Run `k-resdev profile-promotion-revoke-plan --root . --reviewer <reviewer> --reason \"<reason>\" --output reports/profile-promotion-revoke-plan.md --json state/profile-promotion-revoke-plan.json` before rolling back an applied profile promotion.",
             "- Run `k-resdev profile-promotion-revoke --root . --revoke-plan state/profile-promotion-revoke-plan.json --revoke-plan-hash <sha256>` only after reviewing the revoke plan.",
             "- Run `k-resdev profile-lifecycle-ledger --root . --output reports/profile-lifecycle-ledger.md --json state/profile-lifecycle-ledger.json` to review profile review/promotion/apply/revoke history from one ledger.",
+            "- Run `k-resdev profile-pack-readiness --root . --output reports/profile-pack-readiness.md --json state/profile-pack-readiness.json` to scan profile/source readiness across queue, fix-plan, fix-review, promotion, apply/revoke, and lifecycle state.",
             "- Run `k-resdev budget-ledger-import references/budget-ledger.csv --state-dir state --markdown reports/budget-ledger-import.md` to import a reviewable budget ledger.",
             "- Run `k-resdev budget-ledger-integrity --root . --output reports/budget-ledger.md --json state/budget-ledger-integrity.json` to check ledger proof, approval, duplicate, and evidence-link gaps.",
             "- Run `k-resdev checkpoint-create --root . --stage review-pack --summary \"<summary>\" --status needs_review` to create a hash-backed resume checkpoint.",

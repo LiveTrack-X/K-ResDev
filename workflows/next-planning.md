@@ -1,12 +1,12 @@
 # K-ResDev Next Planning
 
-This planning note starts after `0.1.0b44`.
+This planning note starts after `0.1.0b45`.
 
 ## Current Diagnosis
 
-K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, budget ledger review, bibliography metadata, reference corpus adapters, read-only workspace discovery, bibliography review, citation support, research claim matrices, profile source records, profile source-pack review queues, profile source fix plans, profile source fix review records, profile integrity, a narrow source-backed IRIS/Innopolis profile seed, profile promotion review, hash-bound profile promotion records, non-destructive profile promotion apply plans, guarded profile promotion apply results/backups, non-destructive profile promotion revocation plans, guarded profile promotion revocation results/backups, a profile lifecycle ledger, workspace traceability graph, trace passport checkpoints, artifact authority labels, goals/deadline review, weekly operating reviews, workspace dashboards, thin local workflow router, workspace doctor, next actions, workspace summary, and review packs.
+K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, budget ledger review, bibliography metadata, reference corpus adapters, read-only workspace discovery, bibliography review, citation support, research claim matrices, profile source records, profile source-pack review queues, profile source fix plans, profile source fix review records, profile integrity, a narrow source-backed IRIS/Innopolis profile seed, profile promotion review, hash-bound profile promotion records, non-destructive profile promotion apply plans, guarded profile promotion apply results/backups, non-destructive profile promotion revocation plans, guarded profile promotion revocation results/backups, a profile lifecycle ledger, profile pack readiness dashboard, workspace traceability graph, trace passport checkpoints, artifact authority labels, goals/deadline review, weekly operating reviews, workspace dashboards, thin local workflow router, workspace doctor, next actions, workspace summary, and review packs.
 
-The next bottleneck is making the full agency/profile pack pipeline scan-friendly. Operators can now see source-pack gaps, generate local remediation plans, and record supplied fix-action decisions, but they still need one dashboard that says which profile packs are blocked by source gaps, unresolved fix reviews, promotion review failures, guarded apply/revoke gaps, or lifecycle drift.
+The next bottleneck is making each profile-pack readiness blocker easy to investigate. Operators can now see one dashboard across source queues, fix plans, fix reviews, promotion, apply/revoke, and lifecycle state, but a readiness finding should link directly to the upstream artifact row, action ID, review record, lifecycle entry, and command that produced it.
 
 ## Planning Principles
 
@@ -404,7 +404,9 @@ Safety boundary:
 
 Goal: make the profile/source operating state scan-friendly before adding more verified agency packs.
 
-Expected scope:
+Status: implemented as a local first pass in `src/k_resdev_skill/profile_pack_readiness.py`, with CLI/API, schema/template, doctor, next-action, summary, review-pack, operational Markdown filtering, and trace integration.
+
+Implemented scope:
 - aggregate profile-source queue, fix-plan, fix-review, profile-review, profile-promotion, apply/revoke, and lifecycle status;
 - show per-profile blockers such as missing source files, stale hashes, unresolved fix actions, unreviewed promotion decisions, and guarded mutation gaps;
 - write `reports/profile-pack-readiness.md` and `state/profile-pack-readiness.json`;
@@ -413,6 +415,20 @@ Expected scope:
 
 Safety boundary:
 - The dashboard must not fetch official sources, create agency rules, mutate profile/source records, or treat accepted risk as compliance proof.
+
+### Beta 46 - Profile Pack Readiness Evidence Drilldown
+
+Goal: make each readiness blocker traceable to the exact local input that produced it.
+
+Expected scope:
+- `profile-pack-readiness-drilldown` command and public API;
+- read-only drilldown over `state/profile-pack-readiness.json`, `state/profile-source-queue.json`, `state/profile-source-fix-plan.json`, `state/profile-source-fix-summary.json`, `state/profile-review.json`, promotion/apply/revoke artifacts, and `state/profile-lifecycle-ledger.json`;
+- include source artifact paths, SHA-256 hashes, profile IDs, action IDs, review IDs, lifecycle entry IDs, and suggested next command;
+- optional review-pack and trace integration after the standalone report is stable.
+
+Safety boundary:
+- Drilldown is an investigation aid only.
+- It must not fetch official sources, edit profile/source records, promote profiles, or mark accepted risk as compliance proof.
 
 ## Deferred Ideas
 
@@ -426,6 +442,6 @@ These should wait until traceability, impact analysis, and verified profile sour
 
 ## Recommended Next Slice
 
-Implement Beta 45 next.
+Implement Beta 46 next.
 
-Beta 45 should make the agency/profile pack pipeline easier to judge before adding new official-source-backed profile packs.
+Beta 46 should make profile-pack readiness blockers easier to investigate before adding new official-source-backed profile packs.

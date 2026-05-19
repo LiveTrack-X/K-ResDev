@@ -93,6 +93,7 @@ def _actions_for_findings(root: Path, findings: list[WorkspaceDoctorFinding]) ->
         _action_for_profile_promotion_revoke(root, by_code),
         _action_for_profile_promotion_revoke_result(root, by_code),
         _action_for_profile_lifecycle(root, by_code),
+        _action_for_profile_pack_readiness(root, by_code),
         _action_for_approval_coverage(root, by_code),
         _action_for_report_integrity(root, by_code),
         _action_for_artifact_authority(root, by_code),
@@ -469,6 +470,26 @@ def _action_for_profile_lifecycle(root: Path, by_code: dict[str, list[WorkspaceD
         "Review profile lifecycle ledger",
         "Profile review, promotion, apply, and revoke artifacts should line up before relying on current profile status.",
         f'python -m k_resdev_skill profile-lifecycle-ledger --root "{root}" --output "{root / "reports" / "profile-lifecycle-ledger.md"}" --json "{root / "state" / "profile-lifecycle-ledger.json"}"',
+        by_code,
+        codes,
+    )
+
+
+def _action_for_profile_pack_readiness(root: Path, by_code: dict[str, list[WorkspaceDoctorFinding]]) -> WorkspaceActionItem | None:
+    codes = [
+        "profile_pack_readiness_missing",
+        "profile_pack_readiness_high_findings",
+        "profile_pack_readiness_findings",
+    ]
+    if not any(code in by_code for code in codes):
+        return None
+    priority = "high" if "profile_pack_readiness_high_findings" in by_code else "medium" if "profile_pack_readiness_findings" in by_code else "low"
+    return _action(
+        root,
+        priority,
+        "Review profile pack readiness",
+        "Profile/source queue, fix-plan, fix-review, promotion, apply/revoke, and lifecycle state should be scanned together before agency pack expansion.",
+        f'python -m k_resdev_skill profile-pack-readiness --root "{root}" --output "{root / "reports" / "profile-pack-readiness.md"}" --json "{root / "state" / "profile-pack-readiness.json"}"',
         by_code,
         codes,
     )

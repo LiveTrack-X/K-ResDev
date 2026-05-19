@@ -1,0 +1,55 @@
+{
+  "root": ".",
+  "status": "needs_review",
+  "profile_count": 1,
+  "ready_count": 0,
+  "needs_review_count": 1,
+  "blocked_count": 0,
+  "profile_without_findings_count": 0,
+  "finding_count": 1,
+  "high_count": 0,
+  "medium_count": 1,
+  "low_count": 0,
+  "profiles": [
+    {
+      "profile_id": "national-rnd-basic",
+      "status": "needs_review",
+      "profile_status": "needs_review",
+      "queue_item_count": 1,
+      "fix_action_count": 1,
+      "fix_review_record_count": 0,
+      "fix_review_unresolved_count": 1,
+      "profile_review_status": "needs_review",
+      "profile_review_can_promote": false,
+      "promotion_status": "missing_review",
+      "promotion_record_count": 0,
+      "latest_promotion_decision": null,
+      "apply_status": "missing_review",
+      "apply_can_apply": false,
+      "apply_applied": false,
+      "revoke_status": null,
+      "revoke_can_revoke": false,
+      "revoke_revoked": false,
+      "lifecycle_status": "needs_review",
+      "finding_count": 1,
+      "high_count": 0,
+      "medium_count": 1,
+      "low_count": 0,
+      "blockers": ["profile_pack_source_queue_finding"],
+      "warnings": []
+    }
+  ],
+  "findings": [
+    {
+      "code": "profile_pack_source_queue_finding",
+      "severity": "medium",
+      "message": "Profile source records need review before profile promotion.",
+      "profile_id": "national-rnd-basic",
+      "path": "state/profile-sources.json",
+      "suggested_action": "Review profile-source-queue before agency profile pack expansion."
+    }
+  ],
+  "markdown_path": "reports/profile-pack-readiness.md",
+  "json_path": "state/profile-pack-readiness.json",
+  "warnings": []
+}

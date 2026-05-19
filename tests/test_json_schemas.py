@@ -212,6 +212,25 @@ def test_profile_lifecycle_templates_match_json_schemas():
     jsonschema.validate(ledger, ledger_schema)
 
 
+def test_profile_pack_readiness_templates_match_json_schemas():
+    with open("schemas/profile_pack_readiness_profile.schema.json", encoding="utf-8") as handle:
+        profile_schema = json.load(handle)
+    with open("schemas/profile_pack_readiness_finding.schema.json", encoding="utf-8") as handle:
+        finding_schema = json.load(handle)
+    with open("schemas/profile_pack_readiness.schema.json", encoding="utf-8") as handle:
+        readiness_schema = json.load(handle)
+    with open("templates/profile-pack-readiness-profile.json", encoding="utf-8") as handle:
+        profile = json.load(handle)
+    with open("templates/profile-pack-readiness-finding.json", encoding="utf-8") as handle:
+        finding = json.load(handle)
+    with open("templates/profile-pack-readiness.json", encoding="utf-8") as handle:
+        readiness = json.load(handle)
+
+    jsonschema.validate(profile, profile_schema)
+    jsonschema.validate(finding, finding_schema)
+    jsonschema.validate(readiness, readiness_schema)
+
+
 def test_budget_ledger_item_template_matches_json_schema():
     with open("schemas/budget_ledger_item.schema.json", encoding="utf-8") as handle:
         schema = json.load(handle)

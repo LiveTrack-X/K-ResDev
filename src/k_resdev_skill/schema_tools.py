@@ -43,6 +43,12 @@ SCHEMA_ALIASES = {
     "profile_source_fix_summary": "profile_source_fix_review_summary.schema.json",
     "profile-source-fix-review-summary": "profile_source_fix_review_summary.schema.json",
     "profile_source_fix_review_summary": "profile_source_fix_review_summary.schema.json",
+    "profile-pack-readiness": "profile_pack_readiness.schema.json",
+    "profile_pack_readiness": "profile_pack_readiness.schema.json",
+    "profile-pack-readiness-profile": "profile_pack_readiness_profile.schema.json",
+    "profile_pack_readiness_profile": "profile_pack_readiness_profile.schema.json",
+    "profile-pack-readiness-finding": "profile_pack_readiness_finding.schema.json",
+    "profile_pack_readiness_finding": "profile_pack_readiness_finding.schema.json",
     "profile-source-queue": "profile_source_queue.schema.json",
     "profile_source_queue": "profile_source_queue.schema.json",
     "profile-source-queue-item": "profile_source_queue_item.schema.json",
@@ -171,6 +177,8 @@ def _validation_targets(document: Any, schema_payload: dict[str, Any]) -> list[t
         "DashboardCard",
         "EvidenceItem",
         "ProfileSource",
+        "ProfilePackReadinessFinding",
+        "ProfilePackReadinessProfile",
         "ProfileSourceFixPlanAction",
         "ProfileSourceFixReviewFinding",
         "ProfileSourceFixReviewRecord",
@@ -210,6 +218,10 @@ def _validation_targets(document: Any, schema_payload: dict[str, Any]) -> list[t
         if title == "ProfileSourceFixReviewRecord" and isinstance(document, dict) and isinstance(document.get("records"), list):
             return [(f"$.records[{index}]", item) for index, item in enumerate(document["records"])]
         if title == "ProfileSourceFixReviewFinding" and isinstance(document, dict) and isinstance(document.get("findings"), list):
+            return [(f"$.findings[{index}]", item) for index, item in enumerate(document["findings"])]
+        if title == "ProfilePackReadinessProfile" and isinstance(document, dict) and isinstance(document.get("profiles"), list):
+            return [(f"$.profiles[{index}]", item) for index, item in enumerate(document["profiles"])]
+        if title == "ProfilePackReadinessFinding" and isinstance(document, dict) and isinstance(document.get("findings"), list):
             return [(f"$.findings[{index}]", item) for index, item in enumerate(document["findings"])]
         if isinstance(document, dict) and isinstance(document.get("items"), list):
             return [(f"$.items[{index}]", item) for index, item in enumerate(document["items"])]

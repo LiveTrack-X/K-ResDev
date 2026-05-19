@@ -28,6 +28,12 @@ SCHEMA_ALIASES = {
     "admin_profile_pack": "admin_obligation_profile_pack.schema.json",
     "admin-profile-pack-review": "admin_obligation_profile_pack_review.schema.json",
     "admin_profile_pack_review": "admin_obligation_profile_pack_review.schema.json",
+    "admin-profile-pack-review-record": "admin_profile_pack_review_record.schema.json",
+    "admin_profile_pack_review_record": "admin_profile_pack_review_record.schema.json",
+    "admin-profile-pack-review-finding": "admin_profile_pack_review_finding.schema.json",
+    "admin_profile_pack_review_finding": "admin_profile_pack_review_finding.schema.json",
+    "admin-profile-pack-review-summary": "admin_profile_pack_review_summary.schema.json",
+    "admin_profile_pack_review_summary": "admin_profile_pack_review_summary.schema.json",
     "admin-submission": "admin_submission.schema.json",
     "admin_submission": "admin_submission.schema.json",
     "approval": "approval_record.schema.json",
@@ -224,6 +230,8 @@ def _validation_targets(document: Any, schema_payload: dict[str, Any]) -> list[t
         "AdminChangeRecord",
         "AdminFinding",
         "AdminObligation",
+        "AdminProfilePackReviewFinding",
+        "AdminProfilePackReviewRecord",
         "AdminSubmission",
         "ApprovalRecord",
         "ArtifactAuthorityFinding",
@@ -309,6 +317,10 @@ def _validation_targets(document: Any, schema_payload: dict[str, Any]) -> list[t
             return [(f"$.findings[{index}]", item) for index, item in enumerate(document["findings"])]
         if title == "AdminObligation" and isinstance(document, dict) and isinstance(document.get("obligations"), list):
             return [(f"$.obligations[{index}]", item) for index, item in enumerate(document["obligations"])]
+        if title == "AdminProfilePackReviewRecord" and isinstance(document, dict) and isinstance(document.get("records"), list):
+            return [(f"$.records[{index}]", item) for index, item in enumerate(document["records"])]
+        if title == "AdminProfilePackReviewFinding" and isinstance(document, dict) and isinstance(document.get("findings"), list):
+            return [(f"$.findings[{index}]", item) for index, item in enumerate(document["findings"])]
         if title == "AdminSubmission" and isinstance(document, dict) and isinstance(document.get("submissions"), list):
             return [(f"$.submissions[{index}]", item) for index, item in enumerate(document["submissions"])]
         if title == "SettlementEvidenceRequirement" and isinstance(document, dict) and isinstance(document.get("settlement_requirements"), list):

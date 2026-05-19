@@ -1,0 +1,394 @@
+{
+  "$defs": {
+    "AdminProfilePackReviewDecision": {
+      "enum": [
+        "accepted",
+        "accepted_risk",
+        "needs_changes",
+        "rejected",
+        "deferred"
+      ],
+      "title": "AdminProfilePackReviewDecision",
+      "type": "string"
+    },
+    "AdminProfilePackReviewFinding": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "title": "Code",
+          "type": "string"
+        },
+        "severity": {
+          "title": "Severity",
+          "type": "string"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "review_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Review Id"
+        },
+        "profile_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Profile Id"
+        },
+        "target_type": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Target Type"
+        },
+        "target_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Target Id"
+        },
+        "path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Path"
+        },
+        "suggested_action": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Suggested Action"
+        }
+      },
+      "required": [
+        "code",
+        "severity",
+        "message"
+      ],
+      "title": "AdminProfilePackReviewFinding",
+      "type": "object"
+    },
+    "AdminProfilePackReviewRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "review_id": {
+          "title": "Review Id",
+          "type": "string"
+        },
+        "profile_id": {
+          "title": "Profile Id",
+          "type": "string"
+        },
+        "target_type": {
+          "$ref": "#/$defs/AdminProfilePackReviewTargetType",
+          "default": "pack"
+        },
+        "target_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Target Id"
+        },
+        "profile_pack_path": {
+          "title": "Profile Pack Path",
+          "type": "string"
+        },
+        "profile_pack_hash": {
+          "title": "Profile Pack Hash",
+          "type": "string"
+        },
+        "decision": {
+          "$ref": "#/$defs/AdminProfilePackReviewDecision"
+        },
+        "reviewer": {
+          "title": "Reviewer",
+          "type": "string"
+        },
+        "reviewed_at": {
+          "title": "Reviewed At",
+          "type": "string"
+        },
+        "source_record_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Record Ids",
+          "type": "array"
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Notes"
+        },
+        "risk_flags": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Risk Flags",
+          "type": "array"
+        }
+      },
+      "required": [
+        "review_id",
+        "profile_id",
+        "profile_pack_path",
+        "profile_pack_hash",
+        "decision",
+        "reviewer",
+        "reviewed_at"
+      ],
+      "title": "AdminProfilePackReviewRecord",
+      "type": "object"
+    },
+    "AdminProfilePackReviewTargetType": {
+      "enum": [
+        "pack",
+        "obligation",
+        "submission",
+        "settlement_requirement"
+      ],
+      "title": "AdminProfilePackReviewTargetType",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "root": {
+      "title": "Root",
+      "type": "string"
+    },
+    "status": {
+      "title": "Status",
+      "type": "string"
+    },
+    "profile_id": {
+      "title": "Profile Id",
+      "type": "string"
+    },
+    "profile_status": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Profile Status"
+    },
+    "profile_pack_path": {
+      "title": "Profile Pack Path",
+      "type": "string"
+    },
+    "profile_pack_hash": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Profile Pack Hash"
+    },
+    "profile_pack_status": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Profile Pack Status"
+    },
+    "target_count": {
+      "default": 0,
+      "title": "Target Count",
+      "type": "integer"
+    },
+    "reviewed_target_count": {
+      "default": 0,
+      "title": "Reviewed Target Count",
+      "type": "integer"
+    },
+    "missing_target_review_count": {
+      "default": 0,
+      "title": "Missing Target Review Count",
+      "type": "integer"
+    },
+    "record_count": {
+      "default": 0,
+      "title": "Record Count",
+      "type": "integer"
+    },
+    "accepted_count": {
+      "default": 0,
+      "title": "Accepted Count",
+      "type": "integer"
+    },
+    "accepted_risk_count": {
+      "default": 0,
+      "title": "Accepted Risk Count",
+      "type": "integer"
+    },
+    "needs_changes_count": {
+      "default": 0,
+      "title": "Needs Changes Count",
+      "type": "integer"
+    },
+    "rejected_count": {
+      "default": 0,
+      "title": "Rejected Count",
+      "type": "integer"
+    },
+    "deferred_count": {
+      "default": 0,
+      "title": "Deferred Count",
+      "type": "integer"
+    },
+    "unresolved_count": {
+      "default": 0,
+      "title": "Unresolved Count",
+      "type": "integer"
+    },
+    "stale_record_count": {
+      "default": 0,
+      "title": "Stale Record Count",
+      "type": "integer"
+    },
+    "target_mismatch_count": {
+      "default": 0,
+      "title": "Target Mismatch Count",
+      "type": "integer"
+    },
+    "finding_count": {
+      "default": 0,
+      "title": "Finding Count",
+      "type": "integer"
+    },
+    "high_count": {
+      "default": 0,
+      "title": "High Count",
+      "type": "integer"
+    },
+    "medium_count": {
+      "default": 0,
+      "title": "Medium Count",
+      "type": "integer"
+    },
+    "low_count": {
+      "default": 0,
+      "title": "Low Count",
+      "type": "integer"
+    },
+    "records": {
+      "items": {
+        "$ref": "#/$defs/AdminProfilePackReviewRecord"
+      },
+      "title": "Records",
+      "type": "array"
+    },
+    "findings": {
+      "items": {
+        "$ref": "#/$defs/AdminProfilePackReviewFinding"
+      },
+      "title": "Findings",
+      "type": "array"
+    },
+    "markdown_path": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Markdown Path"
+    },
+    "json_path": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Json Path"
+    },
+    "warnings": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Warnings",
+      "type": "array"
+    }
+  },
+  "required": [
+    "root",
+    "status",
+    "profile_id",
+    "profile_pack_path"
+  ],
+  "title": "AdminProfilePackReviewSummaryResult",
+  "type": "object"
+}

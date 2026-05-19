@@ -14,6 +14,12 @@ from .admin_operating import (
     review_admin_obligation_profile_pack,
     review_admin_obligations,
 )
+from .admin_profile_pack_reviews import (
+    create_admin_profile_pack_review_record,
+    default_admin_profile_pack_reviews_dir,
+    summarize_admin_profile_pack_reviews,
+    write_admin_profile_pack_review_record,
+)
 from .artifact_authority import generate_artifact_authority
 from .audit import generate_audit_qna
 from .approval import (
@@ -563,6 +569,31 @@ def main(argv: list[str] | None = None) -> int:
     admin_profile_pack_parser.add_argument("--templates-root", default=None)
     admin_profile_pack_parser.add_argument("--output", default=None)
     admin_profile_pack_parser.add_argument("--json", default=None)
+
+    admin_profile_pack_review_record_parser = subparsers.add_parser("admin-profile-pack-review-record", help="Record a supplied human review for an admin obligation profile-pack row or whole pack.")
+    admin_profile_pack_review_record_parser.add_argument("--root", default=".")
+    admin_profile_pack_review_record_parser.add_argument("--profile", required=True)
+    admin_profile_pack_review_record_parser.add_argument("--decision", required=True, choices=["accepted", "accepted_risk", "needs_changes", "rejected", "deferred"])
+    admin_profile_pack_review_record_parser.add_argument("--reviewer", required=True)
+    admin_profile_pack_review_record_parser.add_argument("--profile-pack-hash", required=True)
+    admin_profile_pack_review_record_parser.add_argument("--target-type", default="pack", choices=["pack", "obligation", "submission", "settlement_requirement"])
+    admin_profile_pack_review_record_parser.add_argument("--target-id", default=None)
+    admin_profile_pack_review_record_parser.add_argument("--profile-pack", default=None)
+    admin_profile_pack_review_record_parser.add_argument("--templates-root", default=None)
+    admin_profile_pack_review_record_parser.add_argument("--reviewed-at", default=None)
+    admin_profile_pack_review_record_parser.add_argument("--note", default=None)
+    admin_profile_pack_review_record_parser.add_argument("--risk-flag", action="append", default=[])
+    admin_profile_pack_review_record_parser.add_argument("--reviews-dir", default=None)
+    admin_profile_pack_review_record_parser.add_argument("--print-only", action="store_true")
+
+    admin_profile_pack_review_summary_parser = subparsers.add_parser("admin-profile-pack-review-summary", help="Summarize supplied human admin profile-pack row review records.")
+    admin_profile_pack_review_summary_parser.add_argument("--root", default=".")
+    admin_profile_pack_review_summary_parser.add_argument("--profile", required=True)
+    admin_profile_pack_review_summary_parser.add_argument("--profile-pack", default=None)
+    admin_profile_pack_review_summary_parser.add_argument("--templates-root", default=None)
+    admin_profile_pack_review_summary_parser.add_argument("--reviews-dir", default=None)
+    admin_profile_pack_review_summary_parser.add_argument("--output", default=None)
+    admin_profile_pack_review_summary_parser.add_argument("--json", default=None)
 
     settlement_binder_parser = subparsers.add_parser("settlement-binder", help="Bind budget ledger rows to evidence, proof, approval, and source-hash state.")
     settlement_binder_parser.add_argument("--root", default=".")
@@ -1177,6 +1208,38 @@ def main(argv: list[str] | None = None) -> int:
         return 0 if result.status != "blocked" else 1
     if args.command == "admin-profile-pack-review":
         result = review_admin_obligation_profile_pack(args.profile, templates_root=args.templates_root, output_path=args.output, json_path=args.json)
+        print(result.model_dump_json(indent=2))
+        return 0 if result.status != "blocked" else 1
+    if args.command == "admin-profile-pack-review-record":
+        record = create_admin_profile_pack_review_record(
+            args.root,
+            profile_id=args.profile,
+            decision=args.decision,
+            reviewer=args.reviewer,
+            profile_pack_hash=args.profile_pack_hash,
+            target_type=args.target_type,
+            target_id=args.target_id,
+            profile_pack_path=args.profile_pack,
+            templates_root=args.templates_root,
+            reviewed_at=args.reviewed_at,
+            notes=args.note,
+            risk_flags=args.risk_flag,
+        )
+        if not args.print_only:
+            reviews_dir = Path(args.reviews_dir) if args.reviews_dir else default_admin_profile_pack_reviews_dir(args.root)
+            write_admin_profile_pack_review_record(record, reviews_dir)
+        print(record.model_dump_json(indent=2))
+        return 0
+    if args.command == "admin-profile-pack-review-summary":
+        result = summarize_admin_profile_pack_reviews(
+            args.root,
+            profile_id=args.profile,
+            profile_pack_path=args.profile_pack,
+            templates_root=args.templates_root,
+            reviews_dir=args.reviews_dir,
+            output_path=args.output,
+            json_path=args.json,
+        )
         print(result.model_dump_json(indent=2))
         return 0 if result.status != "blocked" else 1
     if args.command == "settlement-binder":

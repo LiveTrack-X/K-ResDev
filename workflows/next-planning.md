@@ -1,12 +1,12 @@
 # K-ResDev Next Planning
 
-This planning note starts after `0.1.0b54`.
+This planning note starts after `0.1.0b55`.
 
 ## Current Diagnosis
 
-K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, budget ledger review, settlement binders, admin obligation graphs, admin profile-pack seed review, admin change ledgers, admin calendars, bibliography metadata, reference corpus adapters, read-only workspace discovery, bibliography review, citation support, research claim matrices, profile source records, profile source-pack review queues, profile source fix plans, profile source fix review records, profile integrity, a narrow source-backed IRIS/Innopolis profile seed, profile promotion review, hash-bound profile promotion records, non-destructive profile promotion apply plans, guarded profile promotion apply results/backups, non-destructive profile promotion revocation plans, guarded profile promotion revocation results/backups, a profile lifecycle ledger, profile pack readiness dashboard, profile pack readiness drilldown, profile pack investigation bundle, profile pack investigation package manifest/ZIP, profile pack package reviewer receipts, workspace traceability graph, trace passport checkpoints, artifact authority labels, goals/deadline review, weekly operating reviews, workspace dashboards, thin local workflow router, workspace doctor, next actions, workspace summary, and review packs.
+K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, budget ledger review, settlement binders, admin obligation graphs, admin profile-pack seed review, admin profile-pack human review receipts, admin change ledgers, admin calendars, bibliography metadata, reference corpus adapters, read-only workspace discovery, bibliography review, citation support, research claim matrices, profile source records, profile source-pack review queues, profile source fix plans, profile source fix review records, profile integrity, a narrow source-backed IRIS/Innopolis profile seed, profile promotion review, hash-bound profile promotion records, non-destructive profile promotion apply plans, guarded profile promotion apply results/backups, non-destructive profile promotion revocation plans, guarded profile promotion revocation results/backups, a profile lifecycle ledger, profile pack readiness dashboard, profile pack readiness drilldown, profile pack investigation bundle, profile pack investigation package manifest/ZIP, profile pack package reviewer receipts, workspace traceability graph, trace passport checkpoints, artifact authority labels, goals/deadline review, weekly operating reviews, workspace dashboards, thin local workflow router, workspace doctor, next actions, workspace summary, and review packs.
 
-The next bottleneck is verified agency profile expansion. Beta 49-54 closed the generated package handoff loop, added a generic Korean R&D admin operating layer, and made admin obligation seeds profile-data driven. Official IRIS/NTIS/RCMS/Ezbaro details still must remain source-backed profile data, not hardcoded Python logic.
+The next bottleneck is verified agency profile expansion. Beta 49-55 closed the generated package handoff loop, added a generic Korean R&D admin operating layer, made admin obligation seeds profile-data driven, and added row-level human review receipts for those admin seeds. Official IRIS/NTIS/RCMS/Ezbaro details still must remain source-backed profile data, not hardcoded Python logic.
 
 ## Planning Principles
 
@@ -55,13 +55,33 @@ Implemented scope:
 
 Goal: add supplied human review receipts specifically for admin obligation profile-pack rows before any pack can be promoted beyond `needs_review`.
 
-Status: proposed next slice.
+Status: implemented as a guarded first pass.
 
 Expected scope:
 - hash-bind reviewer records to `templates/agencies/<profile-id>/admin-obligations.json`;
 - record row-level decisions for obligations, submission candidates, settlement requirements, and calendar hints;
 - block non-review admin obligation seeding when pack/source/reviewer hashes drift;
 - keep promotion separate from loading so `admin-obligations-init` remains non-destructive and conservative.
+
+Implemented scope:
+- added `AdminProfilePackReviewRecord`, `AdminProfilePackReviewFinding`, and `AdminProfilePackReviewSummaryResult`;
+- added `admin-profile-pack-review-record` and `admin-profile-pack-review-summary`;
+- hash-bound review records to current `admin-obligations.json` pack files;
+- supported pack-level and row-level targets for obligations, submissions, and settlement requirements;
+- added stale-hash, missing target, rejected, needs_changes, deferred, accepted_risk, and missing-review findings;
+- integrated admin profile-pack human review summaries into doctor, next-actions, summary, review-pack, and trace.
+
+### Beta 56 - Admin Profile Pack Promotion Gate
+
+Goal: prevent profile-driven admin obligation seeds from becoming trusted unless profile source records, admin profile-pack review records, and promotion decisions all agree on current hashes.
+
+Status: proposed next slice.
+
+Expected scope:
+- add a promotion readiness gate that joins profile-review, profile-promotion, profile-pack review, and admin profile-pack review summaries;
+- require current-hash accepted/accepted-risk row coverage before non-review admin obligation seeding can be considered;
+- keep `admin-obligations-init` conservative by default and add an explicit reviewed-seed mode only when all gates pass;
+- surface mismatches in doctor, trace, and review-pack without mutating official templates.
 
 Safety boundary:
 - Do not hardcode official rules from memory or stale manuals.

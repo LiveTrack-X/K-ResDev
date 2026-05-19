@@ -13,6 +13,7 @@ from .admin_operating import (
     review_admin_obligation_profile_pack,
     review_admin_obligations,
 )
+from .admin_profile_pack_reviews import summarize_admin_profile_pack_reviews
 from .artifact_authority import authority_for_trace_node
 from .approval import load_approval_records
 from .bibliography import load_bibliography_index
@@ -1361,6 +1362,7 @@ class _TraceBuilder:
         admin = review_admin_obligations(self.workspace)
         if admin.profile_id:
             profile_pack = review_admin_obligation_profile_pack(admin.profile_id)
+            profile_pack_review = summarize_admin_profile_pack_reviews(self.workspace, admin.profile_id)
             pack_node = self.node(
                 "admin_profile_pack",
                 admin.profile_id,
@@ -1385,6 +1387,51 @@ class _TraceBuilder:
                     finding.severity,
                     finding.message,
                     node_id=pack_node.node_id,
+                    path=finding.path,
+                    suggested_action=finding.suggested_action,
+                )
+            review_node = self.node(
+                "admin_profile_pack_review_summary",
+                admin.profile_id,
+                "Admin profile-pack human review summary",
+                ref_id=admin.profile_id,
+                status=profile_pack_review.status,
+                path=str(self.workspace / "state" / "admin-profile-pack-review-summary.json"),
+                metadata={
+                    "record_count": profile_pack_review.record_count,
+                    "reviewed_target_count": profile_pack_review.reviewed_target_count,
+                    "missing_target_review_count": profile_pack_review.missing_target_review_count,
+                    "stale_record_count": profile_pack_review.stale_record_count,
+                    "finding_count": profile_pack_review.finding_count,
+                },
+            )
+            self.edge(pack_node.node_id, review_node.node_id, "has_human_review_summary")
+            for record in profile_pack_review.records:
+                record_node = self.node(
+                    "admin_profile_pack_review_record",
+                    record.review_id,
+                    f"{record.decision} {record.target_type}:{record.target_id or '-'}",
+                    ref_id=record.review_id,
+                    status=record.decision,
+                    path=record.profile_pack_path,
+                    sha256=record.profile_pack_hash,
+                    metadata={
+                        "profile_id": record.profile_id,
+                        "target_type": record.target_type,
+                        "target_id": record.target_id,
+                        "reviewer": record.reviewer,
+                        "reviewed_at": record.reviewed_at,
+                        "risk_flags": record.risk_flags,
+                    },
+                )
+                self.edge(review_node.node_id, record_node.node_id, "includes_human_review")
+                self.edge(record_node.node_id, pack_node.node_id, "reviews_admin_profile_pack")
+            for finding in profile_pack_review.findings:
+                self.finding(
+                    f"trace_{finding.code}",
+                    finding.severity,
+                    finding.message,
+                    node_id=review_node.node_id,
                     path=finding.path,
                     suggested_action=finding.suggested_action,
                 )

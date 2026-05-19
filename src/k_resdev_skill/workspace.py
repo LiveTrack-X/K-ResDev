@@ -13,6 +13,7 @@ from .admin_operating import (
     review_admin_obligation_profile_pack,
     review_admin_obligations,
 )
+from .admin_profile_pack_reviews import summarize_admin_profile_pack_reviews
 from .artifact_authority import generate_artifact_authority
 from .approval import load_approval_records
 from .approval_coverage import generate_workspace_approval_coverage
@@ -63,6 +64,7 @@ STANDARD_DIRS = (
     "reports",
     "reports/analysis",
     "state/approvals",
+    "state/admin-profile-pack-reviews",
     "state/bibliography-reviews",
     "state/citation-support",
     "state/checkpoints",
@@ -80,6 +82,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "admin-change-ledger.md",
     "admin-obligations.md",
     "admin-profile-pack.md",
+    "admin-profile-pack-review-summary.md",
     "bibliography-integrity.md",
     "budget-ledger.md",
     "budget-checklist.md",
@@ -236,6 +239,7 @@ def run_workspace_doctor(
     _check_profile_pack_investigation_package(workspace, findings)
     _check_profile_pack_package_receipts(workspace, findings)
     _check_admin_profile_pack_review(workspace, findings)
+    _check_admin_profile_pack_reviews(workspace, findings)
     _check_admin_obligations(workspace, findings)
     _check_settlement_binder(workspace, findings)
     _check_admin_change_ledger(workspace, findings)
@@ -1304,6 +1308,48 @@ def _check_admin_profile_pack_review(workspace: Path, findings: list[WorkspaceDo
                 f"Admin profile pack review has {result.medium_count} medium-severity finding(s).",
                 result.pack_path or profile_path,
                 "Keep profile-driven admin obligations as needs_review until official-source and human review are complete.",
+            )
+        )
+
+
+def _check_admin_profile_pack_reviews(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> None:
+    profile_path = workspace / "state" / "project-profile.json"
+    if not profile_path.exists():
+        return
+    try:
+        profile = load_project_profile(profile_path)
+        result = summarize_admin_profile_pack_reviews(workspace, profile.profile_id)
+    except Exception as exc:
+        findings.append(
+            _finding(
+                "admin_profile_pack_reviews_unreadable",
+                "medium",
+                f"Admin profile-pack human review summary could not run: {exc}",
+                profile_path,
+                "Fix state/admin-profile-pack-reviews or the bundled admin profile pack before relying on profile-driven obligations.",
+            )
+        )
+        return
+    if result.status == "not_configured":
+        return
+    if result.high_count:
+        findings.append(
+            _finding(
+                "admin_profile_pack_reviews_high_findings",
+                "high",
+                f"Admin profile-pack human review summary has {result.high_count} high-severity finding(s).",
+                workspace / "state" / "admin-profile-pack-reviews",
+                "Record fresh hash-bound review decisions or fix rejected/stale row reviews before promotion.",
+            )
+        )
+    elif result.medium_count:
+        findings.append(
+            _finding(
+                "admin_profile_pack_reviews_unresolved",
+                "medium",
+                f"Admin profile-pack human review summary has {result.medium_count} unresolved review finding(s).",
+                workspace / "state" / "admin-profile-pack-reviews",
+                "Record pack-level or row-level human review decisions before treating profile-driven obligations as reviewed.",
             )
         )
 

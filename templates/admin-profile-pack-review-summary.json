@@ -1,0 +1,42 @@
+{
+  "root": ".",
+  "status": "needs_review",
+  "profile_id": "national-rnd-basic",
+  "profile_status": "needs_review",
+  "profile_pack_path": "templates/agencies/national-rnd-basic/admin-obligations.json",
+  "profile_pack_hash": "sha256:example",
+  "profile_pack_status": "needs_review",
+  "target_count": 1,
+  "reviewed_target_count": 0,
+  "missing_target_review_count": 1,
+  "record_count": 0,
+  "accepted_count": 0,
+  "accepted_risk_count": 0,
+  "needs_changes_count": 0,
+  "rejected_count": 0,
+  "deferred_count": 0,
+  "unresolved_count": 1,
+  "stale_record_count": 0,
+  "target_mismatch_count": 0,
+  "finding_count": 1,
+  "high_count": 0,
+  "medium_count": 1,
+  "low_count": 0,
+  "records": [],
+  "findings": [
+    {
+      "code": "admin_profile_pack_target_review_missing",
+      "severity": "medium",
+      "message": "Admin profile-pack target `obligation:ADM-EXAMPLE-001` has no current accepted human review.",
+      "review_id": null,
+      "profile_id": "national-rnd-basic",
+      "target_type": "obligation",
+      "target_id": "ADM-EXAMPLE-001",
+      "path": "templates/agencies/national-rnd-basic/admin-obligations.json",
+      "suggested_action": "Record a pack-level accepted review or a row-level accepted/accepted-risk review for this target."
+    }
+  ],
+  "markdown_path": null,
+  "json_path": null,
+  "warnings": []
+}

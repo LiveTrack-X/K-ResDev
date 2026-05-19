@@ -12,6 +12,7 @@ from .admin_operating import (
     review_admin_obligation_profile_pack,
     review_admin_obligations,
 )
+from .admin_profile_pack_reviews import summarize_admin_profile_pack_reviews
 from .artifact_authority import generate_artifact_authority
 from .models import (
     ReviewPackArtifact,
@@ -134,6 +135,8 @@ def generate_workspace_review_pack(
     profile_pack_receipt_json = state / "profile-pack-package-receipt-summary.json"
     admin_profile_pack_md = reports / "admin-profile-pack.md"
     admin_profile_pack_json = state / "admin-profile-pack-review.json"
+    admin_profile_pack_review_md = reports / "admin-profile-pack-review-summary.md"
+    admin_profile_pack_review_json = state / "admin-profile-pack-review-summary.json"
     admin_obligations_md = reports / "admin-obligations.md"
     admin_obligations_json = state / "admin-obligations-review.json"
     settlement_binder_md = reports / "settlement-binder.md"
@@ -177,7 +180,9 @@ def generate_workspace_review_pack(
     profile_pack_investigation = generate_profile_pack_investigation_bundle(workspace, output_path=profile_pack_investigation_md, json_path=profile_pack_investigation_json)
     profile_pack_package = generate_profile_pack_investigation_package(workspace, output_path=profile_pack_package_md, json_path=profile_pack_package_json)
     profile_pack_receipt = summarize_profile_pack_package_receipts(workspace, output_path=profile_pack_receipt_md, json_path=profile_pack_receipt_json)
-    admin_profile_pack = review_admin_obligation_profile_pack(_workspace_profile_id(workspace), output_path=admin_profile_pack_md, json_path=admin_profile_pack_json)
+    workspace_profile_id = _workspace_profile_id(workspace)
+    admin_profile_pack = review_admin_obligation_profile_pack(workspace_profile_id, output_path=admin_profile_pack_md, json_path=admin_profile_pack_json)
+    admin_profile_pack_review = summarize_admin_profile_pack_reviews(workspace, workspace_profile_id, output_path=admin_profile_pack_review_md, json_path=admin_profile_pack_review_json)
     admin_obligations = review_admin_obligations(workspace, output_path=admin_obligations_md, json_path=admin_obligations_json)
     settlement_binder = generate_settlement_binder(workspace, output_path=settlement_binder_md, json_path=settlement_binder_json)
     admin_change_ledger = review_admin_change_ledger(workspace, output_path=admin_change_md, json_path=admin_change_json)
@@ -270,6 +275,8 @@ def generate_workspace_review_pack(
         str(profile_pack_receipt_json),
         str(admin_profile_pack_md),
         str(admin_profile_pack_json),
+        str(admin_profile_pack_review_md),
+        str(admin_profile_pack_review_json),
         str(admin_obligations_md),
         str(admin_obligations_json),
         str(settlement_binder_md),
@@ -412,6 +419,10 @@ def generate_workspace_review_pack(
         admin_profile_pack_status=admin_profile_pack.status,
         admin_profile_pack_obligation_count=admin_profile_pack.obligation_count,
         admin_profile_pack_finding_count=admin_profile_pack.finding_count,
+        admin_profile_pack_review_status=admin_profile_pack_review.status,
+        admin_profile_pack_review_record_count=admin_profile_pack_review.record_count,
+        admin_profile_pack_review_unresolved_count=admin_profile_pack_review.unresolved_count,
+        admin_profile_pack_review_stale_count=admin_profile_pack_review.stale_record_count,
         admin_obligation_status=admin_obligations.status,
         admin_obligation_count=admin_obligations.obligation_count,
         admin_submission_count=admin_obligations.submission_count,
@@ -640,6 +651,9 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
         f"| Admin profile pack status | {_escape(result.admin_profile_pack_status or '-')} |",
         f"| Admin profile pack obligations | {result.admin_profile_pack_obligation_count} |",
         f"| Admin profile pack finding count | {result.admin_profile_pack_finding_count} |",
+        f"| Admin profile pack human review status | {_escape(result.admin_profile_pack_review_status or '-')} |",
+        f"| Admin profile pack human review records | {result.admin_profile_pack_review_record_count} |",
+        f"| Admin profile pack human review unresolved | {result.admin_profile_pack_review_unresolved_count} |",
         f"| Admin obligations status | {_escape(result.admin_obligation_status or '-')} |",
         f"| Admin obligation count | {result.admin_obligation_count} |",
         f"| Admin submission count | {result.admin_submission_count} |",
@@ -714,6 +728,7 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
             "- Use `profile-pack-investigation-package.md` to transfer generated metadata artifacts and explicit raw-source exclusions for reviewer handoff.",
             "- Use `profile-pack-package-receipt-summary.md` to inspect supplied reviewer receipt state for generated profile-pack packages.",
             "- Use `admin-profile-pack.md` to review profile-driven admin obligation seeds before copying them into a workspace.",
+            "- Use `admin-profile-pack-review-summary.md` to inspect supplied hash-bound human review decisions for admin profile-pack rows.",
             "- Use `admin-obligations.md` to inspect local reporting, settlement, performance, agreement/change, and equipment obligation candidates.",
             "- Use `admin-change-ledger.md` to review supplied agreement/KPI/budget/period change records before changed values appear in projections.",
             "- Use `admin-calendar.md` to connect local admin obligations to reviewed project deadlines and due-soon state.",
@@ -799,6 +814,8 @@ def _artifact_label(path: str) -> str:
         "profile-pack-package-receipt-summary.json": "Profile pack package receipt summary JSON",
         "admin-profile-pack.md": "Admin profile pack review",
         "admin-profile-pack-review.json": "Admin profile pack review JSON",
+        "admin-profile-pack-review-summary.md": "Admin profile pack human review summary",
+        "admin-profile-pack-review-summary.json": "Admin profile pack human review summary JSON",
         "admin-obligations.md": "Admin obligations",
         "admin-obligations-review.json": "Admin obligations JSON",
         "settlement-binder.md": "Settlement binder",

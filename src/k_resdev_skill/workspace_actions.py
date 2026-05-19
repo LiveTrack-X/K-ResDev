@@ -99,6 +99,7 @@ def _actions_for_findings(root: Path, findings: list[WorkspaceDoctorFinding]) ->
         _action_for_profile_pack_investigation_package(root, by_code),
         _action_for_profile_pack_package_receipts(root, by_code),
         _action_for_admin_profile_pack(root, by_code),
+        _action_for_admin_profile_pack_reviews(root, by_code),
         _action_for_admin_obligations(root, by_code),
         _action_for_settlement_binder(root, by_code),
         _action_for_admin_change_ledger(root, by_code),
@@ -600,6 +601,26 @@ def _action_for_admin_profile_pack(root: Path, by_code: dict[str, list[Workspace
         "Review admin profile pack",
         "Profile-driven admin obligation seeds should remain source-bound and needs_review before they are copied into a workspace.",
         f'python -m k_resdev_skill admin-profile-pack-review --profile "<profile-id>" --output "{root / "reports" / "admin-profile-pack.md"}" --json "{root / "state" / "admin-profile-pack-review.json"}"',
+        by_code,
+        codes,
+    )
+
+
+def _action_for_admin_profile_pack_reviews(root: Path, by_code: dict[str, list[WorkspaceDoctorFinding]]) -> WorkspaceActionItem | None:
+    codes = [
+        "admin_profile_pack_reviews_unreadable",
+        "admin_profile_pack_reviews_high_findings",
+        "admin_profile_pack_reviews_unresolved",
+    ]
+    if not any(code in by_code for code in codes):
+        return None
+    priority = "high" if "admin_profile_pack_reviews_high_findings" in by_code else "medium"
+    return _action(
+        root,
+        priority,
+        "Review admin profile-pack human decisions",
+        "Profile-driven admin obligation rows should have current hash-bound supplied human decisions before promotion or trusted seeding.",
+        f'python -m k_resdev_skill admin-profile-pack-review-summary --root "{root}" --profile "<profile-id>" --output "{root / "reports" / "admin-profile-pack-review-summary.md"}" --json "{root / "state" / "admin-profile-pack-review-summary.json"}"',
         by_code,
         codes,
     )

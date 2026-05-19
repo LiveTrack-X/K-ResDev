@@ -1,0 +1,108 @@
+{
+  "$defs": {
+    "AdminProfilePackReviewDecision": {
+      "enum": [
+        "accepted",
+        "accepted_risk",
+        "needs_changes",
+        "rejected",
+        "deferred"
+      ],
+      "title": "AdminProfilePackReviewDecision",
+      "type": "string"
+    },
+    "AdminProfilePackReviewTargetType": {
+      "enum": [
+        "pack",
+        "obligation",
+        "submission",
+        "settlement_requirement"
+      ],
+      "title": "AdminProfilePackReviewTargetType",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "review_id": {
+      "title": "Review Id",
+      "type": "string"
+    },
+    "profile_id": {
+      "title": "Profile Id",
+      "type": "string"
+    },
+    "target_type": {
+      "$ref": "#/$defs/AdminProfilePackReviewTargetType",
+      "default": "pack"
+    },
+    "target_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Target Id"
+    },
+    "profile_pack_path": {
+      "title": "Profile Pack Path",
+      "type": "string"
+    },
+    "profile_pack_hash": {
+      "title": "Profile Pack Hash",
+      "type": "string"
+    },
+    "decision": {
+      "$ref": "#/$defs/AdminProfilePackReviewDecision"
+    },
+    "reviewer": {
+      "title": "Reviewer",
+      "type": "string"
+    },
+    "reviewed_at": {
+      "title": "Reviewed At",
+      "type": "string"
+    },
+    "source_record_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Source Record Ids",
+      "type": "array"
+    },
+    "notes": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Notes"
+    },
+    "risk_flags": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Risk Flags",
+      "type": "array"
+    }
+  },
+  "required": [
+    "review_id",
+    "profile_id",
+    "profile_pack_path",
+    "profile_pack_hash",
+    "decision",
+    "reviewer",
+    "reviewed_at"
+  ],
+  "title": "AdminProfilePackReviewRecord",
+  "type": "object"
+}

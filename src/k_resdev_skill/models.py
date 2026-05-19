@@ -111,6 +111,21 @@ class ProfilePackPackageReceiptDecision(str, Enum):
     REJECTED = "rejected"
 
 
+class AdminProfilePackReviewDecision(str, Enum):
+    ACCEPTED = "accepted"
+    ACCEPTED_RISK = "accepted_risk"
+    NEEDS_CHANGES = "needs_changes"
+    REJECTED = "rejected"
+    DEFERRED = "deferred"
+
+
+class AdminProfilePackReviewTargetType(str, Enum):
+    PACK = "pack"
+    OBLIGATION = "obligation"
+    SUBMISSION = "submission"
+    SETTLEMENT_REQUIREMENT = "settlement_requirement"
+
+
 class ResearchClaimStatus(str, Enum):
     HYPOTHESIS = "hypothesis"
     CANDIDATE = "candidate"
@@ -1452,6 +1467,10 @@ class WorkspaceSummaryResult(StrictModel):
     admin_profile_pack_status: str | None = None
     admin_profile_pack_obligation_count: int = 0
     admin_profile_pack_finding_count: int = 0
+    admin_profile_pack_review_status: str | None = None
+    admin_profile_pack_review_record_count: int = 0
+    admin_profile_pack_review_unresolved_count: int = 0
+    admin_profile_pack_review_stale_count: int = 0
     admin_obligation_status: str | None = None
     admin_obligation_count: int = 0
     admin_submission_count: int = 0
@@ -1772,6 +1791,10 @@ class WorkspaceReviewPackResult(StrictModel):
     admin_profile_pack_status: str | None = None
     admin_profile_pack_obligation_count: int = 0
     admin_profile_pack_finding_count: int = 0
+    admin_profile_pack_review_status: str | None = None
+    admin_profile_pack_review_record_count: int = 0
+    admin_profile_pack_review_unresolved_count: int = 0
+    admin_profile_pack_review_stale_count: int = 0
     admin_obligation_status: str | None = None
     admin_obligation_count: int = 0
     admin_submission_count: int = 0
@@ -2443,6 +2466,85 @@ class ProfilePackPackageReceiptSummaryResult(StrictModel):
     @field_validator("root", "status", "package_path")
     @classmethod
     def _profile_pack_receipt_summary_field_must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
+class AdminProfilePackReviewRecord(StrictModel):
+    review_id: str
+    profile_id: str
+    target_type: AdminProfilePackReviewTargetType = AdminProfilePackReviewTargetType.PACK
+    target_id: str | None = None
+    profile_pack_path: str
+    profile_pack_hash: str
+    decision: AdminProfilePackReviewDecision
+    reviewer: str
+    reviewed_at: str
+    source_record_ids: list[str] = Field(default_factory=list)
+    notes: str | None = None
+    risk_flags: list[str] = Field(default_factory=list)
+
+    @field_validator("review_id", "profile_id", "target_type", "profile_pack_path", "profile_pack_hash", "decision", "reviewer", "reviewed_at")
+    @classmethod
+    def _admin_pack_review_record_field_must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
+class AdminProfilePackReviewFinding(StrictModel):
+    code: str
+    severity: str
+    message: str
+    review_id: str | None = None
+    profile_id: str | None = None
+    target_type: str | None = None
+    target_id: str | None = None
+    path: str | None = None
+    suggested_action: str | None = None
+
+    @field_validator("code", "severity", "message")
+    @classmethod
+    def _admin_pack_review_finding_field_must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
+class AdminProfilePackReviewSummaryResult(StrictModel):
+    root: str
+    status: str
+    profile_id: str
+    profile_status: str | None = None
+    profile_pack_path: str
+    profile_pack_hash: str | None = None
+    profile_pack_status: str | None = None
+    target_count: int = 0
+    reviewed_target_count: int = 0
+    missing_target_review_count: int = 0
+    record_count: int = 0
+    accepted_count: int = 0
+    accepted_risk_count: int = 0
+    needs_changes_count: int = 0
+    rejected_count: int = 0
+    deferred_count: int = 0
+    unresolved_count: int = 0
+    stale_record_count: int = 0
+    target_mismatch_count: int = 0
+    finding_count: int = 0
+    high_count: int = 0
+    medium_count: int = 0
+    low_count: int = 0
+    records: list[AdminProfilePackReviewRecord] = Field(default_factory=list)
+    findings: list[AdminProfilePackReviewFinding] = Field(default_factory=list)
+    markdown_path: str | None = None
+    json_path: str | None = None
+    warnings: list[str] = Field(default_factory=list)
+
+    @field_validator("root", "status", "profile_id", "profile_pack_path")
+    @classmethod
+    def _admin_pack_review_summary_field_must_not_be_blank(cls, value: str) -> str:
         if not value or not value.strip():
             raise ValueError("value must not be blank")
         return value.strip()

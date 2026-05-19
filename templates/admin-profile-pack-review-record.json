@@ -1,0 +1,16 @@
+{
+  "review_id": "APRV-2026-EXAMPLE01",
+  "profile_id": "national-rnd-basic",
+  "target_type": "pack",
+  "target_id": "national-rnd-basic",
+  "profile_pack_path": "templates/agencies/national-rnd-basic/admin-obligations.json",
+  "profile_pack_hash": "sha256:example",
+  "decision": "accepted_risk",
+  "reviewer": "reviewer-name",
+  "reviewed_at": "2026-05-19T00:00:00Z",
+  "source_record_ids": [],
+  "notes": "Example supplied human review record only.",
+  "risk_flags": [
+    "official_source_needs_review"
+  ]
+}

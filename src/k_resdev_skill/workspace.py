@@ -27,6 +27,7 @@ from .profile_promotion_apply import generate_profile_promotion_apply_plan, load
 from .profile_promotion_revoke import load_profile_promotion_revoke_plan, load_profile_promotion_revoke_result
 from .profile_lifecycle import generate_profile_lifecycle_ledger
 from .profile_pack_investigation import generate_profile_pack_investigation_bundle
+from .profile_pack_investigation_package import generate_profile_pack_investigation_package, load_profile_pack_investigation_package
 from .profile_pack_drilldown import generate_profile_pack_readiness_drilldown
 from .profile_pack_readiness import generate_profile_pack_readiness
 from .profile_registry import default_agency_templates_root, load_project_profile
@@ -86,6 +87,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "profile-source-fix-plan.md",
     "profile-source-fix-summary.md",
     "profile-pack-investigation-bundle.md",
+    "profile-pack-investigation-package.md",
     "profile-pack-readiness-drilldown.md",
     "profile-pack-readiness.md",
     "profile-source-queue.md",
@@ -216,6 +218,7 @@ def run_workspace_doctor(
     _check_profile_pack_readiness(workspace, findings)
     _check_profile_pack_readiness_drilldown(workspace, findings)
     _check_profile_pack_investigation_bundle(workspace, findings)
+    _check_profile_pack_investigation_package(workspace, findings)
     _check_reports(workspace, findings)
     _check_report_integrity(workspace, findings)
     _check_artifact_authority(workspace, findings)
@@ -1128,6 +1131,73 @@ def _check_profile_pack_investigation_bundle(workspace: Path, findings: list[Wor
         )
 
 
+def _check_profile_pack_investigation_package(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> None:
+    path = workspace / "state" / "profile-pack-investigation-package.json"
+    bundle_path = workspace / "state" / "profile-pack-investigation-bundle.json"
+    if not bundle_path.exists():
+        return
+    try:
+        preview = generate_profile_pack_investigation_package(workspace, bundle_path=bundle_path)
+    except Exception as exc:
+        findings.append(
+            _finding(
+                "profile_pack_investigation_package_schema_invalid",
+                "medium",
+                f"Profile pack investigation package preview could not be generated: {exc}",
+                bundle_path,
+                "Regenerate profile-pack-investigation-bundle, then run profile-pack-investigation-package.",
+            )
+        )
+        return
+    if preview.bundle_status == "not_configured" or preview.selected_item_count == 0:
+        return
+    if not path.exists():
+        findings.append(
+            _finding(
+                "profile_pack_investigation_package_missing",
+                "low",
+                f"{preview.selected_item_count} profile pack investigation item(s) are selected for handoff but no package manifest exists.",
+                path,
+                "Run profile-pack-investigation-package to create a generated-metadata-only reviewer package manifest.",
+            )
+        )
+        return
+    try:
+        validation = validate_json_file(path, "profile-pack-investigation-package")
+        package = load_profile_pack_investigation_package(path)
+    except Exception as exc:
+        findings.append(
+            _finding(
+                "profile_pack_investigation_package_schema_invalid",
+                "medium",
+                f"Profile pack investigation package could not be read or validated: {exc}",
+                path,
+                "Regenerate profile-pack-investigation-package before sharing reviewer handoff metadata.",
+            )
+        )
+        return
+    if not validation["valid"]:
+        findings.append(
+            _finding(
+                "profile_pack_investigation_package_schema_invalid",
+                "medium",
+                f"Profile pack investigation package schema validation failed with {validation['error_count']} error(s).",
+                path,
+                "Run validate-json profile-pack-investigation-package and regenerate the package manifest.",
+            )
+        )
+    if package.missing_artifact_count:
+        findings.append(
+            _finding(
+                "profile_pack_investigation_package_missing_artifacts",
+                "medium",
+                f"{package.missing_artifact_count} generated metadata artifact(s) referenced by the package are missing.",
+                path,
+                "Regenerate readiness, drilldown, bundle, and review-pack artifacts, then rerun profile-pack-investigation-package.",
+            )
+        )
+
+
 def _check_reports(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> None:
     reports_dir = workspace / "reports"
     reports = [path for path in reports_dir.glob("*.md") if not is_operational_markdown(path)] if reports_dir.exists() else []
@@ -1636,6 +1706,7 @@ def _starter_readme(project_id: str, title: str, profile_id: str) -> str:
             "- Run `k-resdev profile-pack-readiness --root . --output reports/profile-pack-readiness.md --json state/profile-pack-readiness.json` to scan profile/source readiness across queue, fix-plan, fix-review, promotion, apply/revoke, and lifecycle state.",
             "- Run `k-resdev profile-pack-readiness-drilldown --root . --output reports/profile-pack-readiness-drilldown.md --json state/profile-pack-readiness-drilldown.json` to trace readiness blockers back to upstream artifacts and hashes.",
             "- Run `k-resdev profile-pack-investigation-bundle --root . --output reports/profile-pack-investigation-bundle.md --json state/profile-pack-investigation-bundle.json` to create a compact profile-pack remediation handoff.",
+            "- Run `k-resdev profile-pack-investigation-package --root . --output reports/profile-pack-investigation-package.md --json state/profile-pack-investigation-package.json --zip reports/profile-pack-investigation-package.zip` to package generated metadata for reviewer handoff without copying raw official-source bodies.",
             "- Run `k-resdev budget-ledger-import references/budget-ledger.csv --state-dir state --markdown reports/budget-ledger-import.md` to import a reviewable budget ledger.",
             "- Run `k-resdev budget-ledger-integrity --root . --output reports/budget-ledger.md --json state/budget-ledger-integrity.json` to check ledger proof, approval, duplicate, and evidence-link gaps.",
             "- Run `k-resdev checkpoint-create --root . --stage review-pack --summary \"<summary>\" --status needs_review` to create a hash-backed resume checkpoint.",
@@ -1643,7 +1714,7 @@ def _starter_readme(project_id: str, title: str, profile_id: str) -> str:
             "- Run `k-resdev checkpoint-resume-plan --root . --output reports/checkpoint-resume-plan.md --json state/checkpoint-resume-plan.json` before resuming from a saved checkpoint.",
             "- Run `k-resdev doctor --root . --output reports/readiness.md --json state/readiness.json` before reporting.",
             "- Run `k-resdev workspace-summary --root . --output reports/workspace-summary.md --json state/workspace-summary.json` for a one-page status handoff.",
-            "- Run `k-resdev workspace-review-pack --root .` to refresh discovery, readiness, next actions, summary, source-verification, artifact-authority, goals-review, weekly-review, workspace-dashboard, budget-ledger, approval-coverage, report-integrity, bibliography-integrity, reference-corpus, citation-support, research-claim-matrix, trace-passport, and trace artifacts together.",
+            "- Run `k-resdev workspace-review-pack --root .` to refresh discovery, readiness, next actions, summary, source-verification, artifact-authority, goals-review, weekly-review, workspace-dashboard, budget-ledger, approval-coverage, report-integrity, bibliography-integrity, reference-corpus, citation-support, research-claim-matrix, profile-pack package, trace-passport, and trace artifacts together.",
             "- Run `k-resdev verify-review-pack state/workspace-review-pack.json` to check saved review-pack artifact hashes.",
             "- Run `k-resdev verify-evidence-sources state/evidence-index.json --root . --output reports/source-verification.md --json state/source-verification.json` to check indexed source hashes.",
             "- Run `k-resdev approval-coverage --root . --output reports/approval-coverage.md --json state/approval-coverage.json` to check report approval coverage.",

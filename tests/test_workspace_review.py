@@ -51,6 +51,8 @@ def test_workspace_review_pack_writes_all_review_artifacts(tmp_path):
         tmp_path / "state" / "profile-integrity.json",
         tmp_path / "reports" / "profile-promotion-apply-plan.md",
         tmp_path / "state" / "profile-promotion-apply-plan.json",
+        tmp_path / "reports" / "profile-pack-investigation-package.md",
+        tmp_path / "state" / "profile-pack-investigation-package.json",
         tmp_path / "reports" / "workspace-trace.md",
         tmp_path / "state" / "workspace-trace.json",
         tmp_path / "reports" / "trace-passport.md",
@@ -103,6 +105,8 @@ def test_workspace_review_pack_writes_all_review_artifacts(tmp_path):
     assert result.profile_integrity_status == "needs_review"
     assert result.profile_source_count == 0
     assert result.profile_integrity_finding_count >= 1
+    assert result.profile_pack_package_status in {"no_matches", "needs_review", "ready_with_notes"}
+    assert result.profile_pack_package_included_artifact_count >= 0
     assert result.workspace_trace_node_count >= 0
     assert result.trace_passport_status == "not_configured"
     assert result.checkpoint_count == 0
@@ -128,6 +132,7 @@ def test_workspace_review_pack_writes_all_review_artifacts(tmp_path):
     assert "Profile integrity status" in rendered
     assert "Profile promotion apply-plan status" in rendered
     assert "Profile promotion apply-result status" in rendered
+    assert "Profile pack package status" in rendered
     assert "Workspace trace status" in rendered
     assert "Trace passport status" in rendered
     assert "Hashed artifacts" in rendered
@@ -152,6 +157,7 @@ def test_workspace_review_pack_writes_all_review_artifacts(tmp_path):
     assert json.loads((tmp_path / "state" / "profile-review.json").read_text(encoding="utf-8"))["status"] == "needs_review"
     assert json.loads((tmp_path / "state" / "profile-promotion-summary.json").read_text(encoding="utf-8"))["status"] == "not_recorded"
     assert json.loads((tmp_path / "state" / "profile-promotion-apply-plan.json").read_text(encoding="utf-8"))["status"] == "missing_promotion_record"
+    assert json.loads((tmp_path / "state" / "profile-pack-investigation-package.json").read_text(encoding="utf-8"))["artifact_count"] >= 0
     assert json.loads((tmp_path / "state" / "workspace-trace.json").read_text(encoding="utf-8"))["node_count"] == result.workspace_trace_node_count
     assert json.loads((tmp_path / "state" / "trace-passport.json").read_text(encoding="utf-8"))["status"] == "not_configured"
     assert verify_workspace_review_pack(tmp_path / "state" / "workspace-review-pack.json").valid is True
@@ -183,6 +189,7 @@ def test_workspace_review_pack_cli(tmp_path, capsys):
     assert (tmp_path / "reports" / "profile-review.md").exists()
     assert (tmp_path / "reports" / "profile-promotion-summary.md").exists()
     assert (tmp_path / "reports" / "profile-promotion-apply-plan.md").exists()
+    assert (tmp_path / "reports" / "profile-pack-investigation-package.md").exists()
     assert (tmp_path / "reports" / "workspace-trace.md").exists()
     assert (tmp_path / "reports" / "trace-passport.md").exists()
 
@@ -239,6 +246,7 @@ def test_operational_markdown_does_not_satisfy_report_draft_check(tmp_path):
         "profile-source-fix-plan.md",
         "profile-source-fix-summary.md",
         "profile-pack-investigation-bundle.md",
+        "profile-pack-investigation-package.md",
         "profile-pack-readiness-drilldown.md",
         "profile-pack-readiness.md",
         "profile-source-queue.md",

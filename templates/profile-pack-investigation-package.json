@@ -1,0 +1,45 @@
+{
+  "root": ".",
+  "status": "needs_review",
+  "package_id": "PPIP-2026-ABCD1234",
+  "profile_id": "national-rnd-basic",
+  "finding_code": null,
+  "selection_policy": "profile_id=national-rnd-basic",
+  "bundle_path": "state/profile-pack-investigation-bundle.json",
+  "bundle_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "bundle_status": "needs_review",
+  "bundle_item_count": 1,
+  "selected_item_count": 1,
+  "schema_valid": true,
+  "schema_error_count": 0,
+  "review_pack_manifest_path": "state/workspace-review-pack.json",
+  "review_pack_manifest_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "artifact_count": 1,
+  "included_artifact_count": 1,
+  "missing_artifact_count": 0,
+  "excluded_artifact_count": 1,
+  "zip_path": "reports/profile-pack-investigation-package.zip",
+  "zip_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "artifacts": [
+    {
+      "artifact_type": "profile_pack_investigation_bundle",
+      "role": "bundle_json",
+      "path": "state/profile-pack-investigation-bundle.json",
+      "exists": true,
+      "included": true,
+      "sha256": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "byte_count": 1024,
+      "warning": null
+    }
+  ],
+  "exclusions": [
+    {
+      "path": "inbox/official-source.pdf",
+      "reason": "raw_or_upstream_source_body_excluded",
+      "related_id": "PPI-2026-ABCD1234"
+    }
+  ],
+  "markdown_path": "reports/profile-pack-investigation-package.md",
+  "json_path": "state/profile-pack-investigation-package.json",
+  "warnings": []
+}

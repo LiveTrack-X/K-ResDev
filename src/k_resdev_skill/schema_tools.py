@@ -61,6 +61,12 @@ SCHEMA_ALIASES = {
     "profile_pack_investigation_artifact": "profile_pack_investigation_artifact.schema.json",
     "profile-pack-investigation-item": "profile_pack_investigation_item.schema.json",
     "profile_pack_investigation_item": "profile_pack_investigation_item.schema.json",
+    "profile-pack-investigation-package": "profile_pack_investigation_package.schema.json",
+    "profile_pack_investigation_package": "profile_pack_investigation_package.schema.json",
+    "profile-pack-investigation-package-artifact": "profile_pack_investigation_package_artifact.schema.json",
+    "profile_pack_investigation_package_artifact": "profile_pack_investigation_package_artifact.schema.json",
+    "profile-pack-investigation-package-exclusion": "profile_pack_investigation_package_exclusion.schema.json",
+    "profile_pack_investigation_package_exclusion": "profile_pack_investigation_package_exclusion.schema.json",
     "profile-source-queue": "profile_source_queue.schema.json",
     "profile_source_queue": "profile_source_queue.schema.json",
     "profile-source-queue-item": "profile_source_queue_item.schema.json",
@@ -195,6 +201,8 @@ def _validation_targets(document: Any, schema_payload: dict[str, Any]) -> list[t
         "ProfilePackReadinessDrilldownItem",
         "ProfilePackInvestigationArtifact",
         "ProfilePackInvestigationItem",
+        "ProfilePackInvestigationPackageArtifact",
+        "ProfilePackInvestigationPackageExclusion",
         "ProfileSourceFixPlanAction",
         "ProfileSourceFixReviewFinding",
         "ProfileSourceFixReviewRecord",
@@ -247,6 +255,10 @@ def _validation_targets(document: Any, schema_payload: dict[str, Any]) -> list[t
             return [(f"$.artifacts[{index}]", item) for index, item in enumerate(document["artifacts"])]
         if title == "ProfilePackInvestigationItem" and isinstance(document, dict) and isinstance(document.get("items"), list):
             return [(f"$.items[{index}]", item) for index, item in enumerate(document["items"])]
+        if title == "ProfilePackInvestigationPackageArtifact" and isinstance(document, dict) and isinstance(document.get("artifacts"), list):
+            return [(f"$.artifacts[{index}]", item) for index, item in enumerate(document["artifacts"])]
+        if title == "ProfilePackInvestigationPackageExclusion" and isinstance(document, dict) and isinstance(document.get("exclusions"), list):
+            return [(f"$.exclusions[{index}]", item) for index, item in enumerate(document["exclusions"])]
         if isinstance(document, dict) and isinstance(document.get("items"), list):
             return [(f"$.items[{index}]", item) for index, item in enumerate(document["items"])]
         if title == "DashboardCard" and isinstance(document, dict) and isinstance(document.get("cards"), list):

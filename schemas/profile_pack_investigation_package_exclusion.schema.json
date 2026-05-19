@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ProfilePackInvestigationPackageExclusion",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["path", "reason", "related_id"],
+  "properties": {
+    "path": {"type": "string"},
+    "reason": {"type": "string"},
+    "related_id": {"type": ["string", "null"]}
+  }
+}

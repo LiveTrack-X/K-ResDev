@@ -1,0 +1,10 @@
+{
+  "artifact_type": "profile_pack_investigation_bundle",
+  "role": "bundle_json",
+  "path": "state/profile-pack-investigation-bundle.json",
+  "exists": true,
+  "included": true,
+  "sha256": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "byte_count": 1024,
+  "warning": null
+}

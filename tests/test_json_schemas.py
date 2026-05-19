@@ -269,6 +269,25 @@ def test_profile_pack_investigation_templates_match_json_schemas():
     jsonschema.validate(bundle, bundle_schema)
 
 
+def test_profile_pack_investigation_package_templates_match_json_schemas():
+    with open("schemas/profile_pack_investigation_package_artifact.schema.json", encoding="utf-8") as handle:
+        artifact_schema = json.load(handle)
+    with open("schemas/profile_pack_investigation_package_exclusion.schema.json", encoding="utf-8") as handle:
+        exclusion_schema = json.load(handle)
+    with open("schemas/profile_pack_investigation_package.schema.json", encoding="utf-8") as handle:
+        package_schema = json.load(handle)
+    with open("templates/profile-pack-investigation-package-artifact.json", encoding="utf-8") as handle:
+        artifact = json.load(handle)
+    with open("templates/profile-pack-investigation-package-exclusion.json", encoding="utf-8") as handle:
+        exclusion = json.load(handle)
+    with open("templates/profile-pack-investigation-package.json", encoding="utf-8") as handle:
+        package = json.load(handle)
+
+    jsonschema.validate(artifact, artifact_schema)
+    jsonschema.validate(exclusion, exclusion_schema)
+    jsonschema.validate(package, package_schema)
+
+
 def test_budget_ledger_item_template_matches_json_schema():
     with open("schemas/budget_ledger_item.schema.json", encoding="utf-8") as handle:
         schema = json.load(handle)

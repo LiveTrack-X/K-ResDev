@@ -36,6 +36,7 @@ from .models import (
 from .profile_promotion import load_profile_promotion_records
 from .profile_lifecycle import load_profile_lifecycle_ledger
 from .profile_pack_investigation import load_profile_pack_investigation_bundle
+from .profile_pack_investigation_package import load_profile_pack_investigation_package
 from .profile_pack_drilldown import load_profile_pack_readiness_drilldown
 from .profile_pack_readiness import load_profile_pack_readiness
 from .profile_review import load_profile_review
@@ -73,6 +74,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "profile-source-fix-plan.md",
     "profile-source-fix-summary.md",
     "profile-pack-investigation-bundle.md",
+    "profile-pack-investigation-package.md",
     "profile-pack-readiness-drilldown.md",
     "profile-pack-readiness.md",
     "profile-source-queue.md",
@@ -121,6 +123,7 @@ def generate_workspace_trace(
     builder.add_profile_pack_readiness()
     builder.add_profile_pack_readiness_drilldown()
     builder.add_profile_pack_investigation_bundle()
+    builder.add_profile_pack_investigation_package()
     builder.add_bibliography()
     builder.add_reference_corpus()
     builder.add_reports()
@@ -1189,6 +1192,97 @@ class _TraceBuilder:
                     path=item.source_path or item.source_artifact_path or str(path),
                     suggested_action="Check current official sources outside this tool before relying on profile-pack remediation state.",
                 )
+
+    def add_profile_pack_investigation_package(self) -> None:
+        path = self.workspace / "state" / "profile-pack-investigation-package.json"
+        if not path.exists():
+            return
+        try:
+            package = load_profile_pack_investigation_package(path)
+        except Exception as exc:
+            self.finding(
+                "trace_profile_pack_investigation_package_unreadable",
+                "medium",
+                f"Profile pack investigation package could not be read: {exc}",
+                path=path,
+                suggested_action="Regenerate profile-pack-investigation-package before relying on reviewer handoff trace state.",
+            )
+            return
+        node = self.node(
+            "profile_pack_investigation_package",
+            package.package_id,
+            "Profile pack investigation package",
+            ref_id=package.package_id,
+            status=package.status,
+            path=str(path),
+            sha256=_sha256_file(path),
+            metadata={
+                "selection_policy": package.selection_policy,
+                "profile_id": package.profile_id,
+                "finding_code": package.finding_code,
+                "schema_valid": package.schema_valid,
+                "selected_item_count": package.selected_item_count,
+                "included_artifact_count": package.included_artifact_count,
+                "missing_artifact_count": package.missing_artifact_count,
+                "excluded_artifact_count": package.excluded_artifact_count,
+                "zip_path": package.zip_path,
+                "zip_hash": package.zip_hash,
+            },
+        )
+        self.edge(node.node_id, _node_id("profile_pack_investigation_bundle", "profile-pack-investigation-bundle"), "packages_bundle")
+        self.edge(node.node_id, _node_id("profile_pack_readiness_drilldown", "profile-pack-readiness-drilldown"), "packages_drilldown")
+        self.edge(node.node_id, _node_id("profile_pack_readiness", "profile-pack-readiness"), "packages_readiness")
+        for artifact in package.artifacts:
+            artifact_node = self.node(
+                "generated_artifact",
+                artifact.path,
+                Path(artifact.path).name,
+                path=artifact.path,
+                sha256=artifact.sha256,
+                metadata={
+                    "artifact_type": artifact.artifact_type,
+                    "role": artifact.role,
+                    "included": artifact.included,
+                    "warning": artifact.warning,
+                },
+            )
+            self.edge(node.node_id, artifact_node.node_id, "includes_metadata_artifact" if artifact.included else "references_metadata_artifact")
+        if package.status == "blocked":
+            self.finding(
+                "trace_profile_pack_investigation_package_blocked",
+                "high",
+                "Profile pack investigation package is blocked.",
+                node_id=node.node_id,
+                path=path,
+                suggested_action="Resolve high-severity investigation items or schema issues before reviewer handoff.",
+            )
+        if not package.schema_valid:
+            self.finding(
+                "trace_profile_pack_investigation_package_schema_invalid",
+                "medium",
+                "Profile pack investigation package reports an invalid upstream bundle schema.",
+                node_id=node.node_id,
+                path=package.bundle_path,
+                suggested_action="Validate and regenerate the profile pack investigation bundle.",
+            )
+        if package.missing_artifact_count:
+            self.finding(
+                "trace_profile_pack_investigation_package_missing_artifacts",
+                "medium",
+                f"Profile pack investigation package references {package.missing_artifact_count} missing generated metadata artifact(s).",
+                node_id=node.node_id,
+                path=path,
+                suggested_action="Regenerate readiness, drilldown, bundle, and review-pack metadata before transfer.",
+            )
+        if package.excluded_artifact_count:
+            self.finding(
+                "trace_profile_pack_investigation_package_exclusions",
+                "low",
+                f"Profile pack investigation package excludes {package.excluded_artifact_count} raw or upstream source path(s).",
+                node_id=node.node_id,
+                path=path,
+                suggested_action="Keep raw official-source bodies out of generated transfer packages unless a separate human-approved process supplies them.",
+            )
 
     def add_approvals(self) -> None:
         approvals_dir = self.workspace / "state" / "approvals"

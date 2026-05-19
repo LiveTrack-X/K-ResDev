@@ -658,13 +658,26 @@ Profile pack investigation bundles are local handoff projections only. They do n
 
 ### Task 58: Profile pack investigation bundle packager
 
-Planned:
-- create a bounded zip/package manifest for selected investigation bundles and their generated metadata artifacts
-- include bundle JSON, bundle Markdown, readiness/drilldown hashes, review-pack hash references, and a no-raw-source-body manifest
-- support one profile ID, one readiness finding code, or all open high/medium blockers
-- keep packaging read-only and exclude raw official-source documents by default
+Implemented:
+- `ProfilePackInvestigationPackageArtifact`, `ProfilePackInvestigationPackageExclusion`, and `ProfilePackInvestigationPackageResult` models
+- `profile-pack-investigation-package` command and public API
+- selection by one profile ID, one readiness finding code, or all open high/medium blockers
+- generated metadata manifest with bundle/readiness/drilldown artifact hashes, bundle schema validation status, optional review-pack hash references, explicit exclusions, and optional ZIP output
+- `reports/profile-pack-investigation-package.md` and `state/profile-pack-investigation-package.json`
+- schema/template coverage and validation aliases
+- doctor, next-action, workspace-summary, review-pack, operational Markdown filtering, and trace integration
 
-This should let a reviewer receive the remediation packet without accidentally treating raw source copies or local projections as official compliance evidence.
+Profile pack investigation packages are transfer aids only. They deliberately exclude raw official-source bodies, never fetch external sources, never mutate profile/source state, and do not certify agency compliance.
+
+### Task 59: Profile pack package reviewer receipt
+
+Planned:
+- record supplied reviewer receipt/decision records for a package manifest hash
+- support decisions such as `received`, `needs_changes`, `accepted_for_review`, and `rejected`
+- bind records to `state/profile-pack-investigation-package.json` SHA-256 and selected package ID
+- summarize unresolved package review requests in doctor, next actions, summary, review-pack, and trace
+
+Receipt records should document supplied human transfer/review decisions only. They must not upgrade a profile, mark official-source checks complete, or certify compliance.
 
 ## Safety constraints
 

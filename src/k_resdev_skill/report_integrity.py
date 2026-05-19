@@ -37,6 +37,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "profile-source-fix-plan.md",
     "profile-source-fix-summary.md",
     "profile-pack-investigation-bundle.md",
+    "profile-pack-investigation-package.md",
     "profile-pack-readiness-drilldown.md",
     "profile-pack-readiness.md",
     "profile-source-queue.md",

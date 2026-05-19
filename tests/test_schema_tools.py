@@ -151,6 +151,9 @@ def test_validate_json_file_accepts_profile_review_aliases():
     profile_pack_investigation_artifact = validate_json_file("templates/profile-pack-investigation-artifact.json", "profile-pack-investigation-artifact")
     profile_pack_investigation_item = validate_json_file("templates/profile-pack-investigation-item.json", "profile-pack-investigation-item")
     profile_pack_investigation = validate_json_file("templates/profile-pack-investigation-bundle.json", "profile-pack-investigation-bundle")
+    profile_pack_package_artifact = validate_json_file("templates/profile-pack-investigation-package-artifact.json", "profile-pack-investigation-package-artifact")
+    profile_pack_package_exclusion = validate_json_file("templates/profile-pack-investigation-package-exclusion.json", "profile-pack-investigation-package-exclusion")
+    profile_pack_package = validate_json_file("templates/profile-pack-investigation-package.json", "profile-pack-investigation-package")
 
     assert source_fix_plan_action["valid"] is True
     assert source_fix_plan["valid"] is True
@@ -177,6 +180,9 @@ def test_validate_json_file_accepts_profile_review_aliases():
     assert profile_pack_investigation_artifact["valid"] is True
     assert profile_pack_investigation_item["valid"] is True
     assert profile_pack_investigation["valid"] is True
+    assert profile_pack_package_artifact["valid"] is True
+    assert profile_pack_package_exclusion["valid"] is True
+    assert profile_pack_package["valid"] is True
 
 
 def test_validate_json_cli_returns_nonzero_for_invalid(tmp_path, capsys):

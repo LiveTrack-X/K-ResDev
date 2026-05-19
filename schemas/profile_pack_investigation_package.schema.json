@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ProfilePackInvestigationPackageResult",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "root",
+    "status",
+    "package_id",
+    "profile_id",
+    "finding_code",
+    "selection_policy",
+    "bundle_path",
+    "bundle_hash",
+    "bundle_status",
+    "bundle_item_count",
+    "selected_item_count",
+    "schema_valid",
+    "schema_error_count",
+    "review_pack_manifest_path",
+    "review_pack_manifest_hash",
+    "artifact_count",
+    "included_artifact_count",
+    "missing_artifact_count",
+    "excluded_artifact_count",
+    "zip_path",
+    "zip_hash",
+    "artifacts",
+    "exclusions",
+    "markdown_path",
+    "json_path",
+    "warnings"
+  ],
+  "properties": {
+    "root": {"type": "string"},
+    "status": {"type": "string"},
+    "package_id": {"type": "string"},
+    "profile_id": {"type": ["string", "null"]},
+    "finding_code": {"type": ["string", "null"]},
+    "selection_policy": {"type": "string"},
+    "bundle_path": {"type": "string"},
+    "bundle_hash": {"type": ["string", "null"]},
+    "bundle_status": {"type": ["string", "null"]},
+    "bundle_item_count": {"type": "integer", "minimum": 0},
+    "selected_item_count": {"type": "integer", "minimum": 0},
+    "schema_valid": {"type": "boolean"},
+    "schema_error_count": {"type": "integer", "minimum": 0},
+    "review_pack_manifest_path": {"type": ["string", "null"]},
+    "review_pack_manifest_hash": {"type": ["string", "null"]},
+    "artifact_count": {"type": "integer", "minimum": 0},
+    "included_artifact_count": {"type": "integer", "minimum": 0},
+    "missing_artifact_count": {"type": "integer", "minimum": 0},
+    "excluded_artifact_count": {"type": "integer", "minimum": 0},
+    "zip_path": {"type": ["string", "null"]},
+    "zip_hash": {"type": ["string", "null"]},
+    "artifacts": {"type": "array", "items": {"$ref": "#/$defs/artifact"}},
+    "exclusions": {"type": "array", "items": {"$ref": "#/$defs/exclusion"}},
+    "markdown_path": {"type": ["string", "null"]},
+    "json_path": {"type": ["string", "null"]},
+    "warnings": {"type": "array", "items": {"type": "string"}}
+  },
+  "$defs": {
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["artifact_type", "role", "path", "exists", "included", "sha256", "byte_count", "warning"],
+      "properties": {
+        "artifact_type": {"type": "string"},
+        "role": {"type": "string"},
+        "path": {"type": "string"},
+        "exists": {"type": "boolean"},
+        "included": {"type": "boolean"},
+        "sha256": {"type": ["string", "null"]},
+        "byte_count": {"type": ["integer", "null"], "minimum": 0},
+        "warning": {"type": ["string", "null"]}
+      }
+    },
+    "exclusion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "reason", "related_id"],
+      "properties": {
+        "path": {"type": "string"},
+        "reason": {"type": "string"},
+        "related_id": {"type": ["string", "null"]}
+      }
+    }
+  }
+}

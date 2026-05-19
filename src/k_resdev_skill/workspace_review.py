@@ -21,6 +21,7 @@ from .profile_promotion_apply import generate_profile_promotion_apply_plan, load
 from .profile_promotion_revoke import load_profile_promotion_revoke_plan, load_profile_promotion_revoke_result
 from .profile_lifecycle import generate_profile_lifecycle_ledger
 from .profile_pack_investigation import generate_profile_pack_investigation_bundle
+from .profile_pack_investigation_package import generate_profile_pack_investigation_package
 from .profile_pack_drilldown import generate_profile_pack_readiness_drilldown
 from .profile_pack_readiness import generate_profile_pack_readiness
 from .profile_review import generate_profile_review
@@ -118,6 +119,8 @@ def generate_workspace_review_pack(
     profile_pack_drilldown_json = state / "profile-pack-readiness-drilldown.json"
     profile_pack_investigation_md = reports / "profile-pack-investigation-bundle.md"
     profile_pack_investigation_json = state / "profile-pack-investigation-bundle.json"
+    profile_pack_package_md = reports / "profile-pack-investigation-package.md"
+    profile_pack_package_json = state / "profile-pack-investigation-package.json"
     workspace_trace_md = reports / "workspace-trace.md"
     workspace_trace_json = state / "workspace-trace.json"
     trace_passport_md = reports / "trace-passport.md"
@@ -151,6 +154,7 @@ def generate_workspace_review_pack(
     profile_pack_readiness = generate_profile_pack_readiness(workspace, output_path=profile_pack_readiness_md, json_path=profile_pack_readiness_json)
     profile_pack_drilldown = generate_profile_pack_readiness_drilldown(workspace, output_path=profile_pack_drilldown_md, json_path=profile_pack_drilldown_json)
     profile_pack_investigation = generate_profile_pack_investigation_bundle(workspace, output_path=profile_pack_investigation_md, json_path=profile_pack_investigation_json)
+    profile_pack_package = generate_profile_pack_investigation_package(workspace, output_path=profile_pack_package_md, json_path=profile_pack_package_json)
     weekly_review = generate_weekly_review(
         workspace,
         review_date=weekly_date,
@@ -233,6 +237,8 @@ def generate_workspace_review_pack(
         str(profile_pack_drilldown_json),
         str(profile_pack_investigation_md),
         str(profile_pack_investigation_json),
+        str(profile_pack_package_md),
+        str(profile_pack_package_json),
         str(workspace_trace_md),
         str(workspace_trace_json),
         str(trace_passport_md),
@@ -356,6 +362,10 @@ def generate_workspace_review_pack(
         profile_pack_investigation_item_count=profile_pack_investigation.bundle_item_count,
         profile_pack_investigation_missing_human_review_count=profile_pack_investigation.human_review_missing_count,
         profile_pack_investigation_official_source_check_count=profile_pack_investigation.official_source_check_count,
+        profile_pack_package_status=profile_pack_package.status,
+        profile_pack_package_included_artifact_count=profile_pack_package.included_artifact_count,
+        profile_pack_package_excluded_artifact_count=profile_pack_package.excluded_artifact_count,
+        profile_pack_package_missing_artifact_count=profile_pack_package.missing_artifact_count,
         workspace_trace_status=workspace_trace.status,
         workspace_trace_node_count=workspace_trace.node_count,
         workspace_trace_edge_count=workspace_trace.edge_count,
@@ -556,6 +566,10 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
         f"| Profile pack investigation items | {result.profile_pack_investigation_item_count} |",
         f"| Profile pack investigation missing human review | {result.profile_pack_investigation_missing_human_review_count} |",
         f"| Profile pack investigation official-source checks | {result.profile_pack_investigation_official_source_check_count} |",
+        f"| Profile pack package status | {_escape(result.profile_pack_package_status or '-')} |",
+        f"| Profile pack package included artifacts | {result.profile_pack_package_included_artifact_count} |",
+        f"| Profile pack package excluded artifacts | {result.profile_pack_package_excluded_artifact_count} |",
+        f"| Profile pack package missing artifacts | {result.profile_pack_package_missing_artifact_count} |",
         f"| Workspace trace status | {_escape(result.workspace_trace_status or '-')} |",
         f"| Workspace trace nodes | {result.workspace_trace_node_count} |",
         f"| Workspace trace edges | {result.workspace_trace_edge_count} |",
@@ -615,6 +629,7 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
             "- Use `profile-pack-readiness.md` to scan profile/source queue, fix-plan, fix-review, promotion, apply/revoke, and lifecycle blockers together.",
             "- Use `profile-pack-readiness-drilldown.md` to trace readiness blockers back to upstream artifact rows, IDs, and hashes.",
             "- Use `profile-pack-investigation-bundle.md` to hand off one profile pack or blocker review without copying raw official-source bodies.",
+            "- Use `profile-pack-investigation-package.md` to transfer generated metadata artifacts and explicit raw-source exclusions for reviewer handoff.",
             "- Use `workspace-trace.md` to inspect cross-artifact traceability and impact findings.",
             "- Use `trace-passport.md` to inspect checkpoint freshness before resuming long-running work.",
             "- Run `verify-review-pack state/workspace-review-pack.json` before relying on a saved pack.",
@@ -691,6 +706,8 @@ def _artifact_label(path: str) -> str:
         "profile-pack-readiness-drilldown.json": "Profile pack readiness drilldown JSON",
         "profile-pack-investigation-bundle.md": "Profile pack investigation bundle",
         "profile-pack-investigation-bundle.json": "Profile pack investigation bundle JSON",
+        "profile-pack-investigation-package.md": "Profile pack investigation package",
+        "profile-pack-investigation-package.json": "Profile pack investigation package JSON",
         "workspace-trace.md": "Workspace trace",
         "workspace-trace.json": "Workspace trace JSON",
         "trace-passport.md": "Trace passport",

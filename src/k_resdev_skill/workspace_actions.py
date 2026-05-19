@@ -96,6 +96,7 @@ def _actions_for_findings(root: Path, findings: list[WorkspaceDoctorFinding]) ->
         _action_for_profile_pack_readiness(root, by_code),
         _action_for_profile_pack_readiness_drilldown(root, by_code),
         _action_for_profile_pack_investigation_bundle(root, by_code),
+        _action_for_profile_pack_investigation_package(root, by_code),
         _action_for_approval_coverage(root, by_code),
         _action_for_report_integrity(root, by_code),
         _action_for_artifact_authority(root, by_code),
@@ -532,6 +533,26 @@ def _action_for_profile_pack_investigation_bundle(root: Path, by_code: dict[str,
         "Prepare profile pack investigation bundle",
         "Profile-pack remediation should be easy to hand off with readiness rows, drilldown rows, artifact hashes, commands, and human-review status in one compact bundle.",
         f'python -m k_resdev_skill profile-pack-investigation-bundle --root "{root}" --output "{root / "reports" / "profile-pack-investigation-bundle.md"}" --json "{root / "state" / "profile-pack-investigation-bundle.json"}"',
+        by_code,
+        codes,
+    )
+
+
+def _action_for_profile_pack_investigation_package(root: Path, by_code: dict[str, list[WorkspaceDoctorFinding]]) -> WorkspaceActionItem | None:
+    codes = [
+        "profile_pack_investigation_package_missing",
+        "profile_pack_investigation_package_schema_invalid",
+        "profile_pack_investigation_package_missing_artifacts",
+    ]
+    if not any(code in by_code for code in codes):
+        return None
+    priority = "medium" if any(code in by_code for code in codes[1:]) else "low"
+    return _action(
+        root,
+        priority,
+        "Package profile pack investigation handoff",
+        "Profile-pack investigation handoff should include generated metadata hashes and explicit raw-source exclusions before reviewer transfer.",
+        f'python -m k_resdev_skill profile-pack-investigation-package --root "{root}" --output "{root / "reports" / "profile-pack-investigation-package.md"}" --json "{root / "state" / "profile-pack-investigation-package.json"}"',
         by_code,
         codes,
     )

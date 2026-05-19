@@ -1,12 +1,12 @@
 # K-ResDev Next Planning
 
-This planning note starts after `0.1.0b47`.
+This planning note starts after `0.1.0b48`.
 
 ## Current Diagnosis
 
-K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, budget ledger review, bibliography metadata, reference corpus adapters, read-only workspace discovery, bibliography review, citation support, research claim matrices, profile source records, profile source-pack review queues, profile source fix plans, profile source fix review records, profile integrity, a narrow source-backed IRIS/Innopolis profile seed, profile promotion review, hash-bound profile promotion records, non-destructive profile promotion apply plans, guarded profile promotion apply results/backups, non-destructive profile promotion revocation plans, guarded profile promotion revocation results/backups, a profile lifecycle ledger, profile pack readiness dashboard, profile pack readiness drilldown, profile pack investigation bundle, workspace traceability graph, trace passport checkpoints, artifact authority labels, goals/deadline review, weekly operating reviews, workspace dashboards, thin local workflow router, workspace doctor, next actions, workspace summary, and review packs.
+K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, budget ledger review, bibliography metadata, reference corpus adapters, read-only workspace discovery, bibliography review, citation support, research claim matrices, profile source records, profile source-pack review queues, profile source fix plans, profile source fix review records, profile integrity, a narrow source-backed IRIS/Innopolis profile seed, profile promotion review, hash-bound profile promotion records, non-destructive profile promotion apply plans, guarded profile promotion apply results/backups, non-destructive profile promotion revocation plans, guarded profile promotion revocation results/backups, a profile lifecycle ledger, profile pack readiness dashboard, profile pack readiness drilldown, profile pack investigation bundle, profile pack investigation package manifest/ZIP, workspace traceability graph, trace passport checkpoints, artifact authority labels, goals/deadline review, weekly operating reviews, workspace dashboards, thin local workflow router, workspace doctor, next actions, workspace summary, and review packs.
 
-The next bottleneck is packaging profile-pack remediation review for transfer. Operators can now create a compact investigation bundle for one profile ID or blocker code, but a reviewer still needs a bounded package/manifest that includes generated metadata while explicitly excluding raw official-source bodies.
+The next bottleneck is closing the loop after a package is transferred. Operators can now create a generated-metadata-only profile-pack investigation package, but K-ResDev still lacks a hash-bound supplied reviewer receipt/decision record for that package.
 
 ## Planning Principles
 
@@ -453,7 +453,9 @@ Safety boundary:
 
 Goal: package generated investigation-bundle metadata for reviewer handoff without copying raw official-source bodies.
 
-Expected scope:
+Status: implemented as a local first pass in `src/k_resdev_skill/profile_pack_investigation_package.py`, with CLI/API, schema/template coverage, optional ZIP output, doctor, next-action, summary, review-pack, operational Markdown filtering, and trace integration.
+
+Implemented scope:
 - `profile-pack-investigation-package` command and public API;
 - select one profile ID, one readiness finding code, or all open high/medium blockers;
 - include bundle Markdown/JSON, readiness and drilldown artifact hashes, schema validation status, and review-pack hash references;
@@ -463,6 +465,22 @@ Expected scope:
 Safety boundary:
 - The package is a transfer aid only.
 - It must not add official-source body copies, fetch current agency sources, mutate profile/source state, or certify compliance.
+
+### Beta 49 - Profile Pack Package Reviewer Receipt
+
+Goal: record supplied reviewer receipt or package-review decisions against a specific investigation package hash.
+
+Expected scope:
+- `profile-pack-package-receipt` command and public API;
+- a receipt model with package ID, package manifest path, package manifest SHA-256, reviewer, decision, reviewed_at, notes, and risk flags;
+- decisions such as `received`, `accepted_for_review`, `needs_changes`, and `rejected`;
+- receipt records under `state/profile-pack-package-receipts/`;
+- a package receipt summary that detects stale package hashes, missing package IDs, unresolved needs-changes decisions, and rejected packages;
+- doctor, next-action, summary, review-pack, operational Markdown filtering, and trace integration.
+
+Safety boundary:
+- Receipt records are supplied human transfer/review metadata only.
+- They must not promote profiles, mark official-source checks resolved, create approvals, or certify agency compliance.
 
 ## Deferred Ideas
 
@@ -476,6 +494,6 @@ These should wait until traceability, impact analysis, and verified profile sour
 
 ## Recommended Next Slice
 
-Implement Beta 48 next.
+Implement Beta 49 next.
 
-Beta 48 should create a read-only investigation bundle package/manifest so profile-pack remediation can be shared with reviewers without copying raw official-source bodies or implying compliance certification.
+Beta 49 should close the package handoff loop with hash-bound supplied reviewer receipt records, without turning reviewer receipt into profile verification or official compliance.

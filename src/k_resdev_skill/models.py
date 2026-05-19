@@ -1168,6 +1168,16 @@ class AdminObligationGraphResult(StrictModel):
     status: str
     profile_id: str | None = None
     profile_status: str | None = None
+    seed_mode: str | None = None
+    source_pack_path: str | None = None
+    source_pack_hash: str | None = None
+    reviewed_seed_gate_status: str | None = None
+    reviewed_seed_gate_path: str | None = None
+    reviewed_seed_gate_hash: str | None = None
+    reviewed_seed_profile_review_hash: str | None = None
+    reviewed_seed_profile_promotion_id: str | None = None
+    reviewed_seed_admin_profile_pack_hash: str | None = None
+    reviewed_seed_review_ids: list[str] = Field(default_factory=list)
     obligation_count: int = 0
     submission_count: int = 0
     settlement_requirement_count: int = 0

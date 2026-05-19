@@ -43,6 +43,8 @@ def initialize_admin_obligations(
     output_path: str | Path | None = None,
     json_path: str | Path | None = None,
     templates_root: str | Path | None = None,
+    reviewed_seed: bool = False,
+    gate_path: str | Path | None = None,
 ) -> AdminObligationGraphResult:
     """Create a local admin-obligation starter without encoding official agency rules."""
 
@@ -52,6 +54,10 @@ def initialize_admin_obligations(
     obligations_path = state / "admin-obligations.json"
     if not obligations_path.exists():
         seed_pack, seed_path, seed_warnings = _admin_obligation_seed_pack(profile_id, templates_root)
+        seed_metadata: dict[str, Any] = {}
+        if reviewed_seed:
+            seed_pack, seed_metadata, reviewed_seed_warnings = _reviewed_seed_pack(workspace, profile_id, seed_pack, seed_path, templates_root, gate_path)
+            seed_warnings = _unique(seed_warnings + reviewed_seed_warnings)
         obligations_path.write_text(
             json.dumps(
                 {
@@ -63,6 +69,7 @@ def initialize_admin_obligations(
                     "source_record_ids": seed_pack.source_record_ids,
                     "notes": seed_pack.notes or "Local admin obligation starter. Verify current agency/program rules before official use.",
                     "warnings": _unique(seed_pack.warnings + seed_warnings),
+                    **seed_metadata,
                     "obligations": [item.model_dump(mode="json") for item in seed_pack.obligations],
                     "settlement_requirements": [item.model_dump(mode="json") for item in seed_pack.settlement_requirements],
                 },
@@ -78,7 +85,8 @@ def initialize_admin_obligations(
             json.dumps(
                 {
                     "generated_by": "k-resdev-skill",
-                    "status": "needs_review",
+                    "status": seed_pack.status if "seed_pack" in locals() else "needs_review",
+                    **(seed_metadata if "seed_metadata" in locals() else {}),
                     "submissions": [item.model_dump(mode="json") for item in seed_pack.submissions] if "seed_pack" in locals() else [],
                 },
                 ensure_ascii=False,
@@ -216,6 +224,7 @@ def review_admin_obligations(
     submissions_path = workspace / ADMIN_SUBMISSIONS_PATH
     warnings: list[str] = []
     findings: list[AdminFinding] = []
+    metadata = _admin_obligation_metadata(obligations_path, warnings)
     obligations = _load_obligations(obligations_path, warnings)
     submissions = _load_submissions(submissions_path, warnings)
     settlement_requirements = _combined_settlement_requirements(workspace, obligations_path, warnings)
@@ -250,6 +259,8 @@ def review_admin_obligations(
                 suggested_action="Keep admin obligations as local candidates until current agency/program sources are reviewed.",
             )
         )
+
+    findings.extend(_reviewed_seed_metadata_findings(workspace, obligations_path, metadata))
 
     evidence_by_type = _evidence_by_type(evidence)
     submissions_by_obligation: dict[str, list[AdminSubmission]] = {}
@@ -309,6 +320,16 @@ def review_admin_obligations(
         status=_status_from_admin_findings(findings),
         profile_id=profile.profile_id if profile else None,
         profile_status=profile.status if profile else None,
+        seed_mode=_metadata_str(metadata, "seed_mode"),
+        source_pack_path=_metadata_str(metadata, "source_pack_path"),
+        source_pack_hash=_metadata_str(metadata, "source_pack_hash"),
+        reviewed_seed_gate_status=_metadata_str(metadata, "reviewed_seed_gate_status"),
+        reviewed_seed_gate_path=_metadata_str(metadata, "reviewed_seed_gate_path"),
+        reviewed_seed_gate_hash=_metadata_str(metadata, "reviewed_seed_gate_hash"),
+        reviewed_seed_profile_review_hash=_metadata_str(metadata, "reviewed_seed_profile_review_hash"),
+        reviewed_seed_profile_promotion_id=_metadata_str(metadata, "reviewed_seed_profile_promotion_id"),
+        reviewed_seed_admin_profile_pack_hash=_metadata_str(metadata, "reviewed_seed_admin_profile_pack_hash"),
+        reviewed_seed_review_ids=_metadata_str_list(metadata, "reviewed_seed_review_ids"),
         obligation_count=len(obligations),
         submission_count=len(submissions),
         settlement_requirement_count=len(settlement_requirements),
@@ -572,6 +593,14 @@ def render_admin_obligations_markdown(result: AdminObligationGraphResult) -> str
         f"| Status | {_escape(result.status)} |",
         f"| Profile | {_escape(result.profile_id or '-')} |",
         f"| Profile status | {_escape(result.profile_status or '-')} |",
+        f"| Seed mode | {_escape(result.seed_mode or '-')} |",
+        f"| Source pack hash | `{_escape(result.source_pack_hash or '-')}` |",
+        f"| Reviewed-seed gate | {_escape(result.reviewed_seed_gate_status or '-')} |",
+        f"| Reviewed-seed gate hash | `{_escape(result.reviewed_seed_gate_hash or '-')}` |",
+        f"| Reviewed-seed profile review hash | `{_escape(result.reviewed_seed_profile_review_hash or '-')}` |",
+        f"| Reviewed-seed promotion ID | {_escape(result.reviewed_seed_profile_promotion_id or '-')} |",
+        f"| Reviewed-seed admin pack hash | `{_escape(result.reviewed_seed_admin_profile_pack_hash or '-')}` |",
+        f"| Reviewed-seed review receipts | {_escape(', '.join(result.reviewed_seed_review_ids) or '-')} |",
         f"| Obligations | {result.obligation_count} |",
         f"| Submissions | {result.submission_count} |",
         f"| Settlement requirements | {result.settlement_requirement_count} |",
@@ -825,6 +854,78 @@ def _admin_obligation_seed_pack(
     )
 
 
+def _reviewed_seed_pack(
+    workspace: Path,
+    profile_id: str,
+    seed_pack: AdminObligationProfilePack,
+    seed_path: Path | None,
+    templates_root: str | Path | None,
+    gate_path: str | Path | None,
+) -> tuple[AdminObligationProfilePack, dict[str, Any], list[str]]:
+    if seed_path is None:
+        raise ValueError("reviewed_seed requires a configured admin obligation profile pack")
+
+    from .admin_profile_pack_gate import generate_admin_profile_pack_promotion_gate, load_admin_profile_pack_promotion_gate
+    from .admin_profile_pack_reviews import summarize_admin_profile_pack_reviews
+
+    if gate_path is not None:
+        requested_gate_path = Path(gate_path)
+        gate_json_path = requested_gate_path if requested_gate_path.is_absolute() else workspace / requested_gate_path
+    else:
+        gate_json_path = workspace / "state" / "admin-profile-pack-gate.json"
+    if gate_path is None:
+        gate = generate_admin_profile_pack_promotion_gate(
+            workspace,
+            profile_id=profile_id,
+            output_path=workspace / "reports" / "admin-profile-pack-gate.md",
+            json_path=gate_json_path,
+            templates_root=templates_root,
+        )
+    else:
+        if not gate_json_path.exists():
+            raise ValueError(f"reviewed seed gate artifact not found: {gate_json_path}")
+        gate = load_admin_profile_pack_promotion_gate(gate_json_path)
+        current_gate = generate_admin_profile_pack_promotion_gate(workspace, profile_id=profile_id, templates_root=templates_root)
+        if _gate_signature(gate) != _gate_signature(current_gate):
+            raise ValueError("reviewed seed gate artifact is stale against current profile/admin pack review state")
+
+    if not gate.can_use_reviewed_seed:
+        raise ValueError(f"admin profile-pack gate is not reviewed-seed eligible: {gate.status}")
+
+    review_summary = summarize_admin_profile_pack_reviews(workspace, profile_id, templates_root=templates_root)
+    current_review_ids = [
+        record.review_id
+        for record in review_summary.records
+        if review_summary.profile_pack_hash is not None
+        and _normalize_hash(record.profile_pack_hash) == _normalize_hash(review_summary.profile_pack_hash)
+        and record.decision in {"accepted", "accepted_risk"}
+    ]
+    pack_hash = _sha256_file(seed_path)
+    reviewed_pack = seed_pack.model_copy(
+        update={
+            "status": "reviewed_seed_candidate",
+            "notes": (seed_pack.notes or "Admin obligation profile pack copied as a reviewed local seed candidate.")
+            + " Reviewed-seed mode remains local and does not certify official agency compliance.",
+            "obligations": [_reviewed_seed_obligation(item) for item in seed_pack.obligations],
+            "submissions": [_reviewed_seed_submission(item) for item in seed_pack.submissions],
+            "settlement_requirements": [_reviewed_seed_settlement_requirement(item) for item in seed_pack.settlement_requirements],
+            "warnings": _unique(seed_pack.warnings + ["reviewed_seed_candidate", "official_submission_requires_human_approval"]),
+        }
+    )
+    metadata = {
+        "seed_mode": "reviewed_seed",
+        "reviewed_seed_gate_status": gate.status,
+        "reviewed_seed_gate_path": str(gate_json_path),
+        "reviewed_seed_gate_hash": _sha256_file(gate_json_path),
+        "reviewed_seed_profile_review_hash": gate.profile_review_hash,
+        "reviewed_seed_profile_promotion_id": gate.latest_profile_promotion_id,
+        "reviewed_seed_admin_profile_pack_hash": pack_hash,
+        "reviewed_seed_review_ids": sorted(set(current_review_ids)),
+        "source_pack_hash": pack_hash,
+    }
+    return reviewed_pack, metadata, ["reviewed_seed_mode_enabled"]
+
+
 def _admin_obligation_profile_pack_path(profile_id: str, templates_root: str | Path | None) -> Path:
     root = Path(templates_root) if templates_root is not None else default_agency_templates_root()
     return root / profile_id / "admin-obligations.json"
@@ -894,6 +995,23 @@ def _guarded_admin_profile_pack(
             "warnings": _unique(warnings),
         }
     )
+
+
+def _reviewed_seed_obligation(item: AdminObligation) -> AdminObligation:
+    return item.model_copy(update={"status": "accepted_risk", "risk_flags": _reviewed_seed_risk_flags(item.risk_flags)})
+
+
+def _reviewed_seed_submission(item: AdminSubmission) -> AdminSubmission:
+    return item.model_copy(update={"status": "accepted_risk", "risk_flags": _reviewed_seed_risk_flags(item.risk_flags)})
+
+
+def _reviewed_seed_settlement_requirement(item: SettlementEvidenceRequirement) -> SettlementEvidenceRequirement:
+    return item.model_copy(update={"status": "accepted_risk", "risk_flags": _reviewed_seed_risk_flags(item.risk_flags)})
+
+
+def _reviewed_seed_risk_flags(flags: list[str]) -> list[str]:
+    retained = [flag for flag in flags if flag != "official_source_needs_review"]
+    return _unique(retained + ["reviewed_seed_candidate", "official_submission_requires_human_approval"])
 
 
 def _admin_profile_pack_findings(
@@ -1100,6 +1218,106 @@ def _load_obligations(path: Path, warnings: list[str]) -> list[AdminObligation]:
     except Exception as exc:
         warnings.append(f"admin_obligations_unreadable:{exc}")
         return []
+
+
+def _admin_obligation_metadata(path: Path, warnings: list[str]) -> dict[str, Any]:
+    if not path.exists():
+        return {}
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8-sig"))
+        if not isinstance(payload, dict):
+            return {}
+        keys = {
+            "seed_mode",
+            "source_pack_path",
+            "source_pack_hash",
+            "reviewed_seed_gate_status",
+            "reviewed_seed_gate_path",
+            "reviewed_seed_gate_hash",
+            "reviewed_seed_profile_review_hash",
+            "reviewed_seed_profile_promotion_id",
+            "reviewed_seed_admin_profile_pack_hash",
+            "reviewed_seed_review_ids",
+        }
+        return {key: payload.get(key) for key in keys if key in payload}
+    except Exception as exc:
+        warnings.append(f"admin_obligation_metadata_unreadable:{exc}")
+        return {}
+
+
+def _reviewed_seed_metadata_findings(workspace: Path, obligations_path: Path, metadata: dict[str, Any]) -> list[AdminFinding]:
+    if metadata.get("seed_mode") != "reviewed_seed":
+        return []
+    findings: list[AdminFinding] = []
+    gate_path = _metadata_path(metadata, "reviewed_seed_gate_path", workspace)
+    gate_hash = _metadata_str(metadata, "reviewed_seed_gate_hash")
+    if gate_path is None or not gate_hash:
+        findings.append(
+            _admin_finding(
+                "admin_reviewed_seed_gate_metadata_missing",
+                "medium",
+                "Reviewed-seed admin obligations are missing gate path or hash metadata.",
+                path=obligations_path,
+                suggested_action="Regenerate admin obligations with reviewed-seed mode after the promotion gate passes.",
+            )
+        )
+    elif not gate_path.exists():
+        findings.append(
+            _admin_finding(
+                "admin_reviewed_seed_gate_missing",
+                "medium",
+                f"Reviewed-seed gate artifact is missing: {gate_path}.",
+                path=gate_path,
+                suggested_action="Restore the gate artifact or regenerate reviewed-seed admin obligations.",
+            )
+        )
+    elif _normalize_hash(_sha256_file(gate_path)) != _normalize_hash(gate_hash):
+        findings.append(
+            _admin_finding(
+                "admin_reviewed_seed_gate_hash_mismatch",
+                "high",
+                "Reviewed-seed gate artifact hash no longer matches the recorded seed metadata.",
+                path=gate_path,
+                suggested_action="Re-run admin-profile-pack-gate and regenerate reviewed-seed admin obligations.",
+            )
+        )
+
+    profile_review_hash = _metadata_str(metadata, "reviewed_seed_profile_review_hash")
+    profile_review_path = workspace / "state" / "profile-review.json"
+    if profile_review_hash and profile_review_path.exists() and _normalize_hash(_sha256_file(profile_review_path)) != _normalize_hash(profile_review_hash):
+        findings.append(
+            _admin_finding(
+                "admin_reviewed_seed_profile_review_hash_mismatch",
+                "high",
+                "Current profile-review.json hash differs from the reviewed-seed metadata.",
+                path=profile_review_path,
+                suggested_action="Re-run profile review, profile promotion, admin-profile-pack-gate, and reviewed-seed initialization.",
+            )
+        )
+
+    pack_path = _metadata_path(metadata, "source_pack_path", workspace)
+    pack_hash = _metadata_str(metadata, "reviewed_seed_admin_profile_pack_hash") or _metadata_str(metadata, "source_pack_hash")
+    if pack_hash and pack_path is not None and pack_path.exists() and _normalize_hash(_sha256_file(pack_path)) != _normalize_hash(pack_hash):
+        findings.append(
+            _admin_finding(
+                "admin_reviewed_seed_profile_pack_hash_mismatch",
+                "high",
+                "Current admin profile-pack hash differs from the reviewed-seed metadata.",
+                path=pack_path,
+                suggested_action="Review the changed admin profile pack and regenerate reviewed-seed admin obligations if still appropriate.",
+            )
+        )
+    if not _metadata_str_list(metadata, "reviewed_seed_review_ids"):
+        findings.append(
+            _admin_finding(
+                "admin_reviewed_seed_review_receipts_missing",
+                "medium",
+                "Reviewed-seed metadata has no admin profile-pack review receipt IDs.",
+                path=obligations_path,
+                suggested_action="Record hash-bound admin profile-pack review receipts before relying on reviewed-seed obligations.",
+            )
+        )
+    return findings
 
 
 def _load_submissions(path: Path, warnings: list[str]) -> list[AdminSubmission]:
@@ -1583,6 +1801,43 @@ def _sha256_file(path: Path) -> str:
 
 def _normalize_hash(value: str) -> str:
     return value.replace("sha256:", "").strip().lower()
+
+
+def _metadata_str(metadata: dict[str, Any], key: str) -> str | None:
+    value = metadata.get(key)
+    return value if isinstance(value, str) and value.strip() else None
+
+
+def _metadata_str_list(metadata: dict[str, Any], key: str) -> list[str]:
+    value = metadata.get(key)
+    if not isinstance(value, list):
+        return []
+    return [item for item in value if isinstance(item, str) and item.strip()]
+
+
+def _metadata_path(metadata: dict[str, Any], key: str, workspace: Path) -> Path | None:
+    value = _metadata_str(metadata, key)
+    if value is None:
+        return None
+    path = Path(value)
+    return path if path.is_absolute() else workspace / path
+
+
+def _gate_signature(gate) -> tuple[Any, ...]:
+    return (
+        gate.status,
+        gate.can_use_reviewed_seed,
+        gate.profile_id,
+        gate.profile_review_hash,
+        gate.latest_profile_promotion_id,
+        gate.admin_profile_pack_status,
+        gate.admin_profile_pack_path,
+        gate.admin_profile_pack_review_status,
+        gate.admin_profile_pack_review_target_count,
+        gate.admin_profile_pack_reviewed_target_count,
+        gate.high_count,
+        gate.medium_count,
+    )
 
 
 def _unique(values: list[str]) -> list[str]:

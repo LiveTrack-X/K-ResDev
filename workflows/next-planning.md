@@ -1,12 +1,12 @@
 # K-ResDev Next Planning
 
-This planning note starts after `0.1.0b56`.
+This planning note starts after `0.1.0b57`.
 
 ## Current Diagnosis
 
 K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, budget ledger review, settlement binders, admin obligation graphs, admin profile-pack seed review, admin profile-pack human review receipts, admin change ledgers, admin calendars, bibliography metadata, reference corpus adapters, read-only workspace discovery, bibliography review, citation support, research claim matrices, profile source records, profile source-pack review queues, profile source fix plans, profile source fix review records, profile integrity, a narrow source-backed IRIS/Innopolis profile seed, profile promotion review, hash-bound profile promotion records, non-destructive profile promotion apply plans, guarded profile promotion apply results/backups, non-destructive profile promotion revocation plans, guarded profile promotion revocation results/backups, a profile lifecycle ledger, profile pack readiness dashboard, profile pack readiness drilldown, profile pack investigation bundle, profile pack investigation package manifest/ZIP, profile pack package reviewer receipts, workspace traceability graph, trace passport checkpoints, artifact authority labels, goals/deadline review, weekly operating reviews, workspace dashboards, thin local workflow router, workspace doctor, next actions, workspace summary, and review packs.
 
-The next bottleneck is verified agency profile expansion. Beta 49-56 closed the generated package handoff loop, added a generic Korean R&D admin operating layer, made admin obligation seeds profile-data driven, added row-level human review receipts for those admin seeds, and added a read-only promotion gate that checks profile review, profile promotion, and admin profile-pack review hashes before any reviewed-seed mode is considered. Official IRIS/NTIS/RCMS/Ezbaro details still must remain source-backed profile data, not hardcoded Python logic.
+The next bottleneck is verified agency profile expansion. Beta 49-57 closed the generated package handoff loop, added a generic Korean R&D admin operating layer, made admin obligation seeds profile-data driven, added row-level human review receipts for those admin seeds, added a read-only promotion gate that checks profile review, profile promotion, and admin profile-pack review hashes, and added an explicit reviewed-seed admin initialization mode gated by that result. Official IRIS/NTIS/RCMS/Ezbaro details still must remain source-backed profile data, not hardcoded Python logic.
 
 ## Planning Principles
 
@@ -99,11 +99,31 @@ Safety boundary:
 
 Goal: add an explicit, opt-in admin obligation initialization mode that may copy profile-driven rows as reviewed local candidates only when the Beta 56 gate passes.
 
+Status: implemented as a guarded first pass.
+
 Expected scope:
 - keep default `admin-obligations-init` behavior conservative and `needs_review`;
 - require `state/admin-profile-pack-gate.json` or a freshly generated gate with `can_use_reviewed_seed=true`;
 - preserve source IDs, pack hash, profile-review hash, promotion ID, and admin review IDs on seeded local obligations;
 - keep final status as a local reviewed candidate, not official compliance.
+
+Implemented scope:
+- added `--reviewed-seed` and optional `--gate` to `admin-obligations-init`;
+- default initialization still writes `needs_review` rows and never overwrites existing local admin files;
+- reviewed-seed mode generates or validates the admin profile-pack promotion gate before writing;
+- reviewed-seed rows are copied as `accepted_risk` with `reviewed_seed_candidate` and `official_submission_requires_human_approval` risk flags;
+- `state/admin-obligations.json` stores gate hash, profile-review hash, profile-promotion ID, admin profile-pack hash, and admin profile-pack review receipt IDs;
+- admin obligation review now reports reviewed-seed metadata and detects profile-review, gate, or admin profile-pack hash drift.
+
+### Beta 58 - Reviewed Seed Drift Dashboard
+
+Goal: make reviewed-seed drift and review metadata easier to inspect across workspaces before adding more agency packs.
+
+Expected scope:
+- aggregate reviewed-seed workspaces and profiles into a scan-friendly dashboard;
+- group drift by profile-review hash, admin profile-pack hash, gate hash, and missing receipt IDs;
+- add next-action routing specifically for reviewed-seed drift repair;
+- keep all repair steps explicit and non-destructive.
 
 ### Beta 23 - Traceability Graph and Impact Review
 

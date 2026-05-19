@@ -718,6 +718,20 @@ Implemented:
 
 The promotion gate must remain read-only. It authorizes no official compliance claim and does not enable trusted seeding by itself.
 
+### Task 63: Reviewed-seed admin obligation initialization
+
+Implemented:
+- `admin-obligations-init --reviewed-seed` with optional `--gate`
+- default `admin-obligations-init` remains conservative and never overwrites existing local admin obligation files
+- reviewed-seed mode requires a fresh or validated admin profile-pack promotion gate with `can_use_reviewed_seed=true`
+- copied obligations, submissions, and settlement requirements use local `accepted_risk` status and keep explicit reviewed-seed/official-approval risk flags
+- `state/admin-obligations.json` records seed mode, source pack hash, gate hash, profile-review hash, profile-promotion ID, admin profile-pack hash, and admin review receipt IDs
+- `AdminObligationGraphResult` surfaces reviewed-seed metadata in JSON/Markdown
+- admin obligation review detects reviewed-seed gate hash drift, profile-review hash drift, admin profile-pack hash drift, missing gate artifact, and missing review receipt IDs
+- schema and tests cover reviewed-seed creation, CLI validation, no-overwrite behavior, and profile-review drift detection
+
+Reviewed-seed initialization is still a local operating projection. It does not mark official agency rules compliant, submit anything, or remove the requirement for human approval.
+
 ## Safety constraints
 
 - Never alter raw files.

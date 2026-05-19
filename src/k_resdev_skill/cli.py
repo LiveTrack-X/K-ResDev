@@ -559,6 +559,8 @@ def main(argv: list[str] | None = None) -> int:
     admin_init_parser.add_argument("--output", default=None)
     admin_init_parser.add_argument("--json", default=None)
     admin_init_parser.add_argument("--templates-root", default=None)
+    admin_init_parser.add_argument("--reviewed-seed", action="store_true")
+    admin_init_parser.add_argument("--gate", default=None)
 
     admin_review_parser = subparsers.add_parser("admin-obligations-review", help="Review local admin obligations, submissions, approvals, and evidence links.")
     admin_review_parser.add_argument("--root", default=".")
@@ -1207,7 +1209,15 @@ def main(argv: list[str] | None = None) -> int:
         print(result.model_dump_json(indent=2))
         return 0
     if args.command == "admin-obligations-init":
-        result = initialize_admin_obligations(args.root, profile_id=args.profile, output_path=args.output, json_path=args.json, templates_root=args.templates_root)
+        result = initialize_admin_obligations(
+            args.root,
+            profile_id=args.profile,
+            output_path=args.output,
+            json_path=args.json,
+            templates_root=args.templates_root,
+            reviewed_seed=args.reviewed_seed,
+            gate_path=args.gate,
+        )
         print(result.model_dump_json(indent=2))
         return 0 if result.status != "blocked" else 1
     if args.command == "admin-obligations-review":

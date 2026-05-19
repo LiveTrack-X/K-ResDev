@@ -418,6 +418,121 @@
       "default": null,
       "title": "Profile Status"
     },
+    "seed_mode": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Seed Mode"
+    },
+    "source_pack_path": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Source Pack Path"
+    },
+    "source_pack_hash": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Source Pack Hash"
+    },
+    "reviewed_seed_gate_status": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Reviewed Seed Gate Status"
+    },
+    "reviewed_seed_gate_path": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Reviewed Seed Gate Path"
+    },
+    "reviewed_seed_gate_hash": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Reviewed Seed Gate Hash"
+    },
+    "reviewed_seed_profile_review_hash": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Reviewed Seed Profile Review Hash"
+    },
+    "reviewed_seed_profile_promotion_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Reviewed Seed Profile Promotion Id"
+    },
+    "reviewed_seed_admin_profile_pack_hash": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Reviewed Seed Admin Profile Pack Hash"
+    },
+    "reviewed_seed_review_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Reviewed Seed Review Ids",
+      "type": "array"
+    },
     "obligation_count": {
       "default": 0,
       "title": "Obligation Count",
@@ -518,6 +633,5 @@
     "status"
   ],
   "title": "AdminObligationGraphResult",
-  "type": "object",
-  "$schema": "https://json-schema.org/draft/2020-12/schema"
+  "type": "object"
 }

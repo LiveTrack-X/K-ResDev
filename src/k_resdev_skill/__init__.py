@@ -737,4 +737,4 @@ __all__ = [
     "write_research_claims",
 ]
 
-__version__ = "0.1.0b56"
+__version__ = "0.1.0b57"

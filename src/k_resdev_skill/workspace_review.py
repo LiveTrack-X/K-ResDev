@@ -13,6 +13,7 @@ from .admin_operating import (
     review_admin_obligations,
 )
 from .admin_profile_pack_reviews import summarize_admin_profile_pack_reviews
+from .admin_profile_pack_gate import generate_admin_profile_pack_promotion_gate
 from .artifact_authority import generate_artifact_authority
 from .models import (
     ReviewPackArtifact,
@@ -137,6 +138,8 @@ def generate_workspace_review_pack(
     admin_profile_pack_json = state / "admin-profile-pack-review.json"
     admin_profile_pack_review_md = reports / "admin-profile-pack-review-summary.md"
     admin_profile_pack_review_json = state / "admin-profile-pack-review-summary.json"
+    admin_profile_pack_gate_md = reports / "admin-profile-pack-gate.md"
+    admin_profile_pack_gate_json = state / "admin-profile-pack-gate.json"
     admin_obligations_md = reports / "admin-obligations.md"
     admin_obligations_json = state / "admin-obligations-review.json"
     settlement_binder_md = reports / "settlement-binder.md"
@@ -183,6 +186,7 @@ def generate_workspace_review_pack(
     workspace_profile_id = _workspace_profile_id(workspace)
     admin_profile_pack = review_admin_obligation_profile_pack(workspace_profile_id, output_path=admin_profile_pack_md, json_path=admin_profile_pack_json)
     admin_profile_pack_review = summarize_admin_profile_pack_reviews(workspace, workspace_profile_id, output_path=admin_profile_pack_review_md, json_path=admin_profile_pack_review_json)
+    admin_profile_pack_gate = generate_admin_profile_pack_promotion_gate(workspace, workspace_profile_id, output_path=admin_profile_pack_gate_md, json_path=admin_profile_pack_gate_json)
     admin_obligations = review_admin_obligations(workspace, output_path=admin_obligations_md, json_path=admin_obligations_json)
     settlement_binder = generate_settlement_binder(workspace, output_path=settlement_binder_md, json_path=settlement_binder_json)
     admin_change_ledger = review_admin_change_ledger(workspace, output_path=admin_change_md, json_path=admin_change_json)
@@ -277,6 +281,8 @@ def generate_workspace_review_pack(
         str(admin_profile_pack_json),
         str(admin_profile_pack_review_md),
         str(admin_profile_pack_review_json),
+        str(admin_profile_pack_gate_md),
+        str(admin_profile_pack_gate_json),
         str(admin_obligations_md),
         str(admin_obligations_json),
         str(settlement_binder_md),
@@ -423,6 +429,11 @@ def generate_workspace_review_pack(
         admin_profile_pack_review_record_count=admin_profile_pack_review.record_count,
         admin_profile_pack_review_unresolved_count=admin_profile_pack_review.unresolved_count,
         admin_profile_pack_review_stale_count=admin_profile_pack_review.stale_record_count,
+        admin_profile_pack_gate_status=admin_profile_pack_gate.status,
+        admin_profile_pack_gate_can_use_reviewed_seed=admin_profile_pack_gate.can_use_reviewed_seed,
+        admin_profile_pack_gate_check_count=admin_profile_pack_gate.check_count,
+        admin_profile_pack_gate_high_count=admin_profile_pack_gate.high_count,
+        admin_profile_pack_gate_medium_count=admin_profile_pack_gate.medium_count,
         admin_obligation_status=admin_obligations.status,
         admin_obligation_count=admin_obligations.obligation_count,
         admin_submission_count=admin_obligations.submission_count,
@@ -654,6 +665,10 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
         f"| Admin profile pack human review status | {_escape(result.admin_profile_pack_review_status or '-')} |",
         f"| Admin profile pack human review records | {result.admin_profile_pack_review_record_count} |",
         f"| Admin profile pack human review unresolved | {result.admin_profile_pack_review_unresolved_count} |",
+        f"| Admin profile pack gate | {_escape(result.admin_profile_pack_gate_status or '-')} |",
+        f"| Admin profile pack reviewed seed candidate | {result.admin_profile_pack_gate_can_use_reviewed_seed} |",
+        f"| Admin profile pack gate checks | {result.admin_profile_pack_gate_check_count} |",
+        f"| Admin profile pack gate high/medium | {result.admin_profile_pack_gate_high_count}/{result.admin_profile_pack_gate_medium_count} |",
         f"| Admin obligations status | {_escape(result.admin_obligation_status or '-')} |",
         f"| Admin obligation count | {result.admin_obligation_count} |",
         f"| Admin submission count | {result.admin_submission_count} |",

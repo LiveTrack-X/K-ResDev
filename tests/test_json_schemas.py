@@ -319,6 +319,8 @@ def test_admin_operating_layer_templates_match_json_schemas():
         ("schemas/admin_profile_pack_review_record.schema.json", "templates/admin-profile-pack-review-record.json"),
         ("schemas/admin_profile_pack_review_finding.schema.json", "templates/admin-profile-pack-review-finding.json"),
         ("schemas/admin_profile_pack_review_summary.schema.json", "templates/admin-profile-pack-review-summary.json"),
+        ("schemas/admin_profile_pack_promotion_gate_check.schema.json", "templates/admin-profile-pack-gate-check.json"),
+        ("schemas/admin_profile_pack_promotion_gate.schema.json", "templates/admin-profile-pack-gate.json"),
         ("schemas/settlement_binder_item.schema.json", "templates/settlement-binder-item.json"),
         ("schemas/settlement_binder.schema.json", "templates/settlement-binder.json"),
         ("schemas/admin_change_record.schema.json", "templates/admin-change-record.json"),

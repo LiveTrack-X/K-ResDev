@@ -34,6 +34,12 @@ SCHEMA_ALIASES = {
     "admin_profile_pack_review_finding": "admin_profile_pack_review_finding.schema.json",
     "admin-profile-pack-review-summary": "admin_profile_pack_review_summary.schema.json",
     "admin_profile_pack_review_summary": "admin_profile_pack_review_summary.schema.json",
+    "admin-profile-pack-gate": "admin_profile_pack_promotion_gate.schema.json",
+    "admin_profile_pack_gate": "admin_profile_pack_promotion_gate.schema.json",
+    "admin-profile-pack-promotion-gate": "admin_profile_pack_promotion_gate.schema.json",
+    "admin_profile_pack_promotion_gate": "admin_profile_pack_promotion_gate.schema.json",
+    "admin-profile-pack-gate-check": "admin_profile_pack_promotion_gate_check.schema.json",
+    "admin_profile_pack_gate_check": "admin_profile_pack_promotion_gate_check.schema.json",
     "admin-submission": "admin_submission.schema.json",
     "admin_submission": "admin_submission.schema.json",
     "approval": "approval_record.schema.json",
@@ -231,6 +237,7 @@ def _validation_targets(document: Any, schema_payload: dict[str, Any]) -> list[t
         "AdminFinding",
         "AdminObligation",
         "AdminProfilePackReviewFinding",
+        "AdminProfilePackPromotionGateCheck",
         "AdminProfilePackReviewRecord",
         "AdminSubmission",
         "ApprovalRecord",
@@ -321,6 +328,8 @@ def _validation_targets(document: Any, schema_payload: dict[str, Any]) -> list[t
             return [(f"$.records[{index}]", item) for index, item in enumerate(document["records"])]
         if title == "AdminProfilePackReviewFinding" and isinstance(document, dict) and isinstance(document.get("findings"), list):
             return [(f"$.findings[{index}]", item) for index, item in enumerate(document["findings"])]
+        if title == "AdminProfilePackPromotionGateCheck" and isinstance(document, dict) and isinstance(document.get("checks"), list):
+            return [(f"$.checks[{index}]", item) for index, item in enumerate(document["checks"])]
         if title == "AdminSubmission" and isinstance(document, dict) and isinstance(document.get("submissions"), list):
             return [(f"$.submissions[{index}]", item) for index, item in enumerate(document["submissions"])]
         if title == "SettlementEvidenceRequirement" and isinstance(document, dict) and isinstance(document.get("settlement_requirements"), list):

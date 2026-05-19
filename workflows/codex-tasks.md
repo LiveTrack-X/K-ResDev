@@ -671,13 +671,52 @@ Profile pack investigation packages are transfer aids only. They deliberately ex
 
 ### Task 59: Profile pack package reviewer receipt
 
-Planned:
-- record supplied reviewer receipt/decision records for a package manifest hash
-- support decisions such as `received`, `needs_changes`, `accepted_for_review`, and `rejected`
-- bind records to `state/profile-pack-investigation-package.json` SHA-256 and selected package ID
-- summarize unresolved package review requests in doctor, next actions, summary, review-pack, and trace
+Implemented:
+- `ProfilePackPackageReceiptRecord`, `ProfilePackPackageReceiptFinding`, and `ProfilePackPackageReceiptSummaryResult` models
+- `profile-pack-package-receipt-record` and `profile-pack-package-receipt-summary` commands and public APIs
+- supplied reviewer receipt/decision records for a package manifest hash
+- decisions such as `received`, `needs_changes`, `accepted_for_review`, and `rejected`
+- binding to `state/profile-pack-investigation-package.json` SHA-256 and selected package ID
+- doctor, next-action, workspace-summary, review-pack, operational Markdown filtering, and trace integration
 
 Receipt records should document supplied human transfer/review decisions only. They must not upgrade a profile, mark official-source checks complete, or certify compliance.
+
+### Task 60: Admin obligation profile packs
+
+Implemented:
+- `AdminObligationProfilePack` and `AdminObligationProfilePackReviewResult` models
+- `admin-profile-pack-review` command and public API
+- profile-pack seed loading from `templates/agencies/<profile-id>/admin-obligations.json`
+- guarded `admin-obligations-init` behavior that keeps rows `needs_review` and source-risk flagged unless profile/source review is complete
+- `national-rnd-basic` and narrow `iris-innopolis-2026-017795` admin obligation profile-pack seeds
+- doctor, next-action, workspace-summary, review-pack, operational Markdown filtering, and trace integration
+
+Admin obligation profile packs are source-backed local candidates only. They must not encode unverified official agency rules in Python.
+
+### Task 61: Admin profile-pack human review receipts
+
+Implemented:
+- `AdminProfilePackReviewRecord`, `AdminProfilePackReviewFinding`, and `AdminProfilePackReviewSummaryResult` models
+- `admin-profile-pack-review-record` and `admin-profile-pack-review-summary` commands and public APIs
+- pack-level and row-level targets for obligations, submissions, and settlement requirements
+- current `admin-obligations.json` SHA-256 binding before a review record is accepted
+- stale-hash, missing target, rejected, needs_changes, deferred, accepted_risk, and missing-review findings
+- doctor, next-action, workspace-summary, review-pack, operational Markdown filtering, and trace integration
+
+Admin profile-pack review receipts are supplied human decisions only. They do not mutate templates, mark official rules verified, or create final submissions.
+
+### Task 62: Admin profile-pack promotion gate
+
+Implemented:
+- `AdminProfilePackPromotionGateCheck` and `AdminProfilePackPromotionGateResult` models
+- `admin-profile-pack-gate` command and public API
+- read-only join of current computed profile review, `state/profile-review.json`, hash-bound profile-promotion records, admin profile-pack structural review, and admin profile-pack human review summary
+- `can_use_reviewed_seed` as a local candidate flag without changing default admin seeding behavior
+- checks for stale profile-review artifacts, missing/current promotion decisions, admin pack high findings, stale admin pack review hashes, unresolved row reviews, incomplete coverage, and accepted-risk notes
+- schema/template coverage and validation aliases
+- doctor, next-action, workspace-summary, review-pack, operational Markdown filtering, and trace integration
+
+The promotion gate must remain read-only. It authorizes no official compliance claim and does not enable trusted seeding by itself.
 
 ## Safety constraints
 

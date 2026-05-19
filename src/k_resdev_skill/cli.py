@@ -20,6 +20,7 @@ from .admin_profile_pack_reviews import (
     summarize_admin_profile_pack_reviews,
     write_admin_profile_pack_review_record,
 )
+from .admin_profile_pack_gate import generate_admin_profile_pack_promotion_gate
 from .artifact_authority import generate_artifact_authority
 from .audit import generate_audit_qna
 from .approval import (
@@ -594,6 +595,13 @@ def main(argv: list[str] | None = None) -> int:
     admin_profile_pack_review_summary_parser.add_argument("--reviews-dir", default=None)
     admin_profile_pack_review_summary_parser.add_argument("--output", default=None)
     admin_profile_pack_review_summary_parser.add_argument("--json", default=None)
+
+    admin_profile_pack_gate_parser = subparsers.add_parser("admin-profile-pack-gate", help="Evaluate read-only reviewed-seed eligibility for an admin obligation profile pack.")
+    admin_profile_pack_gate_parser.add_argument("--root", default=".")
+    admin_profile_pack_gate_parser.add_argument("--profile", default=None)
+    admin_profile_pack_gate_parser.add_argument("--templates-root", default=None)
+    admin_profile_pack_gate_parser.add_argument("--output", default=None)
+    admin_profile_pack_gate_parser.add_argument("--json", default=None)
 
     settlement_binder_parser = subparsers.add_parser("settlement-binder", help="Bind budget ledger rows to evidence, proof, approval, and source-hash state.")
     settlement_binder_parser.add_argument("--root", default=".")
@@ -1237,6 +1245,16 @@ def main(argv: list[str] | None = None) -> int:
             profile_pack_path=args.profile_pack,
             templates_root=args.templates_root,
             reviews_dir=args.reviews_dir,
+            output_path=args.output,
+            json_path=args.json,
+        )
+        print(result.model_dump_json(indent=2))
+        return 0 if result.status != "blocked" else 1
+    if args.command == "admin-profile-pack-gate":
+        result = generate_admin_profile_pack_promotion_gate(
+            args.root,
+            profile_id=args.profile,
+            templates_root=args.templates_root,
             output_path=args.output,
             json_path=args.json,
         )

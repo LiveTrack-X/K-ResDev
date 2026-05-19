@@ -14,6 +14,7 @@ from .admin_operating import (
     review_admin_obligations,
 )
 from .admin_profile_pack_reviews import summarize_admin_profile_pack_reviews
+from .admin_profile_pack_gate import generate_admin_profile_pack_promotion_gate
 from .artifact_authority import generate_artifact_authority
 from .approval import load_approval_records
 from .approval_coverage import generate_workspace_approval_coverage
@@ -82,6 +83,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "admin-change-ledger.md",
     "admin-obligations.md",
     "admin-profile-pack.md",
+    "admin-profile-pack-gate.md",
     "admin-profile-pack-review-summary.md",
     "bibliography-integrity.md",
     "budget-ledger.md",
@@ -240,6 +242,7 @@ def run_workspace_doctor(
     _check_profile_pack_package_receipts(workspace, findings)
     _check_admin_profile_pack_review(workspace, findings)
     _check_admin_profile_pack_reviews(workspace, findings)
+    _check_admin_profile_pack_gate(workspace, findings)
     _check_admin_obligations(workspace, findings)
     _check_settlement_binder(workspace, findings)
     _check_admin_change_ledger(workspace, findings)
@@ -1350,6 +1353,45 @@ def _check_admin_profile_pack_reviews(workspace: Path, findings: list[WorkspaceD
                 f"Admin profile-pack human review summary has {result.medium_count} unresolved review finding(s).",
                 workspace / "state" / "admin-profile-pack-reviews",
                 "Record pack-level or row-level human review decisions before treating profile-driven obligations as reviewed.",
+            )
+        )
+
+
+def _check_admin_profile_pack_gate(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> None:
+    profile_path = workspace / "state" / "project-profile.json"
+    if not profile_path.exists():
+        return
+    try:
+        result = generate_admin_profile_pack_promotion_gate(workspace)
+    except Exception as exc:
+        findings.append(
+            _finding(
+                "admin_profile_pack_gate_unreadable",
+                "medium",
+                f"Admin profile-pack promotion gate could not run: {exc}",
+                profile_path,
+                "Fix profile review, profile promotion, or admin profile-pack review metadata before relying on reviewed-seed eligibility.",
+            )
+        )
+        return
+    if result.status == "blocked":
+        findings.append(
+            _finding(
+                "admin_profile_pack_gate_blocked",
+                "high",
+                f"Admin profile-pack promotion gate is blocked with {result.high_count} high issue(s).",
+                result.json_path or workspace / "state" / "admin-profile-pack-gate.json",
+                "Run admin-profile-pack-gate and fix high-severity profile/admin pack review issues before trusted seeding.",
+            )
+        )
+    elif result.status == "needs_review":
+        findings.append(
+            _finding(
+                "admin_profile_pack_gate_needs_review",
+                "medium",
+                f"Admin profile-pack promotion gate is not ready; can_use_reviewed_seed={result.can_use_reviewed_seed}.",
+                result.json_path or workspace / "state" / "admin-profile-pack-gate.json",
+                "Complete profile-review, profile-promotion, and admin-profile-pack-review receipts before reviewed seeding.",
             )
         )
 

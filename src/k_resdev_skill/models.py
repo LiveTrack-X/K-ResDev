@@ -1471,6 +1471,11 @@ class WorkspaceSummaryResult(StrictModel):
     admin_profile_pack_review_record_count: int = 0
     admin_profile_pack_review_unresolved_count: int = 0
     admin_profile_pack_review_stale_count: int = 0
+    admin_profile_pack_gate_status: str | None = None
+    admin_profile_pack_gate_can_use_reviewed_seed: bool = False
+    admin_profile_pack_gate_check_count: int = 0
+    admin_profile_pack_gate_high_count: int = 0
+    admin_profile_pack_gate_medium_count: int = 0
     admin_obligation_status: str | None = None
     admin_obligation_count: int = 0
     admin_submission_count: int = 0
@@ -1795,6 +1800,11 @@ class WorkspaceReviewPackResult(StrictModel):
     admin_profile_pack_review_record_count: int = 0
     admin_profile_pack_review_unresolved_count: int = 0
     admin_profile_pack_review_stale_count: int = 0
+    admin_profile_pack_gate_status: str | None = None
+    admin_profile_pack_gate_can_use_reviewed_seed: bool = False
+    admin_profile_pack_gate_check_count: int = 0
+    admin_profile_pack_gate_high_count: int = 0
+    admin_profile_pack_gate_medium_count: int = 0
     admin_obligation_status: str | None = None
     admin_obligation_count: int = 0
     admin_submission_count: int = 0
@@ -2545,6 +2555,58 @@ class AdminProfilePackReviewSummaryResult(StrictModel):
     @field_validator("root", "status", "profile_id", "profile_pack_path")
     @classmethod
     def _admin_pack_review_summary_field_must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
+class AdminProfilePackPromotionGateCheck(StrictModel):
+    check_id: str
+    status: str
+    severity: str
+    message: str
+    path: str | None = None
+    suggested_action: str | None = None
+
+    @field_validator("check_id", "status", "severity", "message")
+    @classmethod
+    def _admin_pack_gate_check_field_must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
+class AdminProfilePackPromotionGateResult(StrictModel):
+    root: str
+    status: str
+    can_use_reviewed_seed: bool = False
+    profile_id: str | None = None
+    profile_review_status: str | None = None
+    profile_review_can_promote: bool = False
+    profile_review_path: str | None = None
+    profile_review_hash: str | None = None
+    profile_promotion_status: str | None = None
+    latest_profile_promotion_decision: str | None = None
+    latest_profile_promotion_id: str | None = None
+    admin_profile_pack_status: str | None = None
+    admin_profile_pack_path: str | None = None
+    admin_profile_pack_finding_count: int = 0
+    admin_profile_pack_review_status: str | None = None
+    admin_profile_pack_review_target_count: int = 0
+    admin_profile_pack_reviewed_target_count: int = 0
+    admin_profile_pack_review_record_count: int = 0
+    high_count: int = 0
+    medium_count: int = 0
+    low_count: int = 0
+    check_count: int = 0
+    checks: list[AdminProfilePackPromotionGateCheck] = Field(default_factory=list)
+    markdown_path: str | None = None
+    json_path: str | None = None
+    warnings: list[str] = Field(default_factory=list)
+
+    @field_validator("root", "status")
+    @classmethod
+    def _admin_pack_gate_result_field_must_not_be_blank(cls, value: str) -> str:
         if not value or not value.strip():
             raise ValueError("value must not be blank")
         return value.strip()

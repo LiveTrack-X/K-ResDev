@@ -14,6 +14,7 @@ from .admin_operating import (
     review_admin_obligations,
 )
 from .admin_profile_pack_reviews import summarize_admin_profile_pack_reviews
+from .admin_profile_pack_gate import generate_admin_profile_pack_promotion_gate
 from .artifact_authority import authority_for_trace_node
 from .approval import load_approval_records
 from .bibliography import load_bibliography_index
@@ -1363,6 +1364,7 @@ class _TraceBuilder:
         if admin.profile_id:
             profile_pack = review_admin_obligation_profile_pack(admin.profile_id)
             profile_pack_review = summarize_admin_profile_pack_reviews(self.workspace, admin.profile_id)
+            profile_pack_gate = generate_admin_profile_pack_promotion_gate(self.workspace, admin.profile_id)
             pack_node = self.node(
                 "admin_profile_pack",
                 admin.profile_id,
@@ -1434,6 +1436,38 @@ class _TraceBuilder:
                     node_id=review_node.node_id,
                     path=finding.path,
                     suggested_action=finding.suggested_action,
+                )
+            gate_node = self.node(
+                "admin_profile_pack_promotion_gate",
+                admin.profile_id,
+                "Admin profile-pack promotion gate",
+                ref_id=admin.profile_id,
+                status=profile_pack_gate.status,
+                path=str(self.workspace / "state" / "admin-profile-pack-gate.json"),
+                metadata={
+                    "can_use_reviewed_seed": profile_pack_gate.can_use_reviewed_seed,
+                    "check_count": profile_pack_gate.check_count,
+                    "high_count": profile_pack_gate.high_count,
+                    "medium_count": profile_pack_gate.medium_count,
+                    "profile_review_hash": profile_pack_gate.profile_review_hash,
+                    "latest_profile_promotion_id": profile_pack_gate.latest_profile_promotion_id,
+                },
+            )
+            self.edge(_node_id("profile", admin.profile_id), gate_node.node_id, "gates_admin_profile_pack_seed")
+            self.edge(pack_node.node_id, gate_node.node_id, "feeds_promotion_gate")
+            self.edge(review_node.node_id, gate_node.node_id, "feeds_promotion_gate")
+            if profile_pack_gate.latest_profile_promotion_id:
+                self.edge(_node_id("profile_promotion", profile_pack_gate.latest_profile_promotion_id), gate_node.node_id, "feeds_promotion_gate")
+            for check in profile_pack_gate.checks:
+                if check.status == "pass":
+                    continue
+                self.finding(
+                    f"trace_admin_profile_pack_gate_{check.check_id}",
+                    check.severity,
+                    check.message,
+                    node_id=gate_node.node_id,
+                    path=check.path,
+                    suggested_action=check.suggested_action,
                 )
         admin_node = self.node(
             "admin_obligation_graph",

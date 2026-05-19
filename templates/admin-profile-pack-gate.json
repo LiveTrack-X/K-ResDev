@@ -1,0 +1,37 @@
+{
+  "root": ".",
+  "status": "ready_with_notes",
+  "can_use_reviewed_seed": true,
+  "profile_id": "iris-innopolis-2026-017795",
+  "profile_review_status": "ready_for_human_promotion",
+  "profile_review_can_promote": true,
+  "profile_review_path": "state/profile-review.json",
+  "profile_review_hash": "sha256:example",
+  "profile_promotion_status": "verified_recorded",
+  "latest_profile_promotion_decision": "verified",
+  "latest_profile_promotion_id": "PPR-2026-EXAMPLE",
+  "admin_profile_pack_status": "needs_review",
+  "admin_profile_pack_path": "templates/agencies/iris-innopolis-2026-017795/admin-obligations.json",
+  "admin_profile_pack_finding_count": 2,
+  "admin_profile_pack_review_status": "ready_with_notes",
+  "admin_profile_pack_review_target_count": 4,
+  "admin_profile_pack_reviewed_target_count": 4,
+  "admin_profile_pack_review_record_count": 1,
+  "high_count": 0,
+  "medium_count": 0,
+  "low_count": 2,
+  "check_count": 9,
+  "checks": [
+    {
+      "check_id": "admin_profile_pack_reviews_have_accepted_risk_notes",
+      "status": "warn",
+      "severity": "low",
+      "message": "Admin profile-pack review summary has 1 low-severity note(s).",
+      "path": "templates/agencies/iris-innopolis-2026-017795/admin-obligations.json",
+      "suggested_action": "Carry accepted-risk notes into local admin obligation initialization and human review."
+    }
+  ],
+  "markdown_path": "reports/admin-profile-pack-gate.md",
+  "json_path": "state/admin-profile-pack-gate.json",
+  "warnings": []
+}

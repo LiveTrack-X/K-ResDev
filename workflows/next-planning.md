@@ -1,12 +1,12 @@
 # K-ResDev Next Planning
 
-This planning note starts after `0.1.0b55`.
+This planning note starts after `0.1.0b56`.
 
 ## Current Diagnosis
 
 K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, budget ledger review, settlement binders, admin obligation graphs, admin profile-pack seed review, admin profile-pack human review receipts, admin change ledgers, admin calendars, bibliography metadata, reference corpus adapters, read-only workspace discovery, bibliography review, citation support, research claim matrices, profile source records, profile source-pack review queues, profile source fix plans, profile source fix review records, profile integrity, a narrow source-backed IRIS/Innopolis profile seed, profile promotion review, hash-bound profile promotion records, non-destructive profile promotion apply plans, guarded profile promotion apply results/backups, non-destructive profile promotion revocation plans, guarded profile promotion revocation results/backups, a profile lifecycle ledger, profile pack readiness dashboard, profile pack readiness drilldown, profile pack investigation bundle, profile pack investigation package manifest/ZIP, profile pack package reviewer receipts, workspace traceability graph, trace passport checkpoints, artifact authority labels, goals/deadline review, weekly operating reviews, workspace dashboards, thin local workflow router, workspace doctor, next actions, workspace summary, and review packs.
 
-The next bottleneck is verified agency profile expansion. Beta 49-55 closed the generated package handoff loop, added a generic Korean R&D admin operating layer, made admin obligation seeds profile-data driven, and added row-level human review receipts for those admin seeds. Official IRIS/NTIS/RCMS/Ezbaro details still must remain source-backed profile data, not hardcoded Python logic.
+The next bottleneck is verified agency profile expansion. Beta 49-56 closed the generated package handoff loop, added a generic Korean R&D admin operating layer, made admin obligation seeds profile-data driven, added row-level human review receipts for those admin seeds, and added a read-only promotion gate that checks profile review, profile promotion, and admin profile-pack review hashes before any reviewed-seed mode is considered. Official IRIS/NTIS/RCMS/Ezbaro details still must remain source-backed profile data, not hardcoded Python logic.
 
 ## Planning Principles
 
@@ -75,7 +75,7 @@ Implemented scope:
 
 Goal: prevent profile-driven admin obligation seeds from becoming trusted unless profile source records, admin profile-pack review records, and promotion decisions all agree on current hashes.
 
-Status: proposed next slice.
+Status: implemented as a guarded first pass.
 
 Expected scope:
 - add a promotion readiness gate that joins profile-review, profile-promotion, profile-pack review, and admin profile-pack review summaries;
@@ -83,9 +83,27 @@ Expected scope:
 - keep `admin-obligations-init` conservative by default and add an explicit reviewed-seed mode only when all gates pass;
 - surface mismatches in doctor, trace, and review-pack without mutating official templates.
 
+Implemented scope:
+- added `AdminProfilePackPromotionGateCheck` and `AdminProfilePackPromotionGateResult`;
+- added `admin-profile-pack-gate`;
+- joined current computed profile review, `state/profile-review.json`, hash-bound profile-promotion records, admin profile-pack structural review, and admin profile-pack human review summaries;
+- exposed `can_use_reviewed_seed` as a local candidate flag without changing `admin-obligations-init` behavior;
+- added stale profile-review artifact, missing promotion, stale admin pack review hash, incomplete coverage, accepted-risk, and guarded-needs-review checks;
+- integrated the gate into doctor, next-actions, summary, review-pack, trace, schemas, templates, and tests.
+
 Safety boundary:
 - Do not hardcode official rules from memory or stale manuals.
 - Treat every official-system mapping as a profile candidate until current source metadata, retrieval date, hash, and reviewer decision are recorded.
+
+### Beta 57 - Reviewed Admin Seed Mode
+
+Goal: add an explicit, opt-in admin obligation initialization mode that may copy profile-driven rows as reviewed local candidates only when the Beta 56 gate passes.
+
+Expected scope:
+- keep default `admin-obligations-init` behavior conservative and `needs_review`;
+- require `state/admin-profile-pack-gate.json` or a freshly generated gate with `can_use_reviewed_seed=true`;
+- preserve source IDs, pack hash, profile-review hash, promotion ID, and admin review IDs on seeded local obligations;
+- keep final status as a local reviewed candidate, not official compliance.
 
 ### Beta 23 - Traceability Graph and Impact Review
 

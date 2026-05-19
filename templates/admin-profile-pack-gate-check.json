@@ -1,0 +1,8 @@
+{
+  "check_id": "admin_profile_pack_review_coverage_complete",
+  "status": "pass",
+  "severity": "medium",
+  "message": "Admin profile-pack reviewed targets are 4/4.",
+  "path": "templates/agencies/iris-innopolis-2026-017795/admin-obligations.json",
+  "suggested_action": null
+}

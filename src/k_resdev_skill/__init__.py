@@ -40,6 +40,11 @@ from .admin_profile_pack_reviews import (
     summarize_admin_profile_pack_reviews,
     write_admin_profile_pack_review_record,
 )
+from .admin_profile_pack_gate import (
+    generate_admin_profile_pack_promotion_gate,
+    load_admin_profile_pack_promotion_gate,
+    render_admin_profile_pack_promotion_gate_markdown,
+)
 from .bibliography import (
     import_bibliography,
     load_bibliography_index,
@@ -104,6 +109,8 @@ from .models import (
     AdminObligationGraphResult,
     AdminObligationProfilePack,
     AdminObligationProfilePackReviewResult,
+    AdminProfilePackPromotionGateCheck,
+    AdminProfilePackPromotionGateResult,
     AdminProfilePackReviewDecision,
     AdminProfilePackReviewFinding,
     AdminProfilePackReviewRecord,
@@ -380,6 +387,8 @@ __all__ = [
     "AdminObligationGraphResult",
     "AdminObligationProfilePack",
     "AdminObligationProfilePackReviewResult",
+    "AdminProfilePackPromotionGateCheck",
+    "AdminProfilePackPromotionGateResult",
     "AdminProfilePackReviewDecision",
     "AdminProfilePackReviewFinding",
     "AdminProfilePackReviewRecord",
@@ -544,6 +553,7 @@ __all__ = [
     "extract_markdown_citation_keys",
     "generate_audit_qna",
     "generate_approval_summary",
+    "generate_admin_profile_pack_promotion_gate",
     "generate_artifact_authority",
     "generate_settlement_binder",
     "generate_analysis_script",
@@ -607,6 +617,7 @@ __all__ = [
     "load_approval_records",
     "load_admin_profile_pack_review_records",
     "load_admin_profile_pack_review_summary",
+    "load_admin_profile_pack_promotion_gate",
     "load_artifact_authority",
     "load_bibliography_review_records",
     "load_citation_support_records",
@@ -659,6 +670,7 @@ __all__ = [
     "render_admin_calendar_markdown",
     "render_admin_change_ledger_markdown",
     "render_admin_obligation_profile_pack_review_markdown",
+    "render_admin_profile_pack_promotion_gate_markdown",
     "render_admin_profile_pack_review_summary_markdown",
     "render_admin_obligations_markdown",
     "render_approval_coverage_markdown",
@@ -725,4 +737,4 @@ __all__ = [
     "write_research_claims",
 ]
 
-__version__ = "0.1.0b55"
+__version__ = "0.1.0b56"

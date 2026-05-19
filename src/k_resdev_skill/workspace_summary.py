@@ -18,6 +18,7 @@ from .profile_promotion import summarize_profile_promotions
 from .profile_promotion_apply import generate_profile_promotion_apply_plan, load_profile_promotion_apply_result
 from .profile_promotion_revoke import load_profile_promotion_revoke_plan, load_profile_promotion_revoke_result
 from .profile_lifecycle import generate_profile_lifecycle_ledger
+from .profile_pack_investigation import generate_profile_pack_investigation_bundle
 from .profile_pack_drilldown import generate_profile_pack_readiness_drilldown
 from .profile_pack_readiness import generate_profile_pack_readiness
 from .profile_review import generate_profile_review
@@ -76,6 +77,7 @@ def generate_workspace_summary(
     profile_lifecycle = generate_profile_lifecycle_ledger(workspace)
     profile_pack_readiness = generate_profile_pack_readiness(workspace)
     profile_pack_drilldown = generate_profile_pack_readiness_drilldown(workspace)
+    profile_pack_investigation = generate_profile_pack_investigation_bundle(workspace)
     trace = generate_workspace_trace(workspace)
     trace_passport = generate_trace_passport(workspace)
     weekly_review = load_latest_weekly_review(workspace)
@@ -180,6 +182,10 @@ def generate_workspace_summary(
         profile_pack_drilldown_item_count=profile_pack_drilldown.drilldown_count,
         profile_pack_drilldown_missing_artifact_count=profile_pack_drilldown.missing_artifact_count,
         profile_pack_drilldown_unmatched_count=profile_pack_drilldown.unmatched_count,
+        profile_pack_investigation_status=profile_pack_investigation.status,
+        profile_pack_investigation_item_count=profile_pack_investigation.bundle_item_count,
+        profile_pack_investigation_missing_human_review_count=profile_pack_investigation.human_review_missing_count,
+        profile_pack_investigation_official_source_check_count=profile_pack_investigation.official_source_check_count,
         trace_status=trace.status,
         trace_node_count=trace.node_count,
         trace_edge_count=trace.edge_count,
@@ -246,6 +252,9 @@ def render_workspace_summary_markdown(summary: WorkspaceSummaryResult) -> str:
         f"| Profile pack drilldown | {_escape(summary.profile_pack_drilldown_status or '-')} |",
         f"| Profile pack drilldown items | {summary.profile_pack_drilldown_item_count} |",
         f"| Profile pack drilldown missing artifacts | {summary.profile_pack_drilldown_missing_artifact_count} |",
+        f"| Profile pack investigation bundle | {_escape(summary.profile_pack_investigation_status or '-')} |",
+        f"| Profile pack investigation items | {summary.profile_pack_investigation_item_count} |",
+        f"| Profile pack investigation missing human review | {summary.profile_pack_investigation_missing_human_review_count} |",
         f"| Profile sources | {summary.profile_source_count} |",
         f"| Verified profile sources | {summary.profile_verified_source_count} |",
         f"| Workspace discovery | {_escape(summary.discovery_status or '-')} |",
@@ -320,6 +329,7 @@ def render_workspace_summary_markdown(summary: WorkspaceSummaryResult) -> str:
         f"| Profile lifecycle ledger | {summary.profile_lifecycle_entry_count} | status: {_escape(summary.profile_lifecycle_status or '-')}; findings: {summary.profile_lifecycle_finding_count}; high: {summary.profile_lifecycle_high_count} |",
         f"| Profile pack readiness | {summary.profile_pack_readiness_profile_count} | status: {_escape(summary.profile_pack_readiness_status or '-')}; blocked: {summary.profile_pack_readiness_blocked_count}; findings: {summary.profile_pack_readiness_finding_count}; high: {summary.profile_pack_readiness_high_count} |",
         f"| Profile pack readiness drilldown | {summary.profile_pack_drilldown_item_count} | status: {_escape(summary.profile_pack_drilldown_status or '-')}; missing artifacts: {summary.profile_pack_drilldown_missing_artifact_count}; unmatched: {summary.profile_pack_drilldown_unmatched_count} |",
+        f"| Profile pack investigation bundle | {summary.profile_pack_investigation_item_count} | status: {_escape(summary.profile_pack_investigation_status or '-')}; missing human review: {summary.profile_pack_investigation_missing_human_review_count}; official-source checks: {summary.profile_pack_investigation_official_source_check_count} |",
         f"| Workspace trace | {summary.trace_node_count} | status: {_escape(summary.trace_status or '-')}; findings: {summary.trace_finding_count} |",
         f"| Trace passport | {summary.checkpoint_count} | status: {_escape(summary.trace_passport_status or '-')}; latest: {_escape(summary.latest_checkpoint_id or '-')}; findings: {summary.trace_passport_finding_count} |",
         "",

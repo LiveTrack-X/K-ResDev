@@ -1,12 +1,12 @@
 # K-ResDev Next Planning
 
-This planning note starts after `0.1.0b46`.
+This planning note starts after `0.1.0b47`.
 
 ## Current Diagnosis
 
-K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, budget ledger review, bibliography metadata, reference corpus adapters, read-only workspace discovery, bibliography review, citation support, research claim matrices, profile source records, profile source-pack review queues, profile source fix plans, profile source fix review records, profile integrity, a narrow source-backed IRIS/Innopolis profile seed, profile promotion review, hash-bound profile promotion records, non-destructive profile promotion apply plans, guarded profile promotion apply results/backups, non-destructive profile promotion revocation plans, guarded profile promotion revocation results/backups, a profile lifecycle ledger, profile pack readiness dashboard, profile pack readiness drilldown, workspace traceability graph, trace passport checkpoints, artifact authority labels, goals/deadline review, weekly operating reviews, workspace dashboards, thin local workflow router, workspace doctor, next actions, workspace summary, and review packs.
+K-ResDev now has working local layers for evidence intake, document extraction, report integrity, approvals, budget ledger review, bibliography metadata, reference corpus adapters, read-only workspace discovery, bibliography review, citation support, research claim matrices, profile source records, profile source-pack review queues, profile source fix plans, profile source fix review records, profile integrity, a narrow source-backed IRIS/Innopolis profile seed, profile promotion review, hash-bound profile promotion records, non-destructive profile promotion apply plans, guarded profile promotion apply results/backups, non-destructive profile promotion revocation plans, guarded profile promotion revocation results/backups, a profile lifecycle ledger, profile pack readiness dashboard, profile pack readiness drilldown, profile pack investigation bundle, workspace traceability graph, trace passport checkpoints, artifact authority labels, goals/deadline review, weekly operating reviews, workspace dashboards, thin local workflow router, workspace doctor, next actions, workspace summary, and review packs.
 
-The next bottleneck is making profile-pack remediation review easy to hand off. Operators can now see a readiness dashboard and drill down each blocker to upstream artifacts and hashes, but a reviewer still needs a compact bundle for one profile ID or blocker code without copying raw official-source bodies.
+The next bottleneck is packaging profile-pack remediation review for transfer. Operators can now create a compact investigation bundle for one profile ID or blocker code, but a reviewer still needs a bounded package/manifest that includes generated metadata while explicitly excluding raw official-source bodies.
 
 ## Planning Principles
 
@@ -436,16 +436,33 @@ Safety boundary:
 
 Goal: create a compact review handoff bundle for one profile ID or readiness blocker.
 
-Expected scope:
+Status: implemented as a local first pass in `src/k_resdev_skill/profile_pack_investigation.py`, with CLI/API, schema/template, doctor, next-action, summary, review-pack, operational Markdown filtering, and trace integration.
+
+Implemented scope:
 - `profile-pack-investigation-bundle` command and public API;
-- filter by `--profile-id`, `--finding-code`, or `--severity`;
+- filter by `--profile-id` and/or `--finding-code`;
 - include readiness rows, drilldown rows, upstream artifact hashes, suggested commands, and supplied review/promotion state;
 - write Markdown and JSON bundle artifacts without copying raw official-source files;
-- optionally include in review-pack after the standalone bundle is stable.
+- include in review-pack after the standalone bundle is stable.
 
 Safety boundary:
 - Bundles are handoff aids only.
 - Do not copy official-source bodies, fetch external sources, mutate profile/source state, or certify compliance.
+
+### Beta 48 - Profile Pack Investigation Bundle Packager
+
+Goal: package generated investigation-bundle metadata for reviewer handoff without copying raw official-source bodies.
+
+Expected scope:
+- `profile-pack-investigation-package` command and public API;
+- select one profile ID, one readiness finding code, or all open high/medium blockers;
+- include bundle Markdown/JSON, readiness and drilldown artifact hashes, schema validation status, and review-pack hash references;
+- write a package manifest and optional ZIP that excludes raw official-source documents by default;
+- make exclusions explicit so reviewers can see what was deliberately not copied.
+
+Safety boundary:
+- The package is a transfer aid only.
+- It must not add official-source body copies, fetch current agency sources, mutate profile/source state, or certify compliance.
 
 ## Deferred Ideas
 
@@ -459,6 +476,6 @@ These should wait until traceability, impact analysis, and verified profile sour
 
 ## Recommended Next Slice
 
-Implement Beta 47 next.
+Implement Beta 48 next.
 
-Beta 47 should make profile-pack remediation review easier to hand off before adding new official-source-backed profile packs.
+Beta 48 should create a read-only investigation bundle package/manifest so profile-pack remediation can be shared with reviewers without copying raw official-source bodies or implying compliance certification.

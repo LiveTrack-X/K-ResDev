@@ -1175,6 +1175,10 @@ class WorkspaceSummaryResult(StrictModel):
     profile_pack_drilldown_item_count: int = 0
     profile_pack_drilldown_missing_artifact_count: int = 0
     profile_pack_drilldown_unmatched_count: int = 0
+    profile_pack_investigation_status: str | None = None
+    profile_pack_investigation_item_count: int = 0
+    profile_pack_investigation_missing_human_review_count: int = 0
+    profile_pack_investigation_official_source_check_count: int = 0
     trace_status: str | None = None
     trace_node_count: int = 0
     trace_edge_count: int = 0
@@ -1466,6 +1470,10 @@ class WorkspaceReviewPackResult(StrictModel):
     profile_pack_drilldown_item_count: int = 0
     profile_pack_drilldown_missing_artifact_count: int = 0
     profile_pack_drilldown_unmatched_count: int = 0
+    profile_pack_investigation_status: str | None = None
+    profile_pack_investigation_item_count: int = 0
+    profile_pack_investigation_missing_human_review_count: int = 0
+    profile_pack_investigation_official_source_check_count: int = 0
     workspace_trace_status: str | None = None
     workspace_trace_node_count: int = 0
     workspace_trace_edge_count: int = 0
@@ -1895,6 +1903,98 @@ class ProfilePackReadinessDrilldownResult(StrictModel):
     @field_validator("root", "status", "readiness_path")
     @classmethod
     def _profile_pack_drilldown_result_field_must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
+class ProfilePackInvestigationArtifact(StrictModel):
+    artifact_type: str
+    path: str
+    exists: bool = False
+    sha256: str | None = None
+    status: str | None = None
+    item_count: int = 0
+    warning: str | None = None
+
+    @field_validator("artifact_type", "path")
+    @classmethod
+    def _profile_pack_investigation_artifact_field_must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
+class ProfilePackInvestigationItem(StrictModel):
+    bundle_item_id: str
+    profile_id: str | None = None
+    finding_code: str
+    severity: str
+    readiness_message: str
+    readiness_path: str | None = None
+    readiness_suggested_action: str | None = None
+    drilldown_id: str | None = None
+    drilldown_match_status: str | None = None
+    source_artifact: str | None = None
+    source_artifact_path: str | None = None
+    source_artifact_hash: str | None = None
+    source_ref_id: str | None = None
+    source_code: str | None = None
+    source_status: str | None = None
+    source_message: str | None = None
+    source_path: str | None = None
+    related_ids: list[str] = Field(default_factory=list)
+    command: str | None = None
+    human_review_status: str
+    human_review_ref_id: str | None = None
+    human_review_decision: str | None = None
+    human_review_reviewer: str | None = None
+    human_review_reviewed_at: str | None = None
+    requires_human_review: bool = True
+    requires_official_source_check: bool = False
+    next_step: str | None = None
+
+    @field_validator("bundle_item_id", "finding_code", "severity", "readiness_message", "human_review_status")
+    @classmethod
+    def _profile_pack_investigation_item_field_must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
+class ProfilePackInvestigationBundleResult(StrictModel):
+    root: str
+    status: str
+    bundle_id: str
+    profile_id: str | None = None
+    finding_code: str | None = None
+    readiness_path: str
+    readiness_hash: str | None = None
+    readiness_status: str | None = None
+    drilldown_path: str
+    drilldown_hash: str | None = None
+    drilldown_status: str | None = None
+    readiness_finding_count: int = 0
+    drilldown_item_count: int = 0
+    bundle_item_count: int = 0
+    matched_count: int = 0
+    missing_artifact_count: int = 0
+    unmatched_count: int = 0
+    high_count: int = 0
+    medium_count: int = 0
+    low_count: int = 0
+    human_review_missing_count: int = 0
+    human_review_supplied_count: int = 0
+    official_source_check_count: int = 0
+    artifacts: list[ProfilePackInvestigationArtifact] = Field(default_factory=list)
+    items: list[ProfilePackInvestigationItem] = Field(default_factory=list)
+    markdown_path: str | None = None
+    json_path: str | None = None
+    warnings: list[str] = Field(default_factory=list)
+
+    @field_validator("root", "status", "bundle_id", "readiness_path", "drilldown_path")
+    @classmethod
+    def _profile_pack_investigation_result_field_must_not_be_blank(cls, value: str) -> str:
         if not value or not value.strip():
             raise ValueError("value must not be blank")
         return value.strip()

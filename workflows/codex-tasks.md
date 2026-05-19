@@ -645,13 +645,26 @@ Drilldown reduces operator time spent jumping between profile-source, promotion,
 
 ### Task 57: Profile pack investigation bundle
 
-Planned:
-- create a compact investigation bundle for one profile ID or readiness finding code
-- include the readiness row, drilldown row, upstream artifact hashes, related commands, and supplied human-review status
-- support a Markdown bundle and JSON bundle without copying raw official-source documents
-- keep bundle generation read-only and local-only
+Implemented:
+- `ProfilePackInvestigationArtifact`, `ProfilePackInvestigationItem`, and `ProfilePackInvestigationBundleResult` models
+- `profile-pack-investigation-bundle` command and public API
+- filter support for one profile ID and/or readiness finding code
+- compact handoff rows that include readiness messages, drilldown IDs, upstream artifact paths/hashes, source ref IDs, related commands, supplied human-review status, and official-source-check flags
+- `reports/profile-pack-investigation-bundle.md` and `state/profile-pack-investigation-bundle.json`
+- schema/template coverage and validation aliases
+- doctor, next-action, workspace-summary, review-pack, operational Markdown filtering, and trace integration
 
-This should make profile-pack remediation review easier to hand off without turning local projections into compliance claims.
+Profile pack investigation bundles are local handoff projections only. They do not copy raw official-source bodies, fetch external sources, mutate source/profile records, promote profiles, or certify agency compliance.
+
+### Task 58: Profile pack investigation bundle packager
+
+Planned:
+- create a bounded zip/package manifest for selected investigation bundles and their generated metadata artifacts
+- include bundle JSON, bundle Markdown, readiness/drilldown hashes, review-pack hash references, and a no-raw-source-body manifest
+- support one profile ID, one readiness finding code, or all open high/medium blockers
+- keep packaging read-only and exclude raw official-source documents by default
+
+This should let a reviewer receive the remediation packet without accidentally treating raw source copies or local projections as official compliance evidence.
 
 ## Safety constraints
 

@@ -2,7 +2,7 @@
 
 Purpose: 한국형 국책 R&D 환경에서 연구 행정 문서화, 증빙 정합성, 보고서 생성, 논문/데이터 인사이트 보조를 evidence-first 방식으로 지원하는 Codex/Skill 프로젝트입니다.
 
-Current release: `0.1 BETA 46` (`0.1.0b46`).
+Current release: `0.1 BETA 47` (`0.1.0b47`).
 
 Core principle:
 
@@ -81,9 +81,10 @@ This repository does not encode any single ministry/institution form as authorit
 - Profile lifecycle ledger that combines current profile status, profile-review, human promotion records, guarded apply plans/results, and guarded revoke plans/results into one chronological operating projection.
 - Agency profile pack readiness dashboard that aggregates profile-source queue, fix-plan, fix-review, profile-review, promotion, apply/revoke, and lifecycle blockers into one scan-friendly profile view.
 - Profile pack readiness drilldown that links readiness findings to upstream artifact rows, IDs, commands, and SHA-256 hashes.
+- Profile pack investigation bundle that filters by profile ID or readiness finding code and condenses readiness rows, drilldown rows, upstream hashes, suggested commands, and supplied human-review status without copying raw official-source bodies.
 - Workspace next-action planner that converts doctor findings into deterministic, reviewable commands.
 - Workspace summary report that combines readiness, next actions, evidence counts, approvals, reports, exports, and analysis manifests.
-- Workspace review pack command that refreshes discovery, readiness, next actions, workspace summary, artifact-authority, goals-review, weekly-review, workspace-dashboard, budget-ledger, profile-source-queue, profile-source-fix-plan, profile-source-fix-summary, profile-integrity, profile-promotion-summary, profile-promotion-apply-plan, profile-promotion-apply-result when present, profile-promotion-revoke-plan/result when present, profile-lifecycle-ledger, profile-pack-readiness, profile-pack-readiness-drilldown, source-verification, approval-coverage, report-integrity, bibliography-integrity, reference-corpus, citation-support, research-claim-matrix, and workspace-trace artifacts together.
+- Workspace review pack command that refreshes discovery, readiness, next actions, workspace summary, artifact-authority, goals-review, weekly-review, workspace-dashboard, budget-ledger, profile-source-queue, profile-source-fix-plan, profile-source-fix-summary, profile-integrity, profile-promotion-summary, profile-promotion-apply-plan, profile-promotion-apply-result when present, profile-promotion-revoke-plan/result when present, profile-lifecycle-ledger, profile-pack-readiness, profile-pack-readiness-drilldown, profile-pack-investigation-bundle, source-verification, approval-coverage, report-integrity, bibliography-integrity, reference-corpus, citation-support, research-claim-matrix, and workspace-trace artifacts together.
 - Review pack artifact hash manifest and verifier for detecting missing or changed generated artifacts.
 - Evidence source verifier that checks indexed source files against saved source hashes.
 - Workspace doctor and review pack integration for local evidence-source presence/hash drift checks.
@@ -105,6 +106,7 @@ This repository does not encode any single ministry/institution form as authorit
 - Workspace doctor, next-action, summary, review-pack, and trace integration for profile lifecycle ledger findings.
 - Workspace doctor, next-action, summary, review-pack, and trace integration for profile pack readiness findings.
 - Workspace doctor, next-action, summary, review-pack, and trace integration for profile pack readiness drilldown gaps.
+- Workspace doctor, next-action, summary, review-pack, and trace integration for profile pack investigation bundle handoff gaps.
 - Workspace doctor, next-action, summary, and review-pack integration for trace impact findings.
 - Trace passport and checkpoint ledger for compact resume checkpoints, artifact hash drift detection, and checkpoint-based resume plans.
 - `national-rnd-basic` agency template skeleton for annual/interim/final reports, change requests, and performance registration drafts.
@@ -172,6 +174,7 @@ python -m k_resdev_skill profile-promotion-revoke --root . --revoke-plan .\state
 python -m k_resdev_skill profile-lifecycle-ledger --root . --output .\reports\profile-lifecycle-ledger.md --json .\state\profile-lifecycle-ledger.json
 python -m k_resdev_skill profile-pack-readiness --root . --output .\reports\profile-pack-readiness.md --json .\state\profile-pack-readiness.json
 python -m k_resdev_skill profile-pack-readiness-drilldown --root . --output .\reports\profile-pack-readiness-drilldown.md --json .\state\profile-pack-readiness-drilldown.json
+python -m k_resdev_skill profile-pack-investigation-bundle --root . --profile-id national-rnd-basic --output .\reports\profile-pack-investigation-bundle.md --json .\state\profile-pack-investigation-bundle.json
 python -m k_resdev_skill workspace-trace --root . --output .\reports\workspace-trace.md --json .\state\workspace-trace.json
 python -m k_resdev_skill budget-ledger-import .\references\budget-ledger.csv --state-dir .\state --markdown .\reports\budget-ledger-import.md
 python -m k_resdev_skill budget-ledger-integrity --root . --output .\reports\budget-ledger.md --json .\state\budget-ledger-integrity.json
@@ -197,6 +200,7 @@ python -m k_resdev_skill validate-json profile-promotion-revoke-result .\state\p
 python -m k_resdev_skill validate-json profile-lifecycle-ledger .\state\profile-lifecycle-ledger.json
 python -m k_resdev_skill validate-json profile-pack-readiness .\state\profile-pack-readiness.json
 python -m k_resdev_skill validate-json profile-pack-readiness-drilldown .\state\profile-pack-readiness-drilldown.json
+python -m k_resdev_skill validate-json profile-pack-investigation-bundle .\state\profile-pack-investigation-bundle.json
 python -m k_resdev_skill validate-json budget-ledger .\state\budget-ledger.json
 python -m k_resdev_skill validate-json research-claim .\state\research-claims.json
 python -m k_resdev_skill validate-json checkpoint .\templates\trace-passport-entry.json

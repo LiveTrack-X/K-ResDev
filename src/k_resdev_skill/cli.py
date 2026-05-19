@@ -56,6 +56,7 @@ from .profile_promotion import (
 from .profile_promotion_apply import apply_profile_promotion_plan, generate_profile_promotion_apply_plan
 from .profile_promotion_revoke import generate_profile_promotion_revoke_plan, revoke_profile_promotion_plan
 from .profile_lifecycle import generate_profile_lifecycle_ledger
+from .profile_pack_investigation import generate_profile_pack_investigation_bundle
 from .profile_pack_drilldown import generate_profile_pack_readiness_drilldown
 from .profile_pack_readiness import generate_profile_pack_readiness
 from .profile_sources import (
@@ -441,10 +442,19 @@ def main(argv: list[str] | None = None) -> int:
     profile_pack_drilldown_parser.add_argument("--output", default=None)
     profile_pack_drilldown_parser.add_argument("--json", default=None)
 
+    profile_pack_investigation_parser = subparsers.add_parser("profile-pack-investigation-bundle", help="Create a compact local investigation bundle for a profile pack blocker.")
+    profile_pack_investigation_parser.add_argument("--root", default=".")
+    profile_pack_investigation_parser.add_argument("--profile-id", default=None)
+    profile_pack_investigation_parser.add_argument("--finding-code", default=None)
+    profile_pack_investigation_parser.add_argument("--readiness", default=None)
+    profile_pack_investigation_parser.add_argument("--drilldown", default=None)
+    profile_pack_investigation_parser.add_argument("--output", default=None)
+    profile_pack_investigation_parser.add_argument("--json", default=None)
+
     validate_json_parser = subparsers.add_parser("validate-json", help="Validate JSON files against bundled or custom JSON schema.")
     validate_json_parser.add_argument(
         "schema",
-        help="Schema alias such as evidence, research-insight, project-profile, profile-source, profile-source-fix-plan, profile-source-fix-review, profile-pack-readiness, profile-pack-readiness-drilldown, budget-ledger, approval, or a schema path.",
+        help="Schema alias such as evidence, research-insight, project-profile, profile-source, profile-source-fix-plan, profile-source-fix-review, profile-pack-readiness, profile-pack-readiness-drilldown, profile-pack-investigation-bundle, budget-ledger, approval, or a schema path.",
     )
     validate_json_parser.add_argument("json_paths", nargs="+")
 
@@ -980,6 +990,18 @@ def main(argv: list[str] | None = None) -> int:
         return 0 if result.status != "blocked" else 1
     if args.command == "profile-pack-readiness-drilldown":
         result = generate_profile_pack_readiness_drilldown(args.root, readiness_path=args.readiness, output_path=args.output, json_path=args.json)
+        print(result.model_dump_json(indent=2))
+        return 0 if result.status != "blocked" else 1
+    if args.command == "profile-pack-investigation-bundle":
+        result = generate_profile_pack_investigation_bundle(
+            args.root,
+            profile_id=args.profile_id,
+            finding_code=args.finding_code,
+            readiness_path=args.readiness,
+            drilldown_path=args.drilldown,
+            output_path=args.output,
+            json_path=args.json,
+        )
         print(result.model_dump_json(indent=2))
         return 0 if result.status != "blocked" else 1
     if args.command == "validate-json":

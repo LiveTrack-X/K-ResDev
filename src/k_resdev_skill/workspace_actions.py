@@ -95,6 +95,7 @@ def _actions_for_findings(root: Path, findings: list[WorkspaceDoctorFinding]) ->
         _action_for_profile_lifecycle(root, by_code),
         _action_for_profile_pack_readiness(root, by_code),
         _action_for_profile_pack_readiness_drilldown(root, by_code),
+        _action_for_profile_pack_investigation_bundle(root, by_code),
         _action_for_approval_coverage(root, by_code),
         _action_for_report_integrity(root, by_code),
         _action_for_artifact_authority(root, by_code),
@@ -511,6 +512,26 @@ def _action_for_profile_pack_readiness_drilldown(root: Path, by_code: dict[str, 
         "Review profile pack readiness drilldown",
         "Readiness blockers should point back to the queue, fix-plan, review, promotion, apply/revoke, or lifecycle artifact that produced them.",
         f'python -m k_resdev_skill profile-pack-readiness-drilldown --root "{root}" --output "{root / "reports" / "profile-pack-readiness-drilldown.md"}" --json "{root / "state" / "profile-pack-readiness-drilldown.json"}"',
+        by_code,
+        codes,
+    )
+
+
+def _action_for_profile_pack_investigation_bundle(root: Path, by_code: dict[str, list[WorkspaceDoctorFinding]]) -> WorkspaceActionItem | None:
+    codes = [
+        "profile_pack_investigation_bundle_missing",
+        "profile_pack_investigation_bundle_human_review_missing",
+        "profile_pack_investigation_bundle_official_source_checks",
+    ]
+    if not any(code in by_code for code in codes):
+        return None
+    priority = "medium" if any(code in by_code for code in codes[1:]) else "low"
+    return _action(
+        root,
+        priority,
+        "Prepare profile pack investigation bundle",
+        "Profile-pack remediation should be easy to hand off with readiness rows, drilldown rows, artifact hashes, commands, and human-review status in one compact bundle.",
+        f'python -m k_resdev_skill profile-pack-investigation-bundle --root "{root}" --output "{root / "reports" / "profile-pack-investigation-bundle.md"}" --json "{root / "state" / "profile-pack-investigation-bundle.json"}"',
         by_code,
         codes,
     )

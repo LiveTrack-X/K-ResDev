@@ -35,6 +35,7 @@ from .models import (
 )
 from .profile_promotion import load_profile_promotion_records
 from .profile_lifecycle import load_profile_lifecycle_ledger
+from .profile_pack_investigation import load_profile_pack_investigation_bundle
 from .profile_pack_drilldown import load_profile_pack_readiness_drilldown
 from .profile_pack_readiness import load_profile_pack_readiness
 from .profile_review import load_profile_review
@@ -71,6 +72,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "profile-review.md",
     "profile-source-fix-plan.md",
     "profile-source-fix-summary.md",
+    "profile-pack-investigation-bundle.md",
     "profile-pack-readiness-drilldown.md",
     "profile-pack-readiness.md",
     "profile-source-queue.md",
@@ -118,6 +120,7 @@ def generate_workspace_trace(
     builder.add_profile_lifecycle_ledger()
     builder.add_profile_pack_readiness()
     builder.add_profile_pack_readiness_drilldown()
+    builder.add_profile_pack_investigation_bundle()
     builder.add_bibliography()
     builder.add_reference_corpus()
     builder.add_reports()
@@ -1128,6 +1131,63 @@ class _TraceBuilder:
                     node_id=node.node_id,
                     path=item.source_artifact_path or str(path),
                     suggested_action="Regenerate upstream profile-source and lifecycle artifacts, then rerun profile-pack-readiness-drilldown.",
+                )
+
+    def add_profile_pack_investigation_bundle(self) -> None:
+        path = self.workspace / "state" / "profile-pack-investigation-bundle.json"
+        if not path.exists():
+            return
+        try:
+            bundle = load_profile_pack_investigation_bundle(path)
+        except Exception as exc:
+            self.finding(
+                "trace_profile_pack_investigation_bundle_unreadable",
+                "medium",
+                f"Profile pack investigation bundle could not be read: {exc}",
+                path=path,
+                suggested_action="Regenerate profile-pack-investigation-bundle before relying on handoff trace state.",
+            )
+            return
+        node = self.node(
+            "profile_pack_investigation_bundle",
+            "profile-pack-investigation-bundle",
+            "Profile pack investigation bundle",
+            status=bundle.status,
+            path=str(path),
+            sha256=_sha256_file(path),
+            metadata={
+                "bundle_id": bundle.bundle_id,
+                "profile_id": bundle.profile_id,
+                "finding_code": bundle.finding_code,
+                "bundle_item_count": bundle.bundle_item_count,
+                "human_review_missing_count": bundle.human_review_missing_count,
+                "official_source_check_count": bundle.official_source_check_count,
+            },
+        )
+        self.edge(node.node_id, _node_id("profile_pack_readiness_drilldown", "profile-pack-readiness-drilldown"), "bundles_drilldown")
+        self.edge(node.node_id, _node_id("profile_pack_readiness", "profile-pack-readiness"), "bundles_readiness")
+        for item in bundle.items:
+            if item.profile_id:
+                self.edge(node.node_id, _node_id("profile", item.profile_id), "hands_off_profile_pack")
+            if item.source_artifact:
+                self.edge(node.node_id, _node_id(item.source_artifact, item.source_ref_id or item.source_artifact), "references_upstream_artifact")
+            if item.requires_human_review:
+                self.finding(
+                    "trace_profile_pack_investigation_human_review_missing",
+                    "medium" if item.severity != "high" else "high",
+                    f"Profile pack investigation item `{item.bundle_item_id}` still needs supplied human review.",
+                    node_id=node.node_id,
+                    path=item.source_path or item.source_artifact_path or str(path),
+                    suggested_action="Record supplied profile-source fix or promotion review decisions, then regenerate the investigation bundle.",
+                )
+            if item.requires_official_source_check:
+                self.finding(
+                    "trace_profile_pack_investigation_official_source_check",
+                    "medium",
+                    f"Profile pack investigation item `{item.bundle_item_id}` requires an official-source check.",
+                    node_id=node.node_id,
+                    path=item.source_path or item.source_artifact_path or str(path),
+                    suggested_action="Check current official sources outside this tool before relying on profile-pack remediation state.",
                 )
 
     def add_approvals(self) -> None:

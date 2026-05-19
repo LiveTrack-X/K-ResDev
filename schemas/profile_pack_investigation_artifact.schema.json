@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ProfilePackInvestigationArtifact",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["artifact_type", "path", "exists", "sha256", "status", "item_count", "warning"],
+  "properties": {
+    "artifact_type": {"type": "string"},
+    "path": {"type": "string"},
+    "exists": {"type": "boolean"},
+    "sha256": {"type": ["string", "null"]},
+    "status": {"type": ["string", "null"]},
+    "item_count": {"type": "integer", "minimum": 0},
+    "warning": {"type": ["string", "null"]}
+  }
+}

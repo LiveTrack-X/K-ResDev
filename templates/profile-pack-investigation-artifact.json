@@ -1,0 +1,9 @@
+{
+  "artifact_type": "profile_pack_readiness",
+  "path": "state/profile-pack-readiness.json",
+  "exists": true,
+  "sha256": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "status": "needs_review",
+  "item_count": 1,
+  "warning": null
+}

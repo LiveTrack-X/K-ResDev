@@ -64,6 +64,7 @@ def test_initialize_workspace_creates_standard_layout(tmp_path):
     assert "profile-source-fix-plan" in readme
     assert "profile-source-fix-summary" in readme
     assert "profile-pack-readiness" in readme
+    assert "profile-pack-readiness-drilldown" in readme
     assert "budget-ledger-import" in readme
     assert "budget-ledger-integrity" in readme
     assert "checkpoint-create" in readme

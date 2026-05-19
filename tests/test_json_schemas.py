@@ -231,6 +231,25 @@ def test_profile_pack_readiness_templates_match_json_schemas():
     jsonschema.validate(readiness, readiness_schema)
 
 
+def test_profile_pack_readiness_drilldown_templates_match_json_schemas():
+    with open("schemas/profile_pack_readiness_drilldown_artifact.schema.json", encoding="utf-8") as handle:
+        artifact_schema = json.load(handle)
+    with open("schemas/profile_pack_readiness_drilldown_item.schema.json", encoding="utf-8") as handle:
+        item_schema = json.load(handle)
+    with open("schemas/profile_pack_readiness_drilldown.schema.json", encoding="utf-8") as handle:
+        drilldown_schema = json.load(handle)
+    with open("templates/profile-pack-readiness-drilldown-artifact.json", encoding="utf-8") as handle:
+        artifact = json.load(handle)
+    with open("templates/profile-pack-readiness-drilldown-item.json", encoding="utf-8") as handle:
+        item = json.load(handle)
+    with open("templates/profile-pack-readiness-drilldown.json", encoding="utf-8") as handle:
+        drilldown = json.load(handle)
+
+    jsonschema.validate(artifact, artifact_schema)
+    jsonschema.validate(item, item_schema)
+    jsonschema.validate(drilldown, drilldown_schema)
+
+
 def test_budget_ledger_item_template_matches_json_schema():
     with open("schemas/budget_ledger_item.schema.json", encoding="utf-8") as handle:
         schema = json.load(handle)

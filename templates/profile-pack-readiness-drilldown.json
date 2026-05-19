@@ -1,0 +1,52 @@
+{
+  "root": ".",
+  "status": "needs_review",
+  "readiness_path": "state/profile-pack-readiness.json",
+  "readiness_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "readiness_status": "needs_review",
+  "readiness_finding_count": 1,
+  "drilldown_count": 1,
+  "matched_count": 1,
+  "unmatched_count": 0,
+  "missing_artifact_count": 0,
+  "high_count": 0,
+  "medium_count": 1,
+  "low_count": 0,
+  "artifacts": [
+    {
+      "artifact_type": "profile_source_queue",
+      "path": "state/profile-source-queue.json",
+      "exists": true,
+      "sha256": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "status": "needs_review",
+      "item_count": 1,
+      "warning": null
+    }
+  ],
+  "items": [
+    {
+      "drilldown_id": "PPRD-2026-ABCD1234",
+      "finding_code": "profile_pack_source_queue_finding",
+      "severity": "medium",
+      "profile_id": "national-rnd-basic",
+      "finding_message": "Profile source records need review before profile promotion.",
+      "finding_path": "state/profile-source-queue.json",
+      "finding_suggested_action": "Review profile-source-queue before agency profile pack expansion.",
+      "source_artifact": "profile_source_queue",
+      "source_artifact_path": "state/profile-source-queue.json",
+      "source_artifact_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "source_index": 0,
+      "source_ref_id": "PSQ-2026-ABCD1234",
+      "source_code": "profile_source_not_verified",
+      "source_status": "needs_review",
+      "source_message": "Profile source records need review before profile promotion.",
+      "source_path": "state/profile-sources.json",
+      "related_ids": ["PSQ-2026-ABCD1234"],
+      "command": "python -m k_resdev_skill profile-source-queue --root . --output reports/profile-source-queue.md --json state/profile-source-queue.json",
+      "match_status": "matched"
+    }
+  ],
+  "markdown_path": "reports/profile-pack-readiness-drilldown.md",
+  "json_path": "state/profile-pack-readiness-drilldown.json",
+  "warnings": []
+}

@@ -35,6 +35,7 @@ from .models import (
 )
 from .profile_promotion import load_profile_promotion_records
 from .profile_lifecycle import load_profile_lifecycle_ledger
+from .profile_pack_drilldown import load_profile_pack_readiness_drilldown
 from .profile_pack_readiness import load_profile_pack_readiness
 from .profile_review import load_profile_review
 from .profile_source_fix_plan import load_profile_source_fix_plan
@@ -70,6 +71,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "profile-review.md",
     "profile-source-fix-plan.md",
     "profile-source-fix-summary.md",
+    "profile-pack-readiness-drilldown.md",
     "profile-pack-readiness.md",
     "profile-source-queue.md",
     "profile-source-summary.md",
@@ -115,6 +117,7 @@ def generate_workspace_trace(
     builder.add_profile_promotion_revoke_result()
     builder.add_profile_lifecycle_ledger()
     builder.add_profile_pack_readiness()
+    builder.add_profile_pack_readiness_drilldown()
     builder.add_bibliography()
     builder.add_reference_corpus()
     builder.add_reports()
@@ -1083,6 +1086,49 @@ class _TraceBuilder:
                 path=finding.path or str(path),
                 suggested_action=finding.suggested_action or "Review profile-pack-readiness before agency profile pack expansion.",
             )
+
+    def add_profile_pack_readiness_drilldown(self) -> None:
+        path = self.workspace / "state" / "profile-pack-readiness-drilldown.json"
+        if not path.exists():
+            return
+        try:
+            drilldown = load_profile_pack_readiness_drilldown(path)
+        except Exception as exc:
+            self.finding(
+                "trace_profile_pack_readiness_drilldown_unreadable",
+                "medium",
+                f"Profile pack readiness drilldown could not be read: {exc}",
+                path=path,
+                suggested_action="Regenerate profile-pack-readiness-drilldown before relying on drilldown trace state.",
+            )
+            return
+        node = self.node(
+            "profile_pack_readiness_drilldown",
+            "profile-pack-readiness-drilldown",
+            "Profile pack readiness drilldown",
+            status=drilldown.status,
+            path=str(path),
+            sha256=_sha256_file(path),
+            metadata={
+                "drilldown_count": drilldown.drilldown_count,
+                "matched_count": drilldown.matched_count,
+                "missing_artifact_count": drilldown.missing_artifact_count,
+                "unmatched_count": drilldown.unmatched_count,
+            },
+        )
+        self.edge(node.node_id, _node_id("profile_pack_readiness", "profile-pack-readiness"), "drills_into")
+        for item in drilldown.items:
+            if item.profile_id:
+                self.edge(node.node_id, _node_id("profile", item.profile_id), "explains_profile_pack")
+            if item.match_status in {"missing_artifact", "unmatched"}:
+                self.finding(
+                    "trace_profile_pack_readiness_drilldown_gap",
+                    "medium",
+                    f"Profile pack readiness drilldown item `{item.drilldown_id}` is `{item.match_status}`.",
+                    node_id=node.node_id,
+                    path=item.source_artifact_path or str(path),
+                    suggested_action="Regenerate upstream profile-source and lifecycle artifacts, then rerun profile-pack-readiness-drilldown.",
+                )
 
     def add_approvals(self) -> None:
         approvals_dir = self.workspace / "state" / "approvals"

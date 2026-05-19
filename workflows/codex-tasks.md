@@ -632,13 +632,26 @@ Profile pack readiness helps decide which verified agency profile pack work is r
 
 ### Task 56: Profile pack readiness evidence drilldown
 
-Planned:
-- add a drilldown report that links each profile-pack readiness finding to the exact upstream artifact row, action ID, review record, lifecycle entry, or command that produced it
-- include source artifact paths and SHA-256 hashes for queue, fix-plan, fix-review, promotion, apply/revoke, and lifecycle inputs
-- add `profile-pack-readiness-drilldown` as a read-only command and optional review-pack artifact
-- keep the dashboard summary compact while making blocker investigation one command away
+Implemented:
+- `ProfilePackReadinessDrilldownArtifact`, `ProfilePackReadinessDrilldownItem`, and `ProfilePackReadinessDrilldownResult` models
+- `profile-pack-readiness-drilldown` command and public API
+- `reports/profile-pack-readiness-drilldown.md` and `state/profile-pack-readiness-drilldown.json`
+- read-only links from readiness findings to upstream profile-source queue items, fix-plan actions, fix-review findings, profile-review checks, promotion/apply/revoke summaries, and lifecycle findings
+- source artifact paths, SHA-256 hashes, source row/action/check IDs, suggested next commands, and match status fields
+- schema/template coverage and validation aliases
+- doctor, next-action, workspace-summary, review-pack, operational Markdown filtering, and trace integration
 
-This should reduce operator time spent jumping between profile-source, promotion, and lifecycle artifacts.
+Drilldown reduces operator time spent jumping between profile-source, promotion, and lifecycle artifacts while preserving the local projection boundary.
+
+### Task 57: Profile pack investigation bundle
+
+Planned:
+- create a compact investigation bundle for one profile ID or readiness finding code
+- include the readiness row, drilldown row, upstream artifact hashes, related commands, and supplied human-review status
+- support a Markdown bundle and JSON bundle without copying raw official-source documents
+- keep bundle generation read-only and local-only
+
+This should make profile-pack remediation review easier to hand off without turning local projections into compliance claims.
 
 ## Safety constraints
 

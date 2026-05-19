@@ -20,6 +20,7 @@ from .profile_promotion import summarize_profile_promotions
 from .profile_promotion_apply import generate_profile_promotion_apply_plan, load_profile_promotion_apply_result
 from .profile_promotion_revoke import load_profile_promotion_revoke_plan, load_profile_promotion_revoke_result
 from .profile_lifecycle import generate_profile_lifecycle_ledger
+from .profile_pack_drilldown import generate_profile_pack_readiness_drilldown
 from .profile_pack_readiness import generate_profile_pack_readiness
 from .profile_review import generate_profile_review
 from .profile_source_fix_plan import generate_profile_source_fix_plan
@@ -112,6 +113,8 @@ def generate_workspace_review_pack(
     profile_lifecycle_json = state / "profile-lifecycle-ledger.json"
     profile_pack_readiness_md = reports / "profile-pack-readiness.md"
     profile_pack_readiness_json = state / "profile-pack-readiness.json"
+    profile_pack_drilldown_md = reports / "profile-pack-readiness-drilldown.md"
+    profile_pack_drilldown_json = state / "profile-pack-readiness-drilldown.json"
     workspace_trace_md = reports / "workspace-trace.md"
     workspace_trace_json = state / "workspace-trace.json"
     trace_passport_md = reports / "trace-passport.md"
@@ -143,6 +146,7 @@ def generate_workspace_review_pack(
     profile_revoke_result = _load_profile_revoke_result(profile_revoke_result_json)
     profile_lifecycle = generate_profile_lifecycle_ledger(workspace, output_path=profile_lifecycle_md, json_path=profile_lifecycle_json)
     profile_pack_readiness = generate_profile_pack_readiness(workspace, output_path=profile_pack_readiness_md, json_path=profile_pack_readiness_json)
+    profile_pack_drilldown = generate_profile_pack_readiness_drilldown(workspace, output_path=profile_pack_drilldown_md, json_path=profile_pack_drilldown_json)
     weekly_review = generate_weekly_review(
         workspace,
         review_date=weekly_date,
@@ -221,6 +225,8 @@ def generate_workspace_review_pack(
         str(profile_lifecycle_json),
         str(profile_pack_readiness_md),
         str(profile_pack_readiness_json),
+        str(profile_pack_drilldown_md),
+        str(profile_pack_drilldown_json),
         str(workspace_trace_md),
         str(workspace_trace_json),
         str(trace_passport_md),
@@ -336,6 +342,10 @@ def generate_workspace_review_pack(
         profile_pack_readiness_blocked_count=profile_pack_readiness.blocked_count,
         profile_pack_readiness_finding_count=profile_pack_readiness.finding_count,
         profile_pack_readiness_high_count=profile_pack_readiness.high_count,
+        profile_pack_drilldown_status=profile_pack_drilldown.status,
+        profile_pack_drilldown_item_count=profile_pack_drilldown.drilldown_count,
+        profile_pack_drilldown_missing_artifact_count=profile_pack_drilldown.missing_artifact_count,
+        profile_pack_drilldown_unmatched_count=profile_pack_drilldown.unmatched_count,
         workspace_trace_status=workspace_trace.status,
         workspace_trace_node_count=workspace_trace.node_count,
         workspace_trace_edge_count=workspace_trace.edge_count,
@@ -417,7 +427,7 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
     lines = [
         "# K-ResDev Workspace Review Pack",
         "",
-            "> Review pack projection only. It bundles local discovery, authority, goals, weekly-review, dashboard, readiness, next-action, summary, source-verification, budget-ledger, approval-coverage, report-integrity, bibliography-integrity, reference-corpus, citation-support, research-claim-matrix, trace-passport, profile-source-queue, profile-source-fix-plan, profile-source-fix-summary, profile-pack-readiness, profile-integrity, and trace artifacts; it does not certify official agency compliance.",
+            "> Review pack projection only. It bundles local discovery, authority, goals, weekly-review, dashboard, readiness, next-action, summary, source-verification, budget-ledger, approval-coverage, report-integrity, bibliography-integrity, reference-corpus, citation-support, research-claim-matrix, trace-passport, profile-source-queue, profile-source-fix-plan, profile-source-fix-summary, profile-pack-readiness, profile-pack-readiness-drilldown, profile-integrity, and trace artifacts; it does not certify official agency compliance.",
         "",
         "| Field | Value |",
         "|---|---|",
@@ -528,6 +538,10 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
         f"| Profile pack readiness blocked | {result.profile_pack_readiness_blocked_count} |",
         f"| Profile pack readiness finding count | {result.profile_pack_readiness_finding_count} |",
         f"| Profile pack readiness high count | {result.profile_pack_readiness_high_count} |",
+        f"| Profile pack drilldown status | {_escape(result.profile_pack_drilldown_status or '-')} |",
+        f"| Profile pack drilldown items | {result.profile_pack_drilldown_item_count} |",
+        f"| Profile pack drilldown missing artifacts | {result.profile_pack_drilldown_missing_artifact_count} |",
+        f"| Profile pack drilldown unmatched | {result.profile_pack_drilldown_unmatched_count} |",
         f"| Workspace trace status | {_escape(result.workspace_trace_status or '-')} |",
         f"| Workspace trace nodes | {result.workspace_trace_node_count} |",
         f"| Workspace trace edges | {result.workspace_trace_edge_count} |",
@@ -585,6 +599,7 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
             "- Use `profile-promotion-revoke-result.md` to inspect guarded profile rollback mutations and pre-revoke backup paths.",
             "- Use `profile-lifecycle-ledger.md` to inspect profile review/promotion/apply/revoke history from one chronological ledger.",
             "- Use `profile-pack-readiness.md` to scan profile/source queue, fix-plan, fix-review, promotion, apply/revoke, and lifecycle blockers together.",
+            "- Use `profile-pack-readiness-drilldown.md` to trace readiness blockers back to upstream artifact rows, IDs, and hashes.",
             "- Use `workspace-trace.md` to inspect cross-artifact traceability and impact findings.",
             "- Use `trace-passport.md` to inspect checkpoint freshness before resuming long-running work.",
             "- Run `verify-review-pack state/workspace-review-pack.json` before relying on a saved pack.",
@@ -657,6 +672,8 @@ def _artifact_label(path: str) -> str:
         "profile-lifecycle-ledger.json": "Profile lifecycle ledger JSON",
         "profile-pack-readiness.md": "Profile pack readiness",
         "profile-pack-readiness.json": "Profile pack readiness JSON",
+        "profile-pack-readiness-drilldown.md": "Profile pack readiness drilldown",
+        "profile-pack-readiness-drilldown.json": "Profile pack readiness drilldown JSON",
         "workspace-trace.md": "Workspace trace",
         "workspace-trace.json": "Workspace trace JSON",
         "trace-passport.md": "Trace passport",

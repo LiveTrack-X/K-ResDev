@@ -39,6 +39,7 @@ BIBLIOGRAPHY_OPERATIONAL_NAMES = {
     "profile-review.md",
     "profile-source-fix-plan.md",
     "profile-source-fix-summary.md",
+    "profile-pack-readiness-drilldown.md",
     "profile-pack-readiness.md",
     "profile-source-queue.md",
     "profile-source-summary.md",

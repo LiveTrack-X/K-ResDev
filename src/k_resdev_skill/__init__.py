@@ -101,6 +101,9 @@ from .models import (
     KPI,
     Milestone,
     PaperRecord,
+    ProfilePackReadinessDrilldownArtifact,
+    ProfilePackReadinessDrilldownItem,
+    ProfilePackReadinessDrilldownResult,
     ProfilePackReadinessFinding,
     ProfilePackReadinessProfile,
     ProfilePackReadinessResult,
@@ -208,6 +211,7 @@ from .profile_promotion_revoke import (
     revoke_profile_promotion_plan,
 )
 from .profile_lifecycle import generate_profile_lifecycle_ledger, load_profile_lifecycle_ledger, render_profile_lifecycle_ledger_markdown
+from .profile_pack_drilldown import generate_profile_pack_readiness_drilldown, load_profile_pack_readiness_drilldown, render_profile_pack_readiness_drilldown_markdown
 from .profile_pack_readiness import generate_profile_pack_readiness, load_profile_pack_readiness, render_profile_pack_readiness_markdown
 from .profile_review import generate_profile_review, load_profile_review, render_profile_review_markdown
 from .profile_source_fix_plan import generate_profile_source_fix_plan, load_profile_source_fix_plan, render_profile_source_fix_plan_markdown
@@ -338,6 +342,9 @@ __all__ = [
     "KPI",
     "Milestone",
     "PaperRecord",
+    "ProfilePackReadinessDrilldownArtifact",
+    "ProfilePackReadinessDrilldownItem",
+    "ProfilePackReadinessDrilldownResult",
     "ProfilePackReadinessFinding",
     "ProfilePackReadinessProfile",
     "ProfilePackReadinessResult",
@@ -462,6 +469,7 @@ __all__ = [
     "generate_paper_card_markdown",
     "generate_profile_integrity",
     "generate_profile_lifecycle_ledger",
+    "generate_profile_pack_readiness_drilldown",
     "generate_profile_pack_readiness",
     "generate_profile_source_fix_plan",
     "summarize_profile_source_fix_reviews",
@@ -511,6 +519,7 @@ __all__ = [
     "load_profile_promotion_revoke_plan",
     "load_profile_promotion_revoke_result",
     "load_profile_lifecycle_ledger",
+    "load_profile_pack_readiness_drilldown",
     "load_profile_pack_readiness",
     "load_profile_source_fix_plan",
     "load_profile_source_fix_review_records",
@@ -548,6 +557,7 @@ __all__ = [
     "render_goals_review_markdown",
     "render_profile_integrity_markdown",
     "render_profile_lifecycle_ledger_markdown",
+    "render_profile_pack_readiness_drilldown_markdown",
     "render_profile_pack_readiness_markdown",
     "render_profile_source_fix_plan_markdown",
     "render_profile_source_fix_review_summary_markdown",
@@ -595,4 +605,4 @@ __all__ = [
     "write_research_claims",
 ]
 
-__version__ = "0.1.0b45"
+__version__ = "0.1.0b46"

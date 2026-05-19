@@ -1171,6 +1171,10 @@ class WorkspaceSummaryResult(StrictModel):
     profile_pack_readiness_blocked_count: int = 0
     profile_pack_readiness_finding_count: int = 0
     profile_pack_readiness_high_count: int = 0
+    profile_pack_drilldown_status: str | None = None
+    profile_pack_drilldown_item_count: int = 0
+    profile_pack_drilldown_missing_artifact_count: int = 0
+    profile_pack_drilldown_unmatched_count: int = 0
     trace_status: str | None = None
     trace_node_count: int = 0
     trace_edge_count: int = 0
@@ -1458,6 +1462,10 @@ class WorkspaceReviewPackResult(StrictModel):
     profile_pack_readiness_blocked_count: int = 0
     profile_pack_readiness_finding_count: int = 0
     profile_pack_readiness_high_count: int = 0
+    profile_pack_drilldown_status: str | None = None
+    profile_pack_drilldown_item_count: int = 0
+    profile_pack_drilldown_missing_artifact_count: int = 0
+    profile_pack_drilldown_unmatched_count: int = 0
     workspace_trace_status: str | None = None
     workspace_trace_node_count: int = 0
     workspace_trace_edge_count: int = 0
@@ -1816,6 +1824,80 @@ class ProfilePackReadinessResult(StrictModel):
     markdown_path: str | None = None
     json_path: str | None = None
     warnings: list[str] = Field(default_factory=list)
+
+
+class ProfilePackReadinessDrilldownArtifact(StrictModel):
+    artifact_type: str
+    path: str
+    exists: bool = False
+    sha256: str | None = None
+    status: str | None = None
+    item_count: int = 0
+    warning: str | None = None
+
+    @field_validator("artifact_type", "path")
+    @classmethod
+    def _profile_pack_drilldown_artifact_field_must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
+class ProfilePackReadinessDrilldownItem(StrictModel):
+    drilldown_id: str
+    finding_code: str
+    severity: str
+    profile_id: str | None = None
+    finding_message: str
+    finding_path: str | None = None
+    finding_suggested_action: str | None = None
+    source_artifact: str
+    source_artifact_path: str | None = None
+    source_artifact_hash: str | None = None
+    source_index: int | None = None
+    source_ref_id: str | None = None
+    source_code: str | None = None
+    source_status: str | None = None
+    source_message: str | None = None
+    source_path: str | None = None
+    related_ids: list[str] = Field(default_factory=list)
+    command: str | None = None
+    match_status: str = "matched"
+
+    @field_validator("drilldown_id", "finding_code", "severity", "finding_message", "source_artifact", "match_status")
+    @classmethod
+    def _profile_pack_drilldown_item_field_must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
+class ProfilePackReadinessDrilldownResult(StrictModel):
+    root: str
+    status: str
+    readiness_path: str
+    readiness_hash: str | None = None
+    readiness_status: str | None = None
+    readiness_finding_count: int = 0
+    drilldown_count: int = 0
+    matched_count: int = 0
+    unmatched_count: int = 0
+    missing_artifact_count: int = 0
+    high_count: int = 0
+    medium_count: int = 0
+    low_count: int = 0
+    artifacts: list[ProfilePackReadinessDrilldownArtifact] = Field(default_factory=list)
+    items: list[ProfilePackReadinessDrilldownItem] = Field(default_factory=list)
+    markdown_path: str | None = None
+    json_path: str | None = None
+    warnings: list[str] = Field(default_factory=list)
+
+    @field_validator("root", "status", "readiness_path")
+    @classmethod
+    def _profile_pack_drilldown_result_field_must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
 
 
 class ProfileReviewChecklistItem(StrictModel):

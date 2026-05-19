@@ -145,6 +145,9 @@ def test_validate_json_file_accepts_profile_review_aliases():
     profile_pack_readiness_profile = validate_json_file("templates/profile-pack-readiness-profile.json", "profile-pack-readiness-profile")
     profile_pack_readiness_finding = validate_json_file("templates/profile-pack-readiness-finding.json", "profile-pack-readiness-finding")
     profile_pack_readiness = validate_json_file("templates/profile-pack-readiness.json", "profile-pack-readiness")
+    profile_pack_drilldown_artifact = validate_json_file("templates/profile-pack-readiness-drilldown-artifact.json", "profile-pack-readiness-drilldown-artifact")
+    profile_pack_drilldown_item = validate_json_file("templates/profile-pack-readiness-drilldown-item.json", "profile-pack-readiness-drilldown-item")
+    profile_pack_drilldown = validate_json_file("templates/profile-pack-readiness-drilldown.json", "profile-pack-readiness-drilldown")
 
     assert source_fix_plan_action["valid"] is True
     assert source_fix_plan["valid"] is True
@@ -165,6 +168,9 @@ def test_validate_json_file_accepts_profile_review_aliases():
     assert profile_pack_readiness_profile["valid"] is True
     assert profile_pack_readiness_finding["valid"] is True
     assert profile_pack_readiness["valid"] is True
+    assert profile_pack_drilldown_artifact["valid"] is True
+    assert profile_pack_drilldown_item["valid"] is True
+    assert profile_pack_drilldown["valid"] is True
 
 
 def test_validate_json_cli_returns_nonzero_for_invalid(tmp_path, capsys):

@@ -94,6 +94,7 @@ def _actions_for_findings(root: Path, findings: list[WorkspaceDoctorFinding]) ->
         _action_for_profile_promotion_revoke_result(root, by_code),
         _action_for_profile_lifecycle(root, by_code),
         _action_for_profile_pack_readiness(root, by_code),
+        _action_for_profile_pack_readiness_drilldown(root, by_code),
         _action_for_approval_coverage(root, by_code),
         _action_for_report_integrity(root, by_code),
         _action_for_artifact_authority(root, by_code),
@@ -490,6 +491,26 @@ def _action_for_profile_pack_readiness(root: Path, by_code: dict[str, list[Works
         "Review profile pack readiness",
         "Profile/source queue, fix-plan, fix-review, promotion, apply/revoke, and lifecycle state should be scanned together before agency pack expansion.",
         f'python -m k_resdev_skill profile-pack-readiness --root "{root}" --output "{root / "reports" / "profile-pack-readiness.md"}" --json "{root / "state" / "profile-pack-readiness.json"}"',
+        by_code,
+        codes,
+    )
+
+
+def _action_for_profile_pack_readiness_drilldown(root: Path, by_code: dict[str, list[WorkspaceDoctorFinding]]) -> WorkspaceActionItem | None:
+    codes = [
+        "profile_pack_readiness_drilldown_missing",
+        "profile_pack_readiness_drilldown_missing_artifacts",
+        "profile_pack_readiness_drilldown_unmatched",
+    ]
+    if not any(code in by_code for code in codes):
+        return None
+    priority = "medium" if any(code in by_code for code in codes[1:]) else "low"
+    return _action(
+        root,
+        priority,
+        "Review profile pack readiness drilldown",
+        "Readiness blockers should point back to the queue, fix-plan, review, promotion, apply/revoke, or lifecycle artifact that produced them.",
+        f'python -m k_resdev_skill profile-pack-readiness-drilldown --root "{root}" --output "{root / "reports" / "profile-pack-readiness-drilldown.md"}" --json "{root / "state" / "profile-pack-readiness-drilldown.json"}"',
         by_code,
         codes,
     )

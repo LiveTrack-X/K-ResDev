@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ProfilePackReadinessDrilldownResult",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "root",
+    "status",
+    "readiness_path",
+    "readiness_hash",
+    "readiness_status",
+    "readiness_finding_count",
+    "drilldown_count",
+    "matched_count",
+    "unmatched_count",
+    "missing_artifact_count",
+    "high_count",
+    "medium_count",
+    "low_count",
+    "artifacts",
+    "items",
+    "markdown_path",
+    "json_path",
+    "warnings"
+  ],
+  "properties": {
+    "root": {"type": "string"},
+    "status": {"type": "string"},
+    "readiness_path": {"type": "string"},
+    "readiness_hash": {"type": ["string", "null"]},
+    "readiness_status": {"type": ["string", "null"]},
+    "readiness_finding_count": {"type": "integer", "minimum": 0},
+    "drilldown_count": {"type": "integer", "minimum": 0},
+    "matched_count": {"type": "integer", "minimum": 0},
+    "unmatched_count": {"type": "integer", "minimum": 0},
+    "missing_artifact_count": {"type": "integer", "minimum": 0},
+    "high_count": {"type": "integer", "minimum": 0},
+    "medium_count": {"type": "integer", "minimum": 0},
+    "low_count": {"type": "integer", "minimum": 0},
+    "artifacts": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/artifact"}
+    },
+    "items": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/item"}
+    },
+    "markdown_path": {"type": ["string", "null"]},
+    "json_path": {"type": ["string", "null"]},
+    "warnings": {"type": "array", "items": {"type": "string"}}
+  },
+  "$defs": {
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["artifact_type", "path", "exists", "sha256", "status", "item_count", "warning"],
+      "properties": {
+        "artifact_type": {"type": "string"},
+        "path": {"type": "string"},
+        "exists": {"type": "boolean"},
+        "sha256": {"type": ["string", "null"]},
+        "status": {"type": ["string", "null"]},
+        "item_count": {"type": "integer", "minimum": 0},
+        "warning": {"type": ["string", "null"]}
+      }
+    },
+    "item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "drilldown_id",
+        "finding_code",
+        "severity",
+        "profile_id",
+        "finding_message",
+        "finding_path",
+        "finding_suggested_action",
+        "source_artifact",
+        "source_artifact_path",
+        "source_artifact_hash",
+        "source_index",
+        "source_ref_id",
+        "source_code",
+        "source_status",
+        "source_message",
+        "source_path",
+        "related_ids",
+        "command",
+        "match_status"
+      ],
+      "properties": {
+        "drilldown_id": {"type": "string"},
+        "finding_code": {"type": "string"},
+        "severity": {"type": "string"},
+        "profile_id": {"type": ["string", "null"]},
+        "finding_message": {"type": "string"},
+        "finding_path": {"type": ["string", "null"]},
+        "finding_suggested_action": {"type": ["string", "null"]},
+        "source_artifact": {"type": "string"},
+        "source_artifact_path": {"type": ["string", "null"]},
+        "source_artifact_hash": {"type": ["string", "null"]},
+        "source_index": {"type": ["integer", "null"], "minimum": 0},
+        "source_ref_id": {"type": ["string", "null"]},
+        "source_code": {"type": ["string", "null"]},
+        "source_status": {"type": ["string", "null"]},
+        "source_message": {"type": ["string", "null"]},
+        "source_path": {"type": ["string", "null"]},
+        "related_ids": {"type": "array", "items": {"type": "string"}},
+        "command": {"type": ["string", "null"]},
+        "match_status": {"type": "string"}
+      }
+    }
+  }
+}

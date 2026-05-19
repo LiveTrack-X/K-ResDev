@@ -6,6 +6,13 @@ import re
 from pathlib import Path
 from typing import Any
 
+from .admin_operating import (
+    generate_settlement_binder,
+    review_admin_calendar,
+    review_admin_change_ledger,
+    review_admin_obligation_profile_pack,
+    review_admin_obligations,
+)
 from .artifact_authority import authority_for_trace_node
 from .approval import load_approval_records
 from .bibliography import load_bibliography_index
@@ -37,6 +44,7 @@ from .profile_promotion import load_profile_promotion_records
 from .profile_lifecycle import load_profile_lifecycle_ledger
 from .profile_pack_investigation import load_profile_pack_investigation_bundle
 from .profile_pack_investigation_package import load_profile_pack_investigation_package
+from .profile_pack_package_receipt import summarize_profile_pack_package_receipts
 from .profile_pack_drilldown import load_profile_pack_readiness_drilldown
 from .profile_pack_readiness import load_profile_pack_readiness
 from .profile_review import load_profile_review
@@ -54,6 +62,9 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "approval-coverage.md",
     "approval-summary.md",
     "artifact-authority.md",
+    "admin-calendar.md",
+    "admin-change-ledger.md",
+    "admin-obligations.md",
     "bibliography-integrity.md",
     "budget-ledger.md",
     "budget-checklist.md",
@@ -75,6 +86,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "profile-source-fix-summary.md",
     "profile-pack-investigation-bundle.md",
     "profile-pack-investigation-package.md",
+    "profile-pack-package-receipt-summary.md",
     "profile-pack-readiness-drilldown.md",
     "profile-pack-readiness.md",
     "profile-source-queue.md",
@@ -84,6 +96,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "research-claim-matrix.md",
     "research-claims.md",
     "report-integrity.md",
+    "settlement-binder.md",
     "source-verification.md",
     "trace-passport.md",
     "workspace-discovery.md",
@@ -124,6 +137,8 @@ def generate_workspace_trace(
     builder.add_profile_pack_readiness_drilldown()
     builder.add_profile_pack_investigation_bundle()
     builder.add_profile_pack_investigation_package()
+    builder.add_profile_pack_package_receipts()
+    builder.add_admin_operating_layer()
     builder.add_bibliography()
     builder.add_reference_corpus()
     builder.add_reports()
@@ -1283,6 +1298,217 @@ class _TraceBuilder:
                 path=path,
                 suggested_action="Keep raw official-source bodies out of generated transfer packages unless a separate human-approved process supplies them.",
             )
+
+    def add_profile_pack_package_receipts(self) -> None:
+        path = self.workspace / "state" / "profile-pack-investigation-package.json"
+        if not path.exists():
+            return
+        try:
+            summary = summarize_profile_pack_package_receipts(self.workspace)
+        except Exception as exc:
+            self.finding(
+                "trace_profile_pack_package_receipts_unreadable",
+                "medium",
+                f"Profile pack package receipts could not be summarized: {exc}",
+                path=self.workspace / "state" / "profile-pack-package-receipts",
+                suggested_action="Fix package receipt records before relying on reviewer handoff trace state.",
+            )
+            return
+        summary_node = self.node(
+            "profile_pack_package_receipt_summary",
+            "profile-pack-package-receipt-summary",
+            "Profile pack package receipt summary",
+            status=summary.status,
+            path=str(self.workspace / "state" / "profile-pack-package-receipt-summary.json"),
+            metadata={
+                "package_id": summary.package_id,
+                "record_count": summary.record_count,
+                "unresolved_count": summary.unresolved_count,
+                "stale_record_count": summary.stale_record_count,
+            },
+        )
+        if summary.package_id:
+            self.edge(_node_id("profile_pack_investigation_package", summary.package_id), summary_node.node_id, "has_reviewer_receipts")
+        for record in summary.records:
+            receipt_node = self.node(
+                "profile_pack_package_receipt",
+                record.receipt_id,
+                record.receipt_id,
+                ref_id=record.receipt_id,
+                status=str(record.decision),
+                path=record.package_manifest_path,
+                metadata={
+                    "package_id": record.package_id,
+                    "package_manifest_hash": record.package_manifest_hash,
+                    "reviewer": record.reviewer,
+                    "reviewed_at": record.reviewed_at,
+                    "risk_flags": record.risk_flags,
+                },
+            )
+            self.edge(summary_node.node_id, receipt_node.node_id, "summarizes_receipt")
+            self.edge(receipt_node.node_id, _node_id("profile_pack_investigation_package", record.package_id), "reviews_package")
+        for finding in summary.findings:
+            self.finding(
+                f"trace_{finding.code}",
+                finding.severity,
+                finding.message,
+                node_id=summary_node.node_id,
+                path=finding.path,
+                suggested_action=finding.suggested_action,
+            )
+
+    def add_admin_operating_layer(self) -> None:
+        admin = review_admin_obligations(self.workspace)
+        if admin.profile_id:
+            profile_pack = review_admin_obligation_profile_pack(admin.profile_id)
+            pack_node = self.node(
+                "admin_profile_pack",
+                admin.profile_id,
+                "Admin obligation profile pack",
+                ref_id=admin.profile_id,
+                status=profile_pack.status,
+                path=profile_pack.pack_path,
+                metadata={
+                    "profile_status": profile_pack.profile_status,
+                    "obligation_count": profile_pack.obligation_count,
+                    "source_record_count": profile_pack.source_record_count,
+                    "finding_count": profile_pack.finding_count,
+                },
+            )
+            self.edge(pack_node.node_id, _node_id("profile", admin.profile_id), "seeds_profile_admin_obligations")
+            source_ids = profile_pack.pack.source_record_ids if profile_pack.pack else []
+            for source_id in source_ids:
+                self.edge(_node_id("profile_source", source_id), pack_node.node_id, "supports_admin_profile_pack")
+            for finding in profile_pack.findings:
+                self.finding(
+                    f"trace_{finding.code}",
+                    finding.severity,
+                    finding.message,
+                    node_id=pack_node.node_id,
+                    path=finding.path,
+                    suggested_action=finding.suggested_action,
+                )
+        admin_node = self.node(
+            "admin_obligation_graph",
+            "admin-obligations",
+            "Admin obligation graph",
+            status=admin.status,
+            path=str(self.workspace / "state" / "admin-obligations.json"),
+            metadata={
+                "profile_id": admin.profile_id,
+                "obligation_count": admin.obligation_count,
+                "submission_count": admin.submission_count,
+                "settlement_requirement_count": admin.settlement_requirement_count,
+                "finding_count": admin.finding_count,
+            },
+        )
+        for obligation in admin.obligations:
+            obligation_node = self.node(
+                "admin_obligation",
+                obligation.obligation_id,
+                obligation.title,
+                ref_id=obligation.obligation_id,
+                status=obligation.status,
+                path=str(self.workspace / "state" / "admin-obligations.json"),
+                metadata={
+                    "obligation_type": obligation.obligation_type,
+                    "source_system": obligation.source_system,
+                    "due_date": obligation.due_date.isoformat() if obligation.due_date else None,
+                    "required_evidence_types": obligation.required_evidence_types,
+                    "required_approval": obligation.required_approval,
+                    "risk_flags": obligation.risk_flags,
+                },
+            )
+            self.edge(admin_node.node_id, obligation_node.node_id, "defines_admin_obligation")
+            if obligation.linked_deadline_id:
+                self.edge(obligation_node.node_id, _node_id("project_deadline", obligation.linked_deadline_id), "tracks_deadline")
+        for submission in admin.submissions:
+            submission_node = self.node(
+                "admin_submission",
+                submission.submission_id,
+                submission.title,
+                ref_id=submission.submission_id,
+                status=submission.status,
+                path=submission.artifact_path,
+                metadata={"target_system": submission.target_system, "approval_id": submission.approval_id},
+            )
+            self.edge(_node_id("admin_obligation", submission.obligation_id), submission_node.node_id, "has_submission")
+            if submission.approval_id:
+                self.edge(submission_node.node_id, _node_id("approval", submission.approval_id), "requires_approval")
+            for evidence_id in submission.evidence_ids:
+                self.edge(_node_id("evidence", evidence_id), submission_node.node_id, "supports_submission")
+        for finding in admin.findings:
+            self.finding(f"trace_{finding.code}", finding.severity, finding.message, node_id=admin_node.node_id, path=finding.path, suggested_action=finding.suggested_action)
+
+        binder = generate_settlement_binder(self.workspace)
+        binder_node = self.node(
+            "settlement_binder",
+            "settlement-binder",
+            "Settlement evidence binder",
+            status=binder.status,
+            path=str(self.workspace / "state" / "settlement-binder.json"),
+            metadata={"item_count": binder.item_count, "linked_evidence_count": binder.linked_evidence_count, "finding_count": binder.finding_count},
+        )
+        self.edge(admin_node.node_id, binder_node.node_id, "reviews_settlement_evidence")
+        for item in binder.items:
+            item_node = self.node(
+                "settlement_binder_item",
+                item.ledger_id,
+                item.ledger_id,
+                ref_id=item.ledger_id,
+                status=item.review_status,
+                path=item.source_file,
+                sha256=item.source_hash,
+                metadata={"amount": item.amount, "currency": item.currency, "category": item.category, "finding_codes": item.finding_codes},
+            )
+            self.edge(binder_node.node_id, item_node.node_id, "binds_ledger_item")
+            self.edge(_node_id("budget_ledger", item.ledger_id), item_node.node_id, "settlement_binds")
+            for evidence_id in item.evidence_ids:
+                self.edge(_node_id("evidence", evidence_id), item_node.node_id, "supports_settlement_item")
+
+        change = review_admin_change_ledger(self.workspace)
+        if change.status != "not_configured":
+            change_node = self.node(
+                "admin_change_ledger",
+                "admin-change-ledger",
+                "Admin change ledger",
+                status=change.status,
+                path=str(self.workspace / "state" / "admin-change-ledger.json"),
+                metadata={"change_count": change.change_count, "approved_count": change.approved_count, "pending_count": change.pending_count, "rejected_count": change.rejected_count},
+            )
+            self.edge(admin_node.node_id, change_node.node_id, "tracks_admin_changes")
+            for record in change.changes:
+                record_node = self.node(
+                    "admin_change",
+                    record.change_id,
+                    record.change_id,
+                    ref_id=record.change_id,
+                    status=record.decision,
+                    path=record.target_path,
+                    sha256=record.target_hash,
+                    metadata={"change_type": record.change_type, "target_id": record.target_id, "approval_id": record.approval_id},
+                )
+                self.edge(change_node.node_id, record_node.node_id, "contains_change")
+                if record.approval_id:
+                    self.edge(record_node.node_id, _node_id("approval", record.approval_id), "approved_by")
+                for evidence_id in record.evidence_ids:
+                    self.edge(_node_id("evidence", evidence_id), record_node.node_id, "supports_change")
+            for finding in change.findings:
+                self.finding(f"trace_{finding.code}", finding.severity, finding.message, node_id=change_node.node_id, path=finding.path, suggested_action=finding.suggested_action)
+
+        calendar = review_admin_calendar(self.workspace)
+        if calendar.status != "not_configured":
+            calendar_node = self.node(
+                "admin_calendar",
+                "admin-calendar",
+                "Admin calendar",
+                status=calendar.status,
+                path=str(self.workspace / "state" / "admin-calendar.json"),
+                metadata={"linked_deadline_count": calendar.linked_deadline_count, "due_soon_count": calendar.due_soon_count, "overdue_count": calendar.overdue_count},
+            )
+            self.edge(admin_node.node_id, calendar_node.node_id, "projects_admin_deadlines")
+            for finding in calendar.findings:
+                self.finding(f"trace_{finding.code}", finding.severity, finding.message, node_id=calendar_node.node_id, path=finding.path, suggested_action=finding.suggested_action)
 
     def add_approvals(self) -> None:
         approvals_dir = self.workspace / "state" / "approvals"

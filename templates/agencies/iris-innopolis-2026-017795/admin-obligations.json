@@ -1,0 +1,92 @@
+{
+  "profile_id": "iris-innopolis-2026-017795",
+  "status": "needs_review",
+  "profile_status": "needs_review",
+  "source_record_ids": [
+    "PRS-IRIS-017795-20260519"
+  ],
+  "notes": "Narrow admin obligation seed from the local IRIS announcement 017795 source note. Keep all rows needs_review until a human verifies the current official announcement and program guidance.",
+  "warnings": [
+    "single_announcement_scope",
+    "human_verification_required",
+    "not_general_agency_rule"
+  ],
+  "obligations": [
+    {
+      "obligation_id": "ADM-IRIS-017795-APPLICATION-001",
+      "title": "IRIS online application submission candidate",
+      "obligation_type": "application_submission",
+      "profile_id": "iris-innopolis-2026-017795",
+      "source_system": "IRIS",
+      "required_evidence_types": [
+        "plan_goal",
+        "outcome",
+        "budget_evidence"
+      ],
+      "required_approval": true,
+      "status": "needs_review",
+      "notes": "Application-route seed only. Verify the active IRIS announcement before use.",
+      "risk_flags": [
+        "official_source_needs_review",
+        "single_announcement_scope"
+      ]
+    },
+    {
+      "obligation_id": "ADM-IRIS-017795-PLAN-001",
+      "title": "Research development plan form candidate",
+      "obligation_type": "plan_attachment",
+      "profile_id": "iris-innopolis-2026-017795",
+      "source_system": "IRIS",
+      "required_evidence_types": [
+        "plan_goal",
+        "kpi",
+        "milestone",
+        "budget_evidence"
+      ],
+      "required_approval": true,
+      "status": "needs_review",
+      "notes": "Form mapping candidate only. Use profile field_map and source records before drafting an official submission.",
+      "risk_flags": [
+        "official_source_needs_review",
+        "form_mapping_needs_review"
+      ]
+    },
+    {
+      "obligation_id": "ADM-IRIS-017795-ELIGIBILITY-001",
+      "title": "Eligibility and certificate attachment candidate",
+      "obligation_type": "eligibility_attachment",
+      "profile_id": "iris-innopolis-2026-017795",
+      "source_system": "IRIS",
+      "required_evidence_types": [
+        "outcome"
+      ],
+      "required_approval": true,
+      "status": "needs_review",
+      "notes": "Business registration, eligibility confirmation, financial/tax documents, and consent/pledge attachments are source-note candidates only.",
+      "risk_flags": [
+        "official_source_needs_review",
+        "attachment_list_needs_review"
+      ]
+    },
+    {
+      "obligation_id": "ADM-IRIS-017795-OPTIONAL-001",
+      "title": "If-applicable attachment candidate",
+      "obligation_type": "conditional_attachment",
+      "profile_id": "iris-innopolis-2026-017795",
+      "source_system": "IRIS",
+      "required_evidence_types": [
+        "budget_evidence",
+        "outcome"
+      ],
+      "required_approval": true,
+      "status": "needs_review",
+      "notes": "Conditional attachments should be checked manually against the current announcement and applicant status.",
+      "risk_flags": [
+        "official_source_needs_review",
+        "conditional_requirement"
+      ]
+    }
+  ],
+  "submissions": [],
+  "settlement_requirements": []
+}

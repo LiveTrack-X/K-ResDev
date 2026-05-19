@@ -1,0 +1,26 @@
+{
+  "change_id": "CHG-2026-001",
+  "change_type": "budget_change",
+  "target_id": "BUD-2026-001",
+  "before": {
+    "amount": 1000
+  },
+  "after": {
+    "amount": 1200
+  },
+  "requested_at": "2026-05-01T00:00:00Z",
+  "decision": "needs_review",
+  "reviewer": null,
+  "approved_at": null,
+  "approval_id": null,
+  "target_path": "state/project-state.json",
+  "target_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "evidence_ids": [
+    "EVI-2026-ABCD1234"
+  ],
+  "status": "needs_review",
+  "notes": null,
+  "risk_flags": [
+    "approval_missing"
+  ]
+}

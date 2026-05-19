@@ -1,0 +1,11 @@
+{
+  "receipt_id": "PPR-2026-ABCD1234",
+  "package_id": "PPIP-2026-ABCD1234",
+  "package_manifest_path": "state/profile-pack-investigation-package.json",
+  "package_manifest_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "decision": "accepted_for_review",
+  "reviewer": "Reviewer",
+  "reviewed_at": "2026-05-19T00:00:00Z",
+  "notes": "Package received for review.",
+  "risk_flags": []
+}

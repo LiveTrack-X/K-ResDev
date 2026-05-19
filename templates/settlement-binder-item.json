@@ -1,0 +1,21 @@
+{
+  "ledger_id": "BUD-2026-001",
+  "date": "2026-05-01",
+  "vendor": "Vendor",
+  "amount": 1000.0,
+  "currency": "KRW",
+  "category": "materials",
+  "proof_type": "receipt",
+  "approval_reference": "APR-2026-BUD-001",
+  "evidence_ids": [
+    "EVI-2026-ABCD1234"
+  ],
+  "evidence_count": 1,
+  "source_file": "references/budget-ledger.csv",
+  "source_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "review_status": "needs_review",
+  "finding_codes": [
+    "budget_ledger_missing_approval_reference"
+  ],
+  "risk_flags": []
+}

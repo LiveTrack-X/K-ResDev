@@ -1,0 +1,610 @@
+{
+  "$defs": {
+    "AdminFinding": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "title": "Code",
+          "type": "string"
+        },
+        "severity": {
+          "title": "Severity",
+          "type": "string"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "obligation_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Obligation Id"
+        },
+        "submission_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Submission Id"
+        },
+        "ledger_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Ledger Id"
+        },
+        "change_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Change Id"
+        },
+        "path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Path"
+        },
+        "suggested_action": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Suggested Action"
+        }
+      },
+      "required": [
+        "code",
+        "severity",
+        "message"
+      ],
+      "title": "AdminFinding",
+      "type": "object"
+    },
+    "AdminObligation": {
+      "additionalProperties": false,
+      "properties": {
+        "obligation_id": {
+          "title": "Obligation Id",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "obligation_type": {
+          "title": "Obligation Type",
+          "type": "string"
+        },
+        "profile_id": {
+          "default": "national-rnd-basic",
+          "title": "Profile Id",
+          "type": "string"
+        },
+        "source_system": {
+          "default": "local",
+          "title": "Source System",
+          "type": "string"
+        },
+        "due_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Due Date"
+        },
+        "cadence": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Cadence"
+        },
+        "required_evidence_types": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Required Evidence Types",
+          "type": "array"
+        },
+        "required_approval": {
+          "default": true,
+          "title": "Required Approval",
+          "type": "boolean"
+        },
+        "linked_deadline_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Linked Deadline Id"
+        },
+        "status": {
+          "default": "needs_review",
+          "title": "Status",
+          "type": "string"
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Notes"
+        },
+        "risk_flags": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Risk Flags",
+          "type": "array"
+        }
+      },
+      "required": [
+        "obligation_id",
+        "title",
+        "obligation_type"
+      ],
+      "title": "AdminObligation",
+      "type": "object"
+    },
+    "AdminObligationProfilePack": {
+      "additionalProperties": false,
+      "properties": {
+        "profile_id": {
+          "title": "Profile Id",
+          "type": "string"
+        },
+        "status": {
+          "default": "needs_review",
+          "title": "Status",
+          "type": "string"
+        },
+        "profile_status": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Profile Status"
+        },
+        "source_record_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Record Ids",
+          "type": "array"
+        },
+        "obligations": {
+          "items": {
+            "$ref": "#/$defs/AdminObligation"
+          },
+          "title": "Obligations",
+          "type": "array"
+        },
+        "submissions": {
+          "items": {
+            "$ref": "#/$defs/AdminSubmission"
+          },
+          "title": "Submissions",
+          "type": "array"
+        },
+        "settlement_requirements": {
+          "items": {
+            "$ref": "#/$defs/SettlementEvidenceRequirement"
+          },
+          "title": "Settlement Requirements",
+          "type": "array"
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Notes"
+        },
+        "warnings": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Warnings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "profile_id"
+      ],
+      "title": "AdminObligationProfilePack",
+      "type": "object"
+    },
+    "AdminSubmission": {
+      "additionalProperties": false,
+      "properties": {
+        "submission_id": {
+          "title": "Submission Id",
+          "type": "string"
+        },
+        "obligation_id": {
+          "title": "Obligation Id",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "artifact_path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Artifact Path"
+        },
+        "target_system": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Target System"
+        },
+        "submitted_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Submitted At"
+        },
+        "approval_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Approval Id"
+        },
+        "evidence_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence Ids",
+          "type": "array"
+        },
+        "status": {
+          "default": "needs_review",
+          "title": "Status",
+          "type": "string"
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Notes"
+        },
+        "risk_flags": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Risk Flags",
+          "type": "array"
+        }
+      },
+      "required": [
+        "submission_id",
+        "obligation_id",
+        "title"
+      ],
+      "title": "AdminSubmission",
+      "type": "object"
+    },
+    "SettlementEvidenceRequirement": {
+      "additionalProperties": false,
+      "properties": {
+        "requirement_id": {
+          "title": "Requirement Id",
+          "type": "string"
+        },
+        "ledger_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Ledger Id"
+        },
+        "category": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Category"
+        },
+        "proof_type_required": {
+          "default": true,
+          "title": "Proof Type Required",
+          "type": "boolean"
+        },
+        "approval_required": {
+          "default": true,
+          "title": "Approval Required",
+          "type": "boolean"
+        },
+        "evidence_required": {
+          "default": true,
+          "title": "Evidence Required",
+          "type": "boolean"
+        },
+        "status": {
+          "default": "needs_review",
+          "title": "Status",
+          "type": "string"
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Notes"
+        },
+        "risk_flags": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Risk Flags",
+          "type": "array"
+        }
+      },
+      "required": [
+        "requirement_id"
+      ],
+      "title": "SettlementEvidenceRequirement",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "root": {
+      "title": "Root",
+      "type": "string"
+    },
+    "status": {
+      "title": "Status",
+      "type": "string"
+    },
+    "profile_id": {
+      "title": "Profile Id",
+      "type": "string"
+    },
+    "profile_status": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Profile Status"
+    },
+    "pack_path": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Pack Path"
+    },
+    "source_record_count": {
+      "default": 0,
+      "title": "Source Record Count",
+      "type": "integer"
+    },
+    "verified_source_count": {
+      "default": 0,
+      "title": "Verified Source Count",
+      "type": "integer"
+    },
+    "needs_review_source_count": {
+      "default": 0,
+      "title": "Needs Review Source Count",
+      "type": "integer"
+    },
+    "obligation_count": {
+      "default": 0,
+      "title": "Obligation Count",
+      "type": "integer"
+    },
+    "submission_count": {
+      "default": 0,
+      "title": "Submission Count",
+      "type": "integer"
+    },
+    "settlement_requirement_count": {
+      "default": 0,
+      "title": "Settlement Requirement Count",
+      "type": "integer"
+    },
+    "finding_count": {
+      "default": 0,
+      "title": "Finding Count",
+      "type": "integer"
+    },
+    "high_count": {
+      "default": 0,
+      "title": "High Count",
+      "type": "integer"
+    },
+    "medium_count": {
+      "default": 0,
+      "title": "Medium Count",
+      "type": "integer"
+    },
+    "low_count": {
+      "default": 0,
+      "title": "Low Count",
+      "type": "integer"
+    },
+    "pack": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/AdminObligationProfilePack"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "findings": {
+      "items": {
+        "$ref": "#/$defs/AdminFinding"
+      },
+      "title": "Findings",
+      "type": "array"
+    },
+    "markdown_path": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Markdown Path"
+    },
+    "json_path": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Json Path"
+    },
+    "warnings": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Warnings",
+      "type": "array"
+    }
+  },
+  "required": [
+    "root",
+    "status",
+    "profile_id"
+  ],
+  "title": "AdminObligationProfilePackReviewResult",
+  "type": "object"
+}

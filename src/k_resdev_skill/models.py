@@ -104,6 +104,13 @@ class ProfileSourceFixReviewDecision(str, Enum):
     REJECTED = "rejected"
 
 
+class ProfilePackPackageReceiptDecision(str, Enum):
+    RECEIVED = "received"
+    ACCEPTED_FOR_REVIEW = "accepted_for_review"
+    NEEDS_CHANGES = "needs_changes"
+    REJECTED = "rejected"
+
+
 class ResearchClaimStatus(str, Enum):
     HYPOTHESIS = "hypothesis"
     CANDIDATE = "candidate"
@@ -425,6 +432,47 @@ class BudgetLedgerFinding(StrictModel):
     ledger_id: str | None = None
     path: str | None = None
     suggested_action: str | None = None
+
+
+class SettlementBinderItem(StrictModel):
+    ledger_id: str
+    date: str | None = None
+    vendor: str | None = None
+    amount: float | None = None
+    currency: str = "KRW"
+    category: str | None = None
+    proof_type: str | None = None
+    approval_reference: str | None = None
+    evidence_ids: list[str] = Field(default_factory=list)
+    evidence_count: int = 0
+    source_file: str | None = None
+    source_hash: str | None = None
+    review_status: str = "needs_review"
+    finding_codes: list[str] = Field(default_factory=list)
+    risk_flags: list[str] = Field(default_factory=list)
+
+    @field_validator("ledger_id", "currency", "review_status")
+    @classmethod
+    def _settlement_item_field_must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
+class WorkspaceSettlementBinderResult(StrictModel):
+    root: str
+    status: str
+    item_count: int = 0
+    linked_evidence_count: int = 0
+    finding_count: int = 0
+    high_count: int = 0
+    medium_count: int = 0
+    low_count: int = 0
+    items: list[SettlementBinderItem] = Field(default_factory=list)
+    findings: list[BudgetLedgerFinding] = Field(default_factory=list)
+    markdown_path: str | None = None
+    json_path: str | None = None
+    warnings: list[str] = Field(default_factory=list)
 
 
 class WorkspaceBudgetLedgerResult(StrictModel):
@@ -999,6 +1047,220 @@ class WorkspaceDoctorResult(StrictModel):
     json_path: str | None = None
 
 
+class AdminObligation(StrictModel):
+    obligation_id: str
+    title: str
+    obligation_type: str
+    profile_id: str = "national-rnd-basic"
+    source_system: str = "local"
+    due_date: date | None = None
+    cadence: str | None = None
+    required_evidence_types: list[str] = Field(default_factory=list)
+    required_approval: bool = True
+    linked_deadline_id: str | None = None
+    status: str = "needs_review"
+    notes: str | None = None
+    risk_flags: list[str] = Field(default_factory=list)
+
+    @field_validator("obligation_id", "title", "obligation_type", "profile_id", "source_system", "status")
+    @classmethod
+    def _admin_obligation_field_must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
+class AdminSubmission(StrictModel):
+    submission_id: str
+    obligation_id: str
+    title: str
+    artifact_path: str | None = None
+    target_system: str | None = None
+    submitted_at: str | None = None
+    approval_id: str | None = None
+    evidence_ids: list[str] = Field(default_factory=list)
+    status: str = "needs_review"
+    notes: str | None = None
+    risk_flags: list[str] = Field(default_factory=list)
+
+    @field_validator("submission_id", "obligation_id", "title", "status")
+    @classmethod
+    def _admin_submission_field_must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
+class SettlementEvidenceRequirement(StrictModel):
+    requirement_id: str
+    ledger_id: str | None = None
+    category: str | None = None
+    proof_type_required: bool = True
+    approval_required: bool = True
+    evidence_required: bool = True
+    status: str = "needs_review"
+    notes: str | None = None
+    risk_flags: list[str] = Field(default_factory=list)
+
+    @field_validator("requirement_id", "status")
+    @classmethod
+    def _settlement_requirement_field_must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
+class AdminObligationProfilePack(StrictModel):
+    profile_id: str
+    status: str = "needs_review"
+    profile_status: str | None = None
+    source_record_ids: list[str] = Field(default_factory=list)
+    obligations: list[AdminObligation] = Field(default_factory=list)
+    submissions: list[AdminSubmission] = Field(default_factory=list)
+    settlement_requirements: list[SettlementEvidenceRequirement] = Field(default_factory=list)
+    notes: str | None = None
+    warnings: list[str] = Field(default_factory=list)
+
+    @field_validator("profile_id", "status")
+    @classmethod
+    def _admin_obligation_profile_pack_field_must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
+class AdminFinding(StrictModel):
+    code: str
+    severity: str
+    message: str
+    obligation_id: str | None = None
+    submission_id: str | None = None
+    ledger_id: str | None = None
+    change_id: str | None = None
+    path: str | None = None
+    suggested_action: str | None = None
+
+    @field_validator("code", "severity", "message")
+    @classmethod
+    def _admin_finding_field_must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
+class AdminObligationGraphResult(StrictModel):
+    root: str
+    status: str
+    profile_id: str | None = None
+    profile_status: str | None = None
+    obligation_count: int = 0
+    submission_count: int = 0
+    settlement_requirement_count: int = 0
+    finding_count: int = 0
+    high_count: int = 0
+    medium_count: int = 0
+    low_count: int = 0
+    obligations: list[AdminObligation] = Field(default_factory=list)
+    submissions: list[AdminSubmission] = Field(default_factory=list)
+    settlement_requirements: list[SettlementEvidenceRequirement] = Field(default_factory=list)
+    findings: list[AdminFinding] = Field(default_factory=list)
+    markdown_path: str | None = None
+    json_path: str | None = None
+    warnings: list[str] = Field(default_factory=list)
+
+
+class AdminObligationProfilePackReviewResult(StrictModel):
+    root: str
+    status: str
+    profile_id: str
+    profile_status: str | None = None
+    pack_path: str | None = None
+    source_record_count: int = 0
+    verified_source_count: int = 0
+    needs_review_source_count: int = 0
+    obligation_count: int = 0
+    submission_count: int = 0
+    settlement_requirement_count: int = 0
+    finding_count: int = 0
+    high_count: int = 0
+    medium_count: int = 0
+    low_count: int = 0
+    pack: AdminObligationProfilePack | None = None
+    findings: list[AdminFinding] = Field(default_factory=list)
+    markdown_path: str | None = None
+    json_path: str | None = None
+    warnings: list[str] = Field(default_factory=list)
+
+    @field_validator("root", "status", "profile_id")
+    @classmethod
+    def _admin_profile_pack_review_field_must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
+class AdminCalendarResult(StrictModel):
+    root: str
+    status: str
+    obligation_count: int = 0
+    linked_deadline_count: int = 0
+    due_soon_count: int = 0
+    overdue_count: int = 0
+    finding_count: int = 0
+    high_count: int = 0
+    medium_count: int = 0
+    low_count: int = 0
+    obligations: list[AdminObligation] = Field(default_factory=list)
+    findings: list[AdminFinding] = Field(default_factory=list)
+    markdown_path: str | None = None
+    json_path: str | None = None
+    warnings: list[str] = Field(default_factory=list)
+
+
+class AdminChangeRecord(StrictModel):
+    change_id: str
+    change_type: str
+    target_id: str
+    before: dict[str, Any] = Field(default_factory=dict)
+    after: dict[str, Any] = Field(default_factory=dict)
+    requested_at: str | None = None
+    decision: str = "needs_review"
+    reviewer: str | None = None
+    approved_at: str | None = None
+    approval_id: str | None = None
+    target_path: str | None = None
+    target_hash: str | None = None
+    evidence_ids: list[str] = Field(default_factory=list)
+    status: str = "needs_review"
+    notes: str | None = None
+    risk_flags: list[str] = Field(default_factory=list)
+
+    @field_validator("change_id", "change_type", "target_id", "decision", "status")
+    @classmethod
+    def _admin_change_field_must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
+class AdminChangeLedgerResult(StrictModel):
+    root: str
+    status: str
+    change_count: int = 0
+    approved_count: int = 0
+    pending_count: int = 0
+    rejected_count: int = 0
+    finding_count: int = 0
+    high_count: int = 0
+    medium_count: int = 0
+    low_count: int = 0
+    changes: list[AdminChangeRecord] = Field(default_factory=list)
+    findings: list[AdminFinding] = Field(default_factory=list)
+    markdown_path: str | None = None
+    json_path: str | None = None
+    warnings: list[str] = Field(default_factory=list)
+
+
 class WorkspaceActionItem(StrictModel):
     action_id: str
     priority: str
@@ -1183,6 +1445,27 @@ class WorkspaceSummaryResult(StrictModel):
     profile_pack_package_included_artifact_count: int = 0
     profile_pack_package_excluded_artifact_count: int = 0
     profile_pack_package_missing_artifact_count: int = 0
+    profile_pack_package_receipt_status: str | None = None
+    profile_pack_package_receipt_count: int = 0
+    profile_pack_package_receipt_unresolved_count: int = 0
+    profile_pack_package_receipt_stale_count: int = 0
+    admin_profile_pack_status: str | None = None
+    admin_profile_pack_obligation_count: int = 0
+    admin_profile_pack_finding_count: int = 0
+    admin_obligation_status: str | None = None
+    admin_obligation_count: int = 0
+    admin_submission_count: int = 0
+    admin_obligation_finding_count: int = 0
+    settlement_binder_status: str | None = None
+    settlement_binder_item_count: int = 0
+    settlement_binder_finding_count: int = 0
+    admin_change_ledger_status: str | None = None
+    admin_change_count: int = 0
+    admin_change_finding_count: int = 0
+    admin_calendar_status: str | None = None
+    admin_calendar_linked_deadline_count: int = 0
+    admin_calendar_due_soon_count: int = 0
+    admin_calendar_overdue_count: int = 0
     trace_status: str | None = None
     trace_node_count: int = 0
     trace_edge_count: int = 0
@@ -1482,6 +1765,27 @@ class WorkspaceReviewPackResult(StrictModel):
     profile_pack_package_included_artifact_count: int = 0
     profile_pack_package_excluded_artifact_count: int = 0
     profile_pack_package_missing_artifact_count: int = 0
+    profile_pack_package_receipt_status: str | None = None
+    profile_pack_package_receipt_count: int = 0
+    profile_pack_package_receipt_unresolved_count: int = 0
+    profile_pack_package_receipt_stale_count: int = 0
+    admin_profile_pack_status: str | None = None
+    admin_profile_pack_obligation_count: int = 0
+    admin_profile_pack_finding_count: int = 0
+    admin_obligation_status: str | None = None
+    admin_obligation_count: int = 0
+    admin_submission_count: int = 0
+    admin_obligation_finding_count: int = 0
+    settlement_binder_status: str | None = None
+    settlement_binder_item_count: int = 0
+    settlement_binder_finding_count: int = 0
+    admin_change_ledger_status: str | None = None
+    admin_change_count: int = 0
+    admin_change_finding_count: int = 0
+    admin_calendar_status: str | None = None
+    admin_calendar_linked_deadline_count: int = 0
+    admin_calendar_due_soon_count: int = 0
+    admin_calendar_overdue_count: int = 0
     workspace_trace_status: str | None = None
     workspace_trace_node_count: int = 0
     workspace_trace_edge_count: int = 0
@@ -2070,6 +2374,75 @@ class ProfilePackInvestigationPackageResult(StrictModel):
     @field_validator("root", "status", "package_id", "selection_policy", "bundle_path")
     @classmethod
     def _profile_pack_package_result_field_must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
+class ProfilePackPackageReceiptRecord(StrictModel):
+    receipt_id: str
+    package_id: str
+    package_manifest_path: str
+    package_manifest_hash: str
+    decision: ProfilePackPackageReceiptDecision
+    reviewer: str
+    reviewed_at: str
+    notes: str | None = None
+    risk_flags: list[str] = Field(default_factory=list)
+
+    @field_validator("receipt_id", "package_id", "package_manifest_path", "package_manifest_hash", "decision", "reviewer", "reviewed_at")
+    @classmethod
+    def _profile_pack_receipt_record_field_must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
+class ProfilePackPackageReceiptFinding(StrictModel):
+    code: str
+    severity: str
+    message: str
+    receipt_id: str | None = None
+    package_id: str | None = None
+    path: str | None = None
+    suggested_action: str | None = None
+
+    @field_validator("code", "severity", "message")
+    @classmethod
+    def _profile_pack_receipt_finding_field_must_not_be_blank(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("value must not be blank")
+        return value.strip()
+
+
+class ProfilePackPackageReceiptSummaryResult(StrictModel):
+    root: str
+    status: str
+    package_path: str
+    package_hash: str | None = None
+    package_id: str | None = None
+    package_status: str | None = None
+    record_count: int = 0
+    received_count: int = 0
+    accepted_for_review_count: int = 0
+    needs_changes_count: int = 0
+    rejected_count: int = 0
+    unresolved_count: int = 0
+    stale_record_count: int = 0
+    missing_package_id_count: int = 0
+    finding_count: int = 0
+    high_count: int = 0
+    medium_count: int = 0
+    low_count: int = 0
+    records: list[ProfilePackPackageReceiptRecord] = Field(default_factory=list)
+    findings: list[ProfilePackPackageReceiptFinding] = Field(default_factory=list)
+    markdown_path: str | None = None
+    json_path: str | None = None
+    warnings: list[str] = Field(default_factory=list)
+
+    @field_validator("root", "status", "package_path")
+    @classmethod
+    def _profile_pack_receipt_summary_field_must_not_be_blank(cls, value: str) -> str:
         if not value or not value.strip():
             raise ValueError("value must not be blank")
         return value.strip()

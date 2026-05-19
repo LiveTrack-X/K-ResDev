@@ -6,6 +6,13 @@ import zipfile
 from datetime import date
 from pathlib import Path
 
+from .admin_operating import (
+    generate_settlement_binder,
+    review_admin_calendar,
+    review_admin_change_ledger,
+    review_admin_obligation_profile_pack,
+    review_admin_obligations,
+)
 from .artifact_authority import generate_artifact_authority
 from .approval import load_approval_records
 from .approval_coverage import generate_workspace_approval_coverage
@@ -28,6 +35,7 @@ from .profile_promotion_revoke import load_profile_promotion_revoke_plan, load_p
 from .profile_lifecycle import generate_profile_lifecycle_ledger
 from .profile_pack_investigation import generate_profile_pack_investigation_bundle
 from .profile_pack_investigation_package import generate_profile_pack_investigation_package, load_profile_pack_investigation_package
+from .profile_pack_package_receipt import summarize_profile_pack_package_receipts
 from .profile_pack_drilldown import generate_profile_pack_readiness_drilldown
 from .profile_pack_readiness import generate_profile_pack_readiness
 from .profile_registry import default_agency_templates_root, load_project_profile
@@ -59,6 +67,7 @@ STANDARD_DIRS = (
     "state/citation-support",
     "state/checkpoints",
     "state/profile-backups",
+    "state/profile-pack-package-receipts",
     "state/profile-promotions",
     "state/profile-source-fix-reviews",
 )
@@ -67,6 +76,10 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "approval-coverage.md",
     "approval-summary.md",
     "artifact-authority.md",
+    "admin-calendar.md",
+    "admin-change-ledger.md",
+    "admin-obligations.md",
+    "admin-profile-pack.md",
     "bibliography-integrity.md",
     "budget-ledger.md",
     "budget-checklist.md",
@@ -88,6 +101,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "profile-source-fix-summary.md",
     "profile-pack-investigation-bundle.md",
     "profile-pack-investigation-package.md",
+    "profile-pack-package-receipt-summary.md",
     "profile-pack-readiness-drilldown.md",
     "profile-pack-readiness.md",
     "profile-source-queue.md",
@@ -97,6 +111,7 @@ OPERATIONAL_MARKDOWN_NAMES = {
     "research-claim-matrix.md",
     "research-claims.md",
     "report-integrity.md",
+    "settlement-binder.md",
     "source-verification.md",
     "trace-passport.md",
     "workspace-discovery.md",
@@ -219,6 +234,12 @@ def run_workspace_doctor(
     _check_profile_pack_readiness_drilldown(workspace, findings)
     _check_profile_pack_investigation_bundle(workspace, findings)
     _check_profile_pack_investigation_package(workspace, findings)
+    _check_profile_pack_package_receipts(workspace, findings)
+    _check_admin_profile_pack_review(workspace, findings)
+    _check_admin_obligations(workspace, findings)
+    _check_settlement_binder(workspace, findings)
+    _check_admin_change_ledger(workspace, findings)
+    _check_admin_calendar(workspace, findings)
     _check_reports(workspace, findings)
     _check_report_integrity(workspace, findings)
     _check_artifact_authority(workspace, findings)
@@ -1198,6 +1219,198 @@ def _check_profile_pack_investigation_package(workspace: Path, findings: list[Wo
         )
 
 
+def _check_profile_pack_package_receipts(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> None:
+    package_path = workspace / "state" / "profile-pack-investigation-package.json"
+    if not package_path.exists():
+        return
+    try:
+        result = summarize_profile_pack_package_receipts(workspace)
+    except Exception as exc:
+        findings.append(
+            _finding(
+                "profile_pack_package_receipts_unreadable",
+                "medium",
+                f"Profile pack package receipts could not be summarized: {exc}",
+                workspace / "state" / "profile-pack-package-receipts",
+                "Fix receipt records or regenerate profile-pack-investigation-package before relying on handoff state.",
+            )
+        )
+        return
+    if result.high_count:
+        findings.append(
+            _finding(
+                "profile_pack_package_receipts_high_findings",
+                "high",
+                f"Profile pack package receipt summary has {result.high_count} high-severity finding(s).",
+                workspace / "state" / "profile-pack-package-receipts",
+                "Review stale, rejected, or mismatched package receipts before treating the handoff as reviewed.",
+            )
+        )
+    elif result.unresolved_count or result.medium_count:
+        findings.append(
+            _finding(
+                "profile_pack_package_receipts_unresolved",
+                "medium",
+                f"Profile pack package receipt summary has {result.unresolved_count} unresolved receipt finding(s).",
+                workspace / "state" / "profile-pack-package-receipts",
+                "Record a supplied reviewer receipt or address package receipt needs_changes findings.",
+            )
+        )
+
+
+def _check_admin_profile_pack_review(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> None:
+    profile_path = workspace / "state" / "project-profile.json"
+    if not profile_path.exists():
+        return
+    try:
+        profile = load_project_profile(profile_path)
+        result = review_admin_obligation_profile_pack(profile.profile_id)
+    except Exception as exc:
+        findings.append(
+            _finding(
+                "admin_profile_pack_review_unreadable",
+                "medium",
+                f"Admin profile pack review could not run: {exc}",
+                profile_path,
+                "Fix the project profile or bundled admin profile pack before relying on profile-driven obligations.",
+            )
+        )
+        return
+    if result.status == "not_configured":
+        findings.append(
+            _finding(
+                "admin_profile_pack_missing",
+                "low",
+                f"No admin obligation profile pack was found for `{profile.profile_id}`.",
+                profile_path,
+                "Use the generic starter or add templates/agencies/<profile-id>/admin-obligations.json as a needs-review pack.",
+            )
+        )
+    elif result.high_count:
+        findings.append(
+            _finding(
+                "admin_profile_pack_high_findings",
+                "high",
+                f"Admin profile pack review has {result.high_count} high-severity finding(s).",
+                result.pack_path or profile_path,
+                "Run admin-profile-pack-review and fix source bindings before seeding obligations.",
+            )
+        )
+    elif result.medium_count:
+        findings.append(
+            _finding(
+                "admin_profile_pack_review_findings",
+                "medium",
+                f"Admin profile pack review has {result.medium_count} medium-severity finding(s).",
+                result.pack_path or profile_path,
+                "Keep profile-driven admin obligations as needs_review until official-source and human review are complete.",
+            )
+        )
+
+
+def _check_admin_obligations(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> None:
+    result = review_admin_obligations(workspace)
+    if result.high_count:
+        findings.append(
+            _finding(
+                "admin_obligations_high_findings",
+                "high",
+                f"Admin obligation review has {result.high_count} high-severity finding(s).",
+                workspace / "state" / "admin-obligations.json",
+                "Run admin-obligations-review and resolve stale evidence, approval, or submission links.",
+            )
+        )
+    elif result.medium_count:
+        findings.append(
+            _finding(
+                "admin_obligations_review_findings",
+                "medium",
+                f"Admin obligation review has {result.medium_count} medium-severity finding(s).",
+                workspace / "state" / "admin-obligations.json",
+                "Run admin-obligations-init/review and keep profile-driven admin obligations as needs_review until verified.",
+            )
+        )
+
+
+def _check_settlement_binder(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> None:
+    result = generate_settlement_binder(workspace)
+    if result.status == "not_configured":
+        return
+    if result.high_count:
+        findings.append(
+            _finding(
+                "settlement_binder_high_findings",
+                "high",
+                f"Settlement binder has {result.high_count} high-severity finding(s).",
+                workspace / "state" / "budget-ledger.json",
+                "Run settlement-binder and resolve missing or mismatched settlement evidence links.",
+            )
+        )
+    elif result.medium_count:
+        findings.append(
+            _finding(
+                "settlement_binder_review_findings",
+                "medium",
+                f"Settlement binder has {result.medium_count} medium-severity finding(s).",
+                workspace / "state" / "budget-ledger.json",
+                "Run settlement-binder and complete proof, approval, and evidence metadata before settlement review.",
+            )
+        )
+
+
+def _check_admin_change_ledger(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> None:
+    result = review_admin_change_ledger(workspace)
+    if result.status == "not_configured":
+        return
+    if result.high_count:
+        findings.append(
+            _finding(
+                "admin_change_ledger_high_findings",
+                "high",
+                f"Admin change ledger has {result.high_count} high-severity finding(s).",
+                workspace / "state" / "admin-change-ledger.json",
+                "Review rejected, stale, or report-referenced unapproved changes before using changed values.",
+            )
+        )
+    elif result.medium_count:
+        findings.append(
+            _finding(
+                "admin_change_ledger_review_findings",
+                "medium",
+                f"Admin change ledger has {result.medium_count} medium-severity finding(s).",
+                workspace / "state" / "admin-change-ledger.json",
+                "Complete reviewer, timestamp, approval, and target-hash metadata for admin changes.",
+            )
+        )
+
+
+def _check_admin_calendar(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> None:
+    obligations_path = workspace / "state" / "admin-obligations.json"
+    if not obligations_path.exists():
+        return
+    result = review_admin_calendar(workspace)
+    if result.high_count:
+        findings.append(
+            _finding(
+                "admin_calendar_high_findings",
+                "high",
+                f"Admin calendar review has {result.high_count} high-severity finding(s).",
+                obligations_path,
+                "Review overdue admin obligations and update local submission/approval state.",
+            )
+        )
+    elif result.medium_count:
+        findings.append(
+            _finding(
+                "admin_calendar_review_findings",
+                "medium",
+                f"Admin calendar review has {result.medium_count} medium-severity finding(s).",
+                obligations_path,
+                "Link admin obligations to reviewed project-goals deadlines and prepare due-soon evidence.",
+            )
+        )
+
+
 def _check_reports(workspace: Path, findings: list[WorkspaceDoctorFinding]) -> None:
     reports_dir = workspace / "reports"
     reports = [path for path in reports_dir.glob("*.md") if not is_operational_markdown(path)] if reports_dir.exists() else []
@@ -1707,14 +1920,20 @@ def _starter_readme(project_id: str, title: str, profile_id: str) -> str:
             "- Run `k-resdev profile-pack-readiness-drilldown --root . --output reports/profile-pack-readiness-drilldown.md --json state/profile-pack-readiness-drilldown.json` to trace readiness blockers back to upstream artifacts and hashes.",
             "- Run `k-resdev profile-pack-investigation-bundle --root . --output reports/profile-pack-investigation-bundle.md --json state/profile-pack-investigation-bundle.json` to create a compact profile-pack remediation handoff.",
             "- Run `k-resdev profile-pack-investigation-package --root . --output reports/profile-pack-investigation-package.md --json state/profile-pack-investigation-package.json --zip reports/profile-pack-investigation-package.zip` to package generated metadata for reviewer handoff without copying raw official-source bodies.",
+            "- Run `k-resdev profile-pack-package-receipt-summary --root . --output reports/profile-pack-package-receipt-summary.md --json state/profile-pack-package-receipt-summary.json` after supplied reviewer package receipts are recorded.",
+            "- Run `k-resdev admin-obligations-init --root . --profile <profile-id> --output reports/admin-obligations.md --json state/admin-obligations-review.json` to create and review a local needs-review admin obligation graph.",
+            "- Run `k-resdev admin-obligations-review --root . --output reports/admin-obligations.md --json state/admin-obligations-review.json` to check admin submission, approval, evidence, and profile gaps.",
             "- Run `k-resdev budget-ledger-import references/budget-ledger.csv --state-dir state --markdown reports/budget-ledger-import.md` to import a reviewable budget ledger.",
             "- Run `k-resdev budget-ledger-integrity --root . --output reports/budget-ledger.md --json state/budget-ledger-integrity.json` to check ledger proof, approval, duplicate, and evidence-link gaps.",
+            "- Run `k-resdev settlement-binder --root . --output reports/settlement-binder.md --json state/settlement-binder.json` to bind budget ledger rows to proof, approval, evidence, and source-hash state.",
+            "- Run `k-resdev admin-change-ledger --root . --output reports/admin-change-ledger.md --json state/admin-change-ledger-review.json` to review supplied agreement/change/approval records.",
+            "- Run `k-resdev admin-calendar-review --root . --output reports/admin-calendar.md --json state/admin-calendar.json` to connect local admin obligations to reviewed deadline state.",
             "- Run `k-resdev checkpoint-create --root . --stage review-pack --summary \"<summary>\" --status needs_review` to create a hash-backed resume checkpoint.",
             "- Run `k-resdev checkpoint-summary --root . --output reports/trace-passport.md --json state/trace-passport.json` to review checkpoint freshness.",
             "- Run `k-resdev checkpoint-resume-plan --root . --output reports/checkpoint-resume-plan.md --json state/checkpoint-resume-plan.json` before resuming from a saved checkpoint.",
             "- Run `k-resdev doctor --root . --output reports/readiness.md --json state/readiness.json` before reporting.",
             "- Run `k-resdev workspace-summary --root . --output reports/workspace-summary.md --json state/workspace-summary.json` for a one-page status handoff.",
-            "- Run `k-resdev workspace-review-pack --root .` to refresh discovery, readiness, next actions, summary, source-verification, artifact-authority, goals-review, weekly-review, workspace-dashboard, budget-ledger, approval-coverage, report-integrity, bibliography-integrity, reference-corpus, citation-support, research-claim-matrix, profile-pack package, trace-passport, and trace artifacts together.",
+            "- Run `k-resdev workspace-review-pack --root .` to refresh discovery, readiness, next actions, summary, source-verification, artifact-authority, goals-review, weekly-review, workspace-dashboard, budget-ledger, settlement-binder, admin obligations, admin calendar/change checks, approval-coverage, report-integrity, bibliography-integrity, reference-corpus, citation-support, research-claim-matrix, profile-pack package, trace-passport, and trace artifacts together.",
             "- Run `k-resdev verify-review-pack state/workspace-review-pack.json` to check saved review-pack artifact hashes.",
             "- Run `k-resdev verify-evidence-sources state/evidence-index.json --root . --output reports/source-verification.md --json state/source-verification.json` to check indexed source hashes.",
             "- Run `k-resdev approval-coverage --root . --output reports/approval-coverage.md --json state/approval-coverage.json` to check report approval coverage.",

@@ -1,0 +1,11 @@
+{
+  "code": "admin_profile_needs_review",
+  "severity": "medium",
+  "message": "Profile is needs_review.",
+  "obligation_id": null,
+  "submission_id": null,
+  "ledger_id": null,
+  "change_id": null,
+  "path": "state/project-profile.json",
+  "suggested_action": "Verify current agency/program sources before official use."
+}

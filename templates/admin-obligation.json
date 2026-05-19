@@ -1,0 +1,22 @@
+{
+  "obligation_id": "ADM-REPORT-001",
+  "title": "Periodic report submission candidate",
+  "obligation_type": "reporting",
+  "profile_id": "national-rnd-basic",
+  "source_system": "IRIS",
+  "due_date": null,
+  "cadence": null,
+  "required_evidence_types": [
+    "plan_goal",
+    "kpi",
+    "milestone",
+    "outcome"
+  ],
+  "required_approval": true,
+  "linked_deadline_id": "DL-2026-REPORT-001",
+  "status": "needs_review",
+  "notes": "Verify current official guidance before use.",
+  "risk_flags": [
+    "official_source_needs_review"
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "root": ".",
+  "status": "needs_review",
+  "obligation_count": 1,
+  "linked_deadline_count": 1,
+  "due_soon_count": 0,
+  "overdue_count": 0,
+  "finding_count": 1,
+  "high_count": 0,
+  "medium_count": 1,
+  "low_count": 0,
+  "obligations": [
+    {
+      "obligation_id": "ADM-REPORT-001",
+      "title": "Periodic report submission candidate",
+      "obligation_type": "reporting",
+      "profile_id": "national-rnd-basic",
+      "source_system": "IRIS",
+      "due_date": null,
+      "cadence": null,
+      "required_evidence_types": [
+        "plan_goal",
+        "kpi",
+        "milestone",
+        "outcome"
+      ],
+      "required_approval": true,
+      "linked_deadline_id": "DL-2026-REPORT-001",
+      "status": "needs_review",
+      "notes": "Verify current official guidance before use.",
+      "risk_flags": [
+        "official_source_needs_review"
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "code": "admin_calendar_deadline_link_missing",
+      "severity": "low",
+      "message": "Obligation is not linked to a reviewed deadline.",
+      "obligation_id": "ADM-REPORT-001",
+      "submission_id": null,
+      "ledger_id": null,
+      "change_id": null,
+      "path": "state/admin-obligations.json",
+      "suggested_action": "Link local obligations to project-goals deadlines after human review."
+    }
+  ],
+  "markdown_path": "reports/admin-calendar.md",
+  "json_path": "state/admin-calendar.json",
+  "warnings": []
+}

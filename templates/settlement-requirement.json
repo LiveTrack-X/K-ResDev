@@ -1,0 +1,13 @@
+{
+  "requirement_id": "SET-BUD-2026-001",
+  "ledger_id": "BUD-2026-001",
+  "category": "materials",
+  "proof_type_required": true,
+  "approval_required": true,
+  "evidence_required": true,
+  "status": "needs_review",
+  "notes": null,
+  "risk_flags": [
+    "proof_needs_review"
+  ]
+}

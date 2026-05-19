@@ -2,7 +2,7 @@
 
 Purpose: 한국형 국책 R&D 환경에서 연구 행정 문서화, 증빙 정합성, 보고서 생성, 논문/데이터 인사이트 보조를 evidence-first 방식으로 지원하는 Codex/Skill 프로젝트입니다.
 
-Current release: `0.1 BETA 48` (`0.1.0b48`).
+Current release: `0.1 BETA 54` (`0.1.0b54`).
 
 Core principle:
 
@@ -83,9 +83,16 @@ This repository does not encode any single ministry/institution form as authorit
 - Profile pack readiness drilldown that links readiness findings to upstream artifact rows, IDs, commands, and SHA-256 hashes.
 - Profile pack investigation bundle that filters by profile ID or readiness finding code and condenses readiness rows, drilldown rows, upstream hashes, suggested commands, and supplied human-review status without copying raw official-source bodies.
 - Profile pack investigation package manifest and optional ZIP that transfer generated metadata artifacts while explicitly excluding raw official-source bodies.
+- Profile pack package reviewer receipt records and summaries that bind supplied transfer/review decisions to the current package manifest SHA-256.
+- Profile-driven admin obligation pack loader/reviewer for `templates/agencies/<profile-id>/admin-obligations.json`, with `needs_review` guards unless profile/source records are human-verified.
+- `national-rnd-basic` and narrow `iris-innopolis-2026-017795` admin obligation profile-pack seeds that remain local candidates rather than official rules.
+- Admin obligation graph starter/reviewer for local reporting, settlement, performance, agreement/change, budget, approval, and equipment obligation candidates without hardcoding official IRIS/NTIS/RCMS/Ezbaro rules.
+- Settlement evidence binder that joins budget ledger rows, proof metadata, approval references, evidence IDs, source hashes, and review findings without deciding cost eligibility.
+- Admin change ledger review for agreement, KPI, budget, period, and approval changes, including warnings when unapproved changes appear in report drafts.
+- Admin calendar review that links local admin obligation candidates to reviewed project-goals deadlines and due-soon/overdue state.
 - Workspace next-action planner that converts doctor findings into deterministic, reviewable commands.
 - Workspace summary report that combines readiness, next actions, evidence counts, approvals, reports, exports, and analysis manifests.
-- Workspace review pack command that refreshes discovery, readiness, next actions, workspace summary, artifact-authority, goals-review, weekly-review, workspace-dashboard, budget-ledger, profile-source-queue, profile-source-fix-plan, profile-source-fix-summary, profile-integrity, profile-promotion-summary, profile-promotion-apply-plan, profile-promotion-apply-result when present, profile-promotion-revoke-plan/result when present, profile-lifecycle-ledger, profile-pack-readiness, profile-pack-readiness-drilldown, profile-pack-investigation-bundle, profile-pack-investigation-package, source-verification, approval-coverage, report-integrity, bibliography-integrity, reference-corpus, citation-support, research-claim-matrix, and workspace-trace artifacts together.
+- Workspace review pack command that refreshes discovery, readiness, next actions, workspace summary, artifact-authority, goals-review, weekly-review, workspace-dashboard, budget-ledger, settlement-binder, admin profile-pack review, admin obligations, admin change ledger, admin calendar, profile-source-queue, profile-source-fix-plan, profile-source-fix-summary, profile-integrity, profile-promotion-summary, profile-promotion-apply-plan, profile-promotion-apply-result when present, profile-promotion-revoke-plan/result when present, profile-lifecycle-ledger, profile-pack-readiness, profile-pack-readiness-drilldown, profile-pack-investigation-bundle, profile-pack-investigation-package, package receipt summary, source-verification, approval-coverage, report-integrity, bibliography-integrity, reference-corpus, citation-support, research-claim-matrix, and workspace-trace artifacts together.
 - Review pack artifact hash manifest and verifier for detecting missing or changed generated artifacts.
 - Evidence source verifier that checks indexed source files against saved source hashes.
 - Workspace doctor and review pack integration for local evidence-source presence/hash drift checks.
@@ -108,7 +115,8 @@ This repository does not encode any single ministry/institution form as authorit
 - Workspace doctor, next-action, summary, review-pack, and trace integration for profile pack readiness findings.
 - Workspace doctor, next-action, summary, review-pack, and trace integration for profile pack readiness drilldown gaps.
 - Workspace doctor, next-action, summary, review-pack, and trace integration for profile pack investigation bundle handoff gaps.
-- Workspace doctor, next-action, summary, review-pack, and trace integration for generated profile pack investigation package handoffs.
+- Workspace doctor, next-action, summary, review-pack, and trace integration for generated profile pack investigation package handoffs and package reviewer receipts.
+- Workspace doctor, next-action, summary, review-pack, and trace integration for admin profile packs, admin obligations, settlement binder, admin change ledger, and admin calendar findings.
 - Workspace doctor, next-action, summary, and review-pack integration for trace impact findings.
 - Trace passport and checkpoint ledger for compact resume checkpoints, artifact hash drift detection, and checkpoint-based resume plans.
 - `national-rnd-basic` agency template skeleton for annual/interim/final reports, change requests, and performance registration drafts.
@@ -178,9 +186,17 @@ python -m k_resdev_skill profile-pack-readiness --root . --output .\reports\prof
 python -m k_resdev_skill profile-pack-readiness-drilldown --root . --output .\reports\profile-pack-readiness-drilldown.md --json .\state\profile-pack-readiness-drilldown.json
 python -m k_resdev_skill profile-pack-investigation-bundle --root . --profile-id national-rnd-basic --output .\reports\profile-pack-investigation-bundle.md --json .\state\profile-pack-investigation-bundle.json
 python -m k_resdev_skill profile-pack-investigation-package --root . --profile-id national-rnd-basic --output .\reports\profile-pack-investigation-package.md --json .\state\profile-pack-investigation-package.json --zip .\reports\profile-pack-investigation-package.zip
+python -m k_resdev_skill profile-pack-package-receipt-record --root . --decision received --reviewer reviewer-name --package-hash <sha256>
+python -m k_resdev_skill profile-pack-package-receipt-summary --root . --output .\reports\profile-pack-package-receipt-summary.md --json .\state\profile-pack-package-receipt-summary.json
+python -m k_resdev_skill admin-profile-pack-review --profile national-rnd-basic --output .\reports\admin-profile-pack.md --json .\state\admin-profile-pack-review.json
+python -m k_resdev_skill admin-obligations-init --root . --profile national-rnd-basic --output .\reports\admin-obligations.md --json .\state\admin-obligations-review.json
+python -m k_resdev_skill admin-obligations-review --root . --output .\reports\admin-obligations.md --json .\state\admin-obligations-review.json
 python -m k_resdev_skill workspace-trace --root . --output .\reports\workspace-trace.md --json .\state\workspace-trace.json
 python -m k_resdev_skill budget-ledger-import .\references\budget-ledger.csv --state-dir .\state --markdown .\reports\budget-ledger-import.md
 python -m k_resdev_skill budget-ledger-integrity --root . --output .\reports\budget-ledger.md --json .\state\budget-ledger-integrity.json
+python -m k_resdev_skill settlement-binder --root . --output .\reports\settlement-binder.md --json .\state\settlement-binder.json
+python -m k_resdev_skill admin-change-ledger --root . --output .\reports\admin-change-ledger.md --json .\state\admin-change-ledger-review.json
+python -m k_resdev_skill admin-calendar-review --root . --output .\reports\admin-calendar.md --json .\state\admin-calendar.json
 python -m k_resdev_skill data-insights .\inbox\metrics.csv --output .\reports\data-insights.md
 python -m k_resdev_skill run-analysis .\inbox\metrics.csv --output-dir .\reports\analysis --evidence-id EVI-2026-0001
 python -m k_resdev_skill analysis-script .\inbox\metrics.csv --output-dir .\reports\analysis --output .\reports\analysis\metrics-analysis.py
@@ -205,6 +221,12 @@ python -m k_resdev_skill validate-json profile-pack-readiness .\state\profile-pa
 python -m k_resdev_skill validate-json profile-pack-readiness-drilldown .\state\profile-pack-readiness-drilldown.json
 python -m k_resdev_skill validate-json profile-pack-investigation-bundle .\state\profile-pack-investigation-bundle.json
 python -m k_resdev_skill validate-json profile-pack-investigation-package .\state\profile-pack-investigation-package.json
+python -m k_resdev_skill validate-json profile-pack-package-receipt-summary .\state\profile-pack-package-receipt-summary.json
+python -m k_resdev_skill validate-json admin-profile-pack-review .\state\admin-profile-pack-review.json
+python -m k_resdev_skill validate-json admin-obligations .\state\admin-obligations-review.json
+python -m k_resdev_skill validate-json settlement-binder .\state\settlement-binder.json
+python -m k_resdev_skill validate-json admin-change-ledger .\state\admin-change-ledger-review.json
+python -m k_resdev_skill validate-json admin-calendar .\state\admin-calendar.json
 python -m k_resdev_skill validate-json budget-ledger .\state\budget-ledger.json
 python -m k_resdev_skill validate-json research-claim .\state\research-claims.json
 python -m k_resdev_skill validate-json checkpoint .\templates\trace-passport-entry.json

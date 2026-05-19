@@ -288,6 +288,48 @@ def test_profile_pack_investigation_package_templates_match_json_schemas():
     jsonschema.validate(package, package_schema)
 
 
+def test_profile_pack_package_receipt_templates_match_json_schemas():
+    with open("schemas/profile_pack_package_receipt_record.schema.json", encoding="utf-8") as handle:
+        record_schema = json.load(handle)
+    with open("schemas/profile_pack_package_receipt_finding.schema.json", encoding="utf-8") as handle:
+        finding_schema = json.load(handle)
+    with open("schemas/profile_pack_package_receipt_summary.schema.json", encoding="utf-8") as handle:
+        summary_schema = json.load(handle)
+    with open("templates/profile-pack-package-receipt-record.json", encoding="utf-8") as handle:
+        record = json.load(handle)
+    with open("templates/profile-pack-package-receipt-finding.json", encoding="utf-8") as handle:
+        finding = json.load(handle)
+    with open("templates/profile-pack-package-receipt-summary.json", encoding="utf-8") as handle:
+        summary = json.load(handle)
+
+    jsonschema.validate(record, record_schema)
+    jsonschema.validate(finding, finding_schema)
+    jsonschema.validate(summary, summary_schema)
+
+
+def test_admin_operating_layer_templates_match_json_schemas():
+    pairs = [
+        ("schemas/admin_obligation.schema.json", "templates/admin-obligation.json"),
+        ("schemas/admin_submission.schema.json", "templates/admin-submission.json"),
+        ("schemas/settlement_requirement.schema.json", "templates/settlement-requirement.json"),
+        ("schemas/admin_finding.schema.json", "templates/admin-finding.json"),
+        ("schemas/admin_obligation_graph.schema.json", "templates/admin-obligations.json"),
+        ("schemas/admin_obligation_profile_pack.schema.json", "templates/admin-obligation-profile-pack.json"),
+        ("schemas/admin_obligation_profile_pack_review.schema.json", "templates/admin-obligation-profile-pack-review.json"),
+        ("schemas/settlement_binder_item.schema.json", "templates/settlement-binder-item.json"),
+        ("schemas/settlement_binder.schema.json", "templates/settlement-binder.json"),
+        ("schemas/admin_change_record.schema.json", "templates/admin-change-record.json"),
+        ("schemas/admin_change_ledger.schema.json", "templates/admin-change-ledger.json"),
+        ("schemas/admin_calendar.schema.json", "templates/admin-calendar.json"),
+    ]
+    for schema_path, template_path in pairs:
+        with open(schema_path, encoding="utf-8") as handle:
+            schema = json.load(handle)
+        with open(template_path, encoding="utf-8") as handle:
+            sample = json.load(handle)
+        jsonschema.validate(sample, schema)
+
+
 def test_budget_ledger_item_template_matches_json_schema():
     with open("schemas/budget_ledger_item.schema.json", encoding="utf-8") as handle:
         schema = json.load(handle)

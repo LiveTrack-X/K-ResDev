@@ -1,0 +1,312 @@
+{
+  "$defs": {
+    "ProfilePackPackageReceiptDecision": {
+      "enum": [
+        "received",
+        "accepted_for_review",
+        "needs_changes",
+        "rejected"
+      ],
+      "title": "ProfilePackPackageReceiptDecision",
+      "type": "string"
+    },
+    "ProfilePackPackageReceiptFinding": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "title": "Code",
+          "type": "string"
+        },
+        "severity": {
+          "title": "Severity",
+          "type": "string"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "receipt_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Receipt Id"
+        },
+        "package_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Package Id"
+        },
+        "path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Path"
+        },
+        "suggested_action": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Suggested Action"
+        }
+      },
+      "required": [
+        "code",
+        "severity",
+        "message"
+      ],
+      "title": "ProfilePackPackageReceiptFinding",
+      "type": "object"
+    },
+    "ProfilePackPackageReceiptRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "receipt_id": {
+          "title": "Receipt Id",
+          "type": "string"
+        },
+        "package_id": {
+          "title": "Package Id",
+          "type": "string"
+        },
+        "package_manifest_path": {
+          "title": "Package Manifest Path",
+          "type": "string"
+        },
+        "package_manifest_hash": {
+          "title": "Package Manifest Hash",
+          "type": "string"
+        },
+        "decision": {
+          "$ref": "#/$defs/ProfilePackPackageReceiptDecision"
+        },
+        "reviewer": {
+          "title": "Reviewer",
+          "type": "string"
+        },
+        "reviewed_at": {
+          "title": "Reviewed At",
+          "type": "string"
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Notes"
+        },
+        "risk_flags": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Risk Flags",
+          "type": "array"
+        }
+      },
+      "required": [
+        "receipt_id",
+        "package_id",
+        "package_manifest_path",
+        "package_manifest_hash",
+        "decision",
+        "reviewer",
+        "reviewed_at"
+      ],
+      "title": "ProfilePackPackageReceiptRecord",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "root": {
+      "title": "Root",
+      "type": "string"
+    },
+    "status": {
+      "title": "Status",
+      "type": "string"
+    },
+    "package_path": {
+      "title": "Package Path",
+      "type": "string"
+    },
+    "package_hash": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Package Hash"
+    },
+    "package_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Package Id"
+    },
+    "package_status": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Package Status"
+    },
+    "record_count": {
+      "default": 0,
+      "title": "Record Count",
+      "type": "integer"
+    },
+    "received_count": {
+      "default": 0,
+      "title": "Received Count",
+      "type": "integer"
+    },
+    "accepted_for_review_count": {
+      "default": 0,
+      "title": "Accepted For Review Count",
+      "type": "integer"
+    },
+    "needs_changes_count": {
+      "default": 0,
+      "title": "Needs Changes Count",
+      "type": "integer"
+    },
+    "rejected_count": {
+      "default": 0,
+      "title": "Rejected Count",
+      "type": "integer"
+    },
+    "unresolved_count": {
+      "default": 0,
+      "title": "Unresolved Count",
+      "type": "integer"
+    },
+    "stale_record_count": {
+      "default": 0,
+      "title": "Stale Record Count",
+      "type": "integer"
+    },
+    "missing_package_id_count": {
+      "default": 0,
+      "title": "Missing Package Id Count",
+      "type": "integer"
+    },
+    "finding_count": {
+      "default": 0,
+      "title": "Finding Count",
+      "type": "integer"
+    },
+    "high_count": {
+      "default": 0,
+      "title": "High Count",
+      "type": "integer"
+    },
+    "medium_count": {
+      "default": 0,
+      "title": "Medium Count",
+      "type": "integer"
+    },
+    "low_count": {
+      "default": 0,
+      "title": "Low Count",
+      "type": "integer"
+    },
+    "records": {
+      "items": {
+        "$ref": "#/$defs/ProfilePackPackageReceiptRecord"
+      },
+      "title": "Records",
+      "type": "array"
+    },
+    "findings": {
+      "items": {
+        "$ref": "#/$defs/ProfilePackPackageReceiptFinding"
+      },
+      "title": "Findings",
+      "type": "array"
+    },
+    "markdown_path": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Markdown Path"
+    },
+    "json_path": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Json Path"
+    },
+    "warnings": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Warnings",
+      "type": "array"
+    }
+  },
+  "required": [
+    "root",
+    "status",
+    "package_path"
+  ],
+  "title": "ProfilePackPackageReceiptSummaryResult",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

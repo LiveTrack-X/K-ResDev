@@ -97,6 +97,12 @@ def _actions_for_findings(root: Path, findings: list[WorkspaceDoctorFinding]) ->
         _action_for_profile_pack_readiness_drilldown(root, by_code),
         _action_for_profile_pack_investigation_bundle(root, by_code),
         _action_for_profile_pack_investigation_package(root, by_code),
+        _action_for_profile_pack_package_receipts(root, by_code),
+        _action_for_admin_profile_pack(root, by_code),
+        _action_for_admin_obligations(root, by_code),
+        _action_for_settlement_binder(root, by_code),
+        _action_for_admin_change_ledger(root, by_code),
+        _action_for_admin_calendar(root, by_code),
         _action_for_approval_coverage(root, by_code),
         _action_for_report_integrity(root, by_code),
         _action_for_artifact_authority(root, by_code),
@@ -553,6 +559,111 @@ def _action_for_profile_pack_investigation_package(root: Path, by_code: dict[str
         "Package profile pack investigation handoff",
         "Profile-pack investigation handoff should include generated metadata hashes and explicit raw-source exclusions before reviewer transfer.",
         f'python -m k_resdev_skill profile-pack-investigation-package --root "{root}" --output "{root / "reports" / "profile-pack-investigation-package.md"}" --json "{root / "state" / "profile-pack-investigation-package.json"}"',
+        by_code,
+        codes,
+    )
+
+
+def _action_for_profile_pack_package_receipts(root: Path, by_code: dict[str, list[WorkspaceDoctorFinding]]) -> WorkspaceActionItem | None:
+    codes = [
+        "profile_pack_package_receipts_unreadable",
+        "profile_pack_package_receipts_high_findings",
+        "profile_pack_package_receipts_unresolved",
+    ]
+    if not any(code in by_code for code in codes):
+        return None
+    priority = "high" if "profile_pack_package_receipts_high_findings" in by_code else "medium"
+    return _action(
+        root,
+        priority,
+        "Review profile pack package receipts",
+        "Reviewer receipt records should stay hash-bound to the generated profile-pack package before the handoff is treated as reviewed.",
+        f'python -m k_resdev_skill profile-pack-package-receipt-summary --root "{root}" --output "{root / "reports" / "profile-pack-package-receipt-summary.md"}" --json "{root / "state" / "profile-pack-package-receipt-summary.json"}"',
+        by_code,
+        codes,
+    )
+
+
+def _action_for_admin_profile_pack(root: Path, by_code: dict[str, list[WorkspaceDoctorFinding]]) -> WorkspaceActionItem | None:
+    codes = [
+        "admin_profile_pack_review_unreadable",
+        "admin_profile_pack_missing",
+        "admin_profile_pack_high_findings",
+        "admin_profile_pack_review_findings",
+    ]
+    if not any(code in by_code for code in codes):
+        return None
+    priority = "high" if "admin_profile_pack_high_findings" in by_code else "medium"
+    return _action(
+        root,
+        priority,
+        "Review admin profile pack",
+        "Profile-driven admin obligation seeds should remain source-bound and needs_review before they are copied into a workspace.",
+        f'python -m k_resdev_skill admin-profile-pack-review --profile "<profile-id>" --output "{root / "reports" / "admin-profile-pack.md"}" --json "{root / "state" / "admin-profile-pack-review.json"}"',
+        by_code,
+        codes,
+    )
+
+
+def _action_for_admin_obligations(root: Path, by_code: dict[str, list[WorkspaceDoctorFinding]]) -> WorkspaceActionItem | None:
+    codes = ["admin_obligations_high_findings", "admin_obligations_review_findings"]
+    if not any(code in by_code for code in codes):
+        return None
+    priority = "high" if "admin_obligations_high_findings" in by_code else "medium"
+    return _action(
+        root,
+        priority,
+        "Review admin obligation graph",
+        "Local submission, approval, evidence, settlement, and profile gaps should be visible before report or settlement work.",
+        f'python -m k_resdev_skill admin-obligations-review --root "{root}" --output "{root / "reports" / "admin-obligations.md"}" --json "{root / "state" / "admin-obligations-review.json"}"',
+        by_code,
+        codes,
+    )
+
+
+def _action_for_settlement_binder(root: Path, by_code: dict[str, list[WorkspaceDoctorFinding]]) -> WorkspaceActionItem | None:
+    codes = ["settlement_binder_high_findings", "settlement_binder_review_findings"]
+    if not any(code in by_code for code in codes):
+        return None
+    priority = "high" if "settlement_binder_high_findings" in by_code else "medium"
+    return _action(
+        root,
+        priority,
+        "Review settlement binder",
+        "Budget ledger rows should be tied to proof metadata, approval references, evidence IDs, and source hashes before settlement review.",
+        f'python -m k_resdev_skill settlement-binder --root "{root}" --output "{root / "reports" / "settlement-binder.md"}" --json "{root / "state" / "settlement-binder.json"}"',
+        by_code,
+        codes,
+    )
+
+
+def _action_for_admin_change_ledger(root: Path, by_code: dict[str, list[WorkspaceDoctorFinding]]) -> WorkspaceActionItem | None:
+    codes = ["admin_change_ledger_high_findings", "admin_change_ledger_review_findings"]
+    if not any(code in by_code for code in codes):
+        return None
+    priority = "high" if "admin_change_ledger_high_findings" in by_code else "medium"
+    return _action(
+        root,
+        priority,
+        "Review admin change ledger",
+        "Agreement, KPI, budget, and period changes should be approved and hash-bound before changed values appear in reports or settlement records.",
+        f'python -m k_resdev_skill admin-change-ledger --root "{root}" --output "{root / "reports" / "admin-change-ledger.md"}" --json "{root / "state" / "admin-change-ledger-review.json"}"',
+        by_code,
+        codes,
+    )
+
+
+def _action_for_admin_calendar(root: Path, by_code: dict[str, list[WorkspaceDoctorFinding]]) -> WorkspaceActionItem | None:
+    codes = ["admin_calendar_high_findings", "admin_calendar_review_findings"]
+    if not any(code in by_code for code in codes):
+        return None
+    priority = "high" if "admin_calendar_high_findings" in by_code else "medium"
+    return _action(
+        root,
+        priority,
+        "Review admin calendar",
+        "Local reporting, settlement, performance, and equipment obligations should link to reviewed project deadlines before being used operationally.",
+        f'python -m k_resdev_skill admin-calendar-review --root "{root}" --output "{root / "reports" / "admin-calendar.md"}" --json "{root / "state" / "admin-calendar.json"}"',
         by_code,
         codes,
     )

@@ -1,0 +1,31 @@
+{
+  "profile_id": "national-rnd-basic",
+  "status": "needs_review",
+  "profile_status": "needs_review",
+  "source_record_ids": [],
+  "obligations": [
+    {
+      "obligation_id": "ADM-EXAMPLE-001",
+      "title": "Example admin obligation candidate",
+      "obligation_type": "reporting",
+      "profile_id": "national-rnd-basic",
+      "source_system": "local",
+      "required_evidence_types": [
+        "plan_goal",
+        "outcome"
+      ],
+      "required_approval": true,
+      "status": "needs_review",
+      "notes": "Example only. Verify current agency/program rules before official use.",
+      "risk_flags": [
+        "official_source_needs_review"
+      ]
+    }
+  ],
+  "submissions": [],
+  "settlement_requirements": [],
+  "notes": "Template profile pack only. Keep as needs_review until source-backed and human-reviewed.",
+  "warnings": [
+    "official_source_needs_review"
+  ]
+}

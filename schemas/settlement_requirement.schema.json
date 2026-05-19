@@ -1,0 +1,78 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "requirement_id": {
+      "title": "Requirement Id",
+      "type": "string"
+    },
+    "ledger_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Ledger Id"
+    },
+    "category": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Category"
+    },
+    "proof_type_required": {
+      "default": true,
+      "title": "Proof Type Required",
+      "type": "boolean"
+    },
+    "approval_required": {
+      "default": true,
+      "title": "Approval Required",
+      "type": "boolean"
+    },
+    "evidence_required": {
+      "default": true,
+      "title": "Evidence Required",
+      "type": "boolean"
+    },
+    "status": {
+      "default": "needs_review",
+      "title": "Status",
+      "type": "string"
+    },
+    "notes": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Notes"
+    },
+    "risk_flags": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Risk Flags",
+      "type": "array"
+    }
+  },
+  "required": [
+    "requirement_id"
+  ],
+  "title": "SettlementEvidenceRequirement",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

@@ -154,6 +154,9 @@ def test_validate_json_file_accepts_profile_review_aliases():
     profile_pack_package_artifact = validate_json_file("templates/profile-pack-investigation-package-artifact.json", "profile-pack-investigation-package-artifact")
     profile_pack_package_exclusion = validate_json_file("templates/profile-pack-investigation-package-exclusion.json", "profile-pack-investigation-package-exclusion")
     profile_pack_package = validate_json_file("templates/profile-pack-investigation-package.json", "profile-pack-investigation-package")
+    profile_pack_receipt = validate_json_file("templates/profile-pack-package-receipt-record.json", "profile-pack-package-receipt")
+    profile_pack_receipt_finding = validate_json_file("templates/profile-pack-package-receipt-finding.json", "profile-pack-package-receipt-finding")
+    profile_pack_receipt_summary = validate_json_file("templates/profile-pack-package-receipt-summary.json", "profile-pack-package-receipt-summary")
 
     assert source_fix_plan_action["valid"] is True
     assert source_fix_plan["valid"] is True
@@ -183,6 +186,29 @@ def test_validate_json_file_accepts_profile_review_aliases():
     assert profile_pack_package_artifact["valid"] is True
     assert profile_pack_package_exclusion["valid"] is True
     assert profile_pack_package["valid"] is True
+    assert profile_pack_receipt["valid"] is True
+    assert profile_pack_receipt_finding["valid"] is True
+    assert profile_pack_receipt_summary["valid"] is True
+
+
+def test_validate_json_file_accepts_admin_operating_layer_aliases():
+    aliases = [
+        ("templates/admin-obligation.json", "admin-obligation"),
+        ("templates/admin-submission.json", "admin-submission"),
+        ("templates/settlement-requirement.json", "settlement-requirement"),
+        ("templates/admin-finding.json", "admin-finding"),
+        ("templates/admin-obligations.json", "admin-obligations"),
+        ("templates/admin-obligation-profile-pack.json", "admin-profile-pack"),
+        ("templates/admin-obligation-profile-pack-review.json", "admin-profile-pack-review"),
+        ("templates/settlement-binder-item.json", "settlement-binder-item"),
+        ("templates/settlement-binder.json", "settlement-binder"),
+        ("templates/admin-change-record.json", "admin-change"),
+        ("templates/admin-change-ledger.json", "admin-change-ledger"),
+        ("templates/admin-calendar.json", "admin-calendar"),
+    ]
+    for template, schema in aliases:
+        result = validate_json_file(template, schema)
+        assert result["valid"] is True
 
 
 def test_validate_json_cli_returns_nonzero_for_invalid(tmp_path, capsys):

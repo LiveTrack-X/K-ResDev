@@ -6,6 +6,14 @@ from datetime import date
 from pathlib import Path
 
 from . import __version__
+from .admin_operating import (
+    generate_settlement_binder,
+    initialize_admin_obligations,
+    review_admin_calendar,
+    review_admin_change_ledger,
+    review_admin_obligation_profile_pack,
+    review_admin_obligations,
+)
 from .artifact_authority import generate_artifact_authority
 from .audit import generate_audit_qna
 from .approval import (
@@ -58,6 +66,12 @@ from .profile_promotion_revoke import generate_profile_promotion_revoke_plan, re
 from .profile_lifecycle import generate_profile_lifecycle_ledger
 from .profile_pack_investigation import generate_profile_pack_investigation_bundle
 from .profile_pack_investigation_package import generate_profile_pack_investigation_package
+from .profile_pack_package_receipt import (
+    create_profile_pack_package_receipt_record,
+    default_profile_pack_package_receipts_dir,
+    summarize_profile_pack_package_receipts,
+    write_profile_pack_package_receipt_record,
+)
 from .profile_pack_drilldown import generate_profile_pack_readiness_drilldown
 from .profile_pack_readiness import generate_profile_pack_readiness
 from .profile_sources import (
@@ -462,6 +476,25 @@ def main(argv: list[str] | None = None) -> int:
     profile_pack_package_parser.add_argument("--json", default=None)
     profile_pack_package_parser.add_argument("--zip", default=None)
 
+    profile_pack_receipt_record_parser = subparsers.add_parser("profile-pack-package-receipt-record", help="Record a supplied reviewer receipt for a profile-pack investigation package.")
+    profile_pack_receipt_record_parser.add_argument("--root", default=".")
+    profile_pack_receipt_record_parser.add_argument("--decision", required=True, choices=["received", "accepted_for_review", "needs_changes", "rejected"])
+    profile_pack_receipt_record_parser.add_argument("--reviewer", required=True)
+    profile_pack_receipt_record_parser.add_argument("--package-hash", required=True)
+    profile_pack_receipt_record_parser.add_argument("--package", default=None)
+    profile_pack_receipt_record_parser.add_argument("--reviewed-at", default=None)
+    profile_pack_receipt_record_parser.add_argument("--note", default=None)
+    profile_pack_receipt_record_parser.add_argument("--risk-flag", action="append", default=[])
+    profile_pack_receipt_record_parser.add_argument("--receipts-dir", default=None)
+    profile_pack_receipt_record_parser.add_argument("--print-only", action="store_true")
+
+    profile_pack_receipt_summary_parser = subparsers.add_parser("profile-pack-package-receipt-summary", help="Summarize supplied profile-pack package reviewer receipts.")
+    profile_pack_receipt_summary_parser.add_argument("--root", default=".")
+    profile_pack_receipt_summary_parser.add_argument("--package", default=None)
+    profile_pack_receipt_summary_parser.add_argument("--receipts-dir", default=None)
+    profile_pack_receipt_summary_parser.add_argument("--output", default=None)
+    profile_pack_receipt_summary_parser.add_argument("--json", default=None)
+
     validate_json_parser = subparsers.add_parser("validate-json", help="Validate JSON files against bundled or custom JSON schema.")
     validate_json_parser.add_argument(
         "schema",
@@ -512,6 +545,39 @@ def main(argv: list[str] | None = None) -> int:
     doctor_parser.add_argument("--root", default=".")
     doctor_parser.add_argument("--output", default=None)
     doctor_parser.add_argument("--json", default=None)
+
+    admin_init_parser = subparsers.add_parser("admin-obligations-init", help="Create a needs-review local admin obligation graph.")
+    admin_init_parser.add_argument("--root", default=".")
+    admin_init_parser.add_argument("--profile", default="national-rnd-basic")
+    admin_init_parser.add_argument("--output", default=None)
+    admin_init_parser.add_argument("--json", default=None)
+    admin_init_parser.add_argument("--templates-root", default=None)
+
+    admin_review_parser = subparsers.add_parser("admin-obligations-review", help="Review local admin obligations, submissions, approvals, and evidence links.")
+    admin_review_parser.add_argument("--root", default=".")
+    admin_review_parser.add_argument("--output", default=None)
+    admin_review_parser.add_argument("--json", default=None)
+
+    admin_profile_pack_parser = subparsers.add_parser("admin-profile-pack-review", help="Review a profile-driven admin obligation seed pack.")
+    admin_profile_pack_parser.add_argument("--profile", default="national-rnd-basic")
+    admin_profile_pack_parser.add_argument("--templates-root", default=None)
+    admin_profile_pack_parser.add_argument("--output", default=None)
+    admin_profile_pack_parser.add_argument("--json", default=None)
+
+    settlement_binder_parser = subparsers.add_parser("settlement-binder", help="Bind budget ledger rows to evidence, proof, approval, and source-hash state.")
+    settlement_binder_parser.add_argument("--root", default=".")
+    settlement_binder_parser.add_argument("--output", default=None)
+    settlement_binder_parser.add_argument("--json", default=None)
+
+    admin_change_parser = subparsers.add_parser("admin-change-ledger", help="Review supplied agreement/change/approval ledger records.")
+    admin_change_parser.add_argument("--root", default=".")
+    admin_change_parser.add_argument("--output", default=None)
+    admin_change_parser.add_argument("--json", default=None)
+
+    admin_calendar_parser = subparsers.add_parser("admin-calendar-review", help="Review admin obligation deadline links and local due dates.")
+    admin_calendar_parser.add_argument("--root", default=".")
+    admin_calendar_parser.add_argument("--output", default=None)
+    admin_calendar_parser.add_argument("--json", default=None)
 
     discovery_parser = subparsers.add_parser("discover-workspace", help="Read-only workspace layout discovery and additive setup planning.")
     discovery_parser.add_argument("--root", default=".")
@@ -1028,6 +1094,32 @@ def main(argv: list[str] | None = None) -> int:
         )
         print(result.model_dump_json(indent=2))
         return 0 if result.status != "blocked" else 1
+    if args.command == "profile-pack-package-receipt-record":
+        record = create_profile_pack_package_receipt_record(
+            args.root,
+            decision=args.decision,
+            reviewer=args.reviewer,
+            package_hash=args.package_hash,
+            package_path=args.package,
+            reviewed_at=args.reviewed_at,
+            notes=args.note,
+            risk_flags=args.risk_flag,
+        )
+        if not args.print_only:
+            receipts_dir = Path(args.receipts_dir) if args.receipts_dir else default_profile_pack_package_receipts_dir(args.root)
+            write_profile_pack_package_receipt_record(record, receipts_dir)
+        print(record.model_dump_json(indent=2))
+        return 0
+    if args.command == "profile-pack-package-receipt-summary":
+        result = summarize_profile_pack_package_receipts(
+            args.root,
+            package_path=args.package,
+            receipts_dir=args.receipts_dir,
+            output_path=args.output,
+            json_path=args.json,
+        )
+        print(result.model_dump_json(indent=2))
+        return 0 if result.status != "blocked" else 1
     if args.command == "validate-json":
         result = validate_json_files(args.json_paths, args.schema)
         print(json.dumps(result, ensure_ascii=False, indent=2))
@@ -1075,6 +1167,30 @@ def main(argv: list[str] | None = None) -> int:
         result = run_workspace_doctor(args.root, args.output, args.json)
         print(result.model_dump_json(indent=2))
         return 0
+    if args.command == "admin-obligations-init":
+        result = initialize_admin_obligations(args.root, profile_id=args.profile, output_path=args.output, json_path=args.json, templates_root=args.templates_root)
+        print(result.model_dump_json(indent=2))
+        return 0 if result.status != "blocked" else 1
+    if args.command == "admin-obligations-review":
+        result = review_admin_obligations(args.root, output_path=args.output, json_path=args.json)
+        print(result.model_dump_json(indent=2))
+        return 0 if result.status != "blocked" else 1
+    if args.command == "admin-profile-pack-review":
+        result = review_admin_obligation_profile_pack(args.profile, templates_root=args.templates_root, output_path=args.output, json_path=args.json)
+        print(result.model_dump_json(indent=2))
+        return 0 if result.status != "blocked" else 1
+    if args.command == "settlement-binder":
+        result = generate_settlement_binder(args.root, output_path=args.output, json_path=args.json)
+        print(result.model_dump_json(indent=2))
+        return 0 if result.status != "blocked" else 1
+    if args.command == "admin-change-ledger":
+        result = review_admin_change_ledger(args.root, output_path=args.output, json_path=args.json)
+        print(result.model_dump_json(indent=2))
+        return 0 if result.status != "blocked" else 1
+    if args.command == "admin-calendar-review":
+        result = review_admin_calendar(args.root, output_path=args.output, json_path=args.json)
+        print(result.model_dump_json(indent=2))
+        return 0 if result.status != "blocked" else 1
     if args.command == "discover-workspace":
         result = discover_workspace(args.root, output_path=args.output, json_path=args.json, max_items=args.max_items)
         print(result.model_dump_json(indent=2))

@@ -1,0 +1,15 @@
+{
+  "submission_id": "SUB-2026-REPORT-001",
+  "obligation_id": "ADM-REPORT-001",
+  "title": "Monthly report draft submission candidate",
+  "artifact_path": "reports/monthly-report-2026-05.md",
+  "target_system": "IRIS",
+  "submitted_at": null,
+  "approval_id": "APR-2026-REPORT-001",
+  "evidence_ids": [
+    "EVI-2026-ABCD1234"
+  ],
+  "status": "needs_review",
+  "notes": null,
+  "risk_flags": []
+}

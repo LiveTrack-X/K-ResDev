@@ -1,0 +1,62 @@
+{
+  "root": "templates/agencies",
+  "status": "needs_review",
+  "profile_id": "national-rnd-basic",
+  "profile_status": "needs_review",
+  "pack_path": "templates/agencies/national-rnd-basic/admin-obligations.json",
+  "source_record_count": 0,
+  "verified_source_count": 0,
+  "needs_review_source_count": 0,
+  "obligation_count": 1,
+  "submission_count": 0,
+  "settlement_requirement_count": 0,
+  "finding_count": 1,
+  "high_count": 0,
+  "medium_count": 1,
+  "low_count": 0,
+  "pack": {
+    "profile_id": "national-rnd-basic",
+    "status": "needs_review",
+    "profile_status": "needs_review",
+    "source_record_ids": [],
+    "obligations": [
+      {
+        "obligation_id": "ADM-EXAMPLE-001",
+        "title": "Example admin obligation candidate",
+        "obligation_type": "reporting",
+        "profile_id": "national-rnd-basic",
+        "source_system": "local",
+        "required_evidence_types": [
+          "plan_goal",
+          "outcome"
+        ],
+        "required_approval": true,
+        "status": "needs_review",
+        "notes": "Example only.",
+        "risk_flags": [
+          "official_source_needs_review"
+        ]
+      }
+    ],
+    "submissions": [],
+    "settlement_requirements": [],
+    "notes": "Example profile pack review payload.",
+    "warnings": [
+      "official_source_needs_review"
+    ]
+  },
+  "findings": [
+    {
+      "code": "admin_profile_pack_needs_review",
+      "severity": "medium",
+      "message": "Admin obligation pack `national-rnd-basic` is `needs_review`.",
+      "path": "templates/agencies/national-rnd-basic/admin-obligations.json",
+      "suggested_action": "Keep seeded obligations as local candidates until official-source review and human promotion are complete."
+    }
+  ],
+  "markdown_path": null,
+  "json_path": null,
+  "warnings": [
+    "official_source_needs_review"
+  ]
+}

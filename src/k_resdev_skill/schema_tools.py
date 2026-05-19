@@ -8,6 +8,28 @@ from jsonschema import Draft202012Validator
 
 
 SCHEMA_ALIASES = {
+    "admin-calendar": "admin_calendar.schema.json",
+    "admin_calendar": "admin_calendar.schema.json",
+    "admin-change": "admin_change_record.schema.json",
+    "admin_change": "admin_change_record.schema.json",
+    "admin-change-ledger": "admin_change_ledger.schema.json",
+    "admin_change_ledger": "admin_change_ledger.schema.json",
+    "admin-finding": "admin_finding.schema.json",
+    "admin_finding": "admin_finding.schema.json",
+    "admin-obligation": "admin_obligation.schema.json",
+    "admin_obligation": "admin_obligation.schema.json",
+    "admin-obligation-graph": "admin_obligation_graph.schema.json",
+    "admin_obligation_graph": "admin_obligation_graph.schema.json",
+    "admin-obligations": "admin_obligation_graph.schema.json",
+    "admin_obligations": "admin_obligation_graph.schema.json",
+    "admin-obligation-profile-pack": "admin_obligation_profile_pack.schema.json",
+    "admin_obligation_profile_pack": "admin_obligation_profile_pack.schema.json",
+    "admin-profile-pack": "admin_obligation_profile_pack.schema.json",
+    "admin_profile_pack": "admin_obligation_profile_pack.schema.json",
+    "admin-profile-pack-review": "admin_obligation_profile_pack_review.schema.json",
+    "admin_profile_pack_review": "admin_obligation_profile_pack_review.schema.json",
+    "admin-submission": "admin_submission.schema.json",
+    "admin_submission": "admin_submission.schema.json",
     "approval": "approval_record.schema.json",
     "artifact-authority": "artifact_authority.schema.json",
     "artifact_authority": "artifact_authority.schema.json",
@@ -67,6 +89,14 @@ SCHEMA_ALIASES = {
     "profile_pack_investigation_package_artifact": "profile_pack_investigation_package_artifact.schema.json",
     "profile-pack-investigation-package-exclusion": "profile_pack_investigation_package_exclusion.schema.json",
     "profile_pack_investigation_package_exclusion": "profile_pack_investigation_package_exclusion.schema.json",
+    "profile-pack-package-receipt": "profile_pack_package_receipt_record.schema.json",
+    "profile_pack_package_receipt": "profile_pack_package_receipt_record.schema.json",
+    "profile-pack-package-receipt-record": "profile_pack_package_receipt_record.schema.json",
+    "profile_pack_package_receipt_record": "profile_pack_package_receipt_record.schema.json",
+    "profile-pack-package-receipt-finding": "profile_pack_package_receipt_finding.schema.json",
+    "profile_pack_package_receipt_finding": "profile_pack_package_receipt_finding.schema.json",
+    "profile-pack-package-receipt-summary": "profile_pack_package_receipt_summary.schema.json",
+    "profile_pack_package_receipt_summary": "profile_pack_package_receipt_summary.schema.json",
     "profile-source-queue": "profile_source_queue.schema.json",
     "profile_source_queue": "profile_source_queue.schema.json",
     "profile-source-queue-item": "profile_source_queue_item.schema.json",
@@ -114,6 +144,12 @@ SCHEMA_ALIASES = {
     "research_insight": "research_insight.schema.json",
     "research-claim": "research_claim.schema.json",
     "research_claim": "research_claim.schema.json",
+    "settlement-binder": "settlement_binder.schema.json",
+    "settlement_binder": "settlement_binder.schema.json",
+    "settlement-binder-item": "settlement_binder_item.schema.json",
+    "settlement_binder_item": "settlement_binder_item.schema.json",
+    "settlement-requirement": "settlement_requirement.schema.json",
+    "settlement_requirement": "settlement_requirement.schema.json",
     "trace-passport": "trace_passport.schema.json",
     "trace_passport": "trace_passport.schema.json",
     "checkpoint": "trace_passport_entry.schema.json",
@@ -185,6 +221,10 @@ def validate_json_files(json_paths: list[str | Path], schema: str | Path) -> dic
 def _validation_targets(document: Any, schema_payload: dict[str, Any]) -> list[tuple[str, Any]]:
     title = schema_payload.get("title")
     if title in {
+        "AdminChangeRecord",
+        "AdminFinding",
+        "AdminObligation",
+        "AdminSubmission",
         "ApprovalRecord",
         "ArtifactAuthorityFinding",
         "ArtifactAuthorityRecord",
@@ -203,6 +243,8 @@ def _validation_targets(document: Any, schema_payload: dict[str, Any]) -> list[t
         "ProfilePackInvestigationItem",
         "ProfilePackInvestigationPackageArtifact",
         "ProfilePackInvestigationPackageExclusion",
+        "ProfilePackPackageReceiptFinding",
+        "ProfilePackPackageReceiptRecord",
         "ProfileSourceFixPlanAction",
         "ProfileSourceFixReviewFinding",
         "ProfileSourceFixReviewRecord",
@@ -215,6 +257,8 @@ def _validation_targets(document: Any, schema_payload: dict[str, Any]) -> list[t
         "ReferenceCorpusRejection",
         "ResearchClaim",
         "ResearchInsight",
+        "SettlementBinderItem",
+        "SettlementEvidenceRequirement",
         "TracePassportEntry",
         "WorkspaceDiscoveryItem",
         "WeeklyReviewItem",
@@ -259,6 +303,22 @@ def _validation_targets(document: Any, schema_payload: dict[str, Any]) -> list[t
             return [(f"$.artifacts[{index}]", item) for index, item in enumerate(document["artifacts"])]
         if title == "ProfilePackInvestigationPackageExclusion" and isinstance(document, dict) and isinstance(document.get("exclusions"), list):
             return [(f"$.exclusions[{index}]", item) for index, item in enumerate(document["exclusions"])]
+        if title == "ProfilePackPackageReceiptRecord" and isinstance(document, dict) and isinstance(document.get("records"), list):
+            return [(f"$.records[{index}]", item) for index, item in enumerate(document["records"])]
+        if title == "ProfilePackPackageReceiptFinding" and isinstance(document, dict) and isinstance(document.get("findings"), list):
+            return [(f"$.findings[{index}]", item) for index, item in enumerate(document["findings"])]
+        if title == "AdminObligation" and isinstance(document, dict) and isinstance(document.get("obligations"), list):
+            return [(f"$.obligations[{index}]", item) for index, item in enumerate(document["obligations"])]
+        if title == "AdminSubmission" and isinstance(document, dict) and isinstance(document.get("submissions"), list):
+            return [(f"$.submissions[{index}]", item) for index, item in enumerate(document["submissions"])]
+        if title == "SettlementEvidenceRequirement" and isinstance(document, dict) and isinstance(document.get("settlement_requirements"), list):
+            return [(f"$.settlement_requirements[{index}]", item) for index, item in enumerate(document["settlement_requirements"])]
+        if title == "SettlementBinderItem" and isinstance(document, dict) and isinstance(document.get("items"), list):
+            return [(f"$.items[{index}]", item) for index, item in enumerate(document["items"])]
+        if title == "AdminChangeRecord" and isinstance(document, dict) and isinstance(document.get("changes"), list):
+            return [(f"$.changes[{index}]", item) for index, item in enumerate(document["changes"])]
+        if title == "AdminFinding" and isinstance(document, dict) and isinstance(document.get("findings"), list):
+            return [(f"$.findings[{index}]", item) for index, item in enumerate(document["findings"])]
         if isinstance(document, dict) and isinstance(document.get("items"), list):
             return [(f"$.items[{index}]", item) for index, item in enumerate(document["items"])]
         if title == "DashboardCard" and isinstance(document, dict) and isinstance(document.get("cards"), list):

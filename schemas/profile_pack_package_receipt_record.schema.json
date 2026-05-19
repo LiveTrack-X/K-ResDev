@@ -1,0 +1,75 @@
+{
+  "$defs": {
+    "ProfilePackPackageReceiptDecision": {
+      "enum": [
+        "received",
+        "accepted_for_review",
+        "needs_changes",
+        "rejected"
+      ],
+      "title": "ProfilePackPackageReceiptDecision",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "receipt_id": {
+      "title": "Receipt Id",
+      "type": "string"
+    },
+    "package_id": {
+      "title": "Package Id",
+      "type": "string"
+    },
+    "package_manifest_path": {
+      "title": "Package Manifest Path",
+      "type": "string"
+    },
+    "package_manifest_hash": {
+      "title": "Package Manifest Hash",
+      "type": "string"
+    },
+    "decision": {
+      "$ref": "#/$defs/ProfilePackPackageReceiptDecision"
+    },
+    "reviewer": {
+      "title": "Reviewer",
+      "type": "string"
+    },
+    "reviewed_at": {
+      "title": "Reviewed At",
+      "type": "string"
+    },
+    "notes": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Notes"
+    },
+    "risk_flags": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Risk Flags",
+      "type": "array"
+    }
+  },
+  "required": [
+    "receipt_id",
+    "package_id",
+    "package_manifest_path",
+    "package_manifest_hash",
+    "decision",
+    "reviewer",
+    "reviewed_at"
+  ],
+  "title": "ProfilePackPackageReceiptRecord",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

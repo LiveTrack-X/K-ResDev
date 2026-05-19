@@ -1,0 +1,310 @@
+{
+  "$defs": {
+    "AdminFinding": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "title": "Code",
+          "type": "string"
+        },
+        "severity": {
+          "title": "Severity",
+          "type": "string"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "obligation_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Obligation Id"
+        },
+        "submission_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Submission Id"
+        },
+        "ledger_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Ledger Id"
+        },
+        "change_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Change Id"
+        },
+        "path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Path"
+        },
+        "suggested_action": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Suggested Action"
+        }
+      },
+      "required": [
+        "code",
+        "severity",
+        "message"
+      ],
+      "title": "AdminFinding",
+      "type": "object"
+    },
+    "AdminObligation": {
+      "additionalProperties": false,
+      "properties": {
+        "obligation_id": {
+          "title": "Obligation Id",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "obligation_type": {
+          "title": "Obligation Type",
+          "type": "string"
+        },
+        "profile_id": {
+          "default": "national-rnd-basic",
+          "title": "Profile Id",
+          "type": "string"
+        },
+        "source_system": {
+          "default": "local",
+          "title": "Source System",
+          "type": "string"
+        },
+        "due_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Due Date"
+        },
+        "cadence": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Cadence"
+        },
+        "required_evidence_types": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Required Evidence Types",
+          "type": "array"
+        },
+        "required_approval": {
+          "default": true,
+          "title": "Required Approval",
+          "type": "boolean"
+        },
+        "linked_deadline_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Linked Deadline Id"
+        },
+        "status": {
+          "default": "needs_review",
+          "title": "Status",
+          "type": "string"
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Notes"
+        },
+        "risk_flags": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Risk Flags",
+          "type": "array"
+        }
+      },
+      "required": [
+        "obligation_id",
+        "title",
+        "obligation_type"
+      ],
+      "title": "AdminObligation",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "root": {
+      "title": "Root",
+      "type": "string"
+    },
+    "status": {
+      "title": "Status",
+      "type": "string"
+    },
+    "obligation_count": {
+      "default": 0,
+      "title": "Obligation Count",
+      "type": "integer"
+    },
+    "linked_deadline_count": {
+      "default": 0,
+      "title": "Linked Deadline Count",
+      "type": "integer"
+    },
+    "due_soon_count": {
+      "default": 0,
+      "title": "Due Soon Count",
+      "type": "integer"
+    },
+    "overdue_count": {
+      "default": 0,
+      "title": "Overdue Count",
+      "type": "integer"
+    },
+    "finding_count": {
+      "default": 0,
+      "title": "Finding Count",
+      "type": "integer"
+    },
+    "high_count": {
+      "default": 0,
+      "title": "High Count",
+      "type": "integer"
+    },
+    "medium_count": {
+      "default": 0,
+      "title": "Medium Count",
+      "type": "integer"
+    },
+    "low_count": {
+      "default": 0,
+      "title": "Low Count",
+      "type": "integer"
+    },
+    "obligations": {
+      "items": {
+        "$ref": "#/$defs/AdminObligation"
+      },
+      "title": "Obligations",
+      "type": "array"
+    },
+    "findings": {
+      "items": {
+        "$ref": "#/$defs/AdminFinding"
+      },
+      "title": "Findings",
+      "type": "array"
+    },
+    "markdown_path": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Markdown Path"
+    },
+    "json_path": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Json Path"
+    },
+    "warnings": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Warnings",
+      "type": "array"
+    }
+  },
+  "required": [
+    "root",
+    "status"
+  ],
+  "title": "AdminCalendarResult",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

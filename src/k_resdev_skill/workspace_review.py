@@ -5,6 +5,13 @@ import json
 from datetime import date
 from pathlib import Path
 
+from .admin_operating import (
+    generate_settlement_binder,
+    review_admin_calendar,
+    review_admin_change_ledger,
+    review_admin_obligation_profile_pack,
+    review_admin_obligations,
+)
 from .artifact_authority import generate_artifact_authority
 from .models import (
     ReviewPackArtifact,
@@ -22,8 +29,10 @@ from .profile_promotion_revoke import load_profile_promotion_revoke_plan, load_p
 from .profile_lifecycle import generate_profile_lifecycle_ledger
 from .profile_pack_investigation import generate_profile_pack_investigation_bundle
 from .profile_pack_investigation_package import generate_profile_pack_investigation_package
+from .profile_pack_package_receipt import summarize_profile_pack_package_receipts
 from .profile_pack_drilldown import generate_profile_pack_readiness_drilldown
 from .profile_pack_readiness import generate_profile_pack_readiness
+from .profile_registry import load_project_profile
 from .profile_review import generate_profile_review
 from .profile_source_fix_plan import generate_profile_source_fix_plan
 from .profile_source_fix_review import summarize_profile_source_fix_reviews
@@ -121,6 +130,18 @@ def generate_workspace_review_pack(
     profile_pack_investigation_json = state / "profile-pack-investigation-bundle.json"
     profile_pack_package_md = reports / "profile-pack-investigation-package.md"
     profile_pack_package_json = state / "profile-pack-investigation-package.json"
+    profile_pack_receipt_md = reports / "profile-pack-package-receipt-summary.md"
+    profile_pack_receipt_json = state / "profile-pack-package-receipt-summary.json"
+    admin_profile_pack_md = reports / "admin-profile-pack.md"
+    admin_profile_pack_json = state / "admin-profile-pack-review.json"
+    admin_obligations_md = reports / "admin-obligations.md"
+    admin_obligations_json = state / "admin-obligations-review.json"
+    settlement_binder_md = reports / "settlement-binder.md"
+    settlement_binder_json = state / "settlement-binder.json"
+    admin_change_md = reports / "admin-change-ledger.md"
+    admin_change_json = state / "admin-change-ledger-review.json"
+    admin_calendar_md = reports / "admin-calendar.md"
+    admin_calendar_json = state / "admin-calendar.json"
     workspace_trace_md = reports / "workspace-trace.md"
     workspace_trace_json = state / "workspace-trace.json"
     trace_passport_md = reports / "trace-passport.md"
@@ -155,6 +176,12 @@ def generate_workspace_review_pack(
     profile_pack_drilldown = generate_profile_pack_readiness_drilldown(workspace, output_path=profile_pack_drilldown_md, json_path=profile_pack_drilldown_json)
     profile_pack_investigation = generate_profile_pack_investigation_bundle(workspace, output_path=profile_pack_investigation_md, json_path=profile_pack_investigation_json)
     profile_pack_package = generate_profile_pack_investigation_package(workspace, output_path=profile_pack_package_md, json_path=profile_pack_package_json)
+    profile_pack_receipt = summarize_profile_pack_package_receipts(workspace, output_path=profile_pack_receipt_md, json_path=profile_pack_receipt_json)
+    admin_profile_pack = review_admin_obligation_profile_pack(_workspace_profile_id(workspace), output_path=admin_profile_pack_md, json_path=admin_profile_pack_json)
+    admin_obligations = review_admin_obligations(workspace, output_path=admin_obligations_md, json_path=admin_obligations_json)
+    settlement_binder = generate_settlement_binder(workspace, output_path=settlement_binder_md, json_path=settlement_binder_json)
+    admin_change_ledger = review_admin_change_ledger(workspace, output_path=admin_change_md, json_path=admin_change_json)
+    admin_calendar = review_admin_calendar(workspace, output_path=admin_calendar_md, json_path=admin_calendar_json)
     weekly_review = generate_weekly_review(
         workspace,
         review_date=weekly_date,
@@ -239,6 +266,18 @@ def generate_workspace_review_pack(
         str(profile_pack_investigation_json),
         str(profile_pack_package_md),
         str(profile_pack_package_json),
+        str(profile_pack_receipt_md),
+        str(profile_pack_receipt_json),
+        str(admin_profile_pack_md),
+        str(admin_profile_pack_json),
+        str(admin_obligations_md),
+        str(admin_obligations_json),
+        str(settlement_binder_md),
+        str(settlement_binder_json),
+        str(admin_change_md),
+        str(admin_change_json),
+        str(admin_calendar_md),
+        str(admin_calendar_json),
         str(workspace_trace_md),
         str(workspace_trace_json),
         str(trace_passport_md),
@@ -366,6 +405,27 @@ def generate_workspace_review_pack(
         profile_pack_package_included_artifact_count=profile_pack_package.included_artifact_count,
         profile_pack_package_excluded_artifact_count=profile_pack_package.excluded_artifact_count,
         profile_pack_package_missing_artifact_count=profile_pack_package.missing_artifact_count,
+        profile_pack_package_receipt_status=profile_pack_receipt.status,
+        profile_pack_package_receipt_count=profile_pack_receipt.record_count,
+        profile_pack_package_receipt_unresolved_count=profile_pack_receipt.unresolved_count,
+        profile_pack_package_receipt_stale_count=profile_pack_receipt.stale_record_count,
+        admin_profile_pack_status=admin_profile_pack.status,
+        admin_profile_pack_obligation_count=admin_profile_pack.obligation_count,
+        admin_profile_pack_finding_count=admin_profile_pack.finding_count,
+        admin_obligation_status=admin_obligations.status,
+        admin_obligation_count=admin_obligations.obligation_count,
+        admin_submission_count=admin_obligations.submission_count,
+        admin_obligation_finding_count=admin_obligations.finding_count,
+        settlement_binder_status=settlement_binder.status,
+        settlement_binder_item_count=settlement_binder.item_count,
+        settlement_binder_finding_count=settlement_binder.finding_count,
+        admin_change_ledger_status=admin_change_ledger.status,
+        admin_change_count=admin_change_ledger.change_count,
+        admin_change_finding_count=admin_change_ledger.finding_count,
+        admin_calendar_status=admin_calendar.status,
+        admin_calendar_linked_deadline_count=admin_calendar.linked_deadline_count,
+        admin_calendar_due_soon_count=admin_calendar.due_soon_count,
+        admin_calendar_overdue_count=admin_calendar.overdue_count,
         workspace_trace_status=workspace_trace.status,
         workspace_trace_node_count=workspace_trace.node_count,
         workspace_trace_edge_count=workspace_trace.edge_count,
@@ -494,6 +554,9 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
         f"| Budget ledger count | {result.budget_ledger_count} |",
         f"| Budget ledger finding count | {result.budget_ledger_finding_count} |",
         f"| Budget ledger high count | {result.budget_ledger_high_count} |",
+        f"| Settlement binder status | {_escape(result.settlement_binder_status or '-')} |",
+        f"| Settlement binder item count | {result.settlement_binder_item_count} |",
+        f"| Settlement binder finding count | {result.settlement_binder_finding_count} |",
         f"| Bibliography integrity status | {_escape(result.bibliography_integrity_status or '-')} |",
         f"| Bibliography entry count | {result.bibliography_entry_count} |",
         f"| Bibliography review count | {result.bibliography_review_count} |",
@@ -570,6 +633,24 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
         f"| Profile pack package included artifacts | {result.profile_pack_package_included_artifact_count} |",
         f"| Profile pack package excluded artifacts | {result.profile_pack_package_excluded_artifact_count} |",
         f"| Profile pack package missing artifacts | {result.profile_pack_package_missing_artifact_count} |",
+        f"| Profile pack package receipt status | {_escape(result.profile_pack_package_receipt_status or '-')} |",
+        f"| Profile pack package receipt records | {result.profile_pack_package_receipt_count} |",
+        f"| Profile pack package receipt unresolved | {result.profile_pack_package_receipt_unresolved_count} |",
+        f"| Profile pack package receipt stale | {result.profile_pack_package_receipt_stale_count} |",
+        f"| Admin profile pack status | {_escape(result.admin_profile_pack_status or '-')} |",
+        f"| Admin profile pack obligations | {result.admin_profile_pack_obligation_count} |",
+        f"| Admin profile pack finding count | {result.admin_profile_pack_finding_count} |",
+        f"| Admin obligations status | {_escape(result.admin_obligation_status or '-')} |",
+        f"| Admin obligation count | {result.admin_obligation_count} |",
+        f"| Admin submission count | {result.admin_submission_count} |",
+        f"| Admin obligation finding count | {result.admin_obligation_finding_count} |",
+        f"| Admin change ledger status | {_escape(result.admin_change_ledger_status or '-')} |",
+        f"| Admin change count | {result.admin_change_count} |",
+        f"| Admin change finding count | {result.admin_change_finding_count} |",
+        f"| Admin calendar status | {_escape(result.admin_calendar_status or '-')} |",
+        f"| Admin calendar linked deadlines | {result.admin_calendar_linked_deadline_count} |",
+        f"| Admin calendar due soon | {result.admin_calendar_due_soon_count} |",
+        f"| Admin calendar overdue | {result.admin_calendar_overdue_count} |",
         f"| Workspace trace status | {_escape(result.workspace_trace_status or '-')} |",
         f"| Workspace trace nodes | {result.workspace_trace_node_count} |",
         f"| Workspace trace edges | {result.workspace_trace_edge_count} |",
@@ -611,6 +692,7 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
             "- Use `approval-coverage.md` to check report artifacts against supplied human decisions.",
             "- Use `report-integrity.md` to check draft report claims against indexed evidence.",
             "- Use `budget-ledger.md` to check budget ledger proof, approval, duplicate, and evidence-link gaps.",
+            "- Use `settlement-binder.md` to bind budget ledger rows to proof, approval, evidence, and source-hash review state.",
             "- Use `bibliography-integrity.md` to check local citation keys and bibliography source hashes.",
             "- Use `reference-corpus-summary.md` to review local PDFs, Zotero JSON exports, and Markdown note metadata before bibliography promotion.",
             "- Use `citation-support.md` to check cited papers against supplied paper-claim support records.",
@@ -630,6 +712,11 @@ def render_workspace_review_pack_markdown(result: WorkspaceReviewPackResult) -> 
             "- Use `profile-pack-readiness-drilldown.md` to trace readiness blockers back to upstream artifact rows, IDs, and hashes.",
             "- Use `profile-pack-investigation-bundle.md` to hand off one profile pack or blocker review without copying raw official-source bodies.",
             "- Use `profile-pack-investigation-package.md` to transfer generated metadata artifacts and explicit raw-source exclusions for reviewer handoff.",
+            "- Use `profile-pack-package-receipt-summary.md` to inspect supplied reviewer receipt state for generated profile-pack packages.",
+            "- Use `admin-profile-pack.md` to review profile-driven admin obligation seeds before copying them into a workspace.",
+            "- Use `admin-obligations.md` to inspect local reporting, settlement, performance, agreement/change, and equipment obligation candidates.",
+            "- Use `admin-change-ledger.md` to review supplied agreement/KPI/budget/period change records before changed values appear in projections.",
+            "- Use `admin-calendar.md` to connect local admin obligations to reviewed project deadlines and due-soon state.",
             "- Use `workspace-trace.md` to inspect cross-artifact traceability and impact findings.",
             "- Use `trace-passport.md` to inspect checkpoint freshness before resuming long-running work.",
             "- Run `verify-review-pack state/workspace-review-pack.json` before relying on a saved pack.",
@@ -708,6 +795,18 @@ def _artifact_label(path: str) -> str:
         "profile-pack-investigation-bundle.json": "Profile pack investigation bundle JSON",
         "profile-pack-investigation-package.md": "Profile pack investigation package",
         "profile-pack-investigation-package.json": "Profile pack investigation package JSON",
+        "profile-pack-package-receipt-summary.md": "Profile pack package receipt summary",
+        "profile-pack-package-receipt-summary.json": "Profile pack package receipt summary JSON",
+        "admin-profile-pack.md": "Admin profile pack review",
+        "admin-profile-pack-review.json": "Admin profile pack review JSON",
+        "admin-obligations.md": "Admin obligations",
+        "admin-obligations-review.json": "Admin obligations JSON",
+        "settlement-binder.md": "Settlement binder",
+        "settlement-binder.json": "Settlement binder JSON",
+        "admin-change-ledger.md": "Admin change ledger",
+        "admin-change-ledger-review.json": "Admin change ledger JSON",
+        "admin-calendar.md": "Admin calendar",
+        "admin-calendar.json": "Admin calendar JSON",
         "workspace-trace.md": "Workspace trace",
         "workspace-trace.json": "Workspace trace JSON",
         "trace-passport.md": "Trace passport",
@@ -791,6 +890,16 @@ def _load_profile_revoke_result(path: Path):
         return load_profile_promotion_revoke_result(path)
     except Exception:
         return None
+
+
+def _workspace_profile_id(workspace: Path) -> str:
+    profile_path = workspace / "state" / "project-profile.json"
+    if not profile_path.exists():
+        return "national-rnd-basic"
+    try:
+        return load_project_profile(profile_path).profile_id
+    except Exception:
+        return "national-rnd-basic"
 
 
 def _escape(value: str) -> str:

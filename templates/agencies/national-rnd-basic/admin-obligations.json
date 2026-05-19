@@ -1,0 +1,127 @@
+{
+  "profile_id": "national-rnd-basic",
+  "status": "needs_review",
+  "profile_status": "needs_review",
+  "source_record_ids": [],
+  "notes": "Generic Korean national R&D admin obligation skeleton only. Verify current agency/program rules before official use.",
+  "warnings": [
+    "generic_profile_only",
+    "official_source_needs_review"
+  ],
+  "obligations": [
+    {
+      "obligation_id": "ADM-AGREEMENT-001",
+      "title": "Agreement and change request evidence candidate",
+      "obligation_type": "agreement_change",
+      "profile_id": "national-rnd-basic",
+      "source_system": "IRIS",
+      "required_evidence_types": [
+        "change_request"
+      ],
+      "required_approval": true,
+      "status": "needs_review",
+      "notes": "IRIS agreement/change workflows vary by program; verify current manual and agency guidance.",
+      "risk_flags": [
+        "official_source_needs_review"
+      ]
+    },
+    {
+      "obligation_id": "ADM-BUDGET-001",
+      "title": "Research expense ledger and proof evidence candidate",
+      "obligation_type": "budget_evidence",
+      "profile_id": "national-rnd-basic",
+      "source_system": "GAIA/RCMS/Ezbaro",
+      "required_evidence_types": [
+        "budget_evidence"
+      ],
+      "required_approval": true,
+      "status": "needs_review",
+      "notes": "Use as a local binder for proof, approval, and evidence IDs; do not infer cost eligibility.",
+      "risk_flags": [
+        "official_source_needs_review"
+      ]
+    },
+    {
+      "obligation_id": "ADM-SETTLEMENT-001",
+      "title": "Settlement readiness candidate",
+      "obligation_type": "settlement",
+      "profile_id": "national-rnd-basic",
+      "source_system": "IRIS/GAIA",
+      "required_evidence_types": [
+        "budget_evidence"
+      ],
+      "required_approval": true,
+      "status": "needs_review",
+      "notes": "Settlement requirements differ by program and system. Keep this as needs_review.",
+      "risk_flags": [
+        "official_source_needs_review"
+      ]
+    },
+    {
+      "obligation_id": "ADM-REPORT-001",
+      "title": "Periodic report submission candidate",
+      "obligation_type": "reporting",
+      "profile_id": "national-rnd-basic",
+      "source_system": "IRIS",
+      "required_evidence_types": [
+        "plan_goal",
+        "kpi",
+        "milestone",
+        "outcome"
+      ],
+      "required_approval": true,
+      "status": "needs_review",
+      "notes": "Link monthly/interim/annual/final report drafts after human schedule review.",
+      "risk_flags": [
+        "official_source_needs_review"
+      ]
+    },
+    {
+      "obligation_id": "ADM-PERFORMANCE-001",
+      "title": "Performance registration candidate",
+      "obligation_type": "performance_registration",
+      "profile_id": "national-rnd-basic",
+      "source_system": "NTIS/IRIS",
+      "required_evidence_types": [
+        "outcome"
+      ],
+      "required_approval": true,
+      "status": "needs_review",
+      "notes": "Performance fields should be profile-driven and verified before use.",
+      "risk_flags": [
+        "official_source_needs_review"
+      ]
+    },
+    {
+      "obligation_id": "ADM-EQUIPMENT-001",
+      "title": "Research facilities and equipment admin candidate",
+      "obligation_type": "equipment",
+      "profile_id": "national-rnd-basic",
+      "source_system": "IRIS",
+      "required_evidence_types": [
+        "budget_evidence"
+      ],
+      "required_approval": true,
+      "status": "needs_review",
+      "notes": "Equipment workflows and thresholds are not encoded; verify current official guidance.",
+      "risk_flags": [
+        "official_source_needs_review"
+      ]
+    }
+  ],
+  "submissions": [],
+  "settlement_requirements": [
+    {
+      "requirement_id": "SET-GENERIC-BUDGET-PROOF",
+      "category": "needs_review",
+      "proof_type_required": true,
+      "approval_required": true,
+      "evidence_required": true,
+      "status": "needs_review",
+      "notes": "Generic proof/approval/evidence reminder only; do not infer cost eligibility.",
+      "risk_flags": [
+        "official_source_needs_review"
+      ]
+    }
+  ]
+}

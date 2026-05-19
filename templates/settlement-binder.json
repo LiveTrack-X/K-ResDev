@@ -1,0 +1,46 @@
+{
+  "root": ".",
+  "status": "needs_review",
+  "item_count": 1,
+  "linked_evidence_count": 1,
+  "finding_count": 1,
+  "high_count": 0,
+  "medium_count": 1,
+  "low_count": 0,
+  "items": [
+    {
+      "ledger_id": "BUD-2026-001",
+      "date": "2026-05-01",
+      "vendor": "Vendor",
+      "amount": 1000.0,
+      "currency": "KRW",
+      "category": "materials",
+      "proof_type": "receipt",
+      "approval_reference": "APR-2026-BUD-001",
+      "evidence_ids": [
+        "EVI-2026-ABCD1234"
+      ],
+      "evidence_count": 1,
+      "source_file": "references/budget-ledger.csv",
+      "source_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "review_status": "needs_review",
+      "finding_codes": [
+        "budget_ledger_missing_approval_reference"
+      ],
+      "risk_flags": []
+    }
+  ],
+  "findings": [
+    {
+      "code": "budget_ledger_missing_approval_reference",
+      "severity": "medium",
+      "message": "Budget ledger item is missing approval reference.",
+      "ledger_id": "BUD-2026-001",
+      "path": "state/budget-ledger.json",
+      "suggested_action": "Link a supplied approval reference before settlement review."
+    }
+  ],
+  "markdown_path": "reports/settlement-binder.md",
+  "json_path": "state/settlement-binder.json",
+  "warnings": []
+}

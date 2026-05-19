@@ -2,6 +2,13 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from .admin_operating import (
+    generate_settlement_binder,
+    review_admin_calendar,
+    review_admin_change_ledger,
+    review_admin_obligation_profile_pack,
+    review_admin_obligations,
+)
 from .artifact_authority import generate_artifact_authority
 from .approval import load_approval_records
 from .evidence_index import load_evidence_index
@@ -20,6 +27,7 @@ from .profile_promotion_revoke import load_profile_promotion_revoke_plan, load_p
 from .profile_lifecycle import generate_profile_lifecycle_ledger
 from .profile_pack_investigation import generate_profile_pack_investigation_bundle
 from .profile_pack_investigation_package import generate_profile_pack_investigation_package
+from .profile_pack_package_receipt import summarize_profile_pack_package_receipts
 from .profile_pack_drilldown import generate_profile_pack_readiness_drilldown
 from .profile_pack_readiness import generate_profile_pack_readiness
 from .profile_review import generate_profile_review
@@ -84,6 +92,16 @@ def generate_workspace_summary(
         if (workspace / "state" / "profile-pack-investigation-bundle.json").exists()
         else None
     )
+    profile_pack_receipt = (
+        summarize_profile_pack_package_receipts(workspace)
+        if (workspace / "state" / "profile-pack-investigation-package.json").exists()
+        else None
+    )
+    admin_profile_pack = review_admin_obligation_profile_pack(profile.profile_id) if profile else None
+    admin_obligations = review_admin_obligations(workspace)
+    settlement_binder = generate_settlement_binder(workspace)
+    admin_change_ledger = review_admin_change_ledger(workspace)
+    admin_calendar = review_admin_calendar(workspace)
     trace = generate_workspace_trace(workspace)
     trace_passport = generate_trace_passport(workspace)
     weekly_review = load_latest_weekly_review(workspace)
@@ -196,6 +214,27 @@ def generate_workspace_summary(
         profile_pack_package_included_artifact_count=profile_pack_package.included_artifact_count if profile_pack_package else 0,
         profile_pack_package_excluded_artifact_count=profile_pack_package.excluded_artifact_count if profile_pack_package else 0,
         profile_pack_package_missing_artifact_count=profile_pack_package.missing_artifact_count if profile_pack_package else 0,
+        profile_pack_package_receipt_status=profile_pack_receipt.status if profile_pack_receipt else None,
+        profile_pack_package_receipt_count=profile_pack_receipt.record_count if profile_pack_receipt else 0,
+        profile_pack_package_receipt_unresolved_count=profile_pack_receipt.unresolved_count if profile_pack_receipt else 0,
+        profile_pack_package_receipt_stale_count=profile_pack_receipt.stale_record_count if profile_pack_receipt else 0,
+        admin_profile_pack_status=admin_profile_pack.status if admin_profile_pack else None,
+        admin_profile_pack_obligation_count=admin_profile_pack.obligation_count if admin_profile_pack else 0,
+        admin_profile_pack_finding_count=admin_profile_pack.finding_count if admin_profile_pack else 0,
+        admin_obligation_status=admin_obligations.status,
+        admin_obligation_count=admin_obligations.obligation_count,
+        admin_submission_count=admin_obligations.submission_count,
+        admin_obligation_finding_count=admin_obligations.finding_count,
+        settlement_binder_status=settlement_binder.status,
+        settlement_binder_item_count=settlement_binder.item_count,
+        settlement_binder_finding_count=settlement_binder.finding_count,
+        admin_change_ledger_status=admin_change_ledger.status,
+        admin_change_count=admin_change_ledger.change_count,
+        admin_change_finding_count=admin_change_ledger.finding_count,
+        admin_calendar_status=admin_calendar.status,
+        admin_calendar_linked_deadline_count=admin_calendar.linked_deadline_count,
+        admin_calendar_due_soon_count=admin_calendar.due_soon_count,
+        admin_calendar_overdue_count=admin_calendar.overdue_count,
         trace_status=trace.status,
         trace_node_count=trace.node_count,
         trace_edge_count=trace.edge_count,
@@ -268,6 +307,26 @@ def render_workspace_summary_markdown(summary: WorkspaceSummaryResult) -> str:
         f"| Profile pack investigation package | {_escape(summary.profile_pack_package_status or '-')} |",
         f"| Profile pack package included artifacts | {summary.profile_pack_package_included_artifact_count} |",
         f"| Profile pack package excluded artifacts | {summary.profile_pack_package_excluded_artifact_count} |",
+        f"| Profile pack package receipts | {_escape(summary.profile_pack_package_receipt_status or '-')} |",
+        f"| Profile pack package receipt records | {summary.profile_pack_package_receipt_count} |",
+        f"| Profile pack package receipt unresolved | {summary.profile_pack_package_receipt_unresolved_count} |",
+        f"| Admin profile pack | {_escape(summary.admin_profile_pack_status or '-')} |",
+        f"| Admin profile pack obligations | {summary.admin_profile_pack_obligation_count} |",
+        f"| Admin profile pack findings | {summary.admin_profile_pack_finding_count} |",
+        f"| Admin obligations | {_escape(summary.admin_obligation_status or '-')} |",
+        f"| Admin obligation count | {summary.admin_obligation_count} |",
+        f"| Admin submission count | {summary.admin_submission_count} |",
+        f"| Admin obligation findings | {summary.admin_obligation_finding_count} |",
+        f"| Settlement binder | {_escape(summary.settlement_binder_status or '-')} |",
+        f"| Settlement binder items | {summary.settlement_binder_item_count} |",
+        f"| Settlement binder findings | {summary.settlement_binder_finding_count} |",
+        f"| Admin change ledger | {_escape(summary.admin_change_ledger_status or '-')} |",
+        f"| Admin changes | {summary.admin_change_count} |",
+        f"| Admin change findings | {summary.admin_change_finding_count} |",
+        f"| Admin calendar | {_escape(summary.admin_calendar_status or '-')} |",
+        f"| Admin calendar linked deadlines | {summary.admin_calendar_linked_deadline_count} |",
+        f"| Admin calendar due soon | {summary.admin_calendar_due_soon_count} |",
+        f"| Admin calendar overdue | {summary.admin_calendar_overdue_count} |",
         f"| Profile sources | {summary.profile_source_count} |",
         f"| Verified profile sources | {summary.profile_verified_source_count} |",
         f"| Workspace discovery | {_escape(summary.discovery_status or '-')} |",
@@ -327,6 +386,7 @@ def render_workspace_summary_markdown(summary: WorkspaceSummaryResult) -> str:
         f"| Weekly review | {summary.weekly_review_item_count} | status: {_escape(summary.weekly_review_status or '-')}; high items: {summary.weekly_review_high_count} |",
         f"| Workspace dashboard | {summary.dashboard_card_count} | status: {_escape(summary.dashboard_status or '-')} |",
         f"| Budget ledger | {summary.budget_ledger_count} | status: {_escape(summary.budget_ledger_status or '-')}; findings: {summary.budget_ledger_finding_count}; totals: {_format_float_counts(summary.budget_total_by_currency)} |",
+        f"| Settlement binder | {summary.settlement_binder_item_count} | status: {_escape(summary.settlement_binder_status or '-')}; findings: {summary.settlement_binder_finding_count} |",
         f"| Reference corpus | {summary.reference_corpus_count} | status: {_escape(summary.reference_corpus_status or '-')}; rejections: {summary.reference_rejection_count}; high: {summary.reference_corpus_high_count} |",
         f"| Research claim matrix | {summary.research_claim_count} | status: {_escape(summary.research_claim_matrix_status or '-')}; findings: {summary.research_claim_matrix_finding_count} |",
         f"| Profile integrity | {summary.profile_integrity_finding_count} | status: {_escape(summary.profile_integrity_status or '-')}; verified sources: {summary.profile_verified_source_count} |",
@@ -344,6 +404,11 @@ def render_workspace_summary_markdown(summary: WorkspaceSummaryResult) -> str:
         f"| Profile pack readiness drilldown | {summary.profile_pack_drilldown_item_count} | status: {_escape(summary.profile_pack_drilldown_status or '-')}; missing artifacts: {summary.profile_pack_drilldown_missing_artifact_count}; unmatched: {summary.profile_pack_drilldown_unmatched_count} |",
         f"| Profile pack investigation bundle | {summary.profile_pack_investigation_item_count} | status: {_escape(summary.profile_pack_investigation_status or '-')}; missing human review: {summary.profile_pack_investigation_missing_human_review_count}; official-source checks: {summary.profile_pack_investigation_official_source_check_count} |",
         f"| Profile pack investigation package | {summary.profile_pack_package_included_artifact_count} | status: {_escape(summary.profile_pack_package_status or '-')}; excluded raw/upstream paths: {summary.profile_pack_package_excluded_artifact_count}; missing artifacts: {summary.profile_pack_package_missing_artifact_count} |",
+        f"| Profile pack package receipts | {summary.profile_pack_package_receipt_count} | status: {_escape(summary.profile_pack_package_receipt_status or '-')}; unresolved: {summary.profile_pack_package_receipt_unresolved_count}; stale: {summary.profile_pack_package_receipt_stale_count} |",
+        f"| Admin profile pack | {summary.admin_profile_pack_obligation_count} | status: {_escape(summary.admin_profile_pack_status or '-')}; findings: {summary.admin_profile_pack_finding_count} |",
+        f"| Admin obligations | {summary.admin_obligation_count} | status: {_escape(summary.admin_obligation_status or '-')}; submissions: {summary.admin_submission_count}; findings: {summary.admin_obligation_finding_count} |",
+        f"| Admin change ledger | {summary.admin_change_count} | status: {_escape(summary.admin_change_ledger_status or '-')}; findings: {summary.admin_change_finding_count} |",
+        f"| Admin calendar | {summary.admin_calendar_linked_deadline_count} | status: {_escape(summary.admin_calendar_status or '-')}; due soon: {summary.admin_calendar_due_soon_count}; overdue: {summary.admin_calendar_overdue_count} |",
         f"| Workspace trace | {summary.trace_node_count} | status: {_escape(summary.trace_status or '-')}; findings: {summary.trace_finding_count} |",
         f"| Trace passport | {summary.checkpoint_count} | status: {_escape(summary.trace_passport_status or '-')}; latest: {_escape(summary.latest_checkpoint_id or '-')}; findings: {summary.trace_passport_finding_count} |",
         "",

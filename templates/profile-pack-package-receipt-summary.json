@@ -1,0 +1,47 @@
+{
+  "root": ".",
+  "status": "needs_review",
+  "package_path": "state/profile-pack-investigation-package.json",
+  "package_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "package_id": "PPIP-2026-ABCD1234",
+  "package_status": "needs_review",
+  "record_count": 1,
+  "received_count": 0,
+  "accepted_for_review_count": 1,
+  "needs_changes_count": 0,
+  "rejected_count": 0,
+  "unresolved_count": 1,
+  "stale_record_count": 0,
+  "missing_package_id_count": 0,
+  "finding_count": 1,
+  "high_count": 0,
+  "medium_count": 1,
+  "low_count": 0,
+  "records": [
+    {
+      "receipt_id": "PPR-2026-ABCD1234",
+      "package_id": "PPIP-2026-ABCD1234",
+      "package_manifest_path": "state/profile-pack-investigation-package.json",
+      "package_manifest_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "decision": "accepted_for_review",
+      "reviewer": "Reviewer",
+      "reviewed_at": "2026-05-19T00:00:00Z",
+      "notes": "Package received for review.",
+      "risk_flags": []
+    }
+  ],
+  "findings": [
+    {
+      "code": "profile_pack_package_receipt_missing",
+      "severity": "medium",
+      "message": "No package receipt found.",
+      "receipt_id": null,
+      "package_id": "PPIP-2026-ABCD1234",
+      "path": "state/profile-pack-package-receipts",
+      "suggested_action": "Record a supplied reviewer receipt."
+    }
+  ],
+  "markdown_path": "reports/profile-pack-package-receipt-summary.md",
+  "json_path": "state/profile-pack-package-receipt-summary.json",
+  "warnings": []
+}

@@ -1,0 +1,108 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "obligation_id": {
+      "title": "Obligation Id",
+      "type": "string"
+    },
+    "title": {
+      "title": "Title",
+      "type": "string"
+    },
+    "obligation_type": {
+      "title": "Obligation Type",
+      "type": "string"
+    },
+    "profile_id": {
+      "default": "national-rnd-basic",
+      "title": "Profile Id",
+      "type": "string"
+    },
+    "source_system": {
+      "default": "local",
+      "title": "Source System",
+      "type": "string"
+    },
+    "due_date": {
+      "anyOf": [
+        {
+          "format": "date",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Due Date"
+    },
+    "cadence": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Cadence"
+    },
+    "required_evidence_types": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Required Evidence Types",
+      "type": "array"
+    },
+    "required_approval": {
+      "default": true,
+      "title": "Required Approval",
+      "type": "boolean"
+    },
+    "linked_deadline_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Linked Deadline Id"
+    },
+    "status": {
+      "default": "needs_review",
+      "title": "Status",
+      "type": "string"
+    },
+    "notes": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Notes"
+    },
+    "risk_flags": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Risk Flags",
+      "type": "array"
+    }
+  },
+  "required": [
+    "obligation_id",
+    "title",
+    "obligation_type"
+  ],
+  "title": "AdminObligation",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

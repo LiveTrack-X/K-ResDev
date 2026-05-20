@@ -770,6 +770,16 @@ Implemented:
 
 Documentation work should reduce entry cost, not expose every internal command at the top level.
 
+### Task 67: Capability map for current user-facing scope
+
+Implemented:
+- `guides/capability-map.md` summarizing current K-ResDev capabilities by user workflow
+- explicit "what not to claim" section for official submission, cost eligibility, agency rules, citation support, and research conclusions
+- README, SKILL, and documentation-map links to the capability map
+- doc-boundary tests that keep the capability map discoverable
+
+The capability map should stay user-facing and conservative. It should explain what the skill can help inspect or prepare without implying final official approval.
+
 ## Safety constraints
 
 - Never alter raw files.

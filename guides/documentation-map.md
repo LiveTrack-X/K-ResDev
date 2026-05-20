@@ -29,6 +29,7 @@ SKILL.md / README.md
 | `SKILL.md` | GPT/Codex가 실제 작업 중 읽는 에이전트 운영 계약 |
 | `README.md` | 프로젝트 소개와 가장 짧은 시작 안내 |
 | `guides/user-guide.md` | 처음 쓰는 사람을 위한 한글 진입 문서 |
+| `guides/capability-map.md` | 지금 할 수 있는 일과 하면 안 되는 말을 한눈에 정리 |
 | `guides/operations-guide.md` | 운영자와 에이전트가 반복 점검을 수행하는 방법 |
 | `guides/verification-core.md` | Python CLI 검증 명령 지도 |
 | `guides/agent-skill-boundary.md` | 스킬 본체와 선택적 검증 코어의 경계 |
@@ -47,6 +48,7 @@ SKILL.md / README.md
 ```text
 README.md
 -> guides/user-guide.md
+-> guides/capability-map.md
 -> guides/verification-core.md
 ```
 
@@ -56,6 +58,7 @@ README.md
 SKILL.md
 -> guides/operations-guide.md
 -> guides/documentation-map.md
+-> guides/capability-map.md
 -> 필요한 세부 guide
 ```
 

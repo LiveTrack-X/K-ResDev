@@ -16,6 +16,7 @@ def test_korean_onboarding_docs_are_present_and_role_separated():
     readme = Path("README.md").read_text(encoding="utf-8")
     user_guide = Path("guides/user-guide.md").read_text(encoding="utf-8")
     doc_map = Path("guides/documentation-map.md").read_text(encoding="utf-8")
+    capability_map = Path("guides/capability-map.md").read_text(encoding="utf-8")
     operations = Path("guides/operations-guide.md").read_text(encoding="utf-8")
     boundary = Path("guides/agent-skill-boundary.md").read_text(encoding="utf-8")
     core = Path("guides/verification-core.md").read_text(encoding="utf-8")
@@ -28,6 +29,9 @@ def test_korean_onboarding_docs_are_present_and_role_separated():
     assert "문서 읽는 순서" in readme
     assert "처음 쓰는 사람을 위한 한글 진입 문서" in user_guide
     assert "전체 문서를 한 번에 다 읽지 않도록 돕는 길잡이" in doc_map
+    assert "지금 할 수 있는 일과 하면 안 되는 말" in doc_map
+    assert "K-ResDev가 지금 할 수 있는 일" in capability_map
+    assert "공식 제출 가능하다." in capability_map
     assert "운영하는 GPT/Codex 에이전트와 프로젝트 관리자를 위한 문서" in operations
     assert "K-ResDev는 GPT/Codex 에이전트 스킬이 본체다." in boundary
     assert "CLI는 사용자 경험의 중심이 아니다." in core

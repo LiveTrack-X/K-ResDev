@@ -72,6 +72,9 @@ guides/user-guide.md
 guides/documentation-map.md
   전체 문서 읽는 순서와 역할 지도
 
+guides/capability-map.md
+  지금 K-ResDev가 할 수 있는 일과 하면 안 되는 말
+
 guides/operations-guide.md
   운영자/에이전트용 실행 흐름
 

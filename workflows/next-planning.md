@@ -145,7 +145,7 @@ Implemented scope:
 - added `guides/user-guide.md` for first-time users;
 - added `guides/operations-guide.md` for operators and agents;
 - rewrote `guides/agent-skill-boundary.md` and `guides/verification-core.md` in Korean;
-- added `guides/documentation-map.md` and polished short guide docs into Korean-first navigation documents;
+- added `guides/documentation-map.md`, `guides/capability-map.md`, and polished short guide docs into Korean-first navigation documents;
 - updated agent UI metadata to Korean-centered wording;
 - added doc-boundary tests so future changes keep the skill-first structure visible.
 

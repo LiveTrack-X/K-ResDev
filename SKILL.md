@@ -144,6 +144,7 @@ Suggested next actions
 
 - `guides/user-guide.md`: 처음 쓰는 사람을 위한 한글 진입 문서.
 - `guides/documentation-map.md`: 문서가 많을 때 읽는 순서와 역할 지도.
+- `guides/capability-map.md`: 현재 할 수 있는 일과 하면 안 되는 말.
 - `guides/operations-guide.md`: 운영자/에이전트용 실행 흐름.
 - `guides/agent-skill-boundary.md`: 스킬과 검증 코어의 경계.
 - `guides/verification-core.md`: 선택적 Python 검증 명령 지도.
